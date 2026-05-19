@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a472a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mủ Cao Su">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Mủ Cao Su Pro v1.6</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
+:root{
+  --gd:#1a472a;--gm:#2d6a4f;--gl:#40916c;--gp:#74c69d;--gb:#d8f3dc;
+  --am:#f4a261;--ad:#e76f51;
+  --g50:#f8faf9;--g100:#f0f4f2;--g200:#e0e8e4;--g400:#9ab0a5;--g600:#5a7a6a;--g800:#2d3d36;
+  --red:#e63946;
+  --s1:0 1px 4px rgba(0,0,0,.1);--s2:0 4px 16px rgba(0,0,0,.12);--s3:0 8px 32px rgba(0,0,0,.18);
+  --r:12px;--rs:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g800);min-height:100vh;max-width:480px;margin:0 auto;overflow-x:hidden}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;position:sticky;top:0;z-index:100;box-shadow:var(--s2)}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 6px}
+.logo{display:flex;align-items:center;gap:8px}
+.logo-ico{width:34px;height:34px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-txt{font-size:15px;font-weight:800}
+.logo-ver{font-size:9px;opacity:.6}
+.hdr-acts{display:flex;gap:6px}
+.ico-btn{width:34px;height:34px;background:rgba(255,255,255,.15);border:none;border-radius:10px;color:#fff;font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s}
+.ico-btn:active{background:rgba(255,255,255,.3)}
+
+/* TABS */
+.tab-bar{display:flex;background:rgba(0,0,0,.2);margin:0 14px 10px;border-radius:10px;padding:3px}
+.tab-btn{flex:1;padding:7px 0;background:transparent;border:none;color:rgba(255,255,255,.6);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:600;border-radius:8px;cursor:pointer;transition:all .2s}
+.tab-btn.active{background:#fff;color:var(--gd);box-shadow:var(--s1)}
+
+/* PAGE */
+.tab-pane{display:none}.tab-pane.active{display:block}
+.page{padding:0 10px 100px}
+
+/* DATE BAR */
+.date-bar{background:#fff;border-radius:var(--rs);padding:5px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;box-shadow:var(--s1);cursor:pointer;border:2px solid transparent;transition:border-color .2s;min-height:34px}
+.date-bar:active{border-color:var(--gp)}
+.date-val{font-size:13px;font-weight:700;color:var(--gd)}
+.date-hint{font-size:10px;color:var(--g400);margin-left:auto}
+
+/* FORM CARD */
+.fc{background:#fff;border-radius:var(--r);padding:10px 12px;margin-bottom:6px;box-shadow:var(--s1)}
+.fc.ban-fc{border-left:3px solid var(--am)}
+.fr{margin-bottom:8px;position:relative}
+.fl{font-size:11px;font-weight:600;color:var(--g600);margin-bottom:4px;display:block}
+.fi{width:100%;padding:9px 11px;border:1.5px solid var(--g200);border-radius:var(--rs);font-family:'Be Vietnam Pro',sans-serif;font-size:14px;color:var(--g800);background:var(--g50);outline:none;transition:border-color .2s;-webkit-appearance:none}
+.fi:focus{border-color:var(--gl);background:#fff;box-shadow:0 0 0 3px rgba(64,145,108,.1)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* LOAI MU DROPDOWN */
+.loai-wrap{position:relative}
+.loai-btn{width:100%;padding:9px 11px;border:1.5px solid var(--g200);border-radius:var(--rs);font-family:'Be Vietnam Pro',sans-serif;font-size:14px;font-weight:600;color:var(--gd);background:var(--g50);text-align:left;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:border-color .2s}
+.loai-btn:focus{outline:none;border-color:var(--gl);background:#fff}
+.loai-btn.ban-color{color:var(--ad)}
+.loai-arrow{font-size:10px;opacity:.5;transition:transform .2s}
+.loai-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border-radius:var(--r);box-shadow:var(--s3);z-index:300;overflow:hidden;border:1.5px solid var(--g200);display:none}
+.loai-dropdown.open{display:block;animation:fadeDown .15s ease}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.loai-opt{padding:11px 14px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--g100);transition:background .12s}
+.loai-opt:last-child{border-bottom:none}
+.loai-opt:active,.loai-opt:hover{background:var(--gb)}
+.loai-opt.sel{background:var(--gb);color:var(--gd)}
+
+/* AUTOCOMPLETE */
+.ac-list{position:absolute;top:100%;left:0;right:0;background:#fff;border-radius:var(--rs);box-shadow:var(--s3);z-index:200;max-height:160px;overflow-y:auto;border:1.5px solid var(--gp);display:none}
+.ac-item{padding:9px 12px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--g100)}
+.ac-item:last-child{border-bottom:none}
+.ac-item:active{background:var(--gb)}
+
+/* THANH TIEN */
+.tt-box{background:linear-gradient(135deg,var(--gd),var(--gm));border-radius:var(--r);padding:10px 14px;color:#fff;margin-top:2px}
+.tt-box.ban-tt{background:linear-gradient(135deg,#b5341a,var(--ad))}
+.tt-lbl{font-size:9px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.tt-so{font-size:20px;font-weight:800;letter-spacing:-.5px}
+.tt-chu{font-size:10px;opacity:.85;margin-top:2px;font-style:italic;line-height:1.4}
+
+/* BUTTONS */
+.btn-row{display:flex;gap:8px;margin-top:10px}
+.btn-luu{flex:2;padding:12px;background:linear-gradient(135deg,var(--gl),var(--gm));color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 3px 10px rgba(64,145,108,.35);transition:transform .15s}
+.btn-luu:active{transform:scale(.97)}
+.btn-luu.ban-luu{background:linear-gradient(135deg,var(--am),var(--ad))}
+.btn-luu.edit-mode{background:linear-gradient(135deg,var(--am),var(--ad))}
+.btn-huy{flex:1;padding:12px;background:#fff;color:var(--g600);border:1.5px solid var(--g200);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
+.btn-huy:active{background:var(--g100)}
+.btn-xoa{flex:1;padding:12px;background:var(--red);color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
+
+/* SECTION */
+.sec-title{font-size:12px;font-weight:700;color:var(--gd);margin:10px 0 6px;display:flex;align-items:center;gap:6px}
+.sec-badge{background:var(--gl);color:#fff;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700}
+
+/* TABLE */
+.tbl-wrap{background:#fff;border-radius:var(--r);box-shadow:var(--s1);overflow:hidden}
+.tbl{width:100%;border-collapse:collapse;font-size:11px}
+.tbl th{background:var(--gd);color:#fff;padding:7px 4px;text-align:center;font-weight:600;font-size:10px}
+.tbl.ban-tbl th{background:#b5341a}
+.tbl td{padding:8px 4px;text-align:center;border-bottom:1px solid var(--g100);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr.edited td{background:#fffbea}
+.tbl tr.edited{outline:1px solid #ffd166}
+.tbl tr:active td{background:var(--gb)}
+.tc-ten{text-align:left!important;font-weight:600;font-size:11px;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-left:7px!important}
+.tc-gui{cursor:pointer;user-select:none;font-size:15px}
+.tc-gui.done{color:var(--gm)}
+
+/* THONG KE */
+.tk-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+.tk-card{background:#fff;border-radius:var(--r);padding:10px 12px;box-shadow:var(--s1)}
+.tk-card.full{grid-column:1/-1}
+.tk-card.total{background:linear-gradient(135deg,var(--gd),var(--gl));color:#fff}
+.tk-card.ban-total{background:linear-gradient(135deg,#b5341a,var(--ad));color:#fff}
+.tk-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--g400)}
+.tk-card.total .tk-lbl,.tk-card.ban-total .tk-lbl{color:rgba(255,255,255,.7)}
+.tk-val{font-size:15px;font-weight:800;color:var(--gd);margin-top:2px}
+.tk-card.total .tk-val,.tk-card.ban-total .tk-val{color:#fff;font-size:18px}
+.tk-sub{font-size:10px;color:var(--g600);margin-top:1px}
+
+/* MODAL OVERLAY */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(2px)}
+.modal.show{display:flex}
+.modal.center{align-items:center;padding:20px}
+.modal-box{background:#fff;border-radius:20px 20px 0 0;padding:14px 16px 36px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;animation:slideUp .22s ease}
+.modal-box.center-box{border-radius:16px;padding:22px;animation:popIn .2s ease;max-height:90vh}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes popIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+.modal-handle{width:36px;height:4px;background:var(--g200);border-radius:2px;margin:0 auto 14px}
+.modal-title{font-size:15px;font-weight:800;color:var(--gd);margin-bottom:14px;text-align:center}
+
+/* POPUP XAC NHAN / CHI TIET */
+.cfm-ico{font-size:36px;text-align:center;margin-bottom:8px}
+.cfm-ttl{font-size:15px;font-weight:800;text-align:center;color:var(--g800);margin-bottom:12px}
+.cfm-detail{background:var(--g50);border-radius:var(--rs);padding:12px 14px;margin-bottom:14px}
+.cfm-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--g100);font-size:13px}
+.cfm-row:last-child{border-bottom:none}
+.cfm-row-lbl{color:var(--g600);font-weight:500}
+.cfm-row-val{font-weight:700;color:var(--g800)}
+.cfm-total{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;background:var(--gd);border-radius:var(--rs);color:#fff;font-size:14px;font-weight:700;margin-bottom:14px}
+.cfm-btns{display:flex;gap:8px}
+.cfm-btn{flex:1;padding:11px;border-radius:10px;border:none;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+.cfm-btn.y{background:var(--gl);color:#fff}
+.cfm-btn.n{background:var(--g100);color:var(--g800)}
+
+/* SO GUI MODAL */
+.sg-kh-item{padding:11px 14px;font-size:14px;font-weight:600;cursor:pointer;border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:10px;transition:background .12s}
+.sg-kh-item:last-child{border-bottom:none}
+.sg-kh-item:active{background:var(--gb)}
+.sg-rec{padding:9px 12px;border-bottom:1px solid var(--g100);cursor:pointer;transition:background .12s}
+.sg-rec:last-child{border-bottom:none}
+.sg-rec:active{background:var(--gb)}
+.sg-rec-row{display:flex;justify-content:space-between;font-size:12px}
+.sg-rec-ten{font-weight:700;font-size:13px;color:var(--gd)}
+.sg-rec-tien{font-weight:700;color:var(--gd);font-size:13px}
+.sg-total-bar{background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;padding:10px 14px;border-radius:var(--rs);margin:10px 0;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700}
+.sg-edit-box{background:var(--g50);border-radius:var(--r);padding:12px;margin-top:10px}
+.badge-gui{display:inline-block;background:#e8f5e9;color:var(--gm);font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:4px}
+
+/* KH MODAL */
+.kh-item{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--g100)}
+.kh-name{font-size:13px;font-weight:600}
+.kh-acts{display:flex;gap:6px}
+.kh-btn{padding:4px 10px;border-radius:6px;border:none;font-size:11px;font-weight:600;cursor:pointer}
+.kh-btn.e{background:var(--gb);color:var(--gd)}
+.kh-btn.d{background:#ffe4e4;color:var(--red)}
+.kh-add{display:flex;gap:8px;margin-top:10px}
+.kh-inp{flex:1;padding:9px 11px;border:1.5px solid var(--g200);border-radius:var(--rs);font-family:'Be Vietnam Pro',sans-serif;font-size:14px;outline:none}
+.kh-inp:focus{border-color:var(--gl)}
+.btn-add{padding:9px 14px;background:var(--gl);color:#fff;border:none;border-radius:var(--rs);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+
+/* TOAST */
+.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%);background:var(--gd);color:#fff;padding:9px 18px;border-radius:20px;font-size:12px;font-weight:600;z-index:1000;opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1}
+
+input[type=date]{width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:var(--rs);font-family:'Be Vietnam Pro',sans-serif;font-size:16px;color:var(--g800);background:var(--g50);outline:none;-webkit-appearance:none}
+input[type=date]:focus{border-color:var(--gl)}
+.no-data{font-size:12px;color:var(--g400);text-align:center;padding:18px}
+.back-btn{background:none;border:none;color:var(--gd);font-size:14px;font-weight:700;cursor:pointer;padding:4px 0;display:flex;align-items:center;gap:4px;margin-bottom:10px;font-family:'Be Vietnam Pro',sans-serif}
+
+/* SỔ GỬI DROPDOWN */
+.sg-drop-wrap{position:relative}
+.sg-dropdown{position:fixed;top:54px;right:10px;background:#fff;border-radius:var(--r);box-shadow:var(--s3);z-index:400;min-width:200px;max-width:280px;border:1.5px solid var(--g200);display:none;animation:fadeDown .15s ease;max-height:60vh;overflow-y:auto}
+.sg-dropdown.open{display:block}
+.sg-drop-title{font-size:11px;font-weight:700;color:var(--g600);padding:10px 14px 6px;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--g100)}
+.sg-drop-item{padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;transition:background .12s}
+.sg-drop-item:last-child{border-bottom:none}
+.sg-drop-item:active{background:var(--gb)}
+.sg-drop-item-sub{font-size:10px;color:var(--g400);font-weight:400;margin-top:1px}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-top">
+    <div class="logo">
+      <div class="logo-ico">🌿</div>
+      <div>
+        <div class="logo-txt">Mủ Cao Su Pro</div>
+        <div class="logo-ver">v1.6 · Quản lý mua bán</div>
+      </div>
+    </div>
+    <div class="hdr-acts sg-drop-wrap">
+      <button class="ico-btn" id="sg-btn" onclick="toggleSgDrop(event)" title="Sổ gửi">📒</button>
+      <div class="sg-dropdown" id="sg-dropdown">
+        <div class="sg-drop-title">📒 Sổ gửi — Chọn khách</div>
+        <div id="sg-drop-list"></div>
+      </div>
+      <button class="ico-btn" id="kh-btn" onclick="openKH()" title="Khách hàng">👥</button>
+    </div>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('mua')">🛒 Thu Mua</button>
+    <button class="tab-btn" onclick="switchTab('ban')">💰 Bán Ra</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ===== TAB MUA ===== -->
+<div class="tab-pane active" id="tab-mua">
+<div class="page">
+  <div class="date-bar" onclick="openDate('mua')">
+    <span>📅</span>
+    <span class="date-val" id="mua-date-val">--</span>
+    <span class="date-hint">Nhấn để đổi ngày</span>
+  </div>
+  <div class="fc" id="mua-fc">
+    <div class="g2">
+      <div class="fr">
+        <label class="fl">Loại mủ</label>
+        <div class="loai-wrap">
+          <button class="loai-btn" id="mua-loai-btn" onclick="toggleLoai('mua')">
+            <span id="mua-loai-txt">-- Chọn --</span><span class="loai-arrow" id="mua-loai-arr">▼</span>
+          </button>
+          <div class="loai-dropdown" id="mua-loai-dd">
+            <div class="loai-opt" onclick="chonLoai('mua','nuoc')">💧 Mủ nước</div>
+            <div class="loai-opt" onclick="chonLoai('mua','chen')">🥣 Mủ chén</div>
+            <div class="loai-opt" onclick="chonLoai('mua','day')">🪢 Mủ dây</div>
+            <div class="loai-opt" onclick="chonLoai('mua','dong')">🧱 Mủ đông</div>
+          </div>
+        </div>
+      </div>
+      <div class="fr">
+        <label class="fl">Đơn giá (đ/kg)</label>
+        <input type="text" inputmode="numeric" id="mua-gia" class="fi" placeholder="0" oninput="onGia(this,'mua')" onkeydown="nf(event,'mua-ten')">
+      </div>
+    </div>
+    <div class="fr">
+      <label class="fl">Tên người bán</label>
+      <input type="text" id="mua-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('mua')" autocomplete="off" onkeydown="tenKey(event,'mua')">
+      <div class="ac-list" id="mua-ac"></div>
+    </div>
+    <div class="g2">
+      <div class="fr">
+        <label class="fl">Số kg</label>
+        <input type="number" id="mua-kg" class="fi" placeholder="0.0" step="0.1" oninput="calc('mua')" onkeydown="kgKey(event,'mua')">
+      </div>
+      <div class="fr" id="mua-do-row" style="display:none">
+        <label class="fl" id="mua-do-lbl">Độ</label>
+        <input type="number" id="mua-do" class="fi" placeholder="0" step="0.01" oninput="calc('mua')">
+      </div>
+    </div>
+    <div class="tt-box">
+      <div class="tt-lbl">Thành tiền</div>
+      <div class="tt-so" id="mua-tt-so">0 ₫</div>
+      <div class="tt-chu" id="mua-tt-chu">--</div>
+    </div>
+    <div class="btn-row" id="mua-btns">
+      <button class="btn-luu" onclick="luuGD('mua')">✅ Lưu giao dịch</button>
+      <button class="btn-huy" onclick="huyGD('mua')">Huỷ</button>
+    </div>
+    <div class="btn-row" id="mua-edit-btns" style="display:none">
+      <button class="btn-luu edit-mode" onclick="luuSua('mua')">💾 Lưu thay đổi</button>
+      <button class="btn-huy" onclick="huySua('mua')">Huỷ</button>
+      <button class="btn-xoa" onclick="xoaGD('mua')">🗑️</button>
+    </div>
+  </div>
+  <div class="sec-title">📋 Chi tiết thu mua trong ngày <span class="sec-badge" id="mua-badge">0</span></div>
+  <div class="tbl-wrap">
+    <div class="no-data" id="mua-nodata">Chưa có giao dịch nào</div>
+    <table class="tbl" id="mua-tbl" style="display:none">
+      <thead><tr>
+        <th style="text-align:left;padding-left:7px">Tên</th>
+        <th>Kg</th>
+        <th id="mua-th-chat">Chất</th>
+        <th>Giá</th>
+        <th>Tiền</th>
+        <th>Gửi</th>
+      </tr></thead>
+      <tbody id="mua-tbody"></tbody>
+    </table>
+  </div>
+  <div class="sec-title" style="margin-top:12px">📊 Thống kê trong ngày</div>
+  <div class="tk-grid" id="mua-tk"></div>
+</div>
+</div>
+
+<!-- ===== TAB BAN ===== -->
+<div class="tab-pane" id="tab-ban">
+<div class="page">
+  <div class="date-bar" onclick="openDate('ban')">
+    <span>📅</span>
+    <span class="date-val" id="ban-date-val">--</span>
+    <span class="date-hint">Nhấn để đổi ngày</span>
+  </div>
+  <div class="fc ban-fc" id="ban-fc">
+    <div class="g2">
+      <div class="fr">
+        <label class="fl">Loại mủ</label>
+        <div class="loai-wrap">
+          <button class="loai-btn ban-color" id="ban-loai-btn" onclick="toggleLoai('ban')">
+            <span id="ban-loai-txt">-- Chọn --</span><span class="loai-arrow" id="ban-loai-arr">▼</span>
+          </button>
+          <div class="loai-dropdown" id="ban-loai-dd">
+            <div class="loai-opt" onclick="chonLoai('ban','nuoc')">💧 Mủ nước</div>
+            <div class="loai-opt" onclick="chonLoai('ban','chen')">🥣 Mủ chén</div>
+            <div class="loai-opt" onclick="chonLoai('ban','day')">🪢 Mủ dây</div>
+            <div class="loai-opt" onclick="chonLoai('ban','dong')">🧱 Mủ đông</div>
+          </div>
+        </div>
+      </div>
+      <div class="fr">
+        <label class="fl">Đơn giá (đ/kg)</label>
+        <input type="text" inputmode="numeric" id="ban-gia" class="fi" placeholder="0" oninput="onGia(this,'ban')" onkeydown="nf(event,'ban-ten')">
+      </div>
+    </div>
+    <div class="fr">
+      <label class="fl">Tên người mua</label>
+      <input type="text" id="ban-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('ban')" autocomplete="off" onkeydown="tenKey(event,'ban')">
+      <div class="ac-list" id="ban-ac"></div>
+    </div>
+    <div class="g2">
+      <div class="fr">
+        <label class="fl">Số kg</label>
+        <input type="number" id="ban-kg" class="fi" placeholder="0.0" step="0.1" oninput="calc('ban')" onkeydown="kgKey(event,'ban')">
+      </div>
+      <div class="fr" id="ban-do-row" style="display:none">
+        <label class="fl" id="ban-do-lbl">Độ</label>
+        <input type="number" id="ban-do" class="fi" placeholder="0" step="0.01" oninput="calc('ban')">
+      </div>
+    </div>
+    <div class="tt-box ban-tt">
+      <div class="tt-lbl">Thành tiền</div>
+      <div class="tt-so" id="ban-tt-so">0 ₫</div>
+      <div class="tt-chu" id="ban-tt-chu">--</div>
+    </div>
+    <div class="btn-row" id="ban-btns">
+      <button class="btn-luu ban-luu" onclick="luuGD('ban')">✅ Lưu giao dịch</button>
+      <button class="btn-huy" onclick="huyGD('ban')">Huỷ</button>
+    </div>
+    <div class="btn-row" id="ban-edit-btns" style="display:none">
+      <button class="btn-luu edit-mode" onclick="luuSua('ban')">💾 Lưu thay đổi</button>
+      <button class="btn-huy" onclick="huySua('ban')">Huỷ</button>
+      <button class="btn-xoa" onclick="xoaGD('ban')">🗑️</button>
+    </div>
+  </div>
+  <div class="sec-title" style="color:var(--ad)">📋 Chi tiết bán ra trong ngày <span class="sec-badge" id="ban-badge" style="background:var(--ad)">0</span></div>
+  <div class="tbl-wrap">
+    <div class="no-data" id="ban-nodata">Chưa có giao dịch nào</div>
+    <table class="tbl ban-tbl" id="ban-tbl" style="display:none">
+      <thead><tr>
+        <th style="text-align:left;padding-left:7px">Tên</th>
+        <th>Kg</th>
+        <th id="ban-th-chat">Chất</th>
+        <th>Giá</th>
+        <th>Tiền</th>
+        <th>Gửi</th>
+      </tr></thead>
+      <tbody id="ban-tbody"></tbody>
+    </table>
+  </div>
+  <div class="sec-title" style="color:var(--ad);margin-top:12px">📊 Thống kê bán ra trong ngày</div>
+  <div class="tk-grid" id="ban-tk"></div>
+</div>
+</div>
+
+<!-- MODAL DATE -->
+<div class="modal" id="modal-date">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📅 Chọn ngày</div>
+    <input type="date" id="date-inp">
+    <div style="height:10px"></div>
+    <button class="btn-luu" style="width:100%;margin-top:4px" onclick="applyDate()">Xác nhận</button>
+    <button class="btn-huy" style="width:100%;margin-top:6px" onclick="closeM('modal-date')">Đóng</button>
+  </div>
+</div>
+
+<!-- MODAL KH -->
+<div class="modal" id="modal-kh">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="kh-modal-title">👥 Danh sách khách hàng</div>
+    <div class="kh-add">
+      <input type="text" class="kh-inp" id="kh-inp" placeholder="Thêm khách hàng mới...">
+      <button class="btn-add" onclick="themKH()">+ Thêm</button>
+    </div>
+    <div id="kh-list" style="margin-top:10px;max-height:280px;overflow-y:auto"></div>
+    <button class="btn-huy" style="width:100%;margin-top:10px" onclick="closeM('modal-kh')">Đóng</button>
+  </div>
+</div>
+
+<!-- MODAL SO GUI - danh sach KH -->
+<div class="modal" id="modal-sg">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📒 Sổ gửi — Chọn khách hàng</div>
+    <div id="sg-kh-list" style="max-height:400px;overflow-y:auto;border-radius:var(--r);border:1px solid var(--g200)"></div>
+    <button class="btn-huy" style="width:100%;margin-top:12px" onclick="closeM('modal-sg')">Đóng</button>
+  </div>
+</div>
+
+<!-- MODAL SO GUI - chi tiet 1 KH -->
+<div class="modal" id="modal-sg-detail">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <button class="back-btn" onclick="closeSgDrop();closeM('modal-sg-detail')">← Quay lại</button>
+    <div class="modal-title" id="sg-detail-title">📒 Sổ gửi</div>
+    <div id="sg-detail-list" style="border-radius:var(--r);border:1px solid var(--g200);overflow:hidden;margin-bottom:8px"></div>
+    <div class="sg-total-bar">
+      <span>TỔNG CỘNG</span>
+      <span id="sg-total-val">0 ₫</span>
+    </div>
+    <button class="btn-huy" style="width:100%;margin-top:4px" onclick="closeM('modal-sg-detail')">Đóng</button>
+  </div>
+</div>
+
+<!-- MODAL SO GUI - sua 1 ghi chep -->
+<div class="modal" id="modal-sg-edit">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <button class="back-btn" id="sg-edit-back" onclick="">← Quay lại</button>
+    <div class="modal-title">✏️ Chỉnh sửa ghi chép</div>
+    <div id="sg-edit-form"></div>
+  </div>
+</div>
+
+<!-- MODAL POPUP XAC NHAN / CHI TIET -->
+<div class="modal center" id="modal-cfm">
+  <div class="modal-box center-box">
+    <div class="cfm-ico" id="cfm-ico">✅</div>
+    <div class="cfm-ttl" id="cfm-ttl">Xác nhận</div>
+    <div class="cfm-detail" id="cfm-detail" style="display:none"></div>
+    <div class="cfm-total" id="cfm-total" style="display:none">
+      <span>Thành tiền</span><span id="cfm-total-val"></span>
+    </div>
+    <div class="cfm-btns" id="cfm-btns">
+      <button class="cfm-btn n" onclick="closeCfm()">Huỷ</button>
+      <button class="cfm-btn y" id="cfm-yes" onclick="">Xác nhận</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// MỦ CAO SU PRO v1.3
+// Công thức:
+//   Mủ nước : kg × đơn giá × độ   (độ nhập thẳng, VD: 0.35)
+//   Mủ đông : (kg − khấu hao) × đơn giá
+//   Mủ chén, dây : kg × đơn giá
+// ============================================================
+
+const LOAI_LBL = {nuoc:'Mủ nước', chen:'Mủ chén', day:'Mủ dây', dong:'Mủ đông'};
+const LOAI_ICO = {nuoc:'💧', chen:'🥣', day:'🪢', dong:'🧱'};
+
+let curTab = 'mua';
+let curDate = {mua: today(), ban: today()};
+let editId  = {mua: null, ban: null};
+let dateTab = null;
+let rowT    = {};
+let tapT    = {mua:{}, ban:{}};
+let sgCurKH = null; // tên KH đang xem sổ gửi
+let sgEditId = null; // id record đang sửa trong sổ gửi
+
+// ─── STORAGE ───
+function lsGet(k){ try{ return JSON.parse(localStorage.getItem(k))||[] }catch{ return [] } }
+function lsGetO(k){ try{ return JSON.parse(localStorage.getItem(k))||{} }catch{ return {} } }
+function lsSet(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
+
+const gdKey = t => 'gd3_'+t;
+const khKey = t => 'kh3_'+t;
+const giaKey= t => 'gia3_'+t;
+const loaiKey=t => 'loai3_'+t;
+const sgKey  = () => 'sg3'; // sổ gửi: [{id, tab, gdId, date, ten, loai, kg, do, gia, tt}]
+
+function getGD(t){ return lsGet(gdKey(t)) }
+function setGD(t,v){ lsSet(gdKey(t),v) }
+function getGDDate(t,d){ return getGD(t).filter(g=>g.date===d) }
+function getKH(t){ return lsGet(khKey(t)) }
+function setKH(t,v){ lsSet(khKey(t),v) }
+function getGia(t){ return lsGetO(giaKey(t)) }
+function setGia(t,v){ lsSet(giaKey(t),v) }
+function getLoai(t){ return localStorage.getItem(loaiKey(t)) }
+function setLoai(t,v){ localStorage.setItem(loaiKey(t),v) }
+function getSG(){ return lsGet(sgKey()) }
+function setSG(v){ lsSet(sgKey(),v) }
+
+// ─── UTILS ───
+function today(){ return new Date().toISOString().split('T')[0] }
+function fmtDate(s){
+  if(!s) return '--';
+  const [y,m,d]=s.split('-');
+  const days=['CN','T2','T3','T4','T5','T6','T7'];
+  const dt=new Date(s+'T00:00:00');
+  return days[dt.getDay()]+', '+d+'/'+m+'/'+y;
+}
+function fmtNum(n){ return Math.round(n||0).toLocaleString('vi-VN') }
+function fmtGia(raw){
+  // bỏ ký tự không phải số
+  var digits = String(raw).replace(/[^0-9]/g,'');
+  if(!digits) return '';
+  return parseInt(digits,10).toLocaleString('vi-VN');
+}
+function getGiaVal(tab){
+  var raw = document.getElementById(tab+'-gia').value;
+  return parseFloat(String(raw).replace(/[^0-9]/g,''))||0;
+}
+function onGia(el, tab){
+  var pos = el.selectionStart;
+  var raw = el.value.replace(/[^0-9]/g,'');
+  var fmt = raw ? parseInt(raw,10).toLocaleString('vi-VN') : '';
+  el.value = fmt;
+  calc(tab);
+}
+
+// ─── ĐỌC SỐ TIỀN BẰNG CHỮ TIẾNG VIỆT ───
+function docTien(n){
+  n = Math.round(n||0);
+  if(!n) return 'Không đồng';
+  var ones=['','một','hai','ba','bốn','năm','sáu','bảy','tám','chín'];
+  var teens=['mười','mười một','mười hai','mười ba','mười bốn','mười lăm','mười sáu','mười bảy','mười tám','mười chín'];
+  function d2(x){
+    if(x===0) return '';
+    if(x<10) return ones[x];
+    if(x<20) return teens[x-10];
+    var t=Math.floor(x/10), o=x%10;
+    var r=ones[t]+' mươi';
+    if(o===1) r+=' mốt';
+    else if(o===5) r+=' lăm';
+    else if(o>0) r+=' '+ones[o];
+    return r;
+  }
+  function d3(x){
+    if(x===0) return '';
+    var h=Math.floor(x/100), rem=x%100;
+    var r='';
+    if(h>0) r=ones[h]+' trăm';
+    if(rem>0){
+      // thêm "lẻ" khi rem < 10 (VD: 607 → sáu trăm lẻ bảy)
+      var sep=(h>0&&rem<10)?' lẻ ':' ';
+      r+=sep+d2(rem);
+    }
+    return r.trim();
+  }
+  var ty  = Math.floor(n/1000000000);
+  var tr  = Math.floor((n%1000000000)/1000000);
+  var ngh = Math.floor((n%1000000)/1000);
+  var don = n%1000;
+  var parts=[];
+  if(ty)  parts.push(d3(ty)+' tỷ');
+  if(tr)  parts.push(d3(tr)+' triệu');
+  if(ngh) parts.push(d3(ngh)+' nghìn');
+  if(don) parts.push(d3(don));
+  var s=parts.join(' ').trim();
+  return s.charAt(0).toUpperCase()+s.slice(1)+' đồng';
+}
+
+// ─── CÔNG THỨC TÍNH ───
+function tinhTien(loai, kg, gia, doVal){
+  kg=parseFloat(kg)||0; gia=parseFloat(gia)||0; doVal=parseFloat(doVal)||0;
+  if(!kg||!gia) return 0;
+  if(loai==='nuoc') return kg*gia*doVal;
+  if(loai==='dong'){ const kt=kg-doVal; return kt>0?kt*gia:0; }
+  return kg*gia;
+}
+
+// ─── INIT ───
+document.addEventListener('DOMContentLoaded',()=>{
+  ['mua','ban'].forEach(t=>{
+    updDate(t);
+    const l=getLoai(t);
+    if(l) setLoaiUI(t,l,false);
+    renderTbl(t);
+    updTK(t);
+  });
+  // đóng dropdown khi click ngoài
+  document.addEventListener('click', e=>{
+    ['mua','ban'].forEach(t=>{
+      const dd=document.getElementById(t+'-loai-dd');
+      const btn=document.getElementById(t+'-loai-btn');
+      if(!btn.contains(e.target)&&!dd.contains(e.target)){
+        closeLoaiDD(t);
+      }
+    });
+    // đóng sg dropdown
+    const sgDd=document.getElementById('sg-dropdown');
+    const sgBtn=document.getElementById('sg-btn');
+    if(sgDd&&sgBtn&&!sgBtn.contains(e.target)&&!sgDd.contains(e.target)){
+      closeSgDrop();
+    }
+  });
+});
+
+// ─── TABS ───
+function switchTab(tab){
+  curTab=tab;
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&tab==='mua')||(i===1&&tab==='ban')));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+
+// ─── DATE ───
+function updDate(tab){
+  document.getElementById(tab+'-date-val').textContent=fmtDate(curDate[tab]);
+}
+function openDate(tab){
+  dateTab=tab;
+  document.getElementById('date-inp').value=curDate[tab];
+  openM('modal-date');
+}
+function applyDate(){
+  const v=document.getElementById('date-inp').value;
+  if(!v){ closeM('modal-date'); return; }
+  curDate[dateTab]=v;
+  updDate(dateTab);
+  closeM('modal-date');
+  huySua(dateTab); huyGD(dateTab);
+  renderTbl(dateTab); updTK(dateTab);
+  toast('Đã chuyển ngày '+fmtDate(v));
+}
+
+// ─── LOAI MU DROPDOWN ───
+function toggleLoai(tab){
+  const dd=document.getElementById(tab+'-loai-dd');
+  const arr=document.getElementById(tab+'-loai-arr');
+  const isOpen=dd.classList.contains('open');
+  // đóng cái kia
+  ['mua','ban'].forEach(t=>{ if(t!==tab) closeLoaiDD(t); });
+  if(isOpen){ closeLoaiDD(tab); } else {
+    dd.classList.add('open');
+    arr.style.transform='rotate(180deg)';
+  }
+}
+function closeLoaiDD(tab){
+  document.getElementById(tab+'-loai-dd').classList.remove('open');
+  document.getElementById(tab+'-loai-arr').style.transform='rotate(0deg)';
+}
+function chonLoai(tab, loai){
+  closeLoaiDD(tab);
+  setLoaiUI(tab, loai, true);
+  // auto nhảy sang ô kế tiếp
+  setTimeout(()=>document.getElementById(tab+'-ten').focus(), 50);
+}
+function setLoaiUI(tab, loai, updateGia){
+  setLoai(tab, loai);
+  document.getElementById(tab+'-loai-txt').textContent=LOAI_ICO[loai]+' '+LOAI_LBL[loai];
+  // highlight option
+  document.querySelectorAll('#'+tab+'-loai-dd .loai-opt').forEach((o,i)=>{
+    o.classList.toggle('sel', ['nuoc','chen','day','dong'][i]===loai);
+  });
+  // do/khauhao row
+  const dr=document.getElementById(tab+'-do-row');
+  const dl=document.getElementById(tab+'-do-lbl');
+  if(loai==='nuoc'){ dr.style.display='block'; dl.textContent='Độ'; }
+  else if(loai==='dong'){ dr.style.display='block'; dl.textContent='Khấu hao (kg)'; }
+  else { dr.style.display='none'; document.getElementById(tab+'-do').value=''; }
+  if(updateGia){
+    const gia=getGia(tab);
+    var gv=gia[loai]; document.getElementById(tab+'-gia').value=gv!=null?parseInt(gv).toLocaleString('vi-VN'):'';
+    calc(tab);
+  }
+}
+
+// ─── AUTOCOMPLETE ───
+function onTen(tab){
+  const v=document.getElementById(tab+'-ten').value.trim();
+  const ac=document.getElementById(tab+'-ac');
+  if(!v){ ac.style.display='none'; return; }
+  const kh=getKH(tab).filter(k=>k.toLowerCase().includes(v.toLowerCase()));
+  if(!kh.length){ ac.style.display='none'; return; }
+  ac.innerHTML=kh.map(k=>'<div class="ac-item" onmousedown="pickKH(\''+tab+'\',\''+k.replace(/'/g,"\\'")+'\')">' + '👤 '+k+'</div>').join('');
+  ac.style.display='block';
+}
+function tenKey(e,tab){
+  if(e.key==='Enter'){ document.getElementById(tab+'-ac').style.display='none'; document.getElementById(tab+'-kg').focus(); }
+}
+function pickKH(tab,name){
+  document.getElementById(tab+'-ten').value=name;
+  document.getElementById(tab+'-ac').style.display='none';
+  setTimeout(function(){ document.getElementById(tab+'-kg').focus(); }, 50);
+}
+function nf(e,id){ if(e.key==='Enter'){e.preventDefault();document.getElementById(id).focus();} }
+function kgKey(e,tab){
+  if(e.key==='Enter'){
+    e.preventDefault();
+    const dr=document.getElementById(tab+'-do-row');
+    if(dr.style.display!=='none') document.getElementById(tab+'-do').focus();
+    else document.getElementById(tab+'-btns').querySelector('.btn-luu').focus();
+  }
+}
+
+// ─── CALC ───
+function calc(tab){
+  const loai=getLoai(tab);
+  const kg=document.getElementById(tab+'-kg').value;
+  const gia=getGiaVal(tab);
+  const doV=document.getElementById(tab+'-do').value;
+  const t=tinhTien(loai,kg,gia,doV);
+  document.getElementById(tab+'-tt-so').textContent=fmtNum(t)+' ₫';
+  document.getElementById(tab+'-tt-chu').textContent=t>0?docTien(t):'--';
+}
+
+// ─── POPUP CHI TIET ───
+function showDetail(ico, ttl, rows, totalVal, yesLabel, yesCb, noCb){
+  document.getElementById('cfm-ico').textContent=ico;
+  document.getElementById('cfm-ttl').textContent=ttl;
+  const det=document.getElementById('cfm-detail');
+  const tot=document.getElementById('cfm-total');
+  if(rows&&rows.length){
+    det.innerHTML=rows.map(r=>'<div class="cfm-row"><span class="cfm-row-lbl">'+r[0]+'</span><span class="cfm-row-val">'+r[1]+'</span></div>').join('');
+    det.style.display='block';
+  } else { det.style.display='none'; }
+  if(totalVal!=null){
+    document.getElementById('cfm-total-val').textContent=fmtNum(totalVal)+' ₫';
+    tot.style.display='flex';
+  } else { tot.style.display='none'; }
+  const btns=document.getElementById('cfm-btns');
+  const yes=document.getElementById('cfm-yes');
+  if(yesLabel){
+    btns.style.display='flex';
+    yes.textContent=yesLabel;
+    yes.onclick=()=>{ closeCfm(); if(yesCb) yesCb(); };
+    btns.querySelector('.cfm-btn.n').onclick=()=>{ closeCfm(); if(noCb) noCb(); };
+    btns.querySelector('.cfm-btn.n').textContent='Huỷ';
+  } else {
+    // chỉ hiển thị, không cần nút
+    btns.style.display='flex';
+    btns.innerHTML='<button class="cfm-btn y" style="flex:1" onclick="closeCfm()">Đóng</button>';
+  }
+  openM('modal-cfm');
+}
+function closeCfm(){ closeM('modal-cfm'); }
+
+// ─── LUU GIAO DICH ───
+function luuGD(tab){
+  const ten=document.getElementById(tab+'-ten').value.trim();
+  const kg=parseFloat(document.getElementById(tab+'-kg').value)||0;
+  const gia=getGiaVal(tab);
+  const loai=getLoai(tab);
+  const doV=parseFloat(document.getElementById(tab+'-do').value)||0;
+  if(!loai){ toast('⚠️ Chọn loại mủ trước!'); return; }
+  if(!ten){ toast('⚠️ Nhập tên!'); document.getElementById(tab+'-ten').focus(); return; }
+  if(!kg){ toast('⚠️ Nhập số kg!'); document.getElementById(tab+'-kg').focus(); return; }
+  if(!gia){ toast('⚠️ Nhập đơn giá!'); document.getElementById(tab+'-gia').focus(); return; }
+
+  const tt=tinhTien(loai,kg,gia,doV);
+  const giaObj=getGia(tab); giaObj[loai]=gia; setGia(tab,giaObj);
+  const kh=getKH(tab); if(!kh.includes(ten)){ kh.push(ten); setKH(tab,kh); }
+
+  // Xây rows chi tiết
+  const rows=buildRows(loai,ten,kg,gia,doV);
+  showDetail('✅','Xác nhận lưu giao dịch',rows,tt,'Lưu',()=>{
+    const gd={id:Date.now()+Math.random(), date:curDate[tab], ten, loai, kg, do:doV, gia, tt, guiSo:false, edited:false};
+    const all=getGD(tab); all.push(gd); setGD(tab,all);
+    toast('✅ Đã lưu!'); resetF(tab); renderTbl(tab); updTK(tab);
+  });
+}
+
+function buildRows(loai,ten,kg,gia,doV){
+  var donViGia = (loai==='nuoc') ? 'đ/(kg·độ)' : 'đ/kg';
+  var rows=[
+    ['Tên', ten],
+    ['Loại mủ', LOAI_ICO[loai]+' '+LOAI_LBL[loai]],
+    ['Số kg', fmtNum(kg)+' kg'],
+    ['Đơn giá', fmtNum(gia)+' '+donViGia],
+  ];
+  if(loai==='nuoc') rows.push(['Độ', doV||0]);
+  if(loai==='dong'&&doV) rows.push(['Khấu hao', fmtNum(doV)+' kg']);
+  return rows;
+}
+
+function huyGD(tab){ resetF(tab); }
+function resetF(tab){
+  document.getElementById(tab+'-ten').value='';
+  document.getElementById(tab+'-kg').value='';
+  document.getElementById(tab+'-do').value='';
+  document.getElementById(tab+'-tt-so').textContent='0 ₫';
+  document.getElementById(tab+'-tt-chu').textContent='--';
+  document.getElementById(tab+'-ac').style.display='none';
+  document.getElementById(tab+'-ten').focus();
+}
+
+// ─── CHINH SUA GIAO DICH ───
+function editGD(tab,id){
+  const gd=getGD(tab).find(g=>String(g.id)===String(id));
+  if(!gd) return;
+  editId[tab]=id;
+  setLoaiUI(tab,gd.loai,false);
+  document.getElementById(tab+'-gia').value=gd.gia?parseInt(gd.gia).toLocaleString('vi-VN'):'';
+  document.getElementById(tab+'-ten').value=gd.ten;
+  document.getElementById(tab+'-kg').value=gd.kg;
+  document.getElementById(tab+'-do').value=gd.do||'';
+  calc(tab);
+  document.getElementById(tab+'-btns').style.display='none';
+  document.getElementById(tab+'-edit-btns').style.display='flex';
+  document.getElementById(tab+'-fc').scrollIntoView({behavior:'smooth'});
+}
+function luuSua(tab){
+  const id=editId[tab]; if(!id) return;
+  const ten=document.getElementById(tab+'-ten').value.trim();
+  const kg=parseFloat(document.getElementById(tab+'-kg').value)||0;
+  const gia=getGiaVal(tab);
+  const loai=getLoai(tab);
+  const doV=parseFloat(document.getElementById(tab+'-do').value)||0;
+  if(!ten||!kg||!gia||!loai){ toast('⚠️ Điền đầy đủ!'); return; }
+  const tt=tinhTien(loai,kg,gia,doV);
+  const all=getGD(tab);
+  const idx=all.findIndex(g=>String(g.id)===String(id));
+  if(idx>=0){ all[idx]={...all[idx],ten,loai,kg,do:doV,gia,tt,edited:true}; setGD(tab,all); }
+  huySua(tab); renderTbl(tab); updTK(tab); toast('✅ Đã lưu thay đổi!');
+}
+function huySua(tab){
+  editId[tab]=null;
+  document.getElementById(tab+'-btns').style.display='flex';
+  document.getElementById(tab+'-edit-btns').style.display='none';
+  resetF(tab);
+}
+function xoaGD(tab){
+  showDetail('🗑️','Xoá giao dịch?',[['Bạn có chắc muốn xoá?','']],null,'Xoá',()=>{
+    const all=getGD(tab).filter(g=>String(g.id)!==String(editId[tab]));
+    setGD(tab,all); huySua(tab); renderTbl(tab); updTK(tab); toast('🗑️ Đã xoá!');
+  });
+}
+
+// ─── DOUBLE TAP ───
+function onRow(tab,id){
+  const k='r_'+tab+'_'+id;
+  if(rowT[k]){ clearTimeout(rowT[k]); delete rowT[k]; editGD(tab,id); }
+  else rowT[k]=setTimeout(()=>delete rowT[k],380);
+}
+function onGui(tab,id){
+  const all=getGD(tab);
+  const gd=all.find(g=>String(g.id)===String(id));
+  if(!gd) return;
+  if(gd.guiSo){ toast('ℹ️ Đã ghi sổ gửi rồi!'); return; }
+  const rows=buildRows(gd.loai,gd.ten,gd.kg,gd.gia,gd.do);
+  showDetail('📒','Xác nhận ghi sổ gửi',rows,gd.tt,'Ghi sổ',()=>{
+    gd.guiSo=true; setGD(tab,all);
+    const sg=getSG();
+    sg.push({id:Date.now()+Math.random(), tab, gdId:gd.id, date:gd.date, ten:gd.ten, loai:gd.loai, kg:gd.kg, do:gd.do, gia:gd.gia, tt:gd.tt});
+    setSG(sg);
+    renderTbl(tab); toast('📒 Đã ghi sổ gửi!');
+  });
+}
+
+// ─── RENDER TABLE ───
+function renderTbl(tab){
+  const listAsc=getGDDate(tab,curDate[tab]);
+  const list=[...listAsc].reverse(); // mới nhất lên trên
+  const tbl=document.getElementById(tab+'-tbl');
+  const nd=document.getElementById(tab+'-nodata');
+  document.getElementById(tab+'-badge').textContent=listAsc.length;
+  if(!listAsc.length){ tbl.style.display='none'; nd.style.display='block'; return; }
+  tbl.style.display='table'; nd.style.display='none';
+  // header cột → luôn là "Độ/Loại"
+  const thChat=document.getElementById(tab+'-th-chat');
+  thChat.textContent='Độ/Loại';
+
+  document.getElementById(tab+'-tbody').innerHTML=list.map(gd=>{
+    let chat;
+    if(gd.loai==='nuoc') chat=gd.do||'--';
+    else if(gd.loai==='dong') chat=(gd.do?'KH:'+gd.do:'--');
+    else chat=LOAI_LBL[gd.loai];
+    const guiCls='tc-gui'+(gd.guiSo?' done':'');
+    const editCls=gd.edited?'edited':'';
+    return '<tr class="'+editCls+'" onclick="onRow(\''+tab+'\',\''+gd.id+'\')" ondblclick="editGD(\''+tab+'\',\''+gd.id+'\')">'
+      +'<td class="tc-ten" title="'+gd.ten+'">'+gd.ten+'</td>'
+      +'<td>'+gd.kg+'</td>'
+      +'<td>'+chat+'</td>'
+      +'<td>'+fmtNum(gd.gia)+'</td>'
+      +'<td>'+fmtNum(gd.tt)+'</td>'
+      +'<td class="'+guiCls+'" onclick="event.stopPropagation();onGui(\''+tab+'\',\''+gd.id+'\')">'+(gd.guiSo?'✅':'○')+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+// ─── THONG KE ───
+function grpByLoai(list){
+  var grp={};
+  list.forEach(function(gd){
+    if(!grp[gd.loai]) grp[gd.loai]={kg:0,tt:0,dos:[]};
+    grp[gd.loai].kg+=parseFloat(gd.kg)||0;
+    grp[gd.loai].tt+=parseFloat(gd.tt)||0;
+    if(gd.loai==='nuoc'&&gd.do) grp[gd.loai].dos.push(parseFloat(gd.do));
+  });
+  return grp;
+}
+function doTB(grp,loai){
+  if(loai!=='nuoc'||!grp[loai]||!grp[loai].dos.length) return null;
+  var s=grp[loai].dos; return s.reduce(function(a,b){return a+b;},0)/s.length;
+}
+
+function updTK(tab){
+  var list=getGDDate(tab,curDate[tab]);
+  var cont=document.getElementById(tab+'-tk');
+
+  // Helper: xây card thống kê 1 loại mủ
+  function loaiCard(loai, mData, bData, isBanTab){
+    var ico=LOAI_ICO[loai]; var lbl=LOAI_LBL[loai];
+    var mTB=null, bTB=null;
+    if(loai==='nuoc'){
+      if(mData&&mData.dos.length) mTB=mData.dos.reduce(function(a,b){return a+b;},0)/mData.dos.length;
+      if(bData&&bData.dos.length) bTB=bData.dos.reduce(function(a,b){return a+b;},0)/bData.dos.length;
+    }
+
+    if(!isBanTab){
+      // ── Card MUA: 1 cột ──
+      var d=mData||{kg:0,tt:0,dos:[]};
+      var tbTxt=mTB!=null?('<div class="tk-sub">Độ TB: '+mTB.toFixed(3)+'</div>'):'';
+      return '<div class="tk-card" style="grid-column:1/-1">'
+        +'<div class="tk-lbl">'+ico+' '+lbl+'</div>'
+        +'<div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:4px;margin-top:4px">'
+        +'<div><div style="font-size:11px;color:var(--g600)">Số kg</div><div style="font-size:17px;font-weight:800;color:var(--gd)">'+fmtNum(d.kg)+' kg</div></div>'
+        +'<div style="text-align:right"><div style="font-size:11px;color:var(--g600)">Thành tiền</div><div style="font-size:15px;font-weight:800;color:var(--gd)">'+fmtNum(d.tt)+' ₫</div></div>'
+        +'</div>'
+        +tbTxt
+        +'</div>';
+    } else {
+      // ── Card BAN: 2 cột so sánh ──
+      var m=mData||{kg:0,tt:0,dos:[]};
+      var b=bData||{kg:0,tt:0,dos:[]};
+      function cmpColor(bv,mv){ return bv>mv?'#22c55e':bv<mv?'#ef4444':'var(--g400)'; }
+      var kgC=cmpColor(b.kg,m.kg);
+      var ttC=cmpColor(b.tt,m.tt);
+      var cl=b.tt-m.tt;
+      var clC=cmpColor(cl,0);
+      var clTxt=(cl>=0?'+':'')+fmtNum(cl)+' ₫';
+
+      var doRow='';
+      if(loai==='nuoc'){
+        var ms=mTB!=null?mTB.toFixed(3):'--';
+        var bs=bTB!=null?bTB.toFixed(3):'--';
+        var doC=cmpColor(bTB||0,mTB||0);
+        doRow='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:5px 4px;border-top:1px solid var(--g100);font-size:11px;text-align:center;align-items:center">'
+          +'<span style="text-align:left;padding-left:4px;color:var(--g600)">Độ TB</span>'
+          +'<span style="color:var(--g600)">'+ms+'</span>'
+          +'<span style="font-weight:700;color:'+doC+'">'+bs+'</span>'
+          +'</div>';
+      }
+
+      return '<div class="tk-card" style="grid-column:1/-1;padding:0;overflow:hidden">'
+        // Tiêu đề loại mủ
+        +'<div style="background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;padding:7px 10px;font-size:12px;font-weight:700">'+ico+' '+lbl+'</div>'
+        // Header cột
+        +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--g100);font-size:10px;font-weight:700;text-align:center;padding:5px 4px;color:var(--g600)">'
+        +'<span style="text-align:left;padding-left:4px">Chỉ số</span>'
+        +'<span style="color:var(--gm)">🛒 Mua vào</span>'
+        +'<span style="color:#b5341a">💰 Bán ra</span>'
+        +'</div>'
+        // Kg
+        +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:6px 4px;border-top:1px solid var(--g100);font-size:12px;text-align:center;align-items:center">'
+        +'<span style="text-align:left;padding-left:4px;font-weight:600;color:var(--g600)">Số kg</span>'
+        +'<span style="color:var(--g800)">'+fmtNum(m.kg)+' kg</span>'
+        +'<span style="font-weight:800;color:'+kgC+'">'+fmtNum(b.kg)+' kg</span>'
+        +'</div>'
+        // Độ TB (chỉ nước)
+        +doRow
+        // Tiền
+        +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:6px 4px;border-top:1px solid var(--g100);font-size:12px;text-align:center;align-items:center">'
+        +'<span style="text-align:left;padding-left:4px;font-weight:600;color:var(--g600)">Thành tiền</span>'
+        +'<span style="color:var(--g800)">'+fmtNum(m.tt)+' ₫</span>'
+        +'<span style="font-weight:800;color:'+ttC+'">'+fmtNum(b.tt)+' ₫</span>'
+        +'</div>'
+        // Chênh lệch
+        +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:5px 4px;border-top:2px solid var(--g200);background:var(--g50);font-size:11px;text-align:center;align-items:center">'
+        +'<span style="text-align:left;padding-left:4px;color:var(--g400);font-weight:600">Chênh lệch</span>'
+        +'<span></span>'
+        +'<span style="font-weight:800;color:'+clC+'">'+clTxt+'</span>'
+        +'</div>'
+        +'</div>';
+    }
+  }
+
+  if(tab==='mua'){
+    // ── MUA: hiện từng loại mủ riêng ──
+    var grp=grpByLoai(list);
+    var total=0;
+    list.forEach(function(gd){ total+=parseFloat(gd.tt)||0; });
+    var html='<div class="tk-grid">';
+    ['nuoc','chen','day','dong'].forEach(function(loai){
+      if(grp[loai]) html+=loaiCard(loai, grp[loai], null, false);
+    });
+    html+='<div class="tk-card full total"><div class="tk-lbl">Tổng tiền thu mua</div><div class="tk-val">'+fmtNum(total)+' ₫</div></div>';
+    html+='</div>';
+    cont.innerHTML=html;
+
+  } else {
+    // ── BAN: so sánh theo từng loại mủ ──
+    if(!list.length){ cont.innerHTML=''; return; }
+    var banGrp=grpByLoai(list);
+    var banTotal=0; list.forEach(function(gd){ banTotal+=parseFloat(gd.tt)||0; });
+    var muaList=getGDDate('mua', curDate['ban']);
+    var muaGrp=grpByLoai(muaList);
+    var muaTotal=0; muaList.forEach(function(gd){ muaTotal+=parseFloat(gd.tt)||0; });
+    var allLoais=[];
+    ['nuoc','chen','day','dong'].forEach(function(l){ if(banGrp[l]||muaGrp[l]) allLoais.push(l); });
+
+    var html='<div class="tk-grid">';
+    allLoais.forEach(function(loai){
+      html+=loaiCard(loai, muaGrp[loai]||null, banGrp[loai]||null, true);
+    });
+    var clTotal=banTotal-muaTotal;
+    var clTotalColor=clTotal>0?'#a8e6cf':clTotal<0?'#ffb3b3':'rgba(255,255,255,.7)';
+    html+='<div class="tk-card full ban-total">'
+      +'<div class="tk-lbl">Tổng tiền bán ra</div>'
+      +'<div class="tk-val">'+fmtNum(banTotal)+' ₫</div>'
+      +'<div style="display:flex;justify-content:space-between;font-size:11px;margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.2)">'
+      +'<span style="color:rgba(255,255,255,.8)">Mua vào: '+fmtNum(muaTotal)+' ₫</span>'
+      +'<span style="font-weight:800;color:'+clTotalColor+'">'+(clTotal>=0?'+':'')+fmtNum(clTotal)+' ₫</span>'
+      +'</div>'
+      +'</div>';
+    html+='</div>';
+    cont.innerHTML=html;
+  }
+}
+
+// ─── SỔ GỬI ───
+function toggleSgDrop(e){
+  if(e&&e.stopPropagation) e.stopPropagation();
+  var dd=document.getElementById('sg-dropdown');
+  var isOpen=dd.classList.contains('open');
+  closeSgDrop();
+  if(!isOpen){ renderSgDrop(); dd.classList.add('open'); }
+}
+function closeSgDrop(){
+  var dd=document.getElementById('sg-dropdown');
+  if(dd) dd.classList.remove('open');
+}
+function renderSgDrop(){
+  var sg=getSG();
+  var khMap={};
+  sg.forEach(function(r){ if(!khMap[r.ten]) khMap[r.ten]={cnt:0,tt:0}; khMap[r.ten].cnt++; khMap[r.ten].tt+=r.tt; });
+  var cont=document.getElementById('sg-drop-list');
+  if(!cont) return;
+  if(!Object.keys(khMap).length){
+    cont.innerHTML='<div class="no-data">Chưa có ghi chép</div>';
+  } else {
+    cont.innerHTML=Object.entries(khMap).map(function(e2){
+      var ten=e2[0], d=e2[1];
+      var safeTen=ten.replace(/'/g,"\'");
+      return '<div class="sg-drop-item" onclick="closeSgDrop();openSoGuiDetail(\''+safeTen+'\')"><div><div>👤 '+ten+'</div><div class="sg-drop-item-sub">'+d.cnt+' ghi chép · '+fmtNum(d.tt)+' ₫</div></div><span style="color:var(--g400);font-size:11px">▶</span></div>';
+    }).join('');
+  }
+}
+function openSoGui(){ toggleSgDrop(null); }
+
+function openSoGuiDetail(ten){
+  sgCurKH=ten;
+  closeM('modal-sg');
+  document.getElementById('sg-detail-title').textContent='📒 Sổ gửi — '+ten;
+  renderSoGuiDetail(ten);
+  openM('modal-sg-detail');
+}
+
+function renderSoGuiDetail(ten){
+  const sg=getSG().filter(r=>r.ten===ten);
+  const cont=document.getElementById('sg-detail-list');
+  let total=0;
+  if(!sg.length){
+    cont.innerHTML='<div class="no-data">Không có ghi chép</div>';
+    document.getElementById('sg-total-val').textContent='0 ₫';
+    return;
+  }
+  cont.innerHTML=sg.map(r=>{
+    total+=r.tt;
+    let chatTxt='';
+    if(r.loai==='nuoc') chatTxt=' · Độ: '+(r.do||'--');
+    else if(r.loai==='dong'&&r.do) chatTxt=' · KH: '+r.do+'kg';
+    return '<div class="sg-rec" onclick="onSgRecTap(\''+r.id+'\')" ondblclick="openSgEdit(\''+r.id+'\')">'
+      +'<div class="sg-rec-row"><span class="sg-rec-ten">'+fmtDate(r.date)+'</span><span class="sg-rec-tien">'+fmtNum(r.tt)+' ₫</span></div>'
+      +'<div class="sg-rec-row" style="margin-top:3px"><span style="color:var(--g600);font-size:11px">'+LOAI_ICO[r.loai]+' '+LOAI_LBL[r.loai]+' · '+fmtNum(r.kg)+'kg'+chatTxt+'</span><span style="font-size:11px;color:var(--g600)">'+fmtNum(r.gia)+(r.loai==='nuoc'?' đ/(kg·độ)':' đ/kg')+'</span></div>'
+      +'</div>';
+  }).join('');
+  document.getElementById('sg-total-val').textContent=fmtNum(total)+' ₫';
+}
+
+// double tap để sửa trong sổ gửi
+let sgTapT={};
+function onSgRecTap(id){
+  if(sgTapT[id]){ clearTimeout(sgTapT[id]); delete sgTapT[id]; openSgEdit(id); }
+  else sgTapT[id]=setTimeout(()=>delete sgTapT[id],380);
+}
+
+function openSgEdit(id){
+  sgEditId=id;
+  const sg=getSG();
+  const r=sg.find(x=>String(x.id)===String(id));
+  if(!r) return;
+  closeM('modal-sg-detail');
+  document.getElementById('sg-edit-back').onclick=function(){ closeM('modal-sg-edit'); openSoGuiDetail(sgCurKH); };
+  // build form
+  const doShow=r.loai==='nuoc'||r.loai==='dong';
+  const doLbl=r.loai==='nuoc'?'Độ':'Khấu hao (kg)';
+  document.getElementById('sg-edit-form').innerHTML=
+    '<div class="sg-edit-box">'
+    +'<div class="fr"><label class="fl">Ngày</label><input type="date" id="sge-date" class="fi" value="'+r.date+'"></div>'
+    +'<div class="fr"><label class="fl">Loại mủ</label><input class="fi" value="'+LOAI_ICO[r.loai]+' '+LOAI_LBL[r.loai]+'" readonly></div>'
+    +'<div class="g2">'
+    +'<div class="fr"><label class="fl">Số kg</label><input type="number" id="sge-kg" class="fi" value="'+r.kg+'" oninput="sgCalc()"></div>'
+    +(doShow?'<div class="fr"><label class="fl">'+doLbl+'</label><input type="number" id="sge-do" class="fi" value="'+(r.do||'')+'" oninput="sgCalc()"></div>':'<div></div>')
+    +'</div>'
+    +'<div class="fr"><label class="fl">Đơn giá</label><input type="text" inputmode="numeric" id="sge-gia" class="fi" value="'+(r.gia?parseInt(r.gia).toLocaleString('vi-VN'):'')+'" oninput="var d=this.value.replace(/[^0-9]/g,\'\');this.value=d?parseInt(d).toLocaleString(\'vi-VN\'):(\'\');sgCalc()"></div>'
+    +'<div class="tt-box" style="margin-bottom:10px"><div class="tt-lbl">Thành tiền</div>'
+    +'<div class="tt-so" id="sge-tt">'+fmtNum(r.tt)+' ₫</div>'
+    +'<div class="tt-chu" id="sge-chu">'+docTien(r.tt)+'</div></div>'
+    +'</div>'
+    +'<div class="btn-row">'
+    +'<button class="btn-luu" onclick="luuSgEdit()">💾 Lưu</button>'
+    +'<button class="btn-huy" onclick="document.getElementById(\'sg-edit-back\').onclick()">Huỷ</button>'
+    +'<button class="btn-xoa" onclick="xoaSgEdit()">🗑️</button>'
+    +'</div>';
+  openM('modal-sg-edit');
+}
+function sgCalc(){
+  const sg=getSG();
+  const r=sg.find(x=>String(x.id)===String(sgEditId));
+  if(!r) return;
+  const kg=document.getElementById('sge-kg').value;
+  var giaRaw=document.getElementById('sge-gia').value;
+  var gia=parseFloat(String(giaRaw).replace(/[^0-9]/g,''))||0;
+  const doEl=document.getElementById('sge-do');
+  const doV=doEl?doEl.value:r.do;
+  const t=tinhTien(r.loai,kg,gia,doV);
+  document.getElementById('sge-tt').textContent=fmtNum(t)+' ₫';
+  document.getElementById('sge-chu').textContent=docTien(t);
+}
+function luuSgEdit(){
+  const sg=getSG();
+  const idx=sg.findIndex(x=>String(x.id)===String(sgEditId));
+  if(idx<0) return;
+  const r=sg[idx];
+  const kg=parseFloat(document.getElementById('sge-kg').value)||0;
+  var giaRaw=document.getElementById('sge-gia').value;
+  var gia=parseFloat(String(giaRaw).replace(/[^0-9]/g,''))||0;
+  const doEl=document.getElementById('sge-do');
+  const doV=doEl?parseFloat(doEl.value)||0:r.do;
+  const date=document.getElementById('sge-date').value||r.date;
+  const tt=tinhTien(r.loai,kg,gia,doV);
+  sg[idx]={...r,kg,gia,do:doV,date,tt};
+  setSG(sg);
+  closeM('modal-sg-edit');
+  openSoGuiDetail(sgCurKH);
+  toast('✅ Đã lưu!');
+}
+function xoaSgEdit(){
+  showDetail('🗑️','Xoá ghi chép sổ gửi?',[['Bạn có chắc muốn xoá?','']],null,'Xoá',()=>{
+    const sg=getSG().filter(x=>String(x.id)!==String(sgEditId));
+    setSG(sg);
+    closeM('modal-sg-edit');
+    openSoGuiDetail(sgCurKH);
+    toast('🗑️ Đã xoá!');
+  });
+}
+
+// ─── KHACH HANG ───
+function openKH(){
+  const tab=curTab;
+  document.getElementById('modal-kh').dataset.tab=tab;
+  document.getElementById('kh-modal-title').textContent=tab==='mua'?'👥 KH bán cho mình':'👥 KH mua của mình';
+  document.getElementById('kh-inp').value='';
+  renderKH(tab);
+  openM('modal-kh');
+}
+function renderKH(tab){
+  const kh=getKH(tab);
+  const cont=document.getElementById('kh-list');
+  if(!kh.length){ cont.innerHTML='<div class="no-data">Chưa có khách hàng nào</div>'; return; }
+  cont.innerHTML=kh.map((k,i)=>'<div class="kh-item"><div class="kh-name">👤 '+k+'</div><div class="kh-acts"><button class="kh-btn e" onclick="editKH(\''+tab+'\','+i+')">✏️</button><button class="kh-btn d" onclick="delKH(\''+tab+'\','+i+')">🗑️</button></div></div>').join('');
+}
+function themKH(){
+  const tab=document.getElementById('modal-kh').dataset.tab;
+  const name=document.getElementById('kh-inp').value.trim();
+  if(!name) return;
+  const kh=getKH(tab); if(kh.includes(name)){ toast('⚠️ Tên đã có!'); return; }
+  kh.push(name); setKH(tab,kh); document.getElementById('kh-inp').value='';
+  renderKH(tab); toast('✅ Đã thêm!');
+}
+function editKH(tab,i){
+  const kh=getKH(tab);
+  const n=prompt('Sửa tên:',kh[i]);
+  if(!n||!n.trim()) return;
+  kh[i]=n.trim(); setKH(tab,kh); renderKH(tab); toast('✅ Đã cập nhật!');
+}
+function delKH(tab,i){
+  showDetail('🗑️','Xoá khách hàng?',[],null,'Xoá',()=>{
+    const kh=getKH(tab); kh.splice(i,1); setKH(tab,kh); renderKH(tab); toast('🗑️ Đã xoá!');
+  });
+}
+
+// ─── MODAL ───
+function openM(id){ document.getElementById(id).classList.add('show'); }
+function closeM(id){ document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.modal').forEach(m=>{
+  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('show'); });
+});
+
+// ─── TOAST ───
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// ─── SERVICE WORKER ───
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
