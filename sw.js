@@ -1,5 +1,5 @@
 // Service Worker - Mu Cao Su Pro v1.7
-const CACHE = 'mu-cao-su-v1.7';
+const CACHE = 'mu-cao-su-v1.8';
 const FILES = [
   '/Mucaosu/',
   '/Mucaosu/index.html',

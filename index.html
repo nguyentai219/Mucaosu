@@ -11,7 +11,7 @@
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mủ Cao Su Pro v1.7</title>
+<title>Mủ Cao Su Pro v1.8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -23,7 +23,7 @@
   --r:12px;--rs:8px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g800);min-height:100vh;max-width:480px;margin:0 auto;overflow-x:hidden}
+body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g800);min-height:100vh;max-width:480px;margin:0 auto;overflow-x:hidden;scroll-behavior:smooth}
 
 /* HEADER */
 .hdr{background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;position:sticky;top:0;z-index:100;box-shadow:var(--s2)}
@@ -75,7 +75,7 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g
 .loai-opt.sel{background:var(--gb);color:var(--gd)}
 
 /* AUTOCOMPLETE */
-.ac-list{position:absolute;top:100%;left:0;right:0;background:#fff;border-radius:var(--rs);box-shadow:var(--s3);z-index:200;max-height:160px;overflow-y:auto;border:1.5px solid var(--gp);display:none}
+.ac-list{position:absolute;top:100%;left:0;right:0;background:#fff;border-radius:var(--rs);box-shadow:var(--s3);z-index:200;max-height:180px;overflow-y:auto;border:1.5px solid var(--gp);display:none}
 .ac-item{padding:9px 12px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--g100)}
 .ac-item:last-child{border-bottom:none}
 .ac-item:active{background:var(--gb)}
@@ -225,7 +225,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="logo-ico">🌿</div>
       <div>
         <div class="logo-txt">Mủ Cao Su Pro</div>
-        <div class="logo-ver">v1.7 · Quản lý mua bán</div>
+        <div class="logo-ver">v1.8 · Quản lý mua bán</div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -281,7 +281,7 @@ input[type=date]:focus{border-color:var(--gl)}
     </div>
     <div class="fr">
       <label class="fl">Tên người bán</label>
-      <input type="text" id="mua-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('mua')" autocomplete="off" onkeydown="tenKey(event,'mua')">
+      <input type="text" id="mua-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('mua')" autocomplete="off" onkeydown="tenKey(event,'mua')" onfocus="scrollInputUp(this)">
       <div class="ac-list" id="mua-ac"></div>
     </div>
     <div class="g2">
@@ -360,7 +360,7 @@ input[type=date]:focus{border-color:var(--gl)}
     </div>
     <div class="fr">
       <label class="fl">Tên người mua</label>
-      <input type="text" id="ban-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('ban')" autocomplete="off" onkeydown="tenKey(event,'ban')">
+      <input type="text" id="ban-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('ban')" autocomplete="off" onkeydown="tenKey(event,'ban')" onfocus="scrollInputUp(this)">
       <div class="ac-list" id="ban-ac"></div>
     </div>
     <div class="g2">
@@ -1258,30 +1258,52 @@ function toast(msg){
   setTimeout(()=>t.classList.remove('show'),2200);
 }
 
-// GOOGLE DRIVE SYNC MODULE - Mu Cao Su Pro v1.7
+// ═══════════════════════════════════════════════════════
+// GOOGLE DRIVE SYNC - Mủ Cao Su Pro v1.8
+// - File sao lưu đặt tên theo ngày: backup_DD-MM-YYYY
+// - Sổ gửi: mỗi KH 1 file riêng tên KH
+// ═══════════════════════════════════════════════════════
 var GD_CLIENT_ID = '1051621009021-ke6ln2upne26c0nl7tq6e6rfod0q9ccj.apps.googleusercontent.com';
 var GD_SCOPES = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file';
-var GD_SHEET_NAME = 'MuCaoSuPro';
+var GD_FOLDER_NAME = 'MuCaoSuPro';
 var gdUser = null;
 var gdToken = null;
-var gdSheetId = null;
+var gdFolderId = null;
 var gdSyncing = false;
+
+// ── Helpers ──
+function gdTodayStr() {
+  var d = new Date();
+  var dd = String(d.getDate()).padStart(2,'0');
+  var mm = String(d.getMonth()+1).padStart(2,'0');
+  var yy = d.getFullYear();
+  return dd + '-' + mm + '-' + yy;
+}
+
+// ── Kéo ô nhập tên lên khi focus để tránh bàn phím che đề xuất ──
+function scrollInputUp(el) {
+  setTimeout(function() {
+    var rect = el.getBoundingClientRect();
+    var targetY = window.scrollY + rect.top - 120; // 120px từ top màn hình
+    window.scrollTo({ top: targetY, behavior: 'smooth' });
+  }, 300); // chờ bàn phím hiện ra
+}
 
 function initGoogleAuth() {
   if (typeof google === 'undefined') { setTimeout(initGoogleAuth, 600); return; }
   var saved = localStorage.getItem('gd_user');
-  var savedToken = localStorage.getItem('gd_token');
-  var savedSheet = localStorage.getItem('gd_sheet_id');
-  if (saved) { gdUser = JSON.parse(saved); gdToken = savedToken; gdSheetId = savedSheet; updGDBar(); }
+  var tok   = localStorage.getItem('gd_token');
+  var fid   = localStorage.getItem('gd_folder_id');
+  if (saved) { gdUser = JSON.parse(saved); gdToken = tok; gdFolderId = fid; updGDBar(); }
 }
 
 function signInGoogle() {
-  if (typeof google === 'undefined') { toast('Dang tai Google API...'); return; }
+  if (typeof google === 'undefined') { toast('Đang tải Google API...'); return; }
   var client = google.accounts.oauth2.initTokenClient({
     client_id: GD_CLIENT_ID,
     scope: GD_SCOPES,
     callback: function(resp) {
-      if (resp.error) { toast('Dang nhap that bai: ' + resp.error); return; }
+      if (resp.error) { toast('Đăng nhập thất bại: ' + resp.error); return; }
       gdToken = resp.access_token;
       localStorage.setItem('gd_token', gdToken);
       fetchGoogleUser();
@@ -1298,211 +1320,301 @@ function fetchGoogleUser() {
     localStorage.setItem('gd_user', JSON.stringify(gdUser));
     updGDBar();
     closeM('modal-gd');
-    toast('Dang nhap thanh cong!');
-    findOrCreateSheet();
-  }).catch(function() { toast('Loi lay thong tin tai khoan!'); });
+    toast('✅ Đăng nhập thành công: ' + info.name);
+    findOrCreateFolder();
+  }).catch(function() { toast('❌ Lỗi lấy thông tin tài khoản!'); });
 }
 
 function signOutGoogle() {
-  gdUser = null; gdToken = null; gdSheetId = null;
-  localStorage.removeItem('gd_user');
-  localStorage.removeItem('gd_token');
-  localStorage.removeItem('gd_sheet_id');
+  gdUser = null; gdToken = null; gdFolderId = null;
+  ['gd_user','gd_token','gd_folder_id','gd_last_sync'].forEach(function(k){ localStorage.removeItem(k); });
   updGDBar();
   closeM('modal-gd');
-  toast('Da dang xuat!');
+  toast('👋 Đã đăng xuất Google!');
 }
 
 function updGDBar() {
-  var bar = document.getElementById('gd-bar');
-  var ico = document.getElementById('gd-bar-ico');
-  var name = document.getElementById('gd-bar-name');
-  var status = document.getElementById('gd-bar-status');
+  var bar  = document.getElementById('gd-bar');
+  var ico  = document.getElementById('gd-bar-ico');
+  var nm   = document.getElementById('gd-bar-name');
+  var st   = document.getElementById('gd-bar-status');
   if (!bar) return;
   if (gdUser) {
     ico.innerHTML = '<img class="gd-avatar" src="' + gdUser.avatar + '" onerror="this.style.display=\'none\'">';
-    name.textContent = gdUser.name;
-    status.textContent = gdSheetId ? 'Ket noi' : 'Cho sync';
-    status.className = 'gd-status ' + (gdSheetId ? 'synced' : 'syncing');
+    nm.textContent = gdUser.name;
+    st.textContent = gdFolderId ? 'Đã kết nối' : 'Chờ sync';
+    st.className = 'gd-status ' + (gdFolderId ? 'synced' : 'syncing');
   } else {
     ico.innerHTML = '&#x2601;&#xFE0F;';
-    name.textContent = 'Chua dang nhap Google';
-    status.textContent = 'Offline';
-    status.className = 'gd-status offline';
+    nm.textContent = 'Chưa đăng nhập Google';
+    st.textContent = 'Offline';
+    st.className = 'gd-status offline';
   }
 }
 
 function openGDModal() {
-  var body = document.getElementById('gd-modal-body');
+  var body  = document.getElementById('gd-modal-body');
   var title = document.getElementById('gd-modal-title');
   if (!gdUser) {
-    title.textContent = 'Dang nhap Google Drive';
-    body.innerHTML = '<div style="text-align:center;padding:24px 10px">'
-      + '<div style="font-size:52px;margin-bottom:14px">&#x2601;&#xFE0F;</div>'
-      + '<div style="font-size:15px;font-weight:700;color:var(--g800);margin-bottom:6px">Dong bo du lieu</div>'
-      + '<div style="font-size:12px;color:var(--g400);margin-bottom:24px">Du lieu luu vao Google Sheets trong Drive cua ban</div>'
+    title.textContent = '☁️ Đăng nhập Google Drive';
+    body.innerHTML =
+      '<div style="text-align:center;padding:24px 10px">'
+      + '<div style="font-size:52px;margin-bottom:14px">☁️</div>'
+      + '<div style="font-size:15px;font-weight:700;color:var(--g800);margin-bottom:6px">Sao lưu dữ liệu</div>'
+      + '<div style="font-size:12px;color:var(--g400);margin-bottom:24px">Dữ liệu lưu vào Google Drive theo ngày. Sổ gửi mỗi khách hàng 1 file riêng.</div>'
       + '</div>'
-      + '<div class="gd-opt" onclick="signInGoogle()" style="background:var(--gb);border-radius:var(--r);margin-bottom:4px">'
-      + '<span class="gd-opt-ico">&#x1F511;</span>'
-      + '<div class="gd-opt-txt"><div style="color:var(--gd);font-weight:700">Dang nhap Google</div>'
-      + '<div class="gd-opt-sub">Dung tai khoan Google de dong bo</div></div>'
+      + '<div class="gd-opt" onclick="signInGoogle()" style="background:var(--gb);border-radius:var(--r)">'
+      + '<span class="gd-opt-ico">🔑</span>'
+      + '<div class="gd-opt-txt"><div style="color:var(--gd);font-weight:700">Đăng nhập Google</div>'
+      + '<div class="gd-opt-sub">Dùng tài khoản Google để đồng bộ</div></div>'
       + '</div>';
   } else {
-    title.textContent = 'Google Drive';
+    title.textContent = '☁️ Google Drive';
     var lastSync = localStorage.getItem('gd_last_sync');
-    var lastSyncTxt = lastSync ? new Date(parseInt(lastSync)).toLocaleString('vi-VN') : 'Chua sync';
-    body.innerHTML = '<div style="display:flex;align-items:center;gap:12px;padding:12px 0 14px;border-bottom:1px solid var(--g100);margin-bottom:4px">'
+    var lastTxt  = lastSync ? new Date(parseInt(lastSync)).toLocaleString('vi-VN') : 'Chưa sync';
+    body.innerHTML =
+      '<div style="display:flex;align-items:center;gap:12px;padding:12px 0 14px;border-bottom:1px solid var(--g100);margin-bottom:4px">'
       + '<img src="' + gdUser.avatar + '" style="width:44px;height:44px;border-radius:50%;object-fit:cover">'
       + '<div><div style="font-size:14px;font-weight:700">' + gdUser.name + '</div>'
       + '<div style="font-size:11px;color:var(--g400)">' + gdUser.email + '</div></div>'
       + '</div>'
-      + '<div class="gd-sync-row"><span class="gd-sync-lbl">Lan sync cuoi</span><span class="gd-sync-val">' + lastSyncTxt + '</span></div>'
-      + '<div class="gd-sync-row"><span class="gd-sync-lbl">Google Sheet</span><span class="gd-sync-val">' + (gdSheetId ? 'Da ket noi' : 'Chua tao') + '</span></div>'
-      + '<div class="gd-opt" onclick="syncToSheet()" style="margin-top:8px;background:var(--gb);border-radius:var(--r)">'
-      + '<span class="gd-opt-ico">&#x2B06;&#xFE0F;</span>'
-      + '<div class="gd-opt-txt"><div style="color:var(--gd);font-weight:700">Dong bo len Drive</div>'
-      + '<div class="gd-opt-sub">Luu tat ca du lieu len Google Sheets</div></div>'
+      + '<div class="gd-sync-row"><span class="gd-sync-lbl">🕐 Lần sync cuối</span><span class="gd-sync-val">' + lastTxt + '</span></div>'
+      + '<div class="gd-sync-row"><span class="gd-sync-lbl">📁 Thư mục Drive</span><span class="gd-sync-val">' + (gdFolderId ? 'MuCaoSuPro ✅' : 'Chưa tạo') + '</span></div>'
+      + '<div class="gd-sync-row"><span class="gd-sync-lbl">📅 File hôm nay</span><span class="gd-sync-val">backup_' + gdTodayStr() + '</span></div>'
+      + '<div class="gd-opt" onclick="syncToDrive()" style="margin-top:8px;background:var(--gb);border-radius:var(--r)">'
+      + '<span class="gd-opt-ico">⬆️</span>'
+      + '<div class="gd-opt-txt"><div style="color:var(--gd);font-weight:700">Sao lưu lên Drive</div>'
+      + '<div class="gd-opt-sub">Tạo file backup_' + gdTodayStr() + ' + cập nhật sổ gửi</div></div>'
       + '</div>'
-      + '<div class="gd-opt" onclick="syncFromSheet()">'
-      + '<span class="gd-opt-ico">&#x2B07;&#xFE0F;</span>'
-      + '<div class="gd-opt-txt"><div>Tai du lieu tu Drive</div>'
-      + '<div class="gd-opt-sub">Khoi phuc du lieu tu Google Sheets</div></div>'
+      + '<div class="gd-opt" onclick="restoreFromDrive()">'
+      + '<span class="gd-opt-ico">⬇️</span>'
+      + '<div class="gd-opt-txt"><div>Khôi phục từ Drive</div>'
+      + '<div class="gd-opt-sub">Tải file backup mới nhất về</div></div>'
       + '</div>'
-      + (gdSheetId ? '<div class="gd-opt" onclick="openSheet()"><span class="gd-opt-ico">&#x1F4CA;</span><div class="gd-opt-txt"><div>Mo Google Sheets</div><div class="gd-opt-sub">Xem truc tiep tren trinh duyet</div></div></div>' : '')
+      + (gdFolderId ? '<div class="gd-opt" onclick="openDriveFolder()"><span class="gd-opt-ico">📁</span><div class="gd-opt-txt"><div>Mở thư mục Drive</div><div class="gd-opt-sub">Xem toàn bộ file sao lưu</div></div></div>' : '')
       + '<div class="gd-opt" onclick="signOutGoogle()">'
-      + '<span class="gd-opt-ico">&#x1F6AA;</span>'
-      + '<div class="gd-opt-txt" style="color:var(--red)"><div>Dang xuat</div></div>'
+      + '<span class="gd-opt-ico">🚪</span>'
+      + '<div class="gd-opt-txt" style="color:var(--red)"><div>Đăng xuất</div></div>'
       + '</div>';
   }
   openM('modal-gd');
 }
 
-function findOrCreateSheet() {
+// ── Tạo / tìm thư mục MuCaoSuPro trong Drive ──
+function findOrCreateFolder() {
   if (!gdToken) return;
-  fetch("https://www.googleapis.com/drive/v3/files?q=name%3D'" + GD_SHEET_NAME + "'+and+mimeType%3D'application%2Fvnd.google-apps.spreadsheet'+and+trashed%3Dfalse&fields=files(id,name)", {
+  var q = encodeURIComponent("name='MuCaoSuPro' and mimeType='application/vnd.google-apps.folder' and trashed=false");
+  fetch('https://www.googleapis.com/drive/v3/files?q=' + q + '&fields=files(id,name)', {
     headers: { Authorization: 'Bearer ' + gdToken }
   }).then(function(r) { return r.json(); }).then(function(data) {
     if (data.files && data.files.length > 0) {
-      gdSheetId = data.files[0].id;
-      localStorage.setItem('gd_sheet_id', gdSheetId);
+      gdFolderId = data.files[0].id;
+      localStorage.setItem('gd_folder_id', gdFolderId);
       updGDBar();
-      toast('Da tim thay Sheet!');
-    } else { createSheet(); }
-  }).catch(function(e) { toast('Loi ket noi Drive!'); console.error(e); });
+      toast('📁 Đã kết nối thư mục MuCaoSuPro!');
+    } else { createDriveFolder(); }
+  }).catch(function(e) { toast('❌ Lỗi kết nối Drive!'); console.error(e); });
 }
 
-function createSheet() {
-  fetch('https://sheets.googleapis.com/v4/spreadsheets', {
+function createDriveFolder() {
+  fetch('https://www.googleapis.com/drive/v3/files', {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      properties: { title: GD_SHEET_NAME },
-      sheets: [
-        { properties: { title: 'GiaoDich_Mua' } },
-        { properties: { title: 'GiaoDich_Ban' } },
-        { properties: { title: 'SoGui' } }
-      ]
-    })
+    body: JSON.stringify({ name: 'MuCaoSuPro', mimeType: 'application/vnd.google-apps.folder' })
   }).then(function(r) { return r.json(); }).then(function(data) {
-    gdSheetId = data.spreadsheetId;
-    localStorage.setItem('gd_sheet_id', gdSheetId);
+    gdFolderId = data.id;
+    localStorage.setItem('gd_folder_id', gdFolderId);
     updGDBar();
-    toast('Da tao Google Sheet moi!');
-  }).catch(function(e) { toast('Khong tao duoc Sheet!'); console.error(e); });
+    toast('📁 Đã tạo thư mục MuCaoSuPro!');
+  }).catch(function(e) { toast('❌ Không tạo được thư mục!'); console.error(e); });
 }
 
-function syncToSheet() {
+// ── Tìm file theo tên trong thư mục ──
+function findFileInFolder(fname, cb) {
+  var q = encodeURIComponent("name='" + fname + "' and '" + gdFolderId + "' in parents and trashed=false");
+  fetch('https://www.googleapis.com/drive/v3/files?q=' + q + '&fields=files(id,name)', {
+    headers: { Authorization: 'Bearer ' + gdToken }
+  }).then(function(r) { return r.json(); }).then(function(data) {
+    cb(data.files && data.files.length > 0 ? data.files[0].id : null);
+  }).catch(function() { cb(null); });
+}
+
+// ── Tạo hoặc cập nhật Spreadsheet ──
+function upsertSheet(fname, sheetsData, doneCb) {
+  findFileInFolder(fname, function(existId) {
+    if (existId) {
+      // Cập nhật nội dung các sheet
+      batchUpdateSheets(existId, sheetsData, doneCb);
+    } else {
+      // Tạo mới spreadsheet trong folder
+      var sheetObjs = sheetsData.map(function(s) { return { properties: { title: s.name } }; });
+      fetch('https://sheets.googleapis.com/v4/spreadsheets', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ properties: { title: fname }, sheets: sheetObjs })
+      }).then(function(r) { return r.json(); }).then(function(data) {
+        var sid = data.spreadsheetId;
+        // Move to folder
+        fetch('https://www.googleapis.com/drive/v3/files/' + sid + '?addParents=' + gdFolderId + '&removeParents=root&fields=id', {
+          method: 'PATCH',
+          headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        }).then(function() {
+          batchUpdateSheets(sid, sheetsData, doneCb);
+        });
+      }).catch(function(e) { toast('❌ Lỗi tạo file!'); console.error(e); });
+    }
+  });
+}
+
+function batchUpdateSheets(sid, sheetsData, doneCb) {
+  // Lấy tên sheet thực tế (vì khi tạo sheet mới có thể bị đặt tên khác)
+  fetch('https://sheets.googleapis.com/v4/spreadsheets/' + sid + '?fields=sheets.properties', {
+    headers: { Authorization: 'Bearer ' + gdToken }
+  }).then(function(r) { return r.json(); }).then(function(meta) {
+    var actualSheets = (meta.sheets || []).map(function(s) { return s.properties.title; });
+    // Đảm bảo tất cả sheet cần thiết tồn tại
+    var requests = [];
+    sheetsData.forEach(function(s) {
+      if (actualSheets.indexOf(s.name) === -1) {
+        requests.push({ addSheet: { properties: { title: s.name } } });
+      }
+    });
+    var doUpdate = function() {
+      var data = sheetsData.map(function(s) {
+        return { range: s.name + '!A1', values: s.rows };
+      });
+      fetch('https://sheets.googleapis.com/v4/spreadsheets/' + sid + '/values:batchUpdate', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ valueInputOption: 'RAW', data: data })
+      }).then(function() { if (doneCb) doneCb(sid); })
+        .catch(function(e) { toast('❌ Lỗi ghi dữ liệu!'); console.error(e); });
+    };
+    if (requests.length > 0) {
+      fetch('https://sheets.googleapis.com/v4/spreadsheets/' + sid + ':batchUpdate', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requests: requests })
+      }).then(doUpdate).catch(doUpdate);
+    } else { doUpdate(); }
+  });
+}
+
+// ── SÀO LƯU LÊN DRIVE ──
+function syncToDrive() {
   if (!gdToken) { signInGoogle(); return; }
-  if (!gdSheetId) { findOrCreateSheet(); return; }
-  if (gdSyncing) { toast('Dang sync...'); return; }
+  if (!gdFolderId) { findOrCreateFolder(); setTimeout(syncToDriver, 3000); return; }
+  if (gdSyncing) { toast('⏳ Đang sync...'); return; }
   gdSyncing = true;
   closeM('modal-gd');
-  var statusEl = document.getElementById('gd-bar-status');
-  if (statusEl) { statusEl.textContent = 'Syncing...'; statusEl.className = 'gd-status syncing'; }
+  var stEl = document.getElementById('gd-bar-status');
+  if (stEl) { stEl.textContent = 'Đang sync...'; stEl.className = 'gd-status syncing'; }
 
+  var fname = 'backup_' + gdTodayStr();
+  var hdrGD = ['ID','Ngày','Tên','Loại mủ','Số kg','Độ/KH','Đơn giá','Thành tiền','Gửi sổ','Đã sửa'];
   function gdRows(tab) {
-    return getGD(tab).map(function(g) {
-      return [String(g.id), g.date, g.ten, LOAI_LBL[g.loai] || g.loai, g.kg, g.do || '', g.gia, g.tt, g.guiSo ? '1' : '0', g.edited ? '1' : '0'];
-    });
+    return [hdrGD].concat(getGD(tab).map(function(g) {
+      return [String(g.id), g.date, g.ten, LOAI_LBL[g.loai]||g.loai, g.kg, g.do||'', g.gia, g.tt, g.guiSo?'Có':'', g.edited?'Có':''];
+    }));
   }
-  var sgRows = getSG().map(function(g) {
-    return [String(g.id), g.tab, g.date, g.ten, LOAI_LBL[g.loai] || g.loai, g.kg, g.do || '', g.gia, g.tt];
-  });
-  var muaHdr = [['ID','Ngay','Ten','Loai','Kg','Do/KH','Gia','Tien','GuiSo','Edited']];
-  var sgHdr  = [['ID','Tab','Ngay','Ten','Loai','Kg','Do/KH','Gia','Tien']];
 
-  fetch('https://sheets.googleapis.com/v4/spreadsheets/' + gdSheetId + '/values:batchUpdate', {
-    method: 'POST',
-    headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      valueInputOption: 'RAW',
-      data: [
-        { range: 'GiaoDich_Mua!A1', values: muaHdr.concat(gdRows('mua')) },
-        { range: 'GiaoDich_Ban!A1', values: muaHdr.concat(gdRows('ban')) },
-        { range: 'SoGui!A1',        values: sgHdr.concat(sgRows) }
-      ]
-    })
-  }).then(function(r) {
-    if (!r.ok) return r.json().then(function(e) { throw new Error(e.error ? e.error.message : r.status); });
-    return r.json();
-  }).then(function() {
+  // 1. Sao lưu giao dịch theo ngày
+  upsertSheet(fname, [
+    { name: 'Thu_Mua', rows: gdRows('mua') },
+    { name: 'Ban_Ra',  rows: gdRows('ban') }
+  ], function(sid) {
+    toast('✅ Đã sao lưu ' + fname + '!');
     gdSyncing = false;
     localStorage.setItem('gd_last_sync', Date.now().toString());
     updGDBar();
-    toast('Dong bo thanh cong!');
-  }).catch(function(e) {
-    gdSyncing = false;
-    updGDBar();
-    toast('Loi sync: ' + e.message);
-    if (String(e.message).indexOf('401') !== -1) { gdToken = null; localStorage.removeItem('gd_token'); signInGoogle(); }
+    // 2. Đồng bộ sổ gửi theo từng KH
+    syncSoGui();
   });
 }
 
-function syncFromSheet() {
+// ── ĐỒNG BỘ SỔ GỬI - mỗi KH 1 file ──
+function syncSoGui() {
+  var sg = getSG();
+  if (!sg.length) return;
+  // Group by tên KH
+  var byKH = {};
+  sg.forEach(function(r) {
+    if (!byKH[r.ten]) byKH[r.ten] = [];
+    byKH[r.ten].push(r);
+  });
+  var khs = Object.keys(byKH);
+  var idx = 0;
+  function next() {
+    if (idx >= khs.length) { toast('📒 Sổ gửi đã cập nhật!'); return; }
+    var ten = khs[idx++];
+    var rows = byKH[ten];
+    var hdr = ['Ngày','Loại mủ','Số kg','Độ/KH','Đơn giá','Thành tiền'];
+    var data = [hdr].concat(rows.map(function(r) {
+      return [r.date, LOAI_LBL[r.loai]||r.loai, r.kg, r.do||'', r.gia, r.tt];
+    }));
+    // Tổng cộng
+    var total = rows.reduce(function(s,r) { return s + (parseFloat(r.tt)||0); }, 0);
+    data.push(['','','','','TỔNG CỘNG', total]);
+    // Tên file = "SoGui_TenKH" (bỏ ký tự đặc biệt không hợp lệ)
+    var safeName = 'SoGui_' + ten.replace(/[\/\\?*[\]]/g,'_');
+    upsertSheet(safeName, [{ name: ten, rows: data }], function() { next(); });
+  }
+  next();
+}
+
+// ── KHÔI PHỤC từ Drive ──
+function restoreFromDrive() {
   if (!gdToken) { signInGoogle(); return; }
-  if (!gdSheetId) { toast('Chua co Sheet!'); return; }
+  if (!gdFolderId) { toast('⚠️ Chưa kết nối Drive!'); return; }
   closeM('modal-gd');
-  toast('Dang tai du lieu...');
-  fetch('https://sheets.googleapis.com/v4/spreadsheets/' + gdSheetId + '/values:batchGet?ranges=GiaoDich_Mua&ranges=GiaoDich_Ban&ranges=SoGui', {
+  // Tìm file backup mới nhất (sắp xếp theo modifiedTime)
+  var q = encodeURIComponent("'" + gdFolderId + "' in parents and name contains 'backup_' and trashed=false");
+  fetch('https://www.googleapis.com/drive/v3/files?q=' + q + '&orderBy=modifiedTime+desc&fields=files(id,name)&pageSize=1', {
+    headers: { Authorization: 'Bearer ' + gdToken }
+  }).then(function(r) { return r.json(); }).then(function(data) {
+    if (!data.files || !data.files.length) { toast('⚠️ Chưa có file backup nào!'); return; }
+    var file = data.files[0];
+    toast('⬇️ Đang tải ' + file.name + '...');
+    restoreFromFile(file.id);
+  }).catch(function(e) { toast('❌ Lỗi tìm file!'); console.error(e); });
+}
+
+function restoreFromFile(sid) {
+  fetch('https://sheets.googleapis.com/v4/spreadsheets/' + sid + '/values:batchGet?ranges=Thu_Mua&ranges=Ban_Ra', {
     headers: { Authorization: 'Bearer ' + gdToken }
   }).then(function(r) { return r.json(); }).then(function(data) {
     var vrs = data.valueRanges || [];
     function parseRows(rows) {
       if (!rows || rows.length < 2) return [];
       return rows.slice(1).filter(function(r) { return r[2] && r[4]; }).map(function(r) {
-        return { id: r[0] || (Date.now() + Math.random()), date: r[1] || '', ten: r[2] || '', loai: loaiFromLbl(r[3]), kg: parseFloat(r[4]) || 0, do: parseFloat(r[5]) || 0, gia: parseFloat(r[6]) || 0, tt: parseFloat(r[7]) || 0, guiSo: r[8] === '1', edited: r[9] === '1' };
+        return { id: r[0]||(Date.now()+Math.random()), date:r[1]||'', ten:r[2]||'', loai:loaiFromLbl(r[3]), kg:parseFloat(r[4])||0, do:parseFloat(r[5])||0, gia:parseFloat(r[6])||0, tt:parseFloat(r[7])||0, guiSo:r[8]==='Có', edited:r[9]==='Có' };
       });
     }
-    function parseSGRows(rows) {
-      if (!rows || rows.length < 2) return [];
-      return rows.slice(1).filter(function(r) { return r[3] && r[5]; }).map(function(r) {
-        return { id: r[0] || (Date.now() + Math.random()), tab: r[1] || 'mua', date: r[2] || '', ten: r[3] || '', loai: loaiFromLbl(r[4]), kg: parseFloat(r[5]) || 0, do: parseFloat(r[6]) || 0, gia: parseFloat(r[7]) || 0, tt: parseFloat(r[8]) || 0 };
-      });
-    }
-    setGD('mua', parseRows(vrs[0] ? vrs[0].values : []));
-    setGD('ban', parseRows(vrs[1] ? vrs[1].values : []));
-    setSG(parseSGRows(vrs[2] ? vrs[2].values : []));
-    ['mua', 'ban'].forEach(function(t) { renderTbl(t); updTK(t); });
+    setGD('mua', parseRows(vrs[0]?vrs[0].values:[]));
+    setGD('ban', parseRows(vrs[1]?vrs[1].values:[]));
+    ['mua','ban'].forEach(function(t) { renderTbl(t); updTK(t); });
     localStorage.setItem('gd_last_sync', Date.now().toString());
-    toast('Da tai du lieu tu Drive!');
-  }).catch(function(e) { toast('Loi tai: ' + e.message); console.error(e); });
+    toast('✅ Đã khôi phục dữ liệu!');
+  }).catch(function(e) { toast('❌ Lỗi khôi phục!'); console.error(e); });
 }
 
 function loaiFromLbl(lbl) {
-  var map = {
-    'Mu nuoc':'nuoc','Mu chen':'chen','Mu day':'day','Mu dong':'dong',
-    'Mủ nước':'nuoc','Mủ chén':'chen','Mủ dây':'day','Mủ đông':'dong'
-  };
+  var map = { 'Thu Mua':'nuoc','Ban Ra':'nuoc',
+    'M\u1ee7 n\u01b0\u1edbc':'nuoc','M\u1ee7 ch\u00e9n':'chen','M\u1ee7 d\u00e2y':'day','M\u1ee7 \u0111\u00f4ng':'dong',
+    'Mu nuoc':'nuoc','Mu chen':'chen','Mu day':'day','Mu dong':'dong' };
   return map[lbl] || 'nuoc';
 }
 
-function openSheet() {
-  if (gdSheetId) window.open('https://docs.google.com/spreadsheets/d/' + gdSheetId, '_blank');
+function openDriveFolder() {
+  if (gdFolderId) window.open('https://drive.google.com/drive/folders/' + gdFolderId, '_blank');
 }
 
 function autoSync() {
-  if (gdToken && gdSheetId) setTimeout(syncToSheet, 2000);
+  if (gdToken && gdFolderId) setTimeout(syncToDriver, 2000);
 }
+function syncToDriver() { syncToDrive(); }
+
 
 
 // ─── SERVICE WORKER ───
