@@ -2,7 +2,7 @@
   "name": "Mủ Cao Su Pro",
   "short_name": "Mủ Cao Su",
   "description": "Phần mềm ghi chép mua bán mủ cao su - v1.7",
-  "start_url": "/index.html",
+  "start_url": "/Mucaosu/index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#1a472a",
@@ -13,5 +13,5 @@
   ],
   "categories": ["business","finance"],
   "lang": "vi",
-  "scope": "/"
+  "scope": "/Mucaosu/"
 }
