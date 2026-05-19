@@ -11,7 +11,7 @@
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mủ Cao Su Pro v1.8</title>
+<title>Mủ Cao Su Pro v1.9</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -225,7 +225,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="logo-ico">🌿</div>
       <div>
         <div class="logo-txt">Mủ Cao Su Pro</div>
-        <div class="logo-ver">v1.8 · Quản lý mua bán</div>
+        <div class="logo-ver">v1.9 · Quản lý mua bán</div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -692,11 +692,29 @@ function closeLoaiDD(tab){
   document.getElementById(tab+'-loai-dd').classList.remove('open');
   document.getElementById(tab+'-loai-arr').style.transform='rotate(0deg)';
 }
+var kbHideTimer = {};
 function chonLoai(tab, loai){
   closeLoaiDD(tab);
   setLoaiUI(tab, loai, true);
-  // auto nhảy sang ô kế tiếp
-  setTimeout(()=>document.getElementById(tab+'-ten').focus(), 50);
+  // Nếu đã có giá → focus tên ngay
+  var giaEl = document.getElementById(tab+'-gia');
+  var hasGia = giaEl && giaEl.value && giaEl.value !== '';
+  setTimeout(function(){
+    if(hasGia){
+      var tenEl = document.getElementById(tab+'-ten');
+      tenEl.focus();
+      scrollInputUp(tenEl);
+      // Ẩn bàn phím sau 5 giây nếu không nhập gì
+      if(kbHideTimer[tab]) clearTimeout(kbHideTimer[tab]);
+      kbHideTimer[tab] = setTimeout(function(){
+        if(document.activeElement === tenEl && !tenEl.value.trim()){
+          tenEl.blur();
+        }
+      }, 5000);
+    } else {
+      document.getElementById(tab+'-gia').focus();
+    }
+  }, 50);
 }
 function setLoaiUI(tab, loai, updateGia){
   setLoai(tab, loai);
@@ -720,6 +738,8 @@ function setLoaiUI(tab, loai, updateGia){
 
 // ─── AUTOCOMPLETE ───
 function onTen(tab){
+  // Hủy timer ẩn bàn phím khi bắt đầu nhập
+  if(kbHideTimer[tab]){ clearTimeout(kbHideTimer[tab]); delete kbHideTimer[tab]; }
   const v=document.getElementById(tab+'-ten').value.trim();
   const ac=document.getElementById(tab+'-ac');
   if(!v){ ac.style.display='none'; return; }
@@ -834,7 +854,9 @@ function resetF(tab){
   document.getElementById(tab+'-tt-so').textContent='0 ₫';
   document.getElementById(tab+'-tt-chu').textContent='--';
   document.getElementById(tab+'-ac').style.display='none';
-  document.getElementById(tab+'-ten').focus();
+  // Ẩn bàn phím trước khi focus lại
+  if(document.activeElement) document.activeElement.blur();
+  setTimeout(function(){ document.getElementById(tab+'-ten').focus(); }, 100);
 }
 
 // ─── CHINH SUA GIAO DICH ───
@@ -1043,10 +1065,11 @@ function updTK(tab){
 
   } else {
     // ── BAN: so sánh theo từng loại mủ ──
-    if(!list.length){ cont.innerHTML=''; return; }
+    var muaList0=getGDDate('mua', curDate['ban']);
+    if(!list.length && !muaList0.length){ cont.innerHTML=''; return; }
     var banGrp=grpByLoai(list);
     var banTotal=0; list.forEach(function(gd){ banTotal+=parseFloat(gd.tt)||0; });
-    var muaList=getGDDate('mua', curDate['ban']);
+    var muaList=muaList0;
     var muaGrp=grpByLoai(muaList);
     var muaTotal=0; muaList.forEach(function(gd){ muaTotal+=parseFloat(gd.tt)||0; });
     var allLoais=[];
@@ -1515,7 +1538,9 @@ function syncToDrive() {
   var hdrGD = ['ID','Ngày','Tên','Loại mủ','Số kg','Độ/KH','Đơn giá','Thành tiền','Gửi sổ','Đã sửa'];
   function gdRows(tab) {
     return [hdrGD].concat(getGD(tab).map(function(g) {
-      return [String(g.id), g.date, g.ten, LOAI_LBL[g.loai]||g.loai, g.kg, g.do||'', g.gia, g.tt, g.guiSo?'Có':'', g.edited?'Có':''];
+      return [String(g.id), g.date, g.ten, LOAI_LBL[g.loai]||g.loai,
+        fmtNum(g.kg), g.do||'', fmtNum(g.gia), fmtNum(g.tt),
+        g.guiSo?'Có':'', g.edited?'Có':''];
     }));
   }
 
@@ -1551,11 +1576,11 @@ function syncSoGui() {
     var rows = byKH[ten];
     var hdr = ['Ngày','Loại mủ','Số kg','Độ/KH','Đơn giá','Thành tiền'];
     var data = [hdr].concat(rows.map(function(r) {
-      return [r.date, LOAI_LBL[r.loai]||r.loai, r.kg, r.do||'', r.gia, r.tt];
+      return [r.date, LOAI_LBL[r.loai]||r.loai, fmtNum(r.kg), r.do||'', fmtNum(r.gia), fmtNum(r.tt)];
     }));
     // Tổng cộng
     var total = rows.reduce(function(s,r) { return s + (parseFloat(r.tt)||0); }, 0);
-    data.push(['','','','','TỔNG CỘNG', total]);
+    data.push(['','','','','TỔNG CỘNG', fmtNum(total)]);
     // Tên file = "SoGui_TenKH" (bỏ ký tự đặc biệt không hợp lệ)
     var safeName = 'SoGui_' + ten.replace(/[\/\\?*[\]]/g,'_');
     upsertSheet(safeName, [{ name: ten, rows: data }], function() { next(); });
