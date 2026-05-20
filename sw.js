@@ -1,13 +1,5 @@
-// Service Worker - Mu Cao Su Pro v1.7
-const CACHE = 'mu-cao-su-v1.9';
-const FILES = [
-  '/Mucaosu/',
-  '/Mucaosu/index.html',
-  '/Mucaosu/manifest.json',
-  '/Mucaosu/icon-192.png',
-  '/Mucaosu/icon-512.png'
-];
-
+const CACHE = 'mu-cao-su-v2.5';
+const FILES = ['/Mucaosu/','/Mucaosu/index.html','/Mucaosu/manifest.json','/Mucaosu/icon-192.png','/Mucaosu/icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).catch(()=>{}));
   self.skipWaiting();
@@ -17,7 +9,5 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('/Mucaosu/index.html')))
-  );
+  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('/Mucaosu/index.html'))));
 });

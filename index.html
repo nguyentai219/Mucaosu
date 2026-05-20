@@ -11,7 +11,7 @@
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mủ Cao Su Pro v1.9</title>
+<title>Mua Bán Mủ Cao Su v2.5</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -99,6 +99,7 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g
 
 /* SECTION */
 .sec-title{font-size:12px;font-weight:700;color:var(--gd);margin:10px 0 6px;display:flex;align-items:center;gap:6px}
+.sec-divider{height:6px;background:var(--g100);margin:14px -10px;border-top:1px solid var(--g200);border-bottom:1px solid var(--g200)}
 .sec-badge{background:var(--gl);color:#fff;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700}
 
 /* TABLE */
@@ -116,7 +117,7 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g
 .tc-gui.done{color:var(--gm)}
 
 /* THONG KE */
-.tk-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+.tk-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
 .tk-card{background:#fff;border-radius:var(--r);padding:10px 12px;box-shadow:var(--s1)}
 .tk-card.full{grid-column:1/-1}
 .tk-card.total{background:linear-gradient(135deg,var(--gd),var(--gl));color:#fff}
@@ -210,7 +211,7 @@ input[type=date]:focus{border-color:var(--gl)}
 .sg-dropdown{position:fixed;top:54px;right:10px;background:#fff;border-radius:var(--r);box-shadow:var(--s3);z-index:400;min-width:200px;max-width:280px;border:1.5px solid var(--g200);display:none;animation:fadeDown .15s ease;max-height:60vh;overflow-y:auto}
 .sg-dropdown.open{display:block}
 .sg-drop-title{font-size:11px;font-weight:700;color:var(--g600);padding:10px 14px 6px;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--g100)}
-.sg-drop-item{padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;transition:background .12s}
+.sg-drop-item{padding:11px 14px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;gap:8px;transition:background .12s}
 .sg-drop-item:last-child{border-bottom:none}
 .sg-drop-item:active{background:var(--gb)}
 .sg-drop-item-sub{font-size:10px;color:var(--g400);font-weight:400;margin-top:1px}
@@ -224,14 +225,14 @@ input[type=date]:focus{border-color:var(--gl)}
     <div class="logo">
       <div class="logo-ico">🌿</div>
       <div>
-        <div class="logo-txt">Mủ Cao Su Pro</div>
-        <div class="logo-ver">v1.9 · Quản lý mua bán</div>
+        <div class="logo-txt">Mua Bán Mủ Cao Su</div>
+        <div class="logo-ver">v2.5 · Mua Bán Mủ Cao Su</div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
       <button class="ico-btn" id="sg-btn" onclick="toggleSgDrop(event)" title="Sổ gửi">📒</button>
       <div class="sg-dropdown" id="sg-dropdown">
-        <div class="sg-drop-title">📒 Sổ gửi — Chọn khách</div>
+        <div class="sg-drop-title">📒 Sổ gửi &nbsp;<span id="sg-drop-title-count" style="font-size:10px;opacity:0.7;font-weight:400"></span></div>
         <div id="sg-drop-list"></div>
       </div>
       <button class="ico-btn" id="kh-btn" onclick="openKH()" title="Khách hàng">👥</button>
@@ -284,15 +285,23 @@ input[type=date]:focus{border-color:var(--gl)}
       <input type="text" id="mua-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('mua')" autocomplete="off" onkeydown="tenKey(event,'mua')" onfocus="scrollInputUp(this)">
       <div class="ac-list" id="mua-ac"></div>
     </div>
-    <div class="g2">
+    <div class="g2" id="mua-kg-row">
       <div class="fr">
         <label class="fl">Số kg</label>
-        <input type="number" id="mua-kg" class="fi" placeholder="0.0" step="0.1" oninput="calc('mua')" onkeydown="kgKey(event,'mua')">
+        <input type="number" id="mua-kg" class="fi" placeholder="0.0" step="0.01" oninput="calc('mua')" onkeydown="kgKey(event,'mua')">
       </div>
       <div class="fr" id="mua-do-row" style="display:none">
         <label class="fl" id="mua-do-lbl">Độ</label>
-        <input type="number" id="mua-do" class="fi" placeholder="0" step="0.01" oninput="calc('mua')">
+        <input type="number" id="mua-do" class="fi" placeholder="0" step="0.01" oninput="calc('mua')" onkeydown="doKey(event,'mua')">
       </div>
+      <div class="fr" id="mua-bi-inline" style="display:none">
+        <label class="fl" id="mua-bi-lbl-inline">Trừ bì/KH (kg)</label>
+        <input type="number" id="mua-bi-inline-inp" class="fi" placeholder="0" step="0.01" oninput="calcBi('mua')" onkeydown="biKey(event,'mua')">
+      </div>
+    </div>
+    <div class="fr" id="mua-bi-row" style="display:none">
+      <label class="fl" id="mua-bi-lbl">Trừ bì (kg) — tùy chọn</label>
+      <input type="number" id="mua-bi" class="fi" placeholder="0 (có thể bỏ trống)" step="0.01" oninput="calc('mua')" onkeydown="biKey(event,'mua')">
     </div>
     <div class="tt-box">
       <div class="tt-lbl">Thành tiền</div>
@@ -324,7 +333,8 @@ input[type=date]:focus{border-color:var(--gl)}
       <tbody id="mua-tbody"></tbody>
     </table>
   </div>
-  <div class="sec-title" style="margin-top:12px">📊 Thống kê trong ngày</div>
+  <div class="sec-divider"></div>
+  <div class="sec-title">📊 Thống kê trong ngày</div>
   <div class="tk-grid" id="mua-tk"></div>
 </div>
 </div>
@@ -363,15 +373,23 @@ input[type=date]:focus{border-color:var(--gl)}
       <input type="text" id="ban-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('ban')" autocomplete="off" onkeydown="tenKey(event,'ban')" onfocus="scrollInputUp(this)">
       <div class="ac-list" id="ban-ac"></div>
     </div>
-    <div class="g2">
+    <div class="g2" id="ban-kg-row">
       <div class="fr">
         <label class="fl">Số kg</label>
-        <input type="number" id="ban-kg" class="fi" placeholder="0.0" step="0.1" oninput="calc('ban')" onkeydown="kgKey(event,'ban')">
+        <input type="number" id="ban-kg" class="fi" placeholder="0.0" step="0.01" oninput="calc('ban')" onkeydown="kgKey(event,'ban')">
       </div>
       <div class="fr" id="ban-do-row" style="display:none">
         <label class="fl" id="ban-do-lbl">Độ</label>
-        <input type="number" id="ban-do" class="fi" placeholder="0" step="0.01" oninput="calc('ban')">
+        <input type="number" id="ban-do" class="fi" placeholder="0" step="0.01" oninput="calc('ban')" onkeydown="doKey(event,'ban')">
       </div>
+      <div class="fr" id="ban-bi-inline" style="display:none">
+        <label class="fl" id="ban-bi-lbl-inline">Trừ bì/KH (kg)</label>
+        <input type="number" id="ban-bi-inline-inp" class="fi" placeholder="0" step="0.01" oninput="calcBi('ban')" onkeydown="biKey(event,'ban')">
+      </div>
+    </div>
+    <div class="fr" id="ban-bi-row" style="display:none">
+      <label class="fl" id="ban-bi-lbl">Trừ bì (kg) — tùy chọn</label>
+      <input type="number" id="ban-bi" class="fi" placeholder="0 (có thể bỏ trống)" step="0.01" oninput="calc('ban')" onkeydown="biKey(event,'ban')">
     </div>
     <div class="tt-box ban-tt">
       <div class="tt-lbl">Thành tiền</div>
@@ -403,7 +421,8 @@ input[type=date]:focus{border-color:var(--gl)}
       <tbody id="ban-tbody"></tbody>
     </table>
   </div>
-  <div class="sec-title" style="color:var(--ad);margin-top:12px">📊 Thống kê bán ra trong ngày</div>
+  <div class="sec-divider"></div>
+  <div class="sec-title" style="color:var(--ad)">📊 Thống kê bán ra trong ngày</div>
   <div class="tk-grid" id="ban-tk"></div>
 </div>
 </div>
@@ -508,7 +527,7 @@ const LOAI_LBL = {nuoc:'Mủ nước', chen:'Mủ chén', day:'Mủ dây', dong:
 const LOAI_ICO = {nuoc:'💧', chen:'🥣', day:'🪢', dong:'🧱'};
 
 let curTab = 'mua';
-let curDate = {mua: today(), ban: today()};
+let curDate = {mua: today(), ban: today()}; // luôn lấy ngày hệ thống
 let editId  = {mua: null, ban: null};
 let dateTab = null;
 let rowT    = {};
@@ -540,7 +559,13 @@ function getSG(){ return lsGet(sgKey()) }
 function setSG(v){ lsSet(sgKey(),v) }
 
 // ─── UTILS ───
-function today(){ return new Date().toISOString().split('T')[0] }
+function today(){
+  var d = new Date();
+  var y = d.getFullYear();
+  var m = String(d.getMonth()+1).padStart(2,'0');
+  var day = String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+day; // dùng giờ địa phương (không phải UTC)
+}
 function fmtDate(s){
   if(!s) return '--';
   const [y,m,d]=s.split('-');
@@ -549,6 +574,16 @@ function fmtDate(s){
   return days[dt.getDay()]+', '+d+'/'+m+'/'+y;
 }
 function fmtNum(n){ return Math.round(n||0).toLocaleString('vi-VN') }
+function fmtKg(n){
+  var v = parseFloat(n)||0;
+  // Tối đa 3 chữ số thập phân, bỏ trailing zeros
+  return parseFloat(v.toFixed(3)).toString(); // giữ dấu . (1.4, 2.35...)
+}
+function fmtDo(n){
+  // Format độ: bỏ trailing zeros (35.100 → 35.1, 35.000 → 35, 32.200 → 32.2)
+  var v = parseFloat(n)||0;
+  return parseFloat(v.toFixed(3)).toString();
+}
 function fmtGia(raw){
   // bỏ ký tự không phải số
   var digits = String(raw).replace(/[^0-9]/g,'');
@@ -610,17 +645,53 @@ function docTien(n){
 }
 
 // ─── CÔNG THỨC TÍNH ───
-function tinhTien(loai, kg, gia, doVal){
-  kg=parseFloat(kg)||0; gia=parseFloat(gia)||0; doVal=parseFloat(doVal)||0;
+function parseNum(v){ return v!==undefined&&v!==''&&v!==null ? Number(v)||0 : 0; }
+// Trả về kg thực tế sau khi trừ bì/khấu hao (không làm tròn)
+function kgThuc(loai, kg, doVal, bi){
+  kg=parseNum(kg); doVal=parseNum(doVal); bi=parseNum(bi);
+  if(loai==='dong') return Math.max(0, kg - doVal - bi);
+  if(bi>0) return Math.max(0, kg - bi);
+  return kg;
+}
+function tinhTien(loai, kg, gia, doVal, bi){
+  kg=parseNum(kg); gia=parseNum(gia);
+  doVal=parseNum(doVal);
+  bi=parseNum(bi);
   if(!kg||!gia) return 0;
-  if(loai==='nuoc') return kg*gia*doVal;
-  if(loai==='dong'){ const kt=kg-doVal; return kt>0?kt*gia:0; }
-  return kg*gia;
+  if(loai==='nuoc'){
+    // kg x gia x do, sau đó trừ bì: (kg - bi) x gia x do
+    var kNet = bi>0 ? kg-bi : kg;
+    return kNet>0 ? kNet*gia*doVal : 0;
+  }
+  if(loai==='dong'){
+    // (kg - khấu hao) x gia, sau đó trừ bì nếu có
+    var kD = kg - doVal - bi;
+    return kD>0 ? kD*gia : 0;
+  }
+  // chen, day: (kg - bi) x gia
+  var kNet2 = bi>0 ? kg-bi : kg;
+  return kNet2>0 ? kNet2*gia : 0;
 }
 
 // ─── INIT ───
 document.addEventListener('DOMContentLoaded',()=>{
+  // Khôi phục tab đang dùng
+  var savedTab = localStorage.getItem('active_tab') || 'mua';
+  switchTab(savedTab);
+
+  // Lấy ngày hiện tại từ hệ thống điện thoại
+  var todayKey = today();
+
+  // Xoá giá nếu sang ngày mới
+  var savedDay = localStorage.getItem('gia_day');
+  if(savedDay !== todayKey){
+    localStorage.removeItem('gia3_mua');
+    localStorage.removeItem('gia3_ban');
+    localStorage.setItem('gia_day', todayKey);
+  }
+
   initGoogleAuth();
+
   ['mua','ban'].forEach(t=>{
     updDate(t);
     const l=getLoai(t);
@@ -628,17 +699,16 @@ document.addEventListener('DOMContentLoaded',()=>{
     renderTbl(t);
     updTK(t);
   });
-  // đóng dropdown khi click ngoài
+
+  // Đóng dropdown khi click ngoài
   document.addEventListener('click', e=>{
-    initGoogleAuth();
-  ['mua','ban'].forEach(t=>{
+    ['mua','ban'].forEach(t=>{
       const dd=document.getElementById(t+'-loai-dd');
       const btn=document.getElementById(t+'-loai-btn');
-      if(!btn.contains(e.target)&&!dd.contains(e.target)){
+      if(btn&&dd&&!btn.contains(e.target)&&!dd.contains(e.target)){
         closeLoaiDD(t);
       }
     });
-    // đóng sg dropdown
     const sgDd=document.getElementById('sg-dropdown');
     const sgBtn=document.getElementById('sg-btn');
     if(sgDd&&sgBtn&&!sgBtn.contains(e.target)&&!sgDd.contains(e.target)){
@@ -650,6 +720,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 // ─── TABS ───
 function switchTab(tab){
   curTab=tab;
+  localStorage.setItem('active_tab', tab);
   document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&tab==='mua')||(i===1&&tab==='ban')));
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
   document.getElementById('tab-'+tab).classList.add('active');
@@ -682,6 +753,14 @@ function toggleLoai(tab){
   const isOpen=dd.classList.contains('open');
   // đóng cái kia
   initGoogleAuth();
+  // Xoá giá nếu sang ngày mới
+  var savedDay = localStorage.getItem('gia_day');
+  var todayKey = today();
+  if(savedDay !== todayKey){
+    localStorage.removeItem('gia3_mua');
+    localStorage.removeItem('gia3_ban');
+    localStorage.setItem('gia_day', todayKey);
+  }
   ['mua','ban'].forEach(t=>{ if(t!==tab) closeLoaiDD(t); });
   if(isOpen){ closeLoaiDD(tab); } else {
     dd.classList.add('open');
@@ -696,25 +775,8 @@ var kbHideTimer = {};
 function chonLoai(tab, loai){
   closeLoaiDD(tab);
   setLoaiUI(tab, loai, true);
-  // Nếu đã có giá → focus tên ngay
-  var giaEl = document.getElementById(tab+'-gia');
-  var hasGia = giaEl && giaEl.value && giaEl.value !== '';
-  setTimeout(function(){
-    if(hasGia){
-      var tenEl = document.getElementById(tab+'-ten');
-      tenEl.focus();
-      scrollInputUp(tenEl);
-      // Ẩn bàn phím sau 5 giây nếu không nhập gì
-      if(kbHideTimer[tab]) clearTimeout(kbHideTimer[tab]);
-      kbHideTimer[tab] = setTimeout(function(){
-        if(document.activeElement === tenEl && !tenEl.value.trim()){
-          tenEl.blur();
-        }
-      }, 5000);
-    } else {
-      document.getElementById(tab+'-gia').focus();
-    }
-  }, 50);
+  // Không tự focus/hiện bàn phím, chỉ đóng dropdown
+  // Người dùng tự nhấp vào ô cần nhập
 }
 function setLoaiUI(tab, loai, updateGia){
   setLoai(tab, loai);
@@ -723,12 +785,23 @@ function setLoaiUI(tab, loai, updateGia){
   document.querySelectorAll('#'+tab+'-loai-dd .loai-opt').forEach((o,i)=>{
     o.classList.toggle('sel', ['nuoc','chen','day','dong'][i]===loai);
   });
-  // do/khauhao row
+  // do row (chỉ hiện với mủ nước)
   const dr=document.getElementById(tab+'-do-row');
   const dl=document.getElementById(tab+'-do-lbl');
   if(loai==='nuoc'){ dr.style.display='block'; dl.textContent='Độ'; }
-  else if(loai==='dong'){ dr.style.display='block'; dl.textContent='Khấu hao (kg)'; }
   else { dr.style.display='none'; document.getElementById(tab+'-do').value=''; }
+  // Mủ nước: bi hàng riêng (phía dưới)
+  // Mủ khác: bi inline cùng hàng kg (thay chỗ ô độ)
+  const brRow  = document.getElementById(tab+'-bi-row');    // hàng riêng (nước)
+  const bInline= document.getElementById(tab+'-bi-inline'); // inline (khác)
+  if(loai==='nuoc'){
+    brRow.style.display='block'; bInline.style.display='none';
+    document.getElementById(tab+'-bi-lbl').textContent='Trừ bì (kg) — tùy chọn';
+  } else {
+    brRow.style.display='none'; bInline.style.display='block';
+    var inlineLbl = loai==='dong' ? 'Trừ bì/KH (kg)' : 'Trừ bì (kg)';
+    document.getElementById(tab+'-bi-lbl-inline').textContent=inlineLbl;
+  }
   if(updateGia){
     const gia=getGia(tab);
     var gv=gia[loai]; document.getElementById(tab+'-gia').value=gv!=null?parseInt(gv).toLocaleString('vi-VN'):'';
@@ -760,19 +833,48 @@ function nf(e,id){ if(e.key==='Enter'){e.preventDefault();document.getElementByI
 function kgKey(e,tab){
   if(e.key==='Enter'){
     e.preventDefault();
-    const dr=document.getElementById(tab+'-do-row');
-    if(dr.style.display!=='none') document.getElementById(tab+'-do').focus();
-    else document.getElementById(tab+'-btns').querySelector('.btn-luu').focus();
+    var loai=getLoai(tab);
+    if(loai==='nuoc'){
+      document.getElementById(tab+'-do').focus();
+    } else {
+      document.getElementById(tab+'-bi-inline-inp').focus();
+    }
+  }
+}
+function doKey(e,tab){
+  if(e.key==='Enter'){
+    e.preventDefault();
+    // nuoc: do → bi-row → lưu
+    document.getElementById(tab+'-bi').focus();
+  }
+}
+function biKey(e,tab){
+  if(e.key==='Enter'){
+    e.preventDefault();
+    // từ bất kỳ ô bi nào → hiện popup lưu
+    luuGD(tab);
   }
 }
 
 // ─── CALC ───
+function getBiVal(tab){
+  // mủ nước dùng bi-row, loại khác dùng bi-inline
+  var loai=getLoai(tab);
+  if(loai==='nuoc'){
+    return parseFloat(document.getElementById(tab+'-bi').value)||0;
+  } else {
+    return parseFloat(document.getElementById(tab+'-bi-inline-inp').value)||0;
+  }
+}
+function calcBi(tab){ calc(tab); } // alias
+
 function calc(tab){
   const loai=getLoai(tab);
   const kg=document.getElementById(tab+'-kg').value;
   const gia=getGiaVal(tab);
   const doV=document.getElementById(tab+'-do').value;
-  const t=tinhTien(loai,kg,gia,doV);
+  const bi=getBiVal(tab);
+  const t=tinhTien(loai,kg,gia,doV,bi);
   document.getElementById(tab+'-tt-so').textContent=fmtNum(t)+' ₫';
   document.getElementById(tab+'-tt-chu').textContent=t>0?docTien(t):'--';
 }
@@ -815,48 +917,65 @@ function luuGD(tab){
   const gia=getGiaVal(tab);
   const loai=getLoai(tab);
   const doV=parseFloat(document.getElementById(tab+'-do').value)||0;
+  const bi=getBiVal(tab);
   if(!loai){ toast('⚠️ Chọn loại mủ trước!'); return; }
   if(!ten){ toast('⚠️ Nhập tên!'); document.getElementById(tab+'-ten').focus(); return; }
   if(!kg){ toast('⚠️ Nhập số kg!'); document.getElementById(tab+'-kg').focus(); return; }
   if(!gia){ toast('⚠️ Nhập đơn giá!'); document.getElementById(tab+'-gia').focus(); return; }
 
-  const tt=tinhTien(loai,kg,gia,doV);
+  const tt=tinhTien(loai,kg,gia,doV,bi);
   const giaObj=getGia(tab); giaObj[loai]=gia; setGia(tab,giaObj);
   const kh=getKH(tab); if(!kh.includes(ten)){ kh.push(ten); setKH(tab,kh); }
 
   // Xây rows chi tiết
-  const rows=buildRows(loai,ten,kg,gia,doV);
+  const rows=buildRows(loai,ten,kg,gia,doV,bi);
   showDetail('✅','Xác nhận lưu giao dịch',rows,tt,'Lưu',()=>{
-    const gd={id:Date.now()+Math.random(), date:curDate[tab], ten, loai, kg, do:doV, gia, tt, guiSo:false, edited:false};
+    const gd={id:Date.now()+Math.random(), date:curDate[tab], ten, loai, kg, do:doV, bi, gia, tt, guiSo:false, edited:false};
     const all=getGD(tab); all.push(gd); setGD(tab,all);
-    toast('✅ Đã lưu!'); resetF(tab); renderTbl(tab); updTK(tab); autoSync();
+    toast('✅ Đã lưu!'); resetF(tab); renderTbl(tab); updTK(tab); updTK('ban'); autoSync();
   });
 }
 
-function buildRows(loai,ten,kg,gia,doV){
+function buildRows(loai,ten,kg,gia,doV,bi){
+  bi=parseNum(bi);
   var donViGia = (loai==='nuoc') ? 'đ/(kg·độ)' : 'đ/kg';
+  var kgNet = kgThuc(loai, kg, doV, bi);
   var rows=[
     ['Tên', ten],
     ['Loại mủ', LOAI_ICO[loai]+' '+LOAI_LBL[loai]],
-    ['Số kg', fmtNum(kg)+' kg'],
+    ['Số kg nhập', fmtKg(kg)+' kg'],
     ['Đơn giá', fmtNum(gia)+' '+donViGia],
   ];
   if(loai==='nuoc') rows.push(['Độ', doV||0]);
-  if(loai==='dong'&&doV) rows.push(['Khấu hao', fmtNum(doV)+' kg']);
+  if(loai==='dong'&&doV) rows.push(['Khấu hao', fmtKg(doV)+' kg']);
+  if(bi>0) rows.push(['Trừ bì', fmtKg(bi)+' kg']);
+  if(bi>0||(loai==='dong'&&doV)) rows.push(['✅ Kg còn lại', fmtKg(kgNet)+' kg']);
   return rows;
 }
 
 function huyGD(tab){ resetF(tab); }
+function hideKeyboard(){
+  // Tạo input ẩn focus rồi blur để ép ẩn bàn phím mobile
+  var tmp = document.createElement('input');
+  tmp.setAttribute('type','text');
+  tmp.style.cssText='position:fixed;top:-9999px;left:-9999px;opacity:0;';
+  document.body.appendChild(tmp);
+  tmp.focus();
+  tmp.blur();
+  document.body.removeChild(tmp);
+}
 function resetF(tab){
   document.getElementById(tab+'-ten').value='';
   document.getElementById(tab+'-kg').value='';
   document.getElementById(tab+'-do').value='';
+  document.getElementById(tab+'-bi').value='';
+  document.getElementById(tab+'-bi-inline-inp').value='';
   document.getElementById(tab+'-tt-so').textContent='0 ₫';
   document.getElementById(tab+'-tt-chu').textContent='--';
   document.getElementById(tab+'-ac').style.display='none';
-  // Ẩn bàn phím trước khi focus lại
+  // Ẩn bàn phím
   if(document.activeElement) document.activeElement.blur();
-  setTimeout(function(){ document.getElementById(tab+'-ten').focus(); }, 100);
+  hideKeyboard();
 }
 
 // ─── CHINH SUA GIAO DICH ───
@@ -869,6 +988,12 @@ function editGD(tab,id){
   document.getElementById(tab+'-ten').value=gd.ten;
   document.getElementById(tab+'-kg').value=gd.kg;
   document.getElementById(tab+'-do').value=gd.do||'';
+  // restore bi vào đúng ô theo loại mủ
+  if(gd.loai==='nuoc'){
+    document.getElementById(tab+'-bi').value=gd.bi||'';
+  } else {
+    document.getElementById(tab+'-bi-inline-inp').value=gd.bi||'';
+  }
   calc(tab);
   document.getElementById(tab+'-btns').style.display='none';
   document.getElementById(tab+'-edit-btns').style.display='flex';
@@ -881,12 +1006,13 @@ function luuSua(tab){
   const gia=getGiaVal(tab);
   const loai=getLoai(tab);
   const doV=parseFloat(document.getElementById(tab+'-do').value)||0;
+  const bi=getBiVal(tab);
   if(!ten||!kg||!gia||!loai){ toast('⚠️ Điền đầy đủ!'); return; }
-  const tt=tinhTien(loai,kg,gia,doV);
+  const tt=tinhTien(loai,kg,gia,doV,bi);
   const all=getGD(tab);
   const idx=all.findIndex(g=>String(g.id)===String(id));
-  if(idx>=0){ all[idx]={...all[idx],ten,loai,kg,do:doV,gia,tt,edited:true}; setGD(tab,all); }
-  huySua(tab); renderTbl(tab); updTK(tab); toast('✅ Đã lưu thay đổi!');
+  if(idx>=0){ all[idx]={...all[idx],ten,loai,kg,do:doV,bi,gia,tt,edited:true}; setGD(tab,all); }
+  huySua(tab); renderTbl(tab); updTK(tab); updTK('ban'); toast('✅ Đã lưu thay đổi!');
 }
 function huySua(tab){
   editId[tab]=null;
@@ -897,7 +1023,7 @@ function huySua(tab){
 function xoaGD(tab){
   showDetail('🗑️','Xoá giao dịch?',[['Bạn có chắc muốn xoá?','']],null,'Xoá',()=>{
     const all=getGD(tab).filter(g=>String(g.id)!==String(editId[tab]));
-    setGD(tab,all); huySua(tab); renderTbl(tab); updTK(tab); toast('🗑️ Đã xoá!');
+    setGD(tab,all); huySua(tab); renderTbl(tab); updTK(tab); updTK('ban'); toast('🗑️ Đã xoá!');
   });
 }
 
@@ -912,7 +1038,7 @@ function onGui(tab,id){
   const gd=all.find(g=>String(g.id)===String(id));
   if(!gd) return;
   if(gd.guiSo){ toast('ℹ️ Đã ghi sổ gửi rồi!'); return; }
-  const rows=buildRows(gd.loai,gd.ten,gd.kg,gd.gia,gd.do);
+  const rows=buildRows(gd.loai,gd.ten,gd.kg,gd.gia,gd.do,gd.bi||0);
   showDetail('📒','Xác nhận ghi sổ gửi',rows,gd.tt,'Ghi sổ',()=>{
     gd.guiSo=true; setGD(tab,all);
     const sg=getSG();
@@ -938,13 +1064,13 @@ function renderTbl(tab){
   document.getElementById(tab+'-tbody').innerHTML=list.map(gd=>{
     let chat;
     if(gd.loai==='nuoc') chat=gd.do||'--';
-    else if(gd.loai==='dong') chat=(gd.do?'KH:'+gd.do:'--');
+    else if(gd.loai==='dong') chat='Đông'+(gd.do?'/KH:'+gd.do:'');
     else chat=LOAI_LBL[gd.loai];
     const guiCls='tc-gui'+(gd.guiSo?' done':'');
     const editCls=gd.edited?'edited':'';
     return '<tr class="'+editCls+'" onclick="onRow(\''+tab+'\',\''+gd.id+'\')" ondblclick="editGD(\''+tab+'\',\''+gd.id+'\')">'
       +'<td class="tc-ten" title="'+gd.ten+'">'+gd.ten+'</td>'
-      +'<td>'+gd.kg+'</td>'
+      +'<td>'+fmtKg(kgThuc(gd.loai,gd.kg,gd.do,gd.bi||0))+'</td>'
       +'<td>'+chat+'</td>'
       +'<td>'+fmtNum(gd.gia)+'</td>'
       +'<td>'+fmtNum(gd.tt)+'</td>'
@@ -958,7 +1084,7 @@ function grpByLoai(list){
   var grp={};
   list.forEach(function(gd){
     if(!grp[gd.loai]) grp[gd.loai]={kg:0,tt:0,dos:[]};
-    grp[gd.loai].kg+=parseFloat(gd.kg)||0;
+    grp[gd.loai].kg+=kgThuc(gd.loai, gd.kg, gd.do, gd.bi||0);
     grp[gd.loai].tt+=parseFloat(gd.tt)||0;
     if(gd.loai==='nuoc'&&gd.do) grp[gd.loai].dos.push(parseFloat(gd.do));
   });
@@ -985,11 +1111,11 @@ function updTK(tab){
     if(!isBanTab){
       // ── Card MUA: 1 cột ──
       var d=mData||{kg:0,tt:0,dos:[]};
-      var tbTxt=mTB!=null?('<div class="tk-sub">Độ TB: '+mTB.toFixed(3)+'</div>'):'';
-      return '<div class="tk-card" style="grid-column:1/-1">'
+      var tbTxt=mTB!=null?('<div class="tk-sub">Độ TB: '+fmtDo(mTB)+'</div>'):'';
+      return '<div class="tk-card" >'
         +'<div class="tk-lbl">'+ico+' '+lbl+'</div>'
         +'<div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:4px;margin-top:4px">'
-        +'<div><div style="font-size:11px;color:var(--g600)">Số kg</div><div style="font-size:17px;font-weight:800;color:var(--gd)">'+fmtNum(d.kg)+' kg</div></div>'
+        +'<div><div style="font-size:11px;color:var(--g600)">Số kg thực</div><div style="font-size:17px;font-weight:800;color:var(--gd)">'+fmtKg(d.kg)+' kg</div></div>'
         +'<div style="text-align:right"><div style="font-size:11px;color:var(--g600)">Thành tiền</div><div style="font-size:15px;font-weight:800;color:var(--gd)">'+fmtNum(d.tt)+' ₫</div></div>'
         +'</div>'
         +tbTxt
@@ -1007,8 +1133,8 @@ function updTK(tab){
 
       var doRow='';
       if(loai==='nuoc'){
-        var ms=mTB!=null?mTB.toFixed(3):'--';
-        var bs=bTB!=null?bTB.toFixed(3):'--';
+        var ms=mTB!=null?fmtDo(mTB):'--';
+        var bs=bTB!=null?fmtDo(bTB):'--';
         var doC=cmpColor(bTB||0,mTB||0);
         doRow='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:5px 4px;border-top:1px solid var(--g100);font-size:11px;text-align:center;align-items:center">'
           +'<span style="text-align:left;padding-left:4px;color:var(--g600)">Độ TB</span>'
@@ -1029,8 +1155,8 @@ function updTK(tab){
         // Kg
         +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:6px 4px;border-top:1px solid var(--g100);font-size:12px;text-align:center;align-items:center">'
         +'<span style="text-align:left;padding-left:4px;font-weight:600;color:var(--g600)">Số kg</span>'
-        +'<span style="color:var(--g800)">'+fmtNum(m.kg)+' kg</span>'
-        +'<span style="font-weight:800;color:'+kgC+'">'+fmtNum(b.kg)+' kg</span>'
+        +'<span style="color:var(--g800)">'+fmtKg(m.kg)+' kg</span>'
+        +'<span style="font-weight:800;color:'+kgC+'">'+fmtKg(b.kg)+' kg</span>'
         +'</div>'
         // Độ TB (chỉ nước)
         +doRow
@@ -1066,6 +1192,7 @@ function updTK(tab){
   } else {
     // ── BAN: so sánh theo từng loại mủ ──
     var muaList0=getGDDate('mua', curDate['ban']);
+    // Hiện thống kê ngay khi có dữ liệu mua (dù chưa có bán)
     if(!list.length && !muaList0.length){ cont.innerHTML=''; return; }
     var banGrp=grpByLoai(list);
     var banTotal=0; list.forEach(function(gd){ banTotal+=parseFloat(gd.tt)||0; });
@@ -1112,13 +1239,16 @@ function renderSgDrop(){
   sg.forEach(function(r){ if(!khMap[r.ten]) khMap[r.ten]={cnt:0,tt:0}; khMap[r.ten].cnt++; khMap[r.ten].tt+=r.tt; });
   var cont=document.getElementById('sg-drop-list');
   if(!cont) return;
-  if(!Object.keys(khMap).length){
+  var khCount = Object.keys(khMap).length;
+  var titleEl = document.getElementById('sg-drop-title-count');
+  if(titleEl) titleEl.textContent = khCount ? khCount+' khách hàng' : '';
+  if(!khCount){
     cont.innerHTML='<div class="no-data">Chưa có ghi chép</div>';
   } else {
     cont.innerHTML=Object.entries(khMap).map(function(e2){
       var ten=e2[0], d=e2[1];
       var safeTen=ten.replace(/'/g,"\'");
-      return '<div class="sg-drop-item" onclick="closeSgDrop();openSoGuiDetail(\''+safeTen+'\')"><div><div>👤 '+ten+'</div><div class="sg-drop-item-sub">'+d.cnt+' ghi chép · '+fmtNum(d.tt)+' ₫</div></div><span style="color:var(--g400);font-size:11px">▶</span></div>';
+      return '<div class="sg-drop-item" onclick="closeSgDrop();openSoGuiDetail(\''+safeTen+'\')">'  +'<div style="display:flex;align-items:center;gap:8px;flex:1">'  +'<span style="font-size:18px">👤</span>'  +'<div style="flex:1">'  +'<div style="font-size:14px;font-weight:700;color:var(--gd)">'+ten+'</div>'  +'<div style="font-size:11px;color:var(--g400);margin-top:1px">'+d.cnt+' ghi chép · <span style="color:var(--gm);font-weight:700">'+fmtNum(d.tt)+' ₫</span></div>'  +'</div></div>'  +'<span style="color:var(--gp);font-size:14px">▶</span></div>';
     }).join('');
   }
 }
@@ -1148,7 +1278,7 @@ function renderSoGuiDetail(ten){
     else if(r.loai==='dong'&&r.do) chatTxt=' · KH: '+r.do+'kg';
     return '<div class="sg-rec" onclick="onSgRecTap(\''+r.id+'\')" ondblclick="openSgEdit(\''+r.id+'\')">'
       +'<div class="sg-rec-row"><span class="sg-rec-ten">'+fmtDate(r.date)+'</span><span class="sg-rec-tien">'+fmtNum(r.tt)+' ₫</span></div>'
-      +'<div class="sg-rec-row" style="margin-top:3px"><span style="color:var(--g600);font-size:11px">'+LOAI_ICO[r.loai]+' '+LOAI_LBL[r.loai]+' · '+fmtNum(r.kg)+'kg'+chatTxt+'</span><span style="font-size:11px;color:var(--g600)">'+fmtNum(r.gia)+(r.loai==='nuoc'?' đ/(kg·độ)':' đ/kg')+'</span></div>'
+      +'<div class="sg-rec-row" style="margin-top:3px"><span style="color:var(--g600);font-size:11px">'+LOAI_ICO[r.loai]+' '+LOAI_LBL[r.loai]+' · '+fmtKg(r.kg)+'kg'+chatTxt+'</span><span style="font-size:11px;color:var(--g600)">'+fmtNum(r.gia)+(r.loai==='nuoc'?' đ/(kg·độ)':' đ/kg')+'</span></div>'
       +'</div>';
   }).join('');
   document.getElementById('sg-total-val').textContent=fmtNum(total)+' ₫';
@@ -1535,12 +1665,12 @@ function syncToDrive() {
   if (stEl) { stEl.textContent = 'Đang sync...'; stEl.className = 'gd-status syncing'; }
 
   var fname = 'backup_' + gdTodayStr();
-  var hdrGD = ['ID','Ngày','Tên','Loại mủ','Số kg','Độ/KH','Đơn giá','Thành tiền','Gửi sổ','Đã sửa'];
+  var hdrGD = ['Ngày','Tên','Loại mủ','Kg nhập','Kg thực','Độ/KH','Trừ bì','Đơn giá','Thành tiền','Gửi sổ'];
   function gdRows(tab) {
     return [hdrGD].concat(getGD(tab).map(function(g) {
       return [String(g.id), g.date, g.ten, LOAI_LBL[g.loai]||g.loai,
-        fmtNum(g.kg), g.do||'', fmtNum(g.gia), fmtNum(g.tt),
-        g.guiSo?'Có':'', g.edited?'Có':''];
+        fmtKg(g.kg), fmtKg(kgThuc(g.loai,g.kg,g.do,g.bi||0)), g.do||'', fmtKg(g.bi||0)||'', fmtNum(g.gia), fmtNum(g.tt),
+        g.guiSo?'Có':''];
     }));
   }
 
@@ -1574,9 +1704,9 @@ function syncSoGui() {
     if (idx >= khs.length) { toast('📒 Sổ gửi đã cập nhật!'); return; }
     var ten = khs[idx++];
     var rows = byKH[ten];
-    var hdr = ['Ngày','Loại mủ','Số kg','Độ/KH','Đơn giá','Thành tiền'];
+    var hdr = ['Ngày','Loại mủ','Kg nhập','Kg thực','Trừ bì','Đơn giá','Thành tiền'];
     var data = [hdr].concat(rows.map(function(r) {
-      return [r.date, LOAI_LBL[r.loai]||r.loai, fmtNum(r.kg), r.do||'', fmtNum(r.gia), fmtNum(r.tt)];
+      return [r.date, LOAI_LBL[r.loai]||r.loai, fmtKg(r.kg), fmtKg(kgThuc(r.loai,r.kg,r.do,r.bi||0)), fmtKg(r.bi||0)||'', fmtNum(r.gia), fmtNum(r.tt)];
     }));
     // Tổng cộng
     var total = rows.reduce(function(s,r) { return s + (parseFloat(r.tt)||0); }, 0);
