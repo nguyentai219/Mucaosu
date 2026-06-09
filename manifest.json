@@ -1,17 +1,35 @@
 {
   "name": "Mua Bán Mủ Cao Su",
   "short_name": "Mủ Cao Su",
-  "description": "Phần mềm ghi chép mua bán mủ cao su - v2.5",
+  "description": "Phần mềm ghi chép mua bán mủ cao su - v2.9",
   "start_url": "/Mucaosu/index.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#1a472a",
   "theme_color": "#1a472a",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ],
-  "categories": ["business","finance"],
+  "categories": [
+    "business",
+    "finance"
+  ],
   "lang": "vi",
   "scope": "/Mucaosu/"
 }
