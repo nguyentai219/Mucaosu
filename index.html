@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v2.9</title>
+<title>Mua Bán Mủ Cao Su v3.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -264,6 +264,14 @@ input[type=date]:focus{border-color:var(--gl)}
 .ss-popup-box{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;padding:16px 14px 36px;animation:slideUp .22s ease}
 .ss-popup-date{font-size:12px;color:var(--g400);text-align:center;margin-bottom:12px}
 .ss-popup-title{font-size:15px;font-weight:800;color:var(--gd);text-align:center;margin-bottom:4px}
+
+/* TOGGLE SWITCH */
+.toggle-sw{position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0}
+.toggle-sw input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;cursor:pointer;inset:0;background:var(--g200);border-radius:26px;transition:.3s}
+.toggle-slider:before{position:absolute;content:'';height:20px;width:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle-sw input:checked + .toggle-slider{background:var(--gl)}
+.toggle-sw input:checked + .toggle-slider:before{transform:translateX(20px)}
 </style>
 </head>
 <body>
@@ -275,7 +283,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="logo-ico">🌿</div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.9</div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.1</div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -284,6 +292,7 @@ input[type=date]:focus{border-color:var(--gl)}
         <div class="sg-drop-title">📒 Sổ gửi &nbsp;<span id="sg-drop-title-count" style="font-size:10px;opacity:0.7;font-weight:400"></span></div>
         <div id="sg-drop-list"></div>
       </div>
+      <button class="ico-btn" id="settings-btn" onclick="openSettings()" title="Cài đặt">⚙️</button>
       <button class="ico-btn" id="kh-btn" onclick="openKH()" title="Khách hàng">👥</button>
     </div>
   </div>
@@ -362,12 +371,12 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="tt-chu" id="mua-tt-chu">--</div>
     </div>
     <div class="btn-row" id="mua-btns">
-      <button class="btn-luu" onclick="luuGD('mua')">✅ Lưu giao dịch</button>
       <button class="btn-huy" onclick="huyGD('mua')">Huỷ</button>
+      <button class="btn-luu" onclick="luuGD('mua')">✅ Lưu giao dịch</button>
     </div>
     <div class="btn-row" id="mua-edit-btns" style="display:none">
-      <button class="btn-luu edit-mode" onclick="luuSua('mua')">💾 Lưu thay đổi</button>
       <button class="btn-huy" onclick="huySua('mua')">Huỷ</button>
+      <button class="btn-luu edit-mode" onclick="luuSua('mua')">💾 Lưu thay đổi</button>
       <button class="btn-xoa" onclick="xoaGD('mua')">🗑️</button>
     </div>
   </div>
@@ -450,12 +459,12 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="tt-chu" id="ban-tt-chu">--</div>
     </div>
     <div class="btn-row" id="ban-btns">
-      <button class="btn-luu ban-luu" onclick="luuGD('ban')">✅ Lưu giao dịch</button>
       <button class="btn-huy" onclick="huyGD('ban')">Huỷ</button>
+      <button class="btn-luu ban-luu" onclick="luuGD('ban')">✅ Lưu giao dịch</button>
     </div>
     <div class="btn-row" id="ban-edit-btns" style="display:none">
-      <button class="btn-luu edit-mode" onclick="luuSua('ban')">💾 Lưu thay đổi</button>
       <button class="btn-huy" onclick="huySua('ban')">Huỷ</button>
+      <button class="btn-luu edit-mode" onclick="luuSua('ban')">💾 Lưu thay đổi</button>
       <button class="btn-xoa" onclick="xoaGD('ban')">🗑️</button>
     </div>
   </div>
@@ -601,6 +610,39 @@ input[type=date]:focus{border-color:var(--gl)}
     </div>
     <div id="ss-popup-tk"></div>
     <button class="btn-huy" style="width:100%;margin-top:10px" onclick="closeSSPopup()">Đóng</button>
+  </div>
+</div>
+
+<!-- MODAL CÀI ĐẶT -->
+<div class="modal" id="modal-settings">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚙️ Cài đặt</div>
+    <div style="padding:4px 0">
+      <!-- LÀM TRÒN TIỀN -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 4px;border-bottom:1px solid var(--g100)">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--g800)">Làm tròn số tiền</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:2px">≤499 → bỏ · ≥500 → +1.000</div>
+        </div>
+        <label class="toggle-sw">
+          <input type="checkbox" id="setting-round" onchange="saveSetting('round',this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <!-- AUTO SYNC -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 4px">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--g800)">Tự đồng bộ sau khi lưu</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:2px">Đồng bộ Drive ngay khi có thay đổi</div>
+        </div>
+        <label class="toggle-sw">
+          <input type="checkbox" id="setting-autosync" checked onchange="saveSetting('autosync',this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+    <button class="btn-huy" style="width:100%;margin-top:10px" onclick="closeM('modal-settings')">Đóng</button>
   </div>
 </div>
 
@@ -872,6 +914,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     updDate(t);
     const l=getLoai(t);
     if(l) setLoaiUI(t,l,false);
+    restoreGia(t);
     renderTbl(t);
     updTK(t);
   });
@@ -917,11 +960,13 @@ function applyDate(){
   const v=document.getElementById('date-inp').value;
   if(!v){ closeM('modal-date'); return; }
   curDate[dateTab]=v;
-  updDate(dateTab);
+  // Đồng bộ ngày cho cả 2 tab (xem cùng ngày)
+  curDate['mua']=v; curDate['ban']=v;
+  updDate('mua'); updDate('ban');
   closeM('modal-date');
-  huySua(dateTab); huyGD(dateTab);
-  renderTbl(dateTab); updTK(dateTab);
-  toast('Đã chuyển ngày '+fmtDate(v));
+  ['mua','ban'].forEach(function(t){ huySua(t); huyGD(t); renderTbl(t); updTK(t); });
+  if(typeof updSSSummary==='function') updSSSummary();
+  toast('Đã chuyển sang ngày '+fmtDate(v));
 }
 
 // ─── LOAI MU DROPDOWN ───
@@ -983,6 +1028,17 @@ function setLoaiUI(tab, loai, updateGia){
   if(updateGia){
     const gia=getGia(tab);
     var gv=gia[loai]; document.getElementById(tab+'-gia').value=gv!=null?parseInt(gv).toLocaleString('vi-VN'):'';
+    calc(tab);
+  }
+}
+// Khôi phục giá vào ô input khi load (dùng giá đã nhập gần nhất cho loại mủ hiện tại)
+function restoreGia(tab){
+  var loai=getLoai(tab);
+  if(!loai) return;
+  var gia=getGia(tab);
+  var gv=gia[loai];
+  if(gv!=null){
+    document.getElementById(tab+'-gia').value=parseInt(gv).toLocaleString('vi-VN');
     calc(tab);
   }
 }
@@ -1053,8 +1109,14 @@ function calc(tab){
   const doV=document.getElementById(tab+'-do').value;
   const bi=getBiVal(tab);
   const t=tinhTien(loai,kg,gia,doV,bi);
-  document.getElementById(tab+'-tt-so').textContent=fmtNum(t)+' ₫';
-  document.getElementById(tab+'-tt-chu').textContent=t>0?docTien(t):'--';
+  // Áp dụng làm tròn nếu bật
+  var tDisplay=t;
+  if(getSetting&&getSetting('round',false)){
+    var rem=Math.round(t)%1000;
+    tDisplay=rem>=500?Math.round(t)-rem+1000:Math.round(t)-rem;
+  }
+  document.getElementById(tab+'-tt-so').textContent=fmtNum(tDisplay)+' ₫';
+  document.getElementById(tab+'-tt-chu').textContent=tDisplay>0?docTien(tDisplay):'--';
 }
 
 // ─── POPUP CHI TIET ───
@@ -1101,7 +1163,12 @@ function luuGD(tab){
   if(!kg){ toast('⚠️ Nhập số kg!'); document.getElementById(tab+'-kg').focus(); return; }
   if(!gia){ toast('⚠️ Nhập đơn giá!'); document.getElementById(tab+'-gia').focus(); return; }
 
-  const tt=tinhTien(loai,kg,gia,doV,bi);
+  var ttRaw=tinhTien(loai,kg,gia,doV,bi);
+  var tt=ttRaw;
+  if(getSetting&&getSetting('round',false)){
+    var r3=Math.round(ttRaw)%1000;
+    tt=r3>=500?Math.round(ttRaw)-r3+1000:Math.round(ttRaw)-r3;
+  }
   const giaObj=getGia(tab); giaObj[loai]=gia; setGia(tab,giaObj);
   const kh=getKH(tab); if(!kh.includes(ten)){ kh.push(ten); setKH(tab,kh); }
 
@@ -1186,7 +1253,12 @@ function luuSua(tab){
   const doV=parseFloat(document.getElementById(tab+'-do').value)||0;
   const bi=getBiVal(tab);
   if(!ten||!kg||!gia||!loai){ toast('⚠️ Điền đầy đủ!'); return; }
-  const tt=tinhTien(loai,kg,gia,doV,bi);
+  var ttRaw=tinhTien(loai,kg,gia,doV,bi);
+  var tt=ttRaw;
+  if(getSetting&&getSetting('round',false)){
+    var r3=Math.round(ttRaw)%1000;
+    tt=r3>=500?Math.round(ttRaw)-r3+1000:Math.round(ttRaw)-r3;
+  }
   const all=getGD(tab);
   const idx=all.findIndex(g=>String(g.id)===String(id));
   if(idx>=0){ all[idx]={...all[idx],ten,loai,kg,do:doV,bi,gia,tt,edited:true}; setGD(tab,all); }
@@ -1868,12 +1940,27 @@ function syncToDrive() {
   if (stEl) { stEl.textContent = 'Đang sync...'; stEl.className = 'gd-status syncing'; }
 
   var fname = 'backup_' + gdTodayStr();
-  var hdrGD = ['Ngày','Tên','Loại mủ','Kg nhập','Kg thực','Độ/KH','Trừ bì','Đơn giá','Thành tiền','Gửi sổ'];
+  var hdrGD = ['Ngày','Tên','Loại mủ','Kg nhập','Trừ bì','Kg thực','Độ/KH','Đơn giá','Thành tiền','Gửi sổ'];
+  function fmtDateVN(dateStr){
+    if(!dateStr) return '';
+    var p=dateStr.split('-');
+    return p.length===3 ? p[2]+'/'+p[1]+'/'+p[0] : dateStr;
+  }
   function gdRows(tab) {
     return [hdrGD].concat(getGD(tab).map(function(g) {
-      return [String(g.id), g.date, g.ten, LOAI_LBL[g.loai]||g.loai,
-        fmtKg(g.kg), fmtKg(kgThuc(g.loai,g.kg,g.do,g.bi||0)), g.do||'', fmtKg(g.bi||0)||'', fmtNum(g.gia), fmtNum(g.tt),
-        g.guiSo?'Có':''];
+      var biVal = parseFloat(g.bi)||0;
+      return [
+        fmtDateVN(g.date),
+        g.ten,
+        LOAI_LBL[g.loai]||g.loai,
+        fmtKg(g.kg),
+        biVal>0 ? fmtKg(biVal) : '',
+        fmtKg(kgThuc(g.loai,g.kg,g.do,g.bi||0)),
+        g.do||'',
+        fmtNum(g.gia),
+        fmtNum(g.tt),
+        g.guiSo?'Có':''
+      ];
     }));
   }
 
@@ -1907,9 +1994,10 @@ function syncSoGui() {
     if (idx >= khs.length) { toast('📒 Sổ gửi đã cập nhật!'); return; }
     var ten = khs[idx++];
     var rows = byKH[ten];
-    var hdr = ['Ngày','Loại mủ','Kg nhập','Kg thực','Trừ bì','Đơn giá','Thành tiền'];
+    var hdr = ['Ngày','Loại mủ','Kg nhập','Trừ bì','Kg thực','Đơn giá','Thành tiền'];
     var data = [hdr].concat(rows.map(function(r) {
-      return [r.date, LOAI_LBL[r.loai]||r.loai, fmtKg(r.kg), fmtKg(kgThuc(r.loai,r.kg,r.do,r.bi||0)), fmtKg(r.bi||0)||'', fmtNum(r.gia), fmtNum(r.tt)];
+      var biSG = parseFloat(r.bi)||0;
+      return [fmtDateVN(r.date), LOAI_LBL[r.loai]||r.loai, fmtKg(r.kg), biSG>0?fmtKg(biSG):'', fmtKg(kgThuc(r.loai,r.kg,r.do,r.bi||0)), fmtNum(r.gia), fmtNum(r.tt)];
     }));
     // Tổng cộng
     var total = rows.reduce(function(s,r) { return s + (parseFloat(r.tt)||0); }, 0);
@@ -1968,10 +2056,8 @@ function openDriveFolder() {
   if (gdFolderId) window.open('https://drive.google.com/drive/folders/' + gdFolderId, '_blank');
 }
 
-function autoSync() {
-  if (gdToken && gdFolderId) setTimeout(syncToDriver, 2000);
-}
-function syncToDriver() { syncToDrive(); }
+// autoSync được định nghĩa trong settings JS block ở trên
+function syncToDriver() { syncToDrive(); } // giữ lại cho compatibility
 
 
 
@@ -2309,6 +2395,9 @@ function luuSoSach() {
     });
     localStorage.setItem('ss_data', JSON.stringify(ssData));
     toast('✅ Đã lưu Sổ Sách ngày ' + fmtDate(dateStr) + '!');
+    // Đồng bộ lên Drive tab riêng
+    var savedEntry = ssData[dateStr].find(function(e){ return e.loai === ssLoai; });
+    if (savedEntry) syncSoSachToDrive(dateStr, savedEntry);
   });
 }
 
@@ -2429,6 +2518,131 @@ function docThanhTien() {
 if ('speechSynthesis' in window) {
   window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
 }
+
+// ══════════════════════════════════════════
+// CÀI ĐẶT
+// ══════════════════════════════════════════
+function getSetting(key, def) {
+  var v = localStorage.getItem('setting_' + key);
+  return v === null ? def : v === 'true';
+}
+function saveSetting(key, val) {
+  localStorage.setItem('setting_' + key, val);
+  if (key === 'round') {
+    // Tính lại thành tiền hiện tại
+    ['mua','ban'].forEach(function(t){ calc(t); });
+  }
+}
+function openSettings() {
+  document.getElementById('setting-round').checked = getSetting('round', false);
+  document.getElementById('setting-autosync').checked = getSetting('autosync', true);
+  openM('modal-settings');
+}
+// Override fmtNum để làm tròn nếu bật setting
+var _origFmtNum = fmtNum;
+function fmtNumRound(n) {
+  n = Math.round(n||0);
+  if (getSetting('round', false)) {
+    var rem = n % 1000;
+    n = rem >= 500 ? n - rem + 1000 : n - rem;
+  }
+  return n.toLocaleString('vi-VN');
+}
+
+// ══════════════════════════════════════════
+// AUTO SYNC VỚI TRẠNG THÁI & OFFLINE QUEUE
+// ══════════════════════════════════════════
+var syncQueue = false; // có pending sync không
+
+function updGDBarStatus(msg, cls) {
+  var el = document.getElementById('gd-bar-status');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'gd-status ' + cls;
+}
+
+function autoSync() {
+  if (!getSetting('autosync', true)) return;
+  if (!gdToken || !gdFolderId) return;
+  if (!navigator.onLine) {
+    syncQueue = true;
+    updGDBarStatus('Chờ kết nối...', 'syncing');
+    toast('📶 Offline — sẽ đồng bộ khi có mạng');
+    return;
+  }
+  doAutoSync();
+}
+
+function doAutoSync() {
+  updGDBarStatus('Đang đồng bộ...', 'syncing');
+  syncToDrive_silent();
+}
+
+// Sync Drive không hiện toast (silent)
+function syncToDrive_silent() {
+  if (!gdToken || !gdFolderId || gdSyncing) return;
+  gdSyncing = true;
+  var hdrGD2 = ['Ngày','Tên','Loại mủ','Kg nhập','Trừ bì','Kg thực','Độ/KH','Đơn giá','Thành tiền','Gửi sổ'];
+  function fmtDateVN2(ds){ var p=ds?ds.split('-'):[]; return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:ds||''; }
+  function gdRows2(tab) {
+    return [hdrGD2].concat(getGD(tab).map(function(g) {
+      var bi=parseFloat(g.bi)||0;
+      return [fmtDateVN2(g.date), g.ten, LOAI_LBL[g.loai]||g.loai,
+        fmtKg(g.kg), bi>0?fmtKg(bi):'', fmtKg(kgThuc(g.loai,g.kg,g.do,g.bi||0)),
+        g.do||'', fmtNum(g.gia), fmtNum(g.tt), g.guiSo?'Có':''];
+    }));
+  }
+  var fname = 'backup_' + gdTodayStr();
+  upsertSheet(fname, [
+    { name: 'Thu_Mua', rows: gdRows2('mua') },
+    { name: 'Ban_Ra',  rows: gdRows2('ban') }
+  ], function() {
+    gdSyncing = false;
+    syncQueue = false;
+    localStorage.setItem('gd_last_sync', Date.now().toString());
+    updGDBarStatus('Đã kết nối', 'synced');
+  });
+}
+
+// Lắng nghe khi có mạng trở lại
+window.addEventListener('online', function() {
+  if (syncQueue && gdToken && gdFolderId) {
+    toast('📶 Đã có mạng — đang đồng bộ...');
+    doAutoSync();
+  }
+});
+window.addEventListener('offline', function() {
+  updGDBarStatus('Offline', 'offline');
+});
+
+// Override tinhTien để áp dụng làm tròn khi tính thành tiền hiển thị
+var _origTinhTien = tinhTien;
+function tinhTienDisplay(loai, kg, gia, doVal, bi) {
+  var t = tinhTien(loai, kg, gia, doVal, bi);
+  if (getSetting('round', false)) {
+    var rem = Math.round(t) % 1000;
+    t = rem >= 500 ? Math.round(t) - rem + 1000 : Math.round(t) - rem;
+  }
+  return t;
+}
+
+// ══════════════════════════════════════════
+// SỔ SÁCH: chỉ sync khi nhấn Lưu Sổ Sách
+// ══════════════════════════════════════════
+function syncSoSachToDrive(dateStr, ssEntry) {
+  if (!gdToken || !gdFolderId) { toast('⚠️ Chưa kết nối Drive!'); return; }
+  var fname = 'backup_' + gdTodayStr();
+  var hdr = ['Ngày','Loại mủ','Tên','Kg','Độ','Đơn giá (đ/độ)','Thành tiền'];
+  var rows = [hdr].concat(ssEntry.list.map(function(p) {
+    return [fmtDateVN_ss(dateStr), LOAI_LBL[ssEntry.loai]||ssEntry.loai, p.ten,
+      fmtKg(p.kg), ssEntry.loai==='nuoc'?p.do.toFixed(1):'', fmtNum(ssEntry.gia), fmtNum(p.tien)];
+  }));
+  rows.push(['','','','','TỔNG CỘNG','', fmtNum(Math.round(ssEntry.totalTien))]);
+  upsertSheet(fname, [{ name: 'So_Sach', rows: rows }], function() {
+    toast('✅ Đã đồng bộ Sổ Sách lên Drive!');
+  });
+}
+function fmtDateVN_ss(ds){ var p=ds?ds.split('-'):[]; return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:ds||''; }
 
 // ─── SERVICE WORKER ───
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
