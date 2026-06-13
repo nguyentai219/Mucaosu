@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v4.0</title>
+<title>Mua Bán Mủ Cao Su v4.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -301,7 +301,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="logo-ico">🌿</div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v4.0 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v4.1 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -450,7 +450,7 @@ input[type=date]:focus{border-color:var(--gl)}
     </div>
     <div class="fr">
       <label class="fl">Tên người mua</label>
-      <input type="text" id="ban-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('ban')" autocomplete="off" onkeydown="tenKey(event,'ban')" onfocus="scrollInputUp(this)">
+      <input type="text" id="ban-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('ban')" autocomplete="off" onkeydown="tenKey(event,'ban')" onfocus="scrollInputUp(this)" onblur="var l=getLoai('ban');var t=this.value.trim();if(l&&t)saveLastBuyer(l,t);">
       <div class="ac-list" id="ban-ac"></div>
     </div>
     <div class="g2" id="ban-kg-row">
@@ -1166,7 +1166,22 @@ function setLoaiUI(tab, loai, updateGia){
     var gv=gia[loai]; document.getElementById(tab+'-gia').value=gv!=null?parseInt(gv).toLocaleString('vi-VN'):'';
     calc(tab);
   }
-  if(tab==='ban') setTimeout(updBanHints, 30);
+  if(tab==='ban') {
+    setTimeout(updBanHints, 30);
+    setTimeout(function(){ restoreLastBuyer(loai); }, 30);
+  }
+}
+function restoreLastBuyer(loai){
+  var lb = JSON.parse(localStorage.getItem('ban_last_buyer')||'{}');
+  var tenEl = document.getElementById('ban-ten');
+  if(!tenEl) return;
+  tenEl.value = lb[loai] || '';
+}
+function saveLastBuyer(loai, ten){
+  if(!ten) return;
+  var lb = JSON.parse(localStorage.getItem('ban_last_buyer')||'{}');
+  lb[loai] = ten;
+  localStorage.setItem('ban_last_buyer', JSON.stringify(lb));
 }
 // Khôi phục giá vào ô input khi load (dùng giá đã nhập gần nhất cho loại mủ hiện tại)
 function restoreGia(tab){
@@ -1193,12 +1208,29 @@ function onTen(tab){
   ac.style.display='block';
 }
 function tenKey(e,tab){
-  if(e.key==='Enter'){ document.getElementById(tab+'-ac').style.display='none'; document.getElementById(tab+'-kg').focus(); }
+  if(e.key==='Enter'){
+    document.getElementById(tab+'-ac').style.display='none';
+    if(tab==='ban'){
+      // Lưu người mua gần nhất cho loại mủ hiện tại
+      var loai=getLoai('ban');
+      var ten=document.getElementById('ban-ten').value.trim();
+      if(loai&&ten) saveLastBuyer(loai, ten);
+      document.getElementById('ban-gia').focus();
+    } else {
+      document.getElementById(tab+'-kg').focus();
+    }
+  }
 }
 function pickKH(tab,name){
   document.getElementById(tab+'-ten').value=name;
   document.getElementById(tab+'-ac').style.display='none';
-  setTimeout(function(){ document.getElementById(tab+'-kg').focus(); }, 50);
+  if(tab==='ban'){
+    var loai=getLoai('ban');
+    if(loai) saveLastBuyer(loai, name);
+    setTimeout(function(){ document.getElementById('ban-gia').focus(); }, 50);
+  } else {
+    setTimeout(function(){ document.getElementById(tab+'-kg').focus(); }, 50);
+  }
 }
 function nf(e,id){ if(e.key==='Enter'){e.preventDefault();document.getElementById(id).focus();} }
 function kgKey(e,tab){
