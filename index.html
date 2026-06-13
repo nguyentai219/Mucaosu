@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v3.8</title>
+<title>Mua Bán Mủ Cao Su v3.9</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -301,7 +301,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="logo-ico">🌿</div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.8</div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.9 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -669,6 +669,12 @@ input[type=date]:focus{border-color:var(--gl)}
           <span class="toggle-slider"></span>
         </label>
       </div>
+      <!-- GIA HẠN -->
+      <div style="padding:14px 4px;border-top:1px solid var(--g100)">
+        <div style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:2px">Thời hạn sử dụng</div>
+        <div id="settings-license-info" style="font-size:12px;color:var(--g600);margin-bottom:8px"></div>
+        <button onclick="openGiaHan()" style="width:100%;padding:10px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">🔑 Gia hạn thời gian sử dụng</button>
+      </div>
     </div>
     <button class="btn-huy" style="width:100%;margin-top:10px" onclick="closeM('modal-settings')">Đóng</button>
   </div>
@@ -685,6 +691,38 @@ input[type=date]:focus{border-color:var(--gl)}
     <div class="cfm-btns">
       <button class="cfm-btn n" onclick="closeM('modal-reset-thang')">Huỷ</button>
       <button class="cfm-btn y" style="background:#dc2626" onclick="doResetThang()">Đặt lại</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL HẾT HẠN -->
+<div class="modal center" id="modal-expired">
+  <div class="modal-box center-box" style="max-width:320px">
+    <div style="font-size:40px;text-align:center;margin-bottom:10px">⏰</div>
+    <div style="font-size:15px;font-weight:800;text-align:center;color:#dc2626;margin-bottom:8px">Đã hết thời hạn sử dụng</div>
+    <div style="font-size:13px;color:var(--g600);text-align:center;line-height:1.6;margin-bottom:14px">
+      Bạn đã hết thời hạn sử dụng app.<br>
+      Liên hệ <b>0987.656.701</b><br>hoặc <b>taidautieng@gmail.com</b><br>để gia hạn.
+    </div>
+    <div style="font-size:11px;color:var(--g400);text-align:center;margin-bottom:12px">
+      Bạn vẫn có thể xem lại dữ liệu cũ, nhưng không thể ghi/sửa dữ liệu mới.
+    </div>
+    <button class="btn-luu" style="width:100%" onclick="closeM('modal-expired')">OK, đã hiểu</button>
+  </div>
+</div>
+
+<!-- MODAL GIA HẠN -->
+<div class="modal center" id="modal-gia-han">
+  <div class="modal-box center-box" style="max-width:320px">
+    <div style="font-size:32px;text-align:center;margin-bottom:8px">🔑</div>
+    <div style="font-size:15px;font-weight:800;text-align:center;color:var(--g800);margin-bottom:10px">Gia hạn thời gian sử dụng</div>
+    <input type="password" id="gh-pw-input" class="fi" placeholder="Nhập mật khẩu..." style="margin-bottom:8px">
+    <input type="number" id="gh-days-input" class="fi" placeholder="Số ngày gia hạn (VD: 30)" style="margin-bottom:8px">
+    <div id="gh-err" style="color:#dc2626;font-size:11px;margin-bottom:8px;display:none">❌ Mật khẩu không đúng!</div>
+    <div id="gh-info" style="font-size:11px;color:var(--g600);margin-bottom:8px;text-align:center"></div>
+    <div class="cfm-btns">
+      <button class="cfm-btn n" onclick="closeM('modal-gia-han')">Huỷ</button>
+      <button class="cfm-btn y" onclick="doGiaHan()">Gia hạn</button>
     </div>
   </div>
 </div>
@@ -954,6 +992,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
 
   initGoogleAuth();
+  checkLicenseOnLoad();
 
   ['mua','ban'].forEach(t=>{
     updDate(t);
@@ -1228,6 +1267,7 @@ function closeCfm(){ closeM('modal-cfm'); }
 
 // ─── LUU GIAO DICH ───
 function luuGD(tab){
+  if(guardLicense()) return;
   const ten=document.getElementById(tab+'-ten').value.trim();
   const kg=parseFloat(document.getElementById(tab+'-kg').value)||0;
   const gia=getGiaVal(tab);
@@ -1321,6 +1361,7 @@ function editGD(tab,id){
   document.getElementById(tab+'-fc').scrollIntoView({behavior:'smooth'});
 }
 function luuSua(tab){
+  if(guardLicense()) return;
   const id=editId[tab]; if(!id) return;
   const ten=document.getElementById(tab+'-ten').value.trim();
   const kg=parseFloat(document.getElementById(tab+'-kg').value)||0;
@@ -1347,6 +1388,7 @@ function huySua(tab){
   resetF(tab);
 }
 function xoaGD(tab){
+  if(guardLicense()) return;
   showDetail('🗑️','Xoá giao dịch?',[['Bạn có chắc muốn xoá?','']],null,'Xoá',()=>{
     const all=getGD(tab).filter(g=>String(g.id)!==String(editId[tab]));
     setGD(tab,all); huySua(tab); renderTbl(tab); updTK(tab); updTK('ban'); if(typeof updThangData==='function') updThangData(); toast('🗑️ Đã xoá!');
@@ -2257,6 +2299,7 @@ function round1dec(v) {
 }
 
 function tinhToanSS() {
+  if(guardLicense()) return;
   var warn = document.getElementById('ss-warn');
   var result = document.getElementById('ss-result');
   warn.style.display = 'none';
@@ -2575,6 +2618,7 @@ function restoreSsState(forDate) {
 
 // ─── LƯU SỔ SÁCH ───
 function luuSoSach() {
+  if(guardLicense()) return;
   if (!window._ssResult) return;
   var r = window._ssResult;
   var totalKg = r.newKgs.reduce(function(a,b){return a+b;},0);
@@ -2758,6 +2802,12 @@ function saveSetting(key, val) {
 function openSettings() {
   document.getElementById('setting-round').checked = getSetting('round', false);
   document.getElementById('setting-autosync').checked = getSetting('autosync', true);
+  var info = document.getElementById('settings-license-info');
+  if (info) {
+    var days = getRemainingDays();
+    if (days > 0) info.innerHTML = '✅ Còn <b style="color:var(--gd)">' + days + ' ngày</b> sử dụng';
+    else info.innerHTML = '❌ <b style="color:#dc2626">Đã hết hạn</b> — chỉ xem được dữ liệu cũ';
+  }
   openM('modal-settings');
 }
 // Override fmtNum để làm tròn nếu bật setting
@@ -3038,6 +3088,101 @@ function updBanHints() {
   if(giaEl && !giaEl.value) giaEl.placeholder = giaLast>0 ? fmtNum(giaLast) : '0';
   if(kgEl  && !kgEl.value)  kgEl.placeholder  = totalKg>0 ? fmtKg(totalKg)  : '0.0';
   if(doEl  && !doEl.value)  doEl.placeholder   = doTBval>0 ? fmtDo(doTBval)  : '0';
+}
+
+// ══════════════════════════════════════════
+// HỆ THỐNG GIỚI HẠN THỜI GIAN SỬ DỤNG
+// ══════════════════════════════════════════
+var LICENSE_PW = '28082008';
+var TRIAL_DAYS = 3;
+var MS_PER_DAY = 24*60*60*1000;
+
+function getLicenseExpiry() {
+  var v = localStorage.getItem('license_expiry');
+  if (!v) {
+    // Lần đầu chạy: đặt hạn dùng thử = hôm nay + TRIAL_DAYS
+    var expiry = Date.now() + TRIAL_DAYS * MS_PER_DAY;
+    localStorage.setItem('license_expiry', String(expiry));
+    return expiry;
+  }
+  return parseInt(v);
+}
+
+function getRemainingDays() {
+  var expiry = getLicenseExpiry();
+  var diff = expiry - Date.now();
+  return Math.ceil(diff / MS_PER_DAY);
+}
+
+function isLicenseExpired() {
+  return Date.now() >= getLicenseExpiry();
+}
+
+// Kiểm tra khi khởi động: nếu hết hạn → hiện popup
+function checkLicenseOnLoad() {
+  updLicenseCountdown();
+  if (isLicenseExpired()) {
+    setTimeout(function(){ openM('modal-expired'); }, 400);
+  }
+}
+
+// Hiện số ngày còn lại cạnh version
+function updLicenseCountdown() {
+  var el = document.getElementById('license-countdown');
+  if (!el) return;
+  var days = getRemainingDays();
+  if (days > 0) {
+    el.textContent = '· còn ' + days + ' ngày';
+    el.style.color = days <= 1 ? '#fca5a5' : 'rgba(255,255,255,.7)';
+  } else {
+    el.textContent = '· hết hạn';
+    el.style.color = '#fca5a5';
+    el.style.fontWeight = '700';
+  }
+}
+
+// Chặn ghi/sửa nếu hết hạn - gọi ở đầu các hàm luuGD, luuSua, xoaGD, luuSoSach
+function guardLicense() {
+  if (isLicenseExpired()) {
+    openM('modal-expired');
+    return true; // bị chặn
+  }
+  return false; // OK
+}
+
+// ── MỞ MODAL GIA HẠN ──
+function openGiaHan() {
+  document.getElementById('gh-pw-input').value = '';
+  document.getElementById('gh-days-input').value = '';
+  document.getElementById('gh-err').style.display = 'none';
+  var days = getRemainingDays();
+  var info = document.getElementById('gh-info');
+  if (info) {
+    info.textContent = days > 0 ? 'Hiện còn ' + days + ' ngày sử dụng' : 'Đã hết hạn sử dụng';
+  }
+  closeM('modal-settings');
+  openM('modal-gia-han');
+}
+
+function doGiaHan() {
+  var pw = document.getElementById('gh-pw-input').value;
+  var days = parseInt(document.getElementById('gh-days-input').value)||0;
+  if (pw !== LICENSE_PW) {
+    document.getElementById('gh-err').style.display = 'block';
+    return;
+  }
+  if (days <= 0) {
+    toast('⚠️ Nhập số ngày hợp lệ!');
+    return;
+  }
+  // Gia hạn thêm `days` ngày tính từ HIỆN TẠI (không cộng dồn vào hạn cũ nếu đã hết hạn)
+  var currentExpiry = getLicenseExpiry();
+  var base = Math.max(currentExpiry, Date.now()); // nếu đã hết hạn, tính từ hôm nay
+  var newExpiry = base + days * MS_PER_DAY;
+  localStorage.setItem('license_expiry', String(newExpiry));
+  updLicenseCountdown();
+  closeM('modal-gia-han');
+  toast('✅ Đã gia hạn thêm ' + days + ' ngày!');
 }
 
 // ─── SERVICE WORKER ───
