@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v3.7</title>
+<title>Mua Bán Mủ Cao Su v3.8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -301,7 +301,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="logo-ico">🌿</div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.7</div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.8</div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2898,7 +2898,9 @@ function updThangData(){
       mList.forEach(function(g){ mKg+=kgThuc(g.loai,g.kg,g.do,g.bi||0); mTien+=parseFloat(g.tt)||0; if(loai==='nuoc'&&g.do) mDos.push(parseFloat(g.do)||0); });
       var bKg=0,bDos=[],bTien=0;
       bList.forEach(function(g){ bKg+=kgThuc(g.loai,g.kg,g.do,g.bi||0); bTien+=parseFloat(g.tt)||0; if(loai==='nuoc'&&g.do) bDos.push(parseFloat(g.do)||0); });
-      rows.push({date:date,loai:loai,mKg:mKg,mDo:mDos.length?mDos.reduce(function(a,b){return a+b;})/mDos.length:0,mTien:mTien,bKg:bKg,bDo:bDos.length?bDos.reduce(function(a,b){return a+b;})/bDos.length:0,bTien:bTien});
+      var bGiaList=[]; bList.forEach(function(g){ if(g.gia) bGiaList.push(parseFloat(g.gia)||0); });
+      var bGiaAvg = bGiaList.length ? bGiaList.reduce(function(a,b){return a+b;})/bGiaList.length : 0;
+      rows.push({date:date,loai:loai,mKg:mKg,mDo:mDos.length?mDos.reduce(function(a,b){return a+b;})/mDos.length:0,mTien:mTien,bKg:bKg,bDo:bDos.length?bDos.reduce(function(a,b){return a+b;})/bDos.length:0,bTien:bTien,bGia:bGiaAvg});
     });
   });
   setThangData(rows);
@@ -2936,8 +2938,9 @@ function renderThangTK(){
     html += '<div class="thang-card">';
     html += '<div class="thang-header"><span>'+(LOAI_ICO[loai]||'')+' '+(LOAI_LBL[loai]||loai)+'</span><span style="font-size:10px;opacity:.8">'+loaiRows.length+' ngày</span></div>';
     // Header cột
-    var doHdr = isNuoc ? '<span>Độ mua</span><span>Độ bán</span>' : '';
-    html += '<div class="thang-row thang-row-hdr" style="grid-template-columns:'+(isNuoc?'1fr 1fr 1fr 1fr 1fr 1fr 1fr':'1fr 1fr 1fr 1fr 1fr')+'"><span style="text-align:left;padding-left:6px">Ngày</span><span>Kg mua</span><span>Kg bán</span>'+doHdr+'<span>Tiền mua</span><span>Tiền bán</span><span>Lời/lỗ</span></div>';
+    var doHdr = isNuoc ? '<span>Độ bán</span>' : '';
+    var gridColsHdr = isNuoc?'1.1fr 1fr 1fr 1fr 1fr 1fr':'1.1fr 1fr 1fr 1fr 1fr';
+    html += '<div class="thang-row thang-row-hdr" style="grid-template-columns:'+gridColsHdr+'"><span style="text-align:left;padding-left:6px">Ngày</span><span>Kg bán</span>'+doHdr+'<span>Giá bán</span><span>Tiền bán</span><span>Lời/lỗ</span></div>';
 
     loaiRows.forEach(function(r){
       var rowLoi = r.bTien - r.mTien;
@@ -2946,32 +2949,33 @@ function renderThangTK(){
       var kgBanC = r.bKg>r.mKg?'col-xanh':r.bKg<r.mKg?'col-do':'';
       var doMuaC = isNuoc?(r.bDo>r.mDo?'col-xanh':r.bDo<r.mDo?'col-do':''):'';
       var doBanC = isNuoc?(r.bDo>r.mDo?'col-xanh':r.bDo<r.mDo?'col-do':''):'';
-      var doTds = isNuoc?('<span class="'+doMuaC+'">'+(r.mDo?fmtDo(r.mDo):'--')+'</span><span class="'+doBanC+'">'+(r.bDo?fmtDo(r.bDo):'--')+'</span>'):'';
-      var gridCols = isNuoc?'1fr 1fr 1fr 1fr 1fr 1fr 1fr':'1fr 1fr 1fr 1fr 1fr';
+      var doTd = isNuoc?('<span class="'+doBanC+'">'+(r.bDo?fmtDo(r.bDo):'--')+'</span>'):'';
+      var gridCols = isNuoc?'1.1fr 1fr 1fr 1fr 1fr 1fr':'1.1fr 1fr 1fr 1fr 1fr';
       // format date dd/mm
       var dp=r.date.split('-'); var fmtD=dp.length===3?dp[2]+'/'+dp[1]:r.date;
       html += '<div class="thang-row" style="grid-template-columns:'+gridCols+'">'
         +'<span class="thang-td-left">'+fmtD+'</span>'
-        +'<span class="'+kgMuaC+'">'+(r.mKg?fmtKg(r.mKg):'--')+'</span>'
         +'<span class="'+kgBanC+'">'+(r.bKg?fmtKg(r.bKg):'--')+'</span>'
-        +doTds
-        +'<span>'+(r.mTien?fmtNum(Math.round(r.mTien)):'--')+'</span>'
+        +doTd
+        +'<span>'+(r.bGia?fmtNum(Math.round(r.bGia)):'--')+'</span>'
         +'<span>'+(r.bTien?fmtNum(Math.round(r.bTien)):'--')+'</span>'
         +'<span class="thang-loi '+rowLoiC+'">'+(rowLoi>0?'+':'')+fmtNum(Math.round(rowLoi))+'</span>'
         +'</div>';
     });
     // Tổng loại
-    var mDoTB=mDos.length?mDos.reduce(function(a,b){return a+b;})/mDos.length:0;
     var bDoTB=bDos.length?bDos.reduce(function(a,b){return a+b;})/bDos.length:0;
-    var doTotals=isNuoc?('<span style="font-weight:800">'+(mDoTB?fmtDo(mDoTB):'--')+'</span><span style="font-weight:800">'+(bDoTB?fmtDo(bDoTB):'--')+'</span>'):'';
-    var gridCols2=isNuoc?'1fr 1fr 1fr 1fr 1fr 1fr 1fr':'1fr 1fr 1fr 1fr 1fr';
+    var bGiaList2=loaiRows.map(function(r){return r.bGia;}).filter(function(g){return g>0;});
+    var bGiaAvgAll=bGiaList2.length?bGiaList2.reduce(function(a,b){return a+b;})/bGiaList2.length:0;
+    var doTotals=isNuoc?('<span style="font-weight:800">'+(bDoTB?fmtDo(bDoTB):'--')+'</span>'):'';
+    var gridCols2=isNuoc?'1.1fr 1fr 1fr 1fr 1fr 1fr':'1.1fr 1fr 1fr 1fr 1fr';
     var loiLoai=totalBTien-totalMTien;
+    // Đường kẻ phân biệt dữ liệu hàng ngày với dòng TỔNG
+    html += '<div style="border-top:2px solid '+(loi>0?'#16a34a':'#dc2626')+';margin:0"></div>';
     html += '<div class="thang-row" style="grid-template-columns:'+gridCols2+';background:var(--g50);font-weight:700;font-size:11px">'
       +'<span class="thang-td-left" style="font-weight:800;color:var(--g800)">TỔNG</span>'
-      +'<span>'+fmtKg(totalMKg)+'</span>'
       +'<span>'+fmtKg(totalBKg)+'</span>'
       +doTotals
-      +'<span>'+fmtNum(Math.round(totalMTien))+'</span>'
+      +'<span>'+(bGiaAvgAll?fmtNum(Math.round(bGiaAvgAll)):'--')+'</span>'
       +'<span>'+fmtNum(Math.round(totalBTien))+'</span>'
       +'<span class="thang-loi '+(loiLoai>0?'col-xanh':'col-do')+'">'+(loiLoai>0?'+':'')+fmtNum(Math.round(loiLoai))+'</span>'
       +'</div>';
