@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v4.9</title>
+<title>Mua Bán Mủ Cao Su v5.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -295,6 +295,22 @@ input[type=date]:focus{border-color:var(--gl)}
 .thang-loi{font-weight:800}
 .col-xanh{color:#16a34a;font-weight:800}
 .col-do{color:#dc2626;font-weight:800}
+
+/* CUSTOM CALENDAR */
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin:8px 0 10px}
+.cal-header button{background:var(--gb);border:none;border-radius:8px;width:36px;height:36px;font-size:18px;color:var(--gd);font-weight:800;cursor:pointer}
+.cal-header span{font-size:14px;font-weight:800;color:var(--g800)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.cal-wd{font-size:11px;font-weight:700;color:var(--g400);padding:6px 0}
+.cal-cell{position:relative;font-size:14px;font-weight:600;color:var(--g800);padding:9px 0;border-radius:10px;cursor:pointer}
+.cal-cell.empty{cursor:default}
+.cal-cell:not(.empty):active{background:var(--gb)}
+.cal-cell.today{color:var(--gd);font-weight:800}
+.cal-cell.selected{background:var(--gd);color:#fff!important}
+.cal-dot{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:#f59e0b}
+.cal-cell.selected .cal-dot{background:#fff}
+.cal-legend{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--g400);margin-top:8px;justify-content:center}
+.cal-legend .cal-dot{position:static;transform:none;background:#f59e0b}
 </style>
 </head>
 <body>
@@ -306,7 +322,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="logo-ico">🌿</div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v4.9 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v5.1 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -780,9 +796,14 @@ input[type=date]:focus{border-color:var(--gl)}
   <div class="modal-box">
     <div class="modal-handle"></div>
     <div class="modal-title">📅 Chọn ngày</div>
-    <input type="date" id="date-inp">
-    <div style="height:10px"></div>
-    <button class="btn-luu" style="width:100%;margin-top:4px" onclick="applyDate()">Xác nhận</button>
+    <div class="cal-header">
+      <button onclick="calNav(-1)">‹</button>
+      <span id="cal-month-label"></span>
+      <button onclick="calNav(1)">›</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-legend"><span class="cal-dot"></span> Ngày có ghi chép</div>
+    <button class="btn-luu" style="width:100%;margin-top:10px" onclick="applyDate()">Xác nhận</button>
     <button class="btn-huy" style="width:100%;margin-top:6px" onclick="closeM('modal-date')">Đóng</button>
   </div>
 </div>
@@ -1109,13 +1130,65 @@ function switchTab(tab){
 function updDate(tab){
   document.getElementById(tab+'-date-val').textContent=fmtDate(curDate[tab]);
 }
+var calViewYear, calViewMonth, calSelectedDate;
+var MONTH_NAMES_VN = ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+
 function openDate(tab){
   dateTab=tab;
-  document.getElementById('date-inp').value=curDate[tab];
+  var d = new Date(curDate[tab]+'T00:00:00');
+  calViewYear = d.getFullYear();
+  calViewMonth = d.getMonth();
+  calSelectedDate = curDate[tab];
+  renderCalendar();
   openM('modal-date');
 }
+
+function calNav(delta){
+  calViewMonth += delta;
+  if(calViewMonth<0){ calViewMonth=11; calViewYear--; }
+  if(calViewMonth>11){ calViewMonth=0; calViewYear++; }
+  renderCalendar();
+}
+
+// Lấy danh sách các ngày đã có ghi chép (mua hoặc bán)
+function getDatesWithData(){
+  var set = {};
+  ['mua','ban'].forEach(function(tab){
+    getGD(tab).forEach(function(g){ if(g.date) set[g.date]=true; });
+  });
+  return set;
+}
+
+function renderCalendar(){
+  var datesWithData = getDatesWithData();
+  var todayD = today();
+  document.getElementById('cal-month-label').textContent = MONTH_NAMES_VN[calViewMonth] + ' ' + calViewYear;
+
+  var firstDay = new Date(calViewYear, calViewMonth, 1);
+  var startWeekday = (firstDay.getDay()+6)%7; // T2=0 ... CN=6
+  var daysInMonth = new Date(calViewYear, calViewMonth+1, 0).getDate();
+
+  var html = '';
+  ['T2','T3','T4','T5','T6','T7','CN'].forEach(function(d){ html += '<div class="cal-wd">'+d+'</div>'; });
+  for(var i=0;i<startWeekday;i++) html += '<div class="cal-cell empty"></div>';
+  for(var day=1; day<=daysInMonth; day++){
+    var dateStr = calViewYear + '-' + String(calViewMonth+1).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+    var cls='cal-cell';
+    if(dateStr===todayD) cls+=' today';
+    if(dateStr===calSelectedDate) cls+=' selected';
+    var dot = datesWithData[dateStr] ? '<span class="cal-dot"></span>' : '';
+    html += '<div class="'+cls+'" onclick="selectCalDay(\''+dateStr+'\')">'+day+dot+'</div>';
+  }
+  document.getElementById('cal-grid').innerHTML = html;
+}
+
+function selectCalDay(dateStr){
+  calSelectedDate = dateStr;
+  renderCalendar();
+}
+
 function applyDate(){
-  const v=document.getElementById('date-inp').value;
+  const v=calSelectedDate;
   if(!v){ closeM('modal-date'); return; }
   curDate[dateTab]=v;
   // Đồng bộ ngày cho cả 2 tab (xem cùng ngày)
@@ -1890,7 +1963,7 @@ function toast(msg){
 // - Sổ gửi: mỗi KH 1 file riêng tên KH
 // ═══════════════════════════════════════════════════════
 var GD_CLIENT_ID = '1051621009021-ke6ln2upne26c0nl7tq6e6rfod0q9ccj.apps.googleusercontent.com';
-var GD_SCOPES = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file';
+var GD_SCOPES = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile';
 var GD_FOLDER_NAME = 'MuCaoSuPro';
 var gdUser = null;
 var gdToken = null;
@@ -1921,7 +1994,18 @@ function initGoogleAuth() {
   var tok   = localStorage.getItem('gd_token');
   var fid   = localStorage.getItem('gd_folder_id');
   if (saved) {
-    gdUser = JSON.parse(saved); gdToken = tok; gdFolderId = fid; updGDBar();
+    gdUser = JSON.parse(saved); gdToken = tok; gdFolderId = fid;
+    // Kiểm tra dữ liệu cũ bị lỗi (do thiếu quyền email/profile hoặc lỗi tạo folder trước đây)
+    var badUser = !gdUser || !gdUser.email || gdUser.email === 'undefined';
+    var badFolder = !gdFolderId || gdFolderId === 'undefined' || gdFolderId === 'null';
+    if (badUser || badFolder) {
+      ['gd_user','gd_token','gd_folder_id','gd_last_sync'].forEach(function(k){ localStorage.removeItem(k); });
+      gdUser = null; gdToken = null; gdFolderId = null;
+      updGDBar();
+      setTimeout(function(){ toast('⚠️ Vui lòng đăng nhập lại Google Drive để cấp đầy đủ quyền!'); }, 600);
+      return;
+    }
+    updGDBar();
     if (navigator.onLine) {
       setTimeout(function(){
         syncLicenseOnConnect();
@@ -1953,14 +2037,21 @@ function signInGoogle() {
 function fetchGoogleUser() {
   fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
     headers: { Authorization: 'Bearer ' + gdToken }
-  }).then(function(r) { return r.json(); }).then(function(info) {
-    gdUser = { name: info.name, email: info.email, avatar: info.picture };
+  }).then(function(r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }).then(function(info) {
+    if (!info.email) throw new Error('Thiếu quyền email/profile');
+    gdUser = { name: info.name || info.email, email: info.email, avatar: info.picture || '' };
     localStorage.setItem('gd_user', JSON.stringify(gdUser));
     updGDBar();
     closeM('modal-gd');
-    toast('✅ Đăng nhập thành công: ' + info.name);
+    toast('✅ Đăng nhập thành công: ' + gdUser.email);
     findOrCreateFolder();
-  }).catch(function() { toast('❌ Lỗi lấy thông tin tài khoản!'); });
+  }).catch(function(e) {
+    toast('❌ Lỗi lấy thông tin tài khoản: ' + e.message);
+    console.error('fetchGoogleUser error:', e);
+  });
 }
 
 function signOutGoogle() {
@@ -1978,8 +2069,8 @@ function updGDBar() {
   var st   = document.getElementById('gd-bar-status');
   if (!bar) return;
   if (gdUser) {
-    ico.innerHTML = '<img class="gd-avatar" src="' + gdUser.avatar + '" onerror="this.style.display=\'none\'">';
-    nm.textContent = gdUser.name;
+    ico.innerHTML = '<img class="gd-avatar" src="' + (gdUser.avatar||'') + '" onerror="this.style.display=\'none\'">';
+    nm.textContent = gdUser.name || gdUser.email || 'Google Drive';
     st.textContent = gdFolderId ? 'Đã kết nối' : 'Chờ sync';
     st.className = 'gd-status ' + (gdFolderId ? 'synced' : 'syncing');
   } else {
@@ -2012,9 +2103,9 @@ function openGDModal() {
     var lastTxt  = lastSync ? new Date(parseInt(lastSync)).toLocaleString('vi-VN') : 'Chưa sync';
     body.innerHTML =
       '<div style="display:flex;align-items:center;gap:12px;padding:12px 0 14px;border-bottom:1px solid var(--g100);margin-bottom:4px">'
-      + '<img src="' + gdUser.avatar + '" style="width:44px;height:44px;border-radius:50%;object-fit:cover">'
-      + '<div><div style="font-size:14px;font-weight:700">' + gdUser.name + '</div>'
-      + '<div style="font-size:11px;color:var(--g400)">' + gdUser.email + '</div></div>'
+      + '<img src="' + (gdUser.avatar||'') + '" style="width:44px;height:44px;border-radius:50%;object-fit:cover;background:var(--gb)" onerror="this.style.display=\'none\'">'
+      + '<div><div style="font-size:14px;font-weight:700">' + (gdUser.name||gdUser.email||'Tài khoản Google') + '</div>'
+      + '<div style="font-size:11px;color:var(--g400)">' + (gdUser.email||'') + '</div></div>'
       + '</div>'
       + '<div class="gd-sync-row"><span class="gd-sync-lbl">🕐 Lần sync cuối</span><span class="gd-sync-val">' + lastTxt + '</span></div>'
       + '<div class="gd-sync-row"><span class="gd-sync-lbl">📁 Thư mục Drive</span><span class="gd-sync-val">' + (gdFolderId ? 'MuCaoSuPro ✅' : 'Chưa tạo') + '</span></div>'
@@ -2044,15 +2135,18 @@ function findOrCreateFolder() {
   var q = encodeURIComponent("name='MuCaoSuPro' and mimeType='application/vnd.google-apps.folder' and trashed=false");
   fetch('https://www.googleapis.com/drive/v3/files?q=' + q + '&fields=files(id,name)', {
     headers: { Authorization: 'Bearer ' + gdToken }
-  }).then(function(r) { return r.json(); }).then(function(data) {
-    if (data.files && data.files.length > 0) {
+  }).then(function(r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }).then(function(data) {
+    if (data.files && data.files.length > 0 && data.files[0].id) {
       gdFolderId = data.files[0].id;
       localStorage.setItem('gd_folder_id', gdFolderId);
       updGDBar();
       toast('📁 Đã kết nối thư mục MuCaoSuPro!');
       syncLicenseOnConnect();
     } else { createDriveFolder(); }
-  }).catch(function(e) { toast('❌ Lỗi kết nối Drive!'); console.error(e); });
+  }).catch(function(e) { toast('❌ Lỗi kết nối Drive: ' + e.message); console.error('findOrCreateFolder error:', e); });
 }
 
 function createDriveFolder() {
@@ -2060,13 +2154,17 @@ function createDriveFolder() {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
     body: JSON.stringify({ name: 'MuCaoSuPro', mimeType: 'application/vnd.google-apps.folder' })
-  }).then(function(r) { return r.json(); }).then(function(data) {
+  }).then(function(r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }).then(function(data) {
+    if (!data.id) throw new Error('Không nhận được ID thư mục');
     gdFolderId = data.id;
     localStorage.setItem('gd_folder_id', gdFolderId);
     updGDBar();
     toast('📁 Đã tạo thư mục MuCaoSuPro!');
     syncLicenseOnConnect();
-  }).catch(function(e) { toast('❌ Không tạo được thư mục!'); console.error(e); });
+  }).catch(function(e) { toast('❌ Không tạo được thư mục: ' + e.message); console.error('createDriveFolder error:', e); });
 }
 
 // ── Tìm file theo tên trong thư mục ──
@@ -2108,18 +2206,45 @@ function upsertSheet(fname, sheetsData, doneCb) {
 }
 
 function batchUpdateSheets(sid, sheetsData, doneCb) {
-  // Lấy tên sheet thực tế (vì khi tạo sheet mới có thể bị đặt tên khác)
+  // Lấy tên + ID sheet thực tế (vì khi tạo sheet mới có thể bị đặt tên/ID khác)
   fetch('https://sheets.googleapis.com/v4/spreadsheets/' + sid + '?fields=sheets.properties', {
     headers: { Authorization: 'Bearer ' + gdToken }
   }).then(function(r) { return r.json(); }).then(function(meta) {
-    var actualSheets = (meta.sheets || []).map(function(s) { return s.properties.title; });
+    var sheetIdMap = {};
+    (meta.sheets || []).forEach(function(s) { sheetIdMap[s.properties.title] = s.properties.sheetId; });
+    var actualSheets = Object.keys(sheetIdMap);
     // Đảm bảo tất cả sheet cần thiết tồn tại
-    var requests = [];
+    var addRequests = [];
     sheetsData.forEach(function(s) {
       if (actualSheets.indexOf(s.name) === -1) {
-        requests.push({ addSheet: { properties: { title: s.name } } });
+        addRequests.push({ addSheet: { properties: { title: s.name } } });
       }
     });
+
+    // Canh giữa toàn bộ ô dữ liệu (chữ + số) cho dễ nhìn
+    function applyAlignment() {
+      var fmtRequests = [];
+      sheetsData.forEach(function(s) {
+        var sheetId = sheetIdMap[s.name];
+        if (sheetId === undefined) return;
+        var numCols = (s.rows[0] || []).length || 10;
+        var numRows = s.rows.length;
+        fmtRequests.push({
+          repeatCell: {
+            range: { sheetId: sheetId, startRowIndex: 0, endRowIndex: numRows, startColumnIndex: 0, endColumnIndex: numCols },
+            cell: { userEnteredFormat: { horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE' } },
+            fields: 'userEnteredFormat(horizontalAlignment,verticalAlignment)'
+          }
+        });
+      });
+      if (fmtRequests.length === 0) return;
+      fetch('https://sheets.googleapis.com/v4/spreadsheets/' + sid + ':batchUpdate', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requests: fmtRequests })
+      }).catch(function(){});
+    }
+
     var doUpdate = function() {
       var data = sheetsData.map(function(s) {
         return { range: s.name + '!A1', values: s.rows };
@@ -2128,15 +2253,23 @@ function batchUpdateSheets(sid, sheetsData, doneCb) {
         method: 'POST',
         headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
         body: JSON.stringify({ valueInputOption: 'RAW', data: data })
-      }).then(function() { if (doneCb) doneCb(sid); })
-        .catch(function(e) { toast('❌ Lỗi ghi dữ liệu!'); console.error(e); });
+      }).then(function() {
+        applyAlignment();
+        if (doneCb) doneCb(sid);
+      }).catch(function(e) { toast('❌ Lỗi ghi dữ liệu!'); console.error(e); });
     };
-    if (requests.length > 0) {
+
+    if (addRequests.length > 0) {
       fetch('https://sheets.googleapis.com/v4/spreadsheets/' + sid + ':batchUpdate', {
         method: 'POST',
         headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ requests: requests })
-      }).then(doUpdate).catch(doUpdate);
+        body: JSON.stringify({ requests: addRequests })
+      }).then(function(r){ return r.json(); }).then(function(addResp){
+        (addResp.replies || []).forEach(function(rep){
+          if (rep.addSheet) sheetIdMap[rep.addSheet.properties.title] = rep.addSheet.properties.sheetId;
+        });
+        doUpdate();
+      }).catch(doUpdate);
     } else { doUpdate(); }
   });
 }
