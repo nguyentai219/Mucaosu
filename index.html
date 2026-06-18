@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v5.3</title>
+<title>Mua Bán Mủ Cao Su v5.4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -326,6 +326,29 @@ input[type=date]:focus{border-color:var(--gl)}
 .sg-total-bar-new{background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border-radius:var(--r);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:8px}
 .sg-chot-btn{background:#dc2626;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:700;font-size:12px;cursor:pointer}
 .sg-empty-name{color:var(--g400);font-size:12px;text-align:center;padding:20px}
+
+/* SỔ GỬI v5.4 */
+.sg-top-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.sg-dd-btn{background:#fff;border:1.5px solid var(--gp);border-radius:var(--r);padding:11px 12px;font-size:13px;font-weight:700;color:var(--gd);display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.sg-overview-card{background:#fff;border-radius:var(--r);box-shadow:var(--s1);padding:14px;margin-bottom:10px}
+.sg-overview-title{font-size:12px;font-weight:800;color:var(--g600);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.sg-overview-row{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0}
+.sg-overview-lbl{font-size:12px;color:var(--g600)}
+.sg-overview-val{font-size:14px;font-weight:800}
+.sg-card-gui{border-left:3px solid var(--gd)}
+.sg-card-ung{border-left:3px solid #d97706}
+.ung-entry{padding:10px 14px;border-bottom:1px solid var(--g100);cursor:pointer}
+.ung-entry:last-child{border-bottom:none}
+.ung-entry-row{display:flex;justify-content:space-between;align-items:baseline}
+.ung-entry-tien{font-size:14px;font-weight:800;color:#d97706}
+.ung-entry-content{font-size:12px;color:var(--g600);margin-top:2px}
+.sg-summary-final{background:linear-gradient(135deg,#1a472a,#2d6a4f);color:#fff;border-radius:var(--r);padding:14px 16px;margin-top:10px}
+.sg-summary-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0}
+.sg-summary-row.total{font-size:16px;font-weight:800;border-top:1px solid rgba(255,255,255,.3);margin-top:6px;padding-top:8px}
+.type-pick-row{display:flex;gap:8px;margin-bottom:4px}
+.type-pick-btn{flex:1;padding:12px;border-radius:var(--r);border:1.5px solid var(--g200);background:#fff;font-size:13px;font-weight:700;color:var(--g600);cursor:pointer;text-align:center}
+.type-pick-btn.active{border-color:var(--gd);background:var(--gb);color:var(--gd)}
+.type-pick-btn.active.ung{border-color:#d97706;background:#fffbeb;color:#d97706}
 </style>
 </head>
 <body>
@@ -337,7 +360,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="logo-ico">🌿</div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v5.3 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v5.4 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -553,66 +576,108 @@ input[type=date]:focus{border-color:var(--gl)}
 <div class="tab-pane" id="tab-sg">
 <div class="page">
 
-  <!-- AUTOCOMPLETE TÊN KHÁCH -->
-  <div class="sec-title">📒 Sổ gửi</div>
-  <div style="position:relative;margin-bottom:10px">
-    <input type="text" id="sg-tab-search" class="fi" placeholder="🔍 Nhập tên khách để xem hoặc ghi chép..." oninput="onSgTabSearch()" autocomplete="off">
-    <div class="ac-drop" id="sg-tab-ac" style="display:none"></div>
+  <div class="sec-title">📒 Sổ gửi &amp; Ứng tiền</div>
+
+  <!-- 2 DROPDOWN TRÊN CÙNG 1 HÀNG -->
+  <div class="sg-top-row">
+    <div style="position:relative">
+      <div class="sg-dd-btn" onclick="toggleSgKhDrop()">
+        <span id="sg-kh-dd-label">👤 Tên khách hàng</span><span>▾</span>
+      </div>
+      <div class="ac-drop" id="sg-kh-dropdown" style="display:none;max-height:260px;overflow-y:auto"></div>
+    </div>
+    <div style="position:relative">
+      <div class="sg-dd-btn" onclick="toggleSgAddDrop()">
+        <span>➕ Thêm ghi chép</span><span>▾</span>
+      </div>
+      <div class="ac-drop" id="sg-add-dropdown" style="display:none">
+        <div class="ac-item" onclick="openSgEntryModal('gui')">📒 Gửi sổ</div>
+        <div class="ac-item" onclick="openSgEntryModal('ung')">💵 Ứng tiền</div>
+      </div>
+    </div>
   </div>
 
-  <!-- NÚT GHI SỔ MỚI -->
-  <button class="btn-luu" style="width:100%;margin-bottom:14px" onclick="openSgTabModal()">📝 + Ghi sổ gửi mới</button>
-
-  <!-- DANH SÁCH KHÁCH HÀNG -->
-  <div id="sg-tab-kh-list"><div class="no-data">Chưa có ghi chép nào</div></div>
+  <!-- NỘI DUNG: tổng quan HOẶC chi tiết 1 KH -->
+  <div id="sg-tab-content"></div>
 
 </div>
 </div>
 
-<!-- MODAL GHI SỔ GỬI (như tab Thu Mua) -->
+<!-- MODAL GHI CHÉP: GỬI SỔ hoặc ỨNG TIỀN -->
 <div class="modal" id="modal-sg-tab">
   <div class="modal-box">
     <div class="modal-handle"></div>
-    <div class="modal-title">📒 Ghi sổ gửi</div>
+    <div class="modal-title" id="sgt-modal-title">📒 Ghi chép</div>
+
+    <!-- Chọn loại ghi chép -->
+    <div class="type-pick-row">
+      <button class="type-pick-btn" id="sgt-type-gui" onclick="setSgtType('gui')">📒 Gửi sổ</button>
+      <button class="type-pick-btn" id="sgt-type-ung" onclick="setSgtType('ung')">💵 Ứng tiền</button>
+    </div>
+
     <div class="fr">
       <label class="fl">Ngày</label>
       <input type="date" id="sgt-date" class="fi">
     </div>
-    <div class="g2">
-      <div class="fr">
-        <label class="fl">Loại mủ</label>
-        <select id="sgt-loai" class="fi" onchange="onSgtLoai()">
-          <option value="">-- Chọn --</option>
-          <option value="nuoc">💧 Mủ nước</option>
-          <option value="chen">🏺 Mủ chén</option>
-          <option value="day">🟡 Mủ dây</option>
-          <option value="dong">🟫 Mủ đông</option>
-        </select>
+
+    <!-- FORM GỬI SỔ -->
+    <div id="sgt-form-gui">
+      <div class="g2">
+        <div class="fr">
+          <label class="fl">Loại mủ</label>
+          <select id="sgt-loai" class="fi" onchange="onSgtLoai()">
+            <option value="">-- Chọn --</option>
+            <option value="nuoc">💧 Mủ nước</option>
+            <option value="chen">🏺 Mủ chén</option>
+            <option value="day">🟡 Mủ dây</option>
+            <option value="dong">🟫 Mủ đông</option>
+          </select>
+        </div>
+        <div class="fr">
+          <label class="fl">Đơn giá (đ/kg)</label>
+          <input type="text" inputmode="numeric" id="sgt-gia" class="fi" placeholder="0" oninput="onSgtGia()">
+        </div>
       </div>
       <div class="fr">
-        <label class="fl">Đơn giá (đ/kg)</label>
-        <input type="text" inputmode="numeric" id="sgt-gia" class="fi" placeholder="0" oninput="onSgtGia()">
+        <label class="fl">Tên khách hàng</label>
+        <div style="position:relative">
+          <input type="text" id="sgt-ten" class="fi" placeholder="Nhập tên..." oninput="onSgtTen()" autocomplete="off">
+          <div class="ac-drop" id="sgt-ac" style="display:none"></div>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="fr"><label class="fl">Số kg</label><input type="number" id="sgt-kg" class="fi" placeholder="0.0" step="0.01" oninput="calcSgt()"></div>
+        <div class="fr" id="sgt-do-row"><label class="fl" id="sgt-do-lbl">Độ</label><input type="number" id="sgt-do" class="fi" placeholder="0" step="0.01" oninput="calcSgt()"></div>
+      </div>
+      <div class="tt-box">
+        <div class="tt-lbl">Thành tiền</div>
+        <div class="tt-so" id="sgt-tt">0 ₫</div>
+        <div class="tt-chu" id="sgt-chu">--</div>
       </div>
     </div>
-    <div class="fr">
-      <label class="fl">Tên khách hàng</label>
-      <div style="position:relative">
-        <input type="text" id="sgt-ten" class="fi" placeholder="Nhập tên..." oninput="onSgtTen()" autocomplete="off">
-        <div class="ac-drop" id="sgt-ac" style="display:none"></div>
+
+    <!-- FORM ỨNG TIỀN -->
+    <div id="sgt-form-ung" style="display:none">
+      <div class="fr">
+        <label class="fl">Tên người ứng</label>
+        <div style="position:relative">
+          <input type="text" id="sgu-ten" class="fi" placeholder="Nhập tên..." oninput="onSguTen()" autocomplete="off">
+          <div class="ac-drop" id="sgu-ac" style="display:none"></div>
+        </div>
+      </div>
+      <div class="fr">
+        <label class="fl">Số tiền ứng (đ)</label>
+        <input type="text" inputmode="numeric" id="sgu-tien" class="fi" placeholder="0" oninput="onSguTien()">
+      </div>
+      <div class="fr">
+        <label class="fl">Nội dung ứng</label>
+        <input type="text" id="sgu-noidung" class="fi" placeholder="VD: Ứng tiền sửa xe...">
       </div>
     </div>
-    <div class="g2">
-      <div class="fr"><label class="fl">Số kg</label><input type="number" id="sgt-kg" class="fi" placeholder="0.0" step="0.01" oninput="calcSgt()"></div>
-      <div class="fr" id="sgt-do-row"><label class="fl" id="sgt-do-lbl">Độ</label><input type="number" id="sgt-do" class="fi" placeholder="0" step="0.01" oninput="calcSgt()"></div>
-    </div>
-    <div class="tt-box">
-      <div class="tt-lbl">Thành tiền</div>
-      <div class="tt-so" id="sgt-tt">0 ₫</div>
-      <div class="tt-chu" id="sgt-chu">--</div>
-    </div>
+
     <div class="btn-row" style="margin-top:10px">
       <button class="btn-huy" onclick="closeM('modal-sg-tab')">Huỷ</button>
-      <button class="btn-luu" onclick="luuSgTab()">📒 Lưu sổ gửi</button>
+      <button class="btn-luu" id="sgt-save-btn" onclick="luuSgEntry()">📒 Lưu sổ gửi</button>
     </div>
   </div>
 </div>
@@ -1195,7 +1260,7 @@ function switchTab(tab){
     if(typeof updBanHints==='function') setTimeout(updBanHints, 80);
   }
   if(tab==='sg') {
-    setTimeout(function(){ renderSgTabKH(); }, 50);
+    setTimeout(function(){ renderSgTabContent(); }, 50);
   }
   if(tab==='ss') {
     // Luôn chọn mủ nước khi mở tab SS (nếu chưa có state lưu)
@@ -1648,7 +1713,7 @@ function onGui(tab,id){
     sg.push({id:Date.now()+Math.random(), tab, gdId:gd.id, date:gd.date, ten:gd.ten, loai:gd.loai, kg:gd.kg, do:gd.do, gia:gd.gia, tt:gd.tt});
     setSG(sg);
     renderTbl(tab);
-    if(typeof renderSgTabKH==='function') renderSgTabKH();
+    if(typeof renderSgTabContent==='function') renderSgTabContent();
     toast('📒 Đã ghi sổ gửi!');
     autoSync();
   });
@@ -3750,134 +3815,211 @@ function doDoiPwThang() {
 }
 
 // ══════════════════════════════════════════
-// TAB SỔ GỬI - Danh sách KH + popup ghi chép
+// TAB SỔ GỬI & ỨNG TIỀN (v5.4)
 // ══════════════════════════════════════════
-var sgtLoai = 'nuoc';
-var sgTabEditId = null; // null = tạo mới, có id = sửa
+function getSU(){ return lsGet(suKey()); }
+function setSU(v){ lsSet(suKey(), v); }
+function suKey(){ return 'su_data'; }
 
-// Tìm kiếm + gợi ý tên trong tab
-function onSgTabSearch() {
-  var val = (document.getElementById('sg-tab-search').value||'').trim();
-  var ac = document.getElementById('sg-tab-ac');
-  if (!val) { ac.style.display='none'; renderSgTabKH(); return; }
+var sgtType = 'gui';
+var sgTabEditId = null;
+var sgTabEditType = null;
+var sgCurrentKH = null;
 
-  var sg = getSG();
-  var khSg = [...new Set(sg.map(function(r){ return r.ten; }))];
-  var khMua = getKH();
-  // Ưu tiên: đã có ghi chép (xanh) trước, rồi KH từ tab mua (đen)
-  var green = khSg.filter(function(n){ return n.toLowerCase().includes(val.toLowerCase()); });
-  var black = khMua.filter(function(n){ return !khSg.includes(n) && n.toLowerCase().includes(val.toLowerCase()); });
-  var all = green.concat(black).slice(0,8);
-
-  if (!all.length) { ac.style.display='none'; renderSgTabKH(); return; }
-  ac.innerHTML = all.map(function(n){
-    var isGreen = khSg.includes(n);
-    return '<div class="ac-item" style="color:'+(isGreen?'var(--gd)':'var(--g800)')+';font-weight:'+(isGreen?'700':'500')+'" onclick="pickSgTabKH(\''+n.replace(/'/g,"\'")+'\')">'
-      + (isGreen?'✅ ':'👤 ') + n + '</div>';
-  }).join('');
-  ac.style.display='block';
-  renderSgTabKH(val);
+function toggleSgKhDrop(){
+  var dd=document.getElementById('sg-kh-dropdown');
+  var addDd=document.getElementById('sg-add-dropdown');
+  addDd.style.display='none';
+  if(dd.style.display==='block'){ dd.style.display='none'; return; }
+  renderSgKhDropdown();
+  dd.style.display='block';
 }
-function pickSgTabKH(name){
-  document.getElementById('sg-tab-search').value = name;
-  document.getElementById('sg-tab-ac').style.display='none';
-  renderSgTabKH(name);
+function toggleSgAddDrop(){
+  var dd=document.getElementById('sg-add-dropdown');
+  var khDd=document.getElementById('sg-kh-dropdown');
+  khDd.style.display='none';
+  dd.style.display = dd.style.display==='block' ? 'none' : 'block';
+}
+document.addEventListener('click', function(e){
+  var khDd=document.getElementById('sg-kh-dropdown');
+  var addDd=document.getElementById('sg-add-dropdown');
+  if(khDd && addDd && !e.target.closest('.sg-top-row')) { khDd.style.display='none'; addDd.style.display='none'; }
+});
+
+function getAllSgKhNames(){
+  var sg=getSG(), su=getSU();
+  var names=new Set();
+  sg.forEach(function(r){ if(r.ten) names.add(r.ten); });
+  su.forEach(function(r){ if(r.ten) names.add(r.ten); });
+  return [...names].sort();
 }
 
-// Danh sách KH → khi search thì filter
-function renderSgTabKH(filter) {
-  var f = filter !== undefined ? filter : (document.getElementById('sg-tab-search')||{}).value||'';
-  var sg = getSG();
-  var khMap={};
-  sg.forEach(function(r){
-    if(!r.ten) return;
-    if(f && !r.ten.toLowerCase().includes(f.toLowerCase())) return;
-    if(!khMap[r.ten]) khMap[r.ten]={cnt:0,tt:0,lastDate:''};
-    khMap[r.ten].cnt++;
-    khMap[r.ten].tt+=r.tt||0;
-    if(!khMap[r.ten].lastDate||r.date>khMap[r.ten].lastDate) khMap[r.ten].lastDate=r.date;
-  });
-  var cont = document.getElementById('sg-tab-kh-list');
-  if(!cont) return;
-  var keys = Object.keys(khMap);
-  if(!keys.length && !f){ cont.innerHTML='<div class="no-data">Chưa có ghi chép nào</div>'; return; }
-  if(!keys.length){ cont.innerHTML='<div class="no-data">Không tìm thấy "'+f+'"</div>'; return; }
-  cont.innerHTML = keys.sort().map(function(ten){
-    var d=khMap[ten];
-    return '<div class="sg-kh-btn" onclick="renderSgTabKHDetail(\''+ten.replace(/'/g,"\'")+'\')">'
-      +'<div><div class="sg-kh-name">👤 '+ten+'</div>'
-      +'<div class="sg-kh-meta">'+d.cnt+' lần ghi · '+fmtDate(d.lastDate)+'</div></div>'
-      +'<div><div class="sg-kh-total">'+fmtNum(Math.round(d.tt))+' ₫</div><span style="color:var(--g400)">›</span></div>'
-      +'</div>';
+function renderSgKhDropdown(){
+  var names=getAllSgKhNames();
+  var dd=document.getElementById('sg-kh-dropdown');
+  if(!names.length){ dd.innerHTML='<div class="ac-item" style="color:var(--g400)">Chưa có khách hàng nào</div>'; return; }
+  dd.innerHTML=names.map(function(n){
+    return '<div class="ac-item" onclick="selectSgKH(\'' + n.replace(/'/g, "\\'") + '\')">👤 '+n+'</div>';
   }).join('');
 }
 
-// Chi tiết 1 KH
-function renderSgTabKHDetail(ten){
-  document.getElementById('sg-tab-search').value = ten;
-  document.getElementById('sg-tab-ac').style.display='none';
-  var sg=getSG().filter(function(r){ return r.ten===ten; });
-  var total=sg.reduce(function(a,r){ return a+r.tt; },0);
-  var days=[...new Set(sg.map(function(r){return r.date;}))].length;
-  var cont=document.getElementById('sg-tab-kh-list');
-  var rows=sg.map(function(r){
-    var chat=r.loai==='nuoc'?'Độ: '+(r.do||'--'):r.loai==='dong'&&r.do?'KH: '+r.do+'kg':'';
-    return '<div class="sg-entry" ondblclick="openSgTabEdit(\''+r.id+'\');" onclick="onSgEntryTap(\''+r.id+'\');">'
-      +'<div class="sg-entry-row"><span class="sg-entry-date">'+fmtDate(r.date)+'</span><span class="sg-entry-tien">'+fmtNum(r.tt)+' ₫</span></div>'
-      +'<div class="sg-entry-row"><span class="sg-entry-meta">'+LOAI_ICO[r.loai]+' '+LOAI_LBL[r.loai]+' · '+fmtKg(r.kg)+'kg'+(chat?' · '+chat:'')+'</span><span class="sg-entry-meta">'+fmtNum(r.gia)+' đ</span></div>'
-      +'</div>';
-  }).join('');
-  var divider='<div style="border-top:2px solid var(--gp);margin:0"></div>';
-  cont.innerHTML='<div class="card" style="padding:0;overflow:hidden;border:1.5px solid var(--gb);border-radius:var(--r)">'+rows+divider+'</div>'
-    +'<div class="sg-total-bar-new"><div>'
-    +'<div style="font-size:11px;opacity:.8">TỔNG ('+days+' ngày)</div>'
-    +'<div style="font-size:18px;font-weight:800">'+fmtNum(Math.round(total))+' ₫</div></div>'
-    +'<button class="sg-chot-btn" onclick="chotSoGuiKH(\''+ten.replace(/'/g,"\'")+'\')" >🔒 Chốt sổ</button>'
-    +'</div>'
-    +'<button class="btn-huy" style="width:100%;margin-top:8px" onclick="renderSgTabKH();document.getElementById(\'sg-tab-search\').value=\'\';"> ← Quay lại</button>';
+function selectSgKH(ten){
+  sgCurrentKH=ten;
+  document.getElementById('sg-kh-dd-label').textContent='👤 '+ten;
+  document.getElementById('sg-kh-dropdown').style.display='none';
+  renderSgTabContent();
 }
 
-// Tap double-tap
+function renderSgOverview(){
+  var sg=getSG(), su=getSU();
+  var guiNames=new Set(sg.map(function(r){return r.ten;}));
+  var ungNames=new Set(su.map(function(r){return r.ten;}));
+  var guiTotal=sg.reduce(function(a,r){return a+(r.tt||0);},0);
+  var ungTotal=su.reduce(function(a,r){return a+(parseFloat(r.tien)||0);},0);
+
+  var html='';
+  html+='<div class="sg-overview-card sg-card-gui">'
+    +'<div class="sg-overview-title">📒 GỬI SỔ</div>'
+    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Số người gửi</span><span class="sg-overview-val" style="color:var(--gd)">'+guiNames.size+' người</span></div>'
+    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Số giao dịch</span><span class="sg-overview-val">'+sg.length+' lần</span></div>'
+    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Tổng tiền gửi</span><span class="sg-overview-val" style="color:var(--gd)">'+fmtNum(Math.round(guiTotal))+' ₫</span></div>'
+    +'</div>';
+  html+='<div class="sg-overview-card sg-card-ung">'
+    +'<div class="sg-overview-title">💵 ỨNG TIỀN</div>'
+    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Số người ứng</span><span class="sg-overview-val" style="color:#d97706">'+ungNames.size+' người</span></div>'
+    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Số giao dịch</span><span class="sg-overview-val">'+su.length+' lần</span></div>'
+    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Tổng tiền ứng</span><span class="sg-overview-val" style="color:#d97706">'+fmtNum(Math.round(ungTotal))+' ₫</span></div>'
+    +'</div>';
+  document.getElementById('sg-tab-content').innerHTML=html;
+}
+
+function renderSgKHDetail(ten){
+  var sgList=getSG().filter(function(r){return r.ten===ten;});
+  var suList=getSU().filter(function(r){return r.ten===ten;});
+  var guiTotal=sgList.reduce(function(a,r){return a+(r.tt||0);},0);
+  var ungTotal=suList.reduce(function(a,r){return a+(parseFloat(r.tien)||0);},0);
+  var conLai=guiTotal-ungTotal;
+  var guiDays=[...new Set(sgList.map(function(r){return r.date;}))].length;
+
+  var html='<button class="btn-huy" style="width:100%;margin-bottom:10px" onclick="backToSgOverview()">← Quay lại tổng quan</button>';
+
+  html+='<div class="sec-title" style="color:var(--gd)">📒 Gửi sổ ('+sgList.length+' lần)</div>';
+  if(sgList.length){
+    html+='<div class="card" style="padding:0;overflow:hidden;border:1.5px solid var(--gb);border-radius:var(--r);margin-bottom:8px">';
+    html+=sgList.map(function(r){
+      var chat=r.loai==='nuoc'?'Độ: '+(r.do||'--'):(r.loai==='dong'&&r.do?'KH: '+r.do+'kg':'');
+      return '<div class="sg-entry" ondblclick="openSgEntryEdit(\'' + r.id + '\',\'gui\')" onclick="onSgEntryTap(\'' + r.id + '\',\'gui\')">'
+        +'<div class="sg-entry-row"><span class="sg-entry-date">'+fmtDate(r.date)+'</span><span class="sg-entry-tien">'+fmtNum(r.tt)+' ₫</span></div>'
+        +'<div class="sg-entry-row"><span class="sg-entry-meta">'+LOAI_ICO[r.loai]+' '+LOAI_LBL[r.loai]+' · '+fmtKg(r.kg)+'kg'+(chat?' · '+chat:'')+'</span><span class="sg-entry-meta">'+fmtNum(r.gia)+' đ</span></div>'
+        +'</div>';
+    }).join('');
+    html+='</div>';
+  } else {
+    html+='<div class="no-data" style="margin-bottom:8px">Chưa có ghi chép gửi sổ</div>';
+  }
+
+  html+='<div class="sec-title" style="color:#d97706">💵 Ứng tiền ('+suList.length+' lần)</div>';
+  if(suList.length){
+    html+='<div class="card" style="padding:0;overflow:hidden;border:1.5px solid #fde68a;border-radius:var(--r);margin-bottom:8px">';
+    html+=suList.map(function(r){
+      return '<div class="ung-entry" ondblclick="openSgEntryEdit(\'' + r.id + '\',\'ung\')" onclick="onSgEntryTap(\'' + r.id + '\',\'ung\')">'
+        +'<div class="ung-entry-row"><span class="sg-entry-date">'+fmtDate(r.date)+'</span><span class="ung-entry-tien">-'+fmtNum(Math.round(r.tien))+' ₫</span></div>'
+        +(r.noidung?'<div class="ung-entry-content">📝 '+r.noidung+'</div>':'')
+        +'</div>';
+    }).join('');
+    html+='</div>';
+  } else {
+    html+='<div class="no-data" style="margin-bottom:8px">Chưa có ghi chép ứng tiền</div>';
+  }
+
+  html+='<div class="sg-summary-final">'
+    +'<div class="sg-summary-row"><span>Tổng tiền gửi ('+guiDays+' ngày)</span><span>'+fmtNum(Math.round(guiTotal))+' ₫</span></div>'
+    +'<div class="sg-summary-row"><span>Tổng tiền đã ứng</span><span>-'+fmtNum(Math.round(ungTotal))+' ₫</span></div>'
+    +'<div class="sg-summary-row total"><span>CÒN LẠI</span><span style="color:'+(conLai>=0?'#86efac':'#fca5a5')+'">'+fmtNum(Math.round(conLai))+' ₫</span></div>'
+    +'</div>';
+
+  html+='<button class="sg-chot-btn" style="width:100%;margin-top:10px" onclick="chotSoGuiKH(\'' + ten.replace(/'/g, "\\'") + '\')">🔒 Chốt sổ '+ten+'</button>';
+
+  document.getElementById('sg-tab-content').innerHTML=html;
+}
+
+function backToSgOverview(){
+  sgCurrentKH=null;
+  document.getElementById('sg-kh-dd-label').textContent='👤 Tên khách hàng';
+  renderSgTabContent();
+}
+
+function renderSgTabContent(){
+  if(sgCurrentKH) renderSgKHDetail(sgCurrentKH);
+  else renderSgOverview();
+}
+
 var sgEntryTaps={};
-function onSgEntryTap(id){
-  if(sgEntryTaps[id]){ clearTimeout(sgEntryTaps[id]); delete sgEntryTaps[id]; openSgTabEdit(id); }
-  else sgEntryTaps[id]=setTimeout(function(){ delete sgEntryTaps[id]; },400);
+function onSgEntryTap(id,type){
+  var key=type+'_'+id;
+  if(sgEntryTaps[key]){ clearTimeout(sgEntryTaps[key]); delete sgEntryTaps[key]; openSgEntryEdit(id,type); }
+  else sgEntryTaps[key]=setTimeout(function(){ delete sgEntryTaps[key]; },400);
 }
 
-// Mở modal ghi chép MỚI
-function openSgTabModal(preTen) {
-  sgTabEditId = null;
-  document.getElementById('sgt-date').value = today();
-  document.getElementById('sgt-loai').value = '';
-  document.getElementById('sgt-gia').value = '';
-  document.getElementById('sgt-ten').value = preTen || '';
-  document.getElementById('sgt-kg').value = '';
-  document.getElementById('sgt-do').value = '';
-  document.getElementById('sgt-do-row').style.display = 'none';
-  document.getElementById('sgt-tt').textContent = '0 ₫';
-  document.getElementById('sgt-chu').textContent = '--';
+function openSgEntryModal(type, preTen){
+  document.getElementById('sg-add-dropdown').style.display='none';
+  sgTabEditId=null; sgTabEditType=null;
+  document.getElementById('sgt-date').value=today();
+  setSgtType(type);
+  if(type==='gui'){
+    document.getElementById('sgt-loai').value='';
+    document.getElementById('sgt-gia').value='';
+    document.getElementById('sgt-ten').value=preTen||sgCurrentKH||'';
+    document.getElementById('sgt-kg').value='';
+    document.getElementById('sgt-do').value='';
+    document.getElementById('sgt-do-row').style.display='none';
+    document.getElementById('sgt-tt').textContent='0 ₫';
+    document.getElementById('sgt-chu').textContent='--';
+  } else {
+    document.getElementById('sgu-ten').value=preTen||sgCurrentKH||'';
+    document.getElementById('sgu-tien').value='';
+    document.getElementById('sgu-noidung').value='';
+  }
   openM('modal-sg-tab');
 }
 
-// Mở modal SỬA ghi chép cũ
-function openSgTabEdit(id) {
-  var sg=getSG(); var r=sg.find(function(x){ return String(x.id)===String(id); });
-  if(!r) return;
-  sgTabEditId = id;
-  document.getElementById('sgt-date').value = r.date;
-  document.getElementById('sgt-loai').value = r.loai;
-  document.getElementById('sgt-ten').value = r.ten;
-  document.getElementById('sgt-kg').value = r.kg;
-  document.getElementById('sgt-do').value = r.do||'';
-  document.getElementById('sgt-gia').value = r.gia ? parseInt(r.gia).toLocaleString('vi-VN') : '';
-  onSgtLoai();
-  calcSgt();
+function openSgEntryEdit(id,type){
+  sgTabEditId=id; sgTabEditType=type;
+  setSgtType(type);
+  if(type==='gui'){
+    var r=getSG().find(function(x){return String(x.id)===String(id);});
+    if(!r) return;
+    document.getElementById('sgt-date').value=r.date;
+    document.getElementById('sgt-loai').value=r.loai;
+    document.getElementById('sgt-ten').value=r.ten;
+    document.getElementById('sgt-kg').value=r.kg;
+    document.getElementById('sgt-do').value=r.do||'';
+    document.getElementById('sgt-gia').value=r.gia?parseInt(r.gia).toLocaleString('vi-VN'):'';
+    onSgtLoai(); calcSgt();
+  } else {
+    var r2=getSU().find(function(x){return String(x.id)===String(id);});
+    if(!r2) return;
+    document.getElementById('sgt-date').value=r2.date;
+    document.getElementById('sgu-ten').value=r2.ten;
+    document.getElementById('sgu-tien').value=parseInt(r2.tien).toLocaleString('vi-VN');
+    document.getElementById('sgu-noidung').value=r2.noidung||'';
+  }
   openM('modal-sg-tab');
+}
+
+function setSgtType(type){
+  sgtType=type;
+  document.getElementById('sgt-type-gui').classList.toggle('active', type==='gui');
+  document.getElementById('sgt-type-ung').classList.toggle('active', type==='ung');
+  if(type==='ung') document.getElementById('sgt-type-ung').classList.add('ung');
+  document.getElementById('sgt-form-gui').style.display = type==='gui' ? '' : 'none';
+  document.getElementById('sgt-form-ung').style.display = type==='ung' ? '' : 'none';
+  document.getElementById('sgt-modal-title').textContent = type==='gui' ? '📒 Gửi sổ' : '💵 Ứng tiền';
+  document.getElementById('sgt-save-btn').textContent = type==='gui' ? '📒 Lưu sổ gửi' : '💵 Lưu ứng tiền';
 }
 
 function onSgtLoai(){
   var loai=document.getElementById('sgt-loai').value;
-  sgtLoai=loai;
   var doRow=document.getElementById('sgt-do-row');
   var doLbl=document.getElementById('sgt-do-lbl');
   if(loai==='nuoc'){ doRow.style.display=''; doLbl.textContent='Độ'; }
@@ -3891,20 +4033,13 @@ function onSgtGia(){
   el.value=d?parseInt(d).toLocaleString('vi-VN'):'';
   calcSgt();
 }
+
+window.sgPickHandler = null;
 function onSgtTen(){
   var val=document.getElementById('sgt-ten').value;
   var ac=document.getElementById('sgt-ac');
-  var sg=getSG(); var khSg=[...new Set(sg.map(function(r){return r.ten;}))];
-  var khMua=getKH();
-  var green=khSg.filter(function(n){ return n.toLowerCase().includes(val.toLowerCase()); });
-  var black=khMua.filter(function(n){ return !khSg.includes(n)&&n.toLowerCase().includes(val.toLowerCase()); });
-  var all=green.concat(black).slice(0,6);
-  if(!val||!all.length){ ac.style.display='none'; return; }
-  ac.innerHTML=all.map(function(n){
-    var isGreen=khSg.includes(n);
-    return '<div class="ac-item" style="color:'+(isGreen?'var(--gd)':'var(--g800)')+'" onclick="document.getElementById(\'sgt-ten\').value=\''+n.replace(/'/g,"\'")+'\'";document.getElementById(\'sgt-ac\').style.display=\'none\'">'+n+'</div>';
-  }).join('');
-  ac.style.display='block';
+  window.sgPickHandler = function(n){ document.getElementById('sgt-ten').value=n; ac.style.display='none'; };
+  renderNameAc(val, ac);
 }
 function calcSgt(){
   var loai=document.getElementById('sgt-loai').value;
@@ -3917,48 +4052,108 @@ function calcSgt(){
   document.getElementById('sgt-chu').textContent=t>0?docTien(t):'--';
 }
 
-function luuSgTab(){
+function onSguTen(){
+  var val=document.getElementById('sgu-ten').value;
+  var ac=document.getElementById('sgu-ac');
+  window.sgPickHandler = function(n){ document.getElementById('sgu-ten').value=n; ac.style.display='none'; };
+  renderNameAc(val, ac);
+}
+function onSguTien(){
+  var el=document.getElementById('sgu-tien');
+  var d=el.value.replace(/[^0-9]/g,'');
+  el.value=d?parseInt(d).toLocaleString('vi-VN'):'';
+}
+
+function renderNameAc(val, acEl){
+  if(!val){ acEl.style.display='none'; return; }
+  var existNames=getAllSgKhNames();
+  var khMua=getKH();
+  var green=existNames.filter(function(n){return n.toLowerCase().includes(val.toLowerCase());});
+  var black=khMua.filter(function(n){return !existNames.includes(n)&&n.toLowerCase().includes(val.toLowerCase());});
+  var all=green.concat(black).slice(0,6);
+  if(!all.length){ acEl.style.display='none'; return; }
+  acEl.innerHTML=all.map(function(n){
+    var isGreen=existNames.includes(n);
+    return '<div class="ac-item" style="color:'+(isGreen?'var(--gd)':'var(--g800)')+';font-weight:'+(isGreen?'700':'500')+'" onclick="window.sgPickHandler(\'' + n.replace(/'/g, "\\'") + '\')">'+(isGreen?'✅ ':'👤 ')+n+'</div>';
+  }).join('');
+  acEl.style.display='block';
+}
+
+function luuSgEntry(){
   if(guardLicense()) return;
-  var ten=document.getElementById('sgt-ten').value.trim();
-  var loai=document.getElementById('sgt-loai').value;
-  var kg=parseFloat(document.getElementById('sgt-kg').value)||0;
-  var giaRaw=document.getElementById('sgt-gia').value.replace(/[^0-9]/g,'');
-  var gia=parseFloat(giaRaw)||0;
-  var doV=parseFloat(document.getElementById('sgt-do').value)||0;
   var date=document.getElementById('sgt-date').value||today();
-  if(!ten){ toast('⚠️ Nhập tên khách!'); return; }
-  if(!loai){ toast('⚠️ Chọn loại mủ!'); return; }
-  if(!kg){ toast('⚠️ Nhập số kg!'); return; }
-  if(!gia){ toast('⚠️ Nhập đơn giá!'); return; }
-  var tt=tinhTien(loai,kg,gia,doV,0);
-  var sg=getSG();
-  if(sgTabEditId) {
-    var idx=sg.findIndex(function(x){ return String(x.id)===String(sgTabEditId); });
-    if(idx>=0) sg[idx]={...sg[idx],date,ten,loai,kg,do:doV,gia,tt};
+
+  if(sgtType==='gui'){
+    var ten=document.getElementById('sgt-ten').value.trim();
+    var loai=document.getElementById('sgt-loai').value;
+    var kg=parseFloat(document.getElementById('sgt-kg').value)||0;
+    var giaRaw=document.getElementById('sgt-gia').value.replace(/[^0-9]/g,'');
+    var gia=parseFloat(giaRaw)||0;
+    var doV=parseFloat(document.getElementById('sgt-do').value)||0;
+    if(!ten){ toast('⚠️ Nhập tên khách!'); return; }
+    if(!loai){ toast('⚠️ Chọn loại mủ!'); return; }
+    if(!kg){ toast('⚠️ Nhập số kg!'); return; }
+    if(!gia){ toast('⚠️ Nhập đơn giá!'); return; }
+    var tt=tinhTien(loai,kg,gia,doV,0);
+    var sg=getSG();
+    if(sgTabEditId && sgTabEditType==='gui'){
+      var idx=sg.findIndex(function(x){return String(x.id)===String(sgTabEditId);});
+      if(idx>=0) sg[idx]={...sg[idx],date,ten,loai,kg,do:doV,gia,tt};
+    } else {
+      sg.push({id:Date.now()+Math.random(),date,ten,loai,kg,do:doV,gia,tt,src:'tab'});
+    }
+    setSG(sg);
+    toast('📒 Đã '+(sgTabEditId?'cập nhật':'lưu')+' sổ gửi!');
+    if(sgCurrentKH!==ten){ sgCurrentKH=ten; document.getElementById('sg-kh-dd-label').textContent='👤 '+ten; }
   } else {
-    sg.push({id:Date.now()+Math.random(),date,ten,loai,kg,do:doV,gia,tt,src:'tab'});
+    var tenU=document.getElementById('sgu-ten').value.trim();
+    var tienRaw=document.getElementById('sgu-tien').value.replace(/[^0-9]/g,'');
+    var tien=parseFloat(tienRaw)||0;
+    var noidung=document.getElementById('sgu-noidung').value.trim();
+    if(!tenU){ toast('⚠️ Nhập tên người ứng!'); return; }
+    if(!tien){ toast('⚠️ Nhập số tiền ứng!'); return; }
+    var su=getSU();
+    if(sgTabEditId && sgTabEditType==='ung'){
+      var idx2=su.findIndex(function(x){return String(x.id)===String(sgTabEditId);});
+      if(idx2>=0) su[idx2]={...su[idx2],date,ten:tenU,tien,noidung};
+    } else {
+      su.push({id:Date.now()+Math.random(),date,ten:tenU,tien,noidung,src:'tab'});
+    }
+    setSU(su);
+    toast('💵 Đã '+(sgTabEditId?'cập nhật':'lưu')+' ứng tiền!');
+    if(sgCurrentKH!==tenU){ sgCurrentKH=tenU; document.getElementById('sg-kh-dd-label').textContent='👤 '+tenU; }
   }
-  setSG(sg);
+
   closeM('modal-sg-tab');
-  renderSgTabKH();
-  renderSgTabKHDetail(ten);
-  toast('📒 Đã '+(sgTabEditId?'cập nhật':'lưu')+' sổ gửi!');
+  renderSgTabContent();
   autoSync();
 }
 
 function chotSoGuiKH(ten){
-  var sg=getSG().filter(function(r){ return r.ten===ten; });
-  var total=sg.reduce(function(a,r){ return a+r.tt; },0);
-  var info=[['Khách hàng',ten],['Số lần ghi',sg.length+' lần'],['Tổng tiền',fmtNum(Math.round(total))+' ₫'],['Lưu ý','Xoá toàn bộ ghi chép — không hoàn tác']];
-  showDetail('🔒','Chốt sổ gửi?',info,null,'Chốt sổ',function(){
+  var sgList=getSG().filter(function(r){return r.ten===ten;});
+  var suList=getSU().filter(function(r){return r.ten===ten;});
+  var guiTotal=sgList.reduce(function(a,r){return a+(r.tt||0);},0);
+  var ungTotal=suList.reduce(function(a,r){return a+(parseFloat(r.tien)||0);},0);
+  var info=[
+    ['Khách hàng',ten],
+    ['Số lần gửi',sgList.length+' lần'],
+    ['Số lần ứng',suList.length+' lần'],
+    ['Tổng gửi',fmtNum(Math.round(guiTotal))+' ₫'],
+    ['Tổng ứng',fmtNum(Math.round(ungTotal))+' ₫'],
+    ['Còn lại',fmtNum(Math.round(guiTotal-ungTotal))+' ₫'],
+    ['Lưu ý','Xoá toàn bộ — không hoàn tác']
+  ];
+  showDetail('🔒','Chốt sổ '+ten+'?',info,null,'Chốt sổ',function(){
     var pw=prompt('Nhập mật khẩu xác nhận:');
     if(pw!==getThangPW()){ toast('❌ Mật khẩu không đúng!'); return; }
-    setSG(getSG().filter(function(r){ return r.ten!==ten; }));
-    renderSgTabKH();
+    setSG(getSG().filter(function(r){return r.ten!==ten;}));
+    setSU(getSU().filter(function(r){return r.ten!==ten;}));
+    backToSgOverview();
     toast('✅ Đã chốt sổ '+ten+'!');
     autoSync();
   });
 }
+
 
 // ══════════════════════════════════════════
 // THỐNG KÊ THÁNG
@@ -4400,180 +4595,6 @@ function doDoiPwThang() {
   setThangPW(newPw);
   closeM('modal-doi-pw-thang');
   toast('✅ Đã đổi mật khẩu thống kê tháng!');
-}
-
-// ══════════════════════════════════════════
-// TAB SỔ GỬI - Ghi sổ thủ công + hiển thị theo KH
-// ══════════════════════════════════════════
-var sgTabLoai = 'nuoc';
-
-function setSgTabLoai(loai) {
-  sgTabLoai = loai;
-  document.querySelectorAll('#sg-tab-loai-btns .loai-btn').forEach(function(b,i){
-    b.classList.toggle('active', ['nuoc','chen','day','dong'][i]===loai);
-  });
-  var doRow = document.getElementById('sg-tab-do-row');
-  var doLbl = document.getElementById('sg-tab-do-lbl');
-  if(loai==='nuoc'){ doRow.style.display=''; doLbl.textContent='Độ'; }
-  else if(loai==='dong'){ doRow.style.display=''; doLbl.textContent='KH (kg)'; }
-  else { doRow.style.display='none'; }
-  calcSgTab();
-}
-
-function onSgTabTen() {
-  var val = document.getElementById('sg-tab-ten').value;
-  var ac = document.getElementById('sg-tab-ac');
-  var all = getKH().filter(function(k){ return k.toLowerCase().includes(val.toLowerCase()); });
-  // Gộp thêm tên từ sổ gửi hiện có
-  var sgNames = [...new Set(getSG().map(function(r){ return r.ten; }))];
-  sgNames.forEach(function(n){ if(!all.includes(n) && n.toLowerCase().includes(val.toLowerCase())) all.push(n); });
-  if(!val || !all.length){ ac.style.display='none'; return; }
-  ac.innerHTML = all.slice(0,6).map(function(n){
-    return '<div class="ac-item" onclick="pickSgTabKH(\''+n+'\')">'+n+'</div>';
-  }).join('');
-  ac.style.display='block';
-}
-function pickSgTabKH(name){
-  document.getElementById('sg-tab-ten').value = name;
-  document.getElementById('sg-tab-ac').style.display='none';
-  document.getElementById('sg-tab-kg').focus();
-  renderSgTabKHDetail(name);
-}
-
-function onSgTabGia(){
-  var el=document.getElementById('sg-tab-gia');
-  var d=el.value.replace(/[^0-9]/g,'');
-  el.value=d?parseInt(d).toLocaleString('vi-VN'):'';
-  calcSgTab();
-}
-function calcSgTab(){
-  var kg=parseFloat(document.getElementById('sg-tab-kg').value)||0;
-  var giaRaw=document.getElementById('sg-tab-gia').value.replace(/[^0-9]/g,'');
-  var gia=parseFloat(giaRaw)||0;
-  var doV=parseFloat(document.getElementById('sg-tab-do').value)||0;
-  var t=tinhTien(sgTabLoai,kg,gia,doV,0);
-  document.getElementById('sg-tab-tt').textContent=fmtNum(t)+' ₫';
-  document.getElementById('sg-tab-chu').textContent=t>0?docTien(t):'--';
-}
-
-function resetSgTabForm(){
-  document.getElementById('sg-tab-ten').value='';
-  document.getElementById('sg-tab-kg').value='';
-  document.getElementById('sg-tab-do').value='';
-  document.getElementById('sg-tab-gia').value='';
-  document.getElementById('sg-tab-tt').textContent='0 ₫';
-  document.getElementById('sg-tab-chu').textContent='--';
-  document.getElementById('sg-tab-ac').style.display='none';
-}
-
-function luuSgTab(){
-  if(guardLicense()) return;
-  var ten=document.getElementById('sg-tab-ten').value.trim();
-  if(!ten){ toast('⚠️ Nhập tên khách!'); return; }
-  var kg=parseFloat(document.getElementById('sg-tab-kg').value)||0;
-  if(!kg){ toast('⚠️ Nhập số kg!'); return; }
-  var giaRaw=document.getElementById('sg-tab-gia').value.replace(/[^0-9]/g,'');
-  var gia=parseFloat(giaRaw)||0;
-  if(!gia){ toast('⚠️ Nhập đơn giá!'); return; }
-  var doV=parseFloat(document.getElementById('sg-tab-do').value)||0;
-  var tt=tinhTien(sgTabLoai,kg,gia,doV,0);
-  var rec={id:Date.now()+Math.random(), date:today(), ten:ten, loai:sgTabLoai, kg:kg, do:doV, gia:gia, tt:tt, src:'tab'};
-  var sg=getSG(); sg.push(rec); setSG(sg);
-  resetSgTabForm();
-  renderSgTabKH();
-  renderSgTabKHDetail(ten);
-  toast('📒 Đã lưu sổ gửi!');
-  autoSync();
-}
-
-// Render danh sách KH ở tab sổ gửi
-function renderSgTabKH(){
-  var search=(document.getElementById('sg-tab-search')||{}).value||'';
-  var sg=getSG();
-  var khMap={};
-  sg.forEach(function(r){
-    if(!r.ten) return;
-    if(search && !r.ten.toLowerCase().includes(search.toLowerCase())) return;
-    if(!khMap[r.ten]) khMap[r.ten]={cnt:0,tt:0,lastDate:''};
-    khMap[r.ten].cnt++;
-    khMap[r.ten].tt+=r.tt||0;
-    if(!khMap[r.ten].lastDate||r.date>khMap[r.ten].lastDate) khMap[r.ten].lastDate=r.date;
-  });
-  var cont=document.getElementById('sg-tab-kh-list');
-  if(!cont) return;
-  var keys=Object.keys(khMap);
-  if(!keys.length){ cont.innerHTML='<div class="no-data">Chưa có ghi chép nào</div>'; return; }
-  cont.innerHTML=keys.map(function(ten){
-    var d=khMap[ten];
-    return '<div class="sg-kh-btn" onclick="renderSgTabKHDetail(\''+ten.replace(/'/g,"\'")+'\')">'
-      +'<div><div class="sg-kh-name">👤 '+ten+'</div>'
-      +'<div class="sg-kh-meta">'+d.cnt+' lần ghi · Gần nhất: '+fmtDate(d.lastDate)+'</div></div>'
-      +'<div><div class="sg-kh-total">'+fmtNum(Math.round(d.tt))+' ₫</div><div style="font-size:10px;color:var(--g400);text-align:right">▶</div></div>'
-      +'</div>';
-  }).join('');
-}
-
-// Hiện chi tiết KH ngay trong tab (bên dưới danh sách)
-function renderSgTabKHDetail(ten){
-  document.getElementById('sg-tab-search').value=ten;
-  var sg=getSG().filter(function(r){ return r.ten===ten; });
-  var cont=document.getElementById('sg-tab-kh-list');
-  var total=sg.reduce(function(a,r){ return a+r.tt; },0);
-  var days=[...new Set(sg.map(function(r){return r.date;}))].length;
-  var rows=sg.map(function(r){
-    var chatTxt='';
-    if(r.loai==='nuoc') chatTxt='Độ: '+(r.do||'--');
-    else if(r.loai==='dong'&&r.do) chatTxt='KH: '+r.do+'kg';
-    return '<div class="sg-entry" ondblclick="openSgEditTab(\''+r.id+'\');" onclick="onSgEntryTap(\''+r.id+'\');">'
-      +'<div class="sg-entry-row"><span class="sg-entry-date">'+fmtDate(r.date)+'</span><span class="sg-entry-tien">'+fmtNum(r.tt)+' ₫</span></div>'
-      +'<div class="sg-entry-row"><span class="sg-entry-meta">'+LOAI_ICO[r.loai]+' '+LOAI_LBL[r.loai]+' · '+fmtKg(r.kg)+'kg'+(chatTxt?' · '+chatTxt:'')+'</span><span class="sg-entry-meta">'+fmtNum(r.gia)+' đ/độ</span></div>'
-      +'</div>';
-  }).join('');
-
-  var divider='<div style="border-top:2px solid var(--gp);margin:4px 0"></div>';
-  cont.innerHTML='<div class="card" style="padding:0;overflow:hidden;border:1.5px solid var(--gb);border-radius:var(--r)">'
-    +rows
-    +divider
-    +'</div>'
-    +'<div class="sg-total-bar-new">'
-    +'<div><div style="font-size:11px;opacity:.8">TỔNG ('+days+' ngày)</div>'
-    +'<div style="font-size:18px;font-weight:800">'+fmtNum(Math.round(total))+' ₫</div></div>'
-    +'<button class="sg-chot-btn" onclick="chotSoGuiKH(\''+ten.replace(/'/g,"\'")+'\')" >🔒 Chốt sổ</button>'
-    +'</div>'
-    +'<button class="btn-huy" style="width:100%;margin-top:8px" onclick="renderSgTabKH();document.getElementById(\'sg-tab-search\').value=\'\';"> ← Quay lại danh sách</button>';
-}
-
-// Tap/double tap để sửa entry
-var sgEntryTaps={};
-function onSgEntryTap(id){
-  if(sgEntryTaps[id]){ clearTimeout(sgEntryTaps[id]); delete sgEntryTaps[id]; openSgEditTab(id); }
-  else sgEntryTaps[id]=setTimeout(function(){ delete sgEntryTaps[id]; },400);
-}
-
-// Sửa entry trong tab
-function openSgEditTab(id){
-  var sg=getSG();
-  var r=sg.find(function(x){ return String(x.id)===String(id); });
-  if(!r) return;
-  sgEditId=id;
-  openSgEdit(id); // dùng lại modal sửa cũ
-}
-
-// Chốt sổ cho 1 KH: xác nhận mật khẩu → xoá ghi chép
-function chotSoGuiKH(ten){
-  var sg=getSG().filter(function(r){ return r.ten===ten; });
-  var total=sg.reduce(function(a,r){ return a+r.tt; },0);
-  var info=[['Khách hàng',ten],['Số lần ghi',sg.length+' lần'],['Tổng tiền',fmtNum(Math.round(total))+' ₫'],['Thao tác','Xoá toàn bộ ghi chép của '+ten]];
-  showDetail('🔒','Chốt sổ gửi?',info,null,'Chốt sổ',function(){
-    // Yêu cầu mật khẩu
-    var pw=prompt('Nhập mật khẩu xác nhận chốt sổ:');
-    if(pw!==getThangPW()){ toast('❌ Mật khẩu không đúng!'); return; }
-    var newSg=getSG().filter(function(r){ return r.ten!==ten; });
-    setSG(newSg);
-    renderSgTabKH();
-    toast('✅ Đã chốt sổ '+ten+'!');
-    autoSync();
-  });
 }
 
 // ─── SERVICE WORKER ───
