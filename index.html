@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v5.4</title>
+<title>Mua Bán Mủ Cao Su v5.5</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -329,7 +329,8 @@ input[type=date]:focus{border-color:var(--gl)}
 
 /* SỔ GỬI v5.4 */
 .sg-top-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.sg-dd-btn{background:#fff;border:1.5px solid var(--gp);border-radius:var(--r);padding:11px 12px;font-size:13px;font-weight:700;color:var(--gd);display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.sg-dd-btn{background:#fff;border:1.5px solid var(--gp)
+.sg-dd-select{width:100%;background:#fff;border:1.5px solid var(--gp);border-radius:var(--r);padding:11px 12px;font-size:13px;font-weight:700;color:var(--gd);cursor:pointer;-webkit-appearance:none};border-radius:var(--r);padding:11px 12px;font-size:13px;font-weight:700;color:var(--gd);display:flex;align-items:center;justify-content:space-between;cursor:pointer}
 .sg-overview-card{background:#fff;border-radius:var(--r);box-shadow:var(--s1);padding:14px;margin-bottom:10px}
 .sg-overview-title{font-size:12px;font-weight:800;color:var(--g600);margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .sg-overview-row{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0}
@@ -360,7 +361,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="logo-ico">🌿</div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v5.4 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v5.5 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -587,13 +588,11 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="ac-drop" id="sg-kh-dropdown" style="display:none;max-height:260px;overflow-y:auto"></div>
     </div>
     <div style="position:relative">
-      <div class="sg-dd-btn" onclick="toggleSgAddDrop()">
-        <span>➕ Thêm ghi chép</span><span>▾</span>
-      </div>
-      <div class="ac-drop" id="sg-add-dropdown" style="display:none">
-        <div class="ac-item" onclick="openSgEntryModal('gui')">📒 Gửi sổ</div>
-        <div class="ac-item" onclick="openSgEntryModal('ung')">💵 Ứng tiền</div>
-      </div>
+      <select class="fi sg-dd-select" onchange="onSgAddSelect(this)">
+        <option value="" selected disabled>➕ Thêm ghi chép</option>
+        <option value="gui">📒 Gửi sổ</option>
+        <option value="ung">💵 Ứng tiền</option>
+      </select>
     </div>
   </div>
 
@@ -802,7 +801,10 @@ input[type=date]:focus{border-color:var(--gl)}
       </table>
     </div>
     <div id="ss-popup-tk"></div>
-    <button class="btn-huy" style="width:100%;margin-top:10px" onclick="closeSSPopup()">Đóng</button>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn-huy" style="flex:1" onclick="closeSSPopup()">✕ Thoát</button>
+      <button class="btn-luu" style="flex:1" onclick="chupAnhSS()">📷 Chụp ảnh</button>
+    </div>
   </div>
 </div>
 
@@ -857,7 +859,7 @@ input[type=date]:focus{border-color:var(--gl)}
     <div style="font-size:32px;text-align:center;margin-bottom:10px">🔐</div>
     <div style="font-size:15px;font-weight:800;text-align:center;color:var(--g800);margin-bottom:6px">Xác nhận đặt lại tháng</div>
     <div style="font-size:12px;color:var(--g400);text-align:center;margin-bottom:14px">Thao tác này sẽ chốt tháng và xoá toàn bộ dữ liệu thống kê tháng hiện tại</div>
-    <input type="password" id="reset-pw-input" class="fi" placeholder="Nhập mật khẩu..." style="margin-bottom:8px" onkeydown="if(event.key==='Enter')doResetThang()">
+    <input type="password" autocomplete="new-password" id="reset-pw-input" class="fi" placeholder="Nhập mật khẩu..." style="margin-bottom:8px" onkeydown="if(event.key==='Enter')doResetThang()">
     <div id="reset-pw-err" style="color:#dc2626;font-size:11px;margin-bottom:8px;display:none">❌ Mật khẩu không đúng!</div>
     <div class="cfm-btns">
       <button class="cfm-btn n" onclick="closeM('modal-reset-thang')">Huỷ</button>
@@ -908,7 +910,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div id="gh-device-code" style="font-size:22px;font-weight:800;color:var(--gd);letter-spacing:2px"></div>
       <div style="font-size:10px;color:var(--g400);margin-top:2px">Thuật toán mã: <b id="gh-algo-ver"></b></div>
     </div>
-    <input type="text" inputmode="numeric" id="gh-pw-input" class="fi" placeholder="Mật khẩu hoặc Mã gia hạn 6 số" style="margin-bottom:8px" oninput="onGhPwInput()">
+    <input type="text" inputmode="numeric" id="gh-pw-input" class="fi" placeholder="Mật khẩu hoặc Mã gia hạn 6 số" autocomplete="off" style="margin-bottom:8px" oninput="onGhPwInput()">
     <input type="text" inputmode="numeric" id="gh-days-input" class="fi" placeholder="—" style="margin-bottom:8px" disabled>
     <div id="gh-err" style="color:#dc2626;font-size:11px;margin-bottom:8px;display:none">❌ Mật khẩu không đúng!</div>
     <div id="gh-info" style="font-size:11px;color:var(--g600);margin-bottom:8px;text-align:center"></div>
@@ -924,9 +926,9 @@ input[type=date]:focus{border-color:var(--gl)}
   <div class="modal-box center-box" style="max-width:320px">
     <div style="font-size:32px;text-align:center;margin-bottom:8px">🔐</div>
     <div style="font-size:15px;font-weight:800;text-align:center;color:var(--g800);margin-bottom:10px">Đổi mật khẩu thống kê tháng</div>
-    <input type="password" id="dpw-old" class="fi" placeholder="Mật khẩu cũ" style="margin-bottom:8px">
-    <input type="password" id="dpw-new" class="fi" placeholder="Mật khẩu mới" style="margin-bottom:8px">
-    <input type="password" id="dpw-confirm" class="fi" placeholder="Xác nhận mật khẩu mới" style="margin-bottom:8px">
+    <input type="password" autocomplete="new-password" id="dpw-old" class="fi" placeholder="Mật khẩu cũ" style="margin-bottom:8px">
+    <input type="password" autocomplete="new-password" id="dpw-new" class="fi" placeholder="Mật khẩu mới" style="margin-bottom:8px">
+    <input type="password" autocomplete="new-password" id="dpw-confirm" class="fi" placeholder="Xác nhận mật khẩu mới" style="margin-bottom:8px">
     <div id="dpw-err" style="color:#dc2626;font-size:11px;margin-bottom:8px;display:none"></div>
     <div class="cfm-btns">
       <button class="cfm-btn n" onclick="closeM('modal-doi-pw-thang')">Huỷ</button>
@@ -3067,23 +3069,20 @@ function xemChiTietSS() {
   var isNuoc = r.isNuoc;
   var dateStr = curDate['mua'];
   var totalKg = r.newKgs.reduce(function(a,b){return a+b;},0);
-  var avgDo = isNuoc ? r.newDos.reduce(function(a,b){return a+b;},0)/r.newDos.length : 0;
+  var avgDo = isNuoc ? round1dec(r.newDos.reduce(function(a,b){return a+b;},0)/r.newDos.length) : 0;
   var totalTien = r.newTiens.reduce(function(a,b){return a+b;},0);
 
-  // Tiêu đề
   document.getElementById('ss-popup-title').textContent = '📋 Chi tiết thu mua trong ngày';
   var days = ['CN','T2','T3','T4','T5','T6','T7'];
   var dt = new Date(dateStr + 'T00:00:00');
-  document.getElementById('ss-popup-date').textContent = days[dt.getDay()] + ', ' + fmtDate(dateStr) + ' — ' + (LOAI_ICO[ssLoai]||'') + ' ' + (LOAI_LBL[ssLoai]||ssLoai);
+  document.getElementById('ss-popup-date').textContent = days[dt.getDay()] + ', ' + fmtDate(dateStr)
+    + ' — ' + (LOAI_ICO[ssLoai]||'') + ' ' + (LOAI_LBL[ssLoai]||ssLoai);
 
-  // Header bảng
-  var thead = document.getElementById('ss-popup-thead');
-  thead.innerHTML = '<th style="text-align:left;padding-left:7px">Tên</th>'
-    + '<th>Kg</th>'
-    + (isNuoc ? '<th>Độ/Loại</th>' : '<th>Loại</th>')
+  document.getElementById('ss-popup-thead').innerHTML =
+    '<th style="text-align:left;padding-left:7px">Tên</th>'
+    + '<th>Kg</th>' + (isNuoc ? '<th>Độ</th>' : '<th>Loại</th>')
     + '<th>Giá</th><th>Tiền</th>';
 
-  // Tbody
   document.getElementById('ss-popup-tbody').innerHTML = r.list.map(function(g,i){
     var doStr = isNuoc ? r.newDos[i].toFixed(1) : LOAI_LBL[ssLoai];
     return '<tr>'
@@ -3095,24 +3094,22 @@ function xemChiTietSS() {
       + '</tr>';
   }).join('');
 
-  // Thống kê
-  var doLine = isNuoc && avgDo > 0 ? '<div class="tk-sub">Độ TB: <b>' + avgDo.toFixed(1) + '</b></div>' : '';
+  // Dòng tổng gọn: gạch ngang + Kg | Độ TB | Tiền trên 1 hàng
+  var doTxt = isNuoc && avgDo > 0 ? ' · Độ TB: <b>' + avgDo.toFixed(1) + '</b>' : '';
   document.getElementById('ss-popup-tk').innerHTML =
-    '<div class="sec-divider" style="margin:10px 0"></div>'
-    + '<div class="sec-title" style="color:var(--gd)">📊 Thống kê trong ngày</div>'
-    + '<div class="tk-card" style="margin-bottom:8px">'
-    + '<div class="tk-lbl">' + (LOAI_ICO[ssLoai]||'') + ' ' + (LOAI_LBL[ssLoai]||ssLoai).toUpperCase() + '</div>'
-    + '<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:6px">'
-    + '<div><div style="font-size:11px;color:var(--g600)">Số kg thực</div>'
-    + '<div style="font-size:20px;font-weight:800;color:var(--gd)">' + fmtKg(totalKg) + ' kg</div>'
-    + doLine + '</div>'
-    + '<div style="text-align:right"><div style="font-size:11px;color:var(--g600)">Thành tiền</div>'
-    + '<div style="font-size:18px;font-weight:800;color:var(--gd)">' + fmtNum(Math.round(totalTien)) + ' ₫</div></div>'
-    + '</div></div>'
-    + '<div style="background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border-radius:var(--r);padding:10px 14px;display:flex;justify-content:space-between;font-size:13px;font-weight:700">'
-    + '<span>TỔNG TIỀN THU MUA</span><span>' + fmtNum(Math.round(totalTien)) + ' ₫</span></div>';
+    '<div style="border-top:2px solid var(--gp);margin:8px 0 6px"></div>'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:0 4px">'
+    + '<span><b>' + fmtKg(totalKg) + ' kg</b>' + doTxt + '</span>'
+    + '<span style="font-size:14px;font-weight:800;color:var(--gd)">' + fmtNum(Math.round(totalTien)) + ' ₫</span>'
+    + '</div>';
 
   document.getElementById('ss-popup').classList.add('show');
+}
+
+function chupAnhSS() {
+  var box = document.querySelector('#ss-popup .ss-popup-box');
+  if (box) box.scrollTop = 0;
+  toast('📷 Chụp màn hình ngay!');
 }
 
 function closeSSPopup() {
@@ -3255,10 +3252,16 @@ function syncToDrive_silent() {
         g.do||'', fmtNum(g.gia), fmtNum(g.tt), g.guiSo?'Có':''];
     }));
   }
+  var hdrGui=['Ngày','Tên','Loại mủ','Kg','Độ/KH','Đơn giá','Thành tiền'];
+  function sgRows(){return [hdrGui].concat(getSG().map(function(r){return[fmtDateVN2(r.date),r.ten,LOAI_LBL[r.loai]||r.loai||'',fmtKg(r.kg),r.do||'',fmtNum(r.gia),fmtNum(r.tt)];}));}
+  var hdrUng=['Ngày','Tên','Số tiền ứng','Nội dung'];
+  function suRows(){return [hdrUng].concat(getSU().map(function(r){return[fmtDateVN2(r.date),r.ten,fmtNum(Math.round(r.tien||0)),r.noidung||''];}));}
   var fname = 'backup_' + gdTodayStr();
   upsertSheet(fname, [
     { name: 'Thu_Mua', rows: gdRows2('mua') },
-    { name: 'Ban_Ra',  rows: gdRows2('ban') }
+    { name: 'Ban_Ra',  rows: gdRows2('ban') },
+    { name: 'So_Gui',  rows: sgRows() },
+    { name: 'So_Ung',  rows: suRows() }
   ], function() {
     gdSyncing = false;
     syncQueue = false;
@@ -3366,8 +3369,8 @@ function syncSoSachToDrive(dateStr, ssEntry) {
       fmtKg(p.kg), ssEntry.loai==='nuoc'?p.do.toFixed(1):'', fmtNum(ssEntry.gia), fmtNum(p.tien)];
   }));
   rows.push(['','','','','TỔNG CỘNG','', fmtNum(Math.round(ssEntry.totalTien))]);
-  upsertSheet(fname, [{ name: 'So_Sach', rows: rows }], function() {
-    toast('✅ Đã đồng bộ Sổ Sách lên Drive!');
+  upsertSheet(fname, [{ name: 'Tinh_Toan', rows: rows }], function() {
+    toast('✅ Đã đồng bộ Tính Toán lên Drive!');
   });
 }
 function fmtDateVN_ss(ds){ var p=ds?ds.split('-'):[]; return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:ds||''; }
@@ -3828,22 +3831,14 @@ var sgCurrentKH = null;
 
 function toggleSgKhDrop(){
   var dd=document.getElementById('sg-kh-dropdown');
-  var addDd=document.getElementById('sg-add-dropdown');
-  addDd.style.display='none';
   if(dd.style.display==='block'){ dd.style.display='none'; return; }
   renderSgKhDropdown();
   dd.style.display='block';
 }
-function toggleSgAddDrop(){
-  var dd=document.getElementById('sg-add-dropdown');
-  var khDd=document.getElementById('sg-kh-dropdown');
-  khDd.style.display='none';
-  dd.style.display = dd.style.display==='block' ? 'none' : 'block';
-}
+function onSgAddSelect(sel){ var t=sel.value; sel.value=''; if(t) openSgEntryModal(t); }
 document.addEventListener('click', function(e){
   var khDd=document.getElementById('sg-kh-dropdown');
-  var addDd=document.getElementById('sg-add-dropdown');
-  if(khDd && addDd && !e.target.closest('.sg-top-row')) { khDd.style.display='none'; addDd.style.display='none'; }
+  if(khDd && !e.target.closest('.sg-top-row')) khDd.style.display='none';
 });
 
 function getAllSgKhNames(){
@@ -3890,8 +3885,39 @@ function renderSgOverview(){
     +'<div class="sg-overview-row"><span class="sg-overview-lbl">Số giao dịch</span><span class="sg-overview-val">'+su.length+' lần</span></div>'
     +'<div class="sg-overview-row"><span class="sg-overview-lbl">Tổng tiền ứng</span><span class="sg-overview-val" style="color:#d97706">'+fmtNum(Math.round(ungTotal))+' ₫</span></div>'
     +'</div>';
+
+  // Danh sách KH bên dưới 2 card
+  var sg2=getSG(), su2=getSU();
+  var khMap={};
+  sg2.forEach(function(r){
+    if(!khMap[r.ten]) khMap[r.ten]={gui:0,guiCnt:0,ung:0,ungCnt:0,lastDate:''};
+    khMap[r.ten].gui+=r.tt||0; khMap[r.ten].guiCnt++;
+    if(!khMap[r.ten].lastDate||r.date>khMap[r.ten].lastDate) khMap[r.ten].lastDate=r.date;
+  });
+  su2.forEach(function(r){
+    if(!khMap[r.ten]) khMap[r.ten]={gui:0,guiCnt:0,ung:0,ungCnt:0,lastDate:''};
+    khMap[r.ten].ung+=parseFloat(r.tien)||0; khMap[r.ten].ungCnt++;
+    if(!khMap[r.ten].lastDate||r.date>khMap[r.ten].lastDate) khMap[r.ten].lastDate=r.date;
+  });
+  window._sgKhList = Object.keys(khMap).sort();
+  html+='<div class="sec-title" style="margin-top:14px">📋 Danh sách khách hàng</div>';
+  if(!window._sgKhList.length){
+    html+='<div class="no-data">Chưa có khách hàng nào</div>';
+  } else {
+    html+=window._sgKhList.map(function(ten,idx){
+      var d=khMap[ten]; var conLai=d.gui-d.ung;
+      var meta=[]; if(d.guiCnt) meta.push(d.guiCnt+' lần gửi'); if(d.ungCnt) meta.push(d.ungCnt+' lần ứng');
+      return '<div class="sg-kh-btn" onclick="selectSgKHByIdx('+idx+')">'
+        +'<div><div class="sg-kh-name">👤 '+ten+'</div>'
+        +'<div class="sg-kh-meta">'+meta.join(' · ')+' · '+fmtDate(d.lastDate)+'</div></div>'
+        +'<div><div class="sg-kh-total" style="color:'+(conLai>=0?'var(--gd)':'#dc2626')+'">'+fmtNum(Math.round(conLai))+' ₫</div><span style="color:var(--g400)">›</span></div>'
+        +'</div>';
+    }).join('');
+  }
+
   document.getElementById('sg-tab-content').innerHTML=html;
 }
+function selectSgKHByIdx(idx){ var k=window._sgKhList||[]; if(k[idx]) selectSgKH(k[idx]); }
 
 function renderSgKHDetail(ten){
   var sgList=getSG().filter(function(r){return r.ten===ten;});
@@ -3962,7 +3988,6 @@ function onSgEntryTap(id,type){
 }
 
 function openSgEntryModal(type, preTen){
-  document.getElementById('sg-add-dropdown').style.display='none';
   sgTabEditId=null; sgTabEditType=null;
   document.getElementById('sgt-date').value=today();
   setSgtType(type);
@@ -4067,18 +4092,20 @@ function onSguTien(){
 function renderNameAc(val, acEl){
   if(!val){ acEl.style.display='none'; return; }
   var existNames=getAllSgKhNames();
-  var khMua=getKH();
-  var green=existNames.filter(function(n){return n.toLowerCase().includes(val.toLowerCase());});
-  var black=khMua.filter(function(n){return !existNames.includes(n)&&n.toLowerCase().includes(val.toLowerCase());});
-  var all=green.concat(black).slice(0,6);
+  var khAll=[...new Set((getKH('mua')||[]).concat(getKH('ban')||[]))];
+  var lower=val.toLowerCase();
+  var green=existNames.filter(function(n){return n.toLowerCase().includes(lower);});
+  var black=khAll.filter(function(n){return !existNames.includes(n)&&n.toLowerCase().includes(lower);});
+  var all=green.concat(black).slice(0,8);
   if(!all.length){ acEl.style.display='none'; return; }
   acEl.innerHTML=all.map(function(n){
     var isGreen=existNames.includes(n);
-    return '<div class="ac-item" style="color:'+(isGreen?'var(--gd)':'var(--g800)')+';font-weight:'+(isGreen?'700':'500')+'" onclick="window.sgPickHandler(\'' + n.replace(/'/g, "\\'") + '\')">'+(isGreen?'✅ ':'👤 ')+n+'</div>';
+    var idx=all.indexOf(n);
+    return '<div class="ac-item" style="color:'+(isGreen?'var(--gd)':'var(--g800)')+';font-weight:'+(isGreen?'700':'500')+'" onclick="window.sgPickHandler(window._sgAcList['+idx+'])">'+(isGreen?'✅ ':'👤 ')+n+'</div>';
   }).join('');
+  window._sgAcList=all;
   acEl.style.display='block';
 }
-
 function luuSgEntry(){
   if(guardLicense()) return;
   var date=document.getElementById('sgt-date').value||today();
