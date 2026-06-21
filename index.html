@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v5.5</title>
+<title>Mua Bán Mủ Cao Su v5.8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -279,9 +279,9 @@ input[type=date]:focus{border-color:var(--gl)}
 .ban-hint::placeholder{color:var(--gp);opacity:.7;font-style:italic}
 .ban-hint:not(:placeholder-shown){color:var(--ad);font-weight:700}
 /* LICENSE COUNTDOWN */
-#license-countdown.lc-yellow{color:#fbbf24;font-weight:700}
-#license-countdown.lc-red{color:#f87171;font-weight:800;animation:lcPulse 1.5s infinite}
-#license-countdown.lc-normal{color:rgba(255,255,255,.7)}
+#license-countdown.lc-yellow{color:#fbbf24;font-weight:800;font-size:13px}
+#license-countdown.lc-red{color:#f87171;font-weight:800;font-size:13px;animation:lcPulse 1.5s infinite}
+#license-countdown.lc-normal{color:rgba(255,255,255,.85);font-size:12px}
 @keyframes lcPulse{0%,100%{opacity:1}50%{opacity:.5}}
 
 /* THỐNG KÊ THÁNG */
@@ -350,6 +350,22 @@ input[type=date]:focus{border-color:var(--gl)}
 .type-pick-btn{flex:1;padding:12px;border-radius:var(--r);border:1.5px solid var(--g200);background:#fff;font-size:13px;font-weight:700;color:var(--g600);cursor:pointer;text-align:center}
 .type-pick-btn.active{border-color:var(--gd);background:var(--gb);color:var(--gd)}
 .type-pick-btn.active.ung{border-color:#d97706;background:#fffbeb;color:#d97706}
+
+/* Center popup override for sg-pick and ss-popup */
+#modal-sg-pick-mua{align-items:center}
+#modal-sg-pick-mua .center-box{border-radius:16px}
+/* SS popup center on screen */
+#ss-popup{align-items:center;justify-content:center}
+#ss-popup .ss-popup-box{border-radius:16px;max-width:440px;max-height:80vh}
+.sgpick-row{display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid var(--g100);gap:10px;cursor:pointer}
+.sgpick-row:last-child{border-bottom:none}
+.sgpick-row:active{background:var(--gb)}
+.sgpick-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--gp);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.sgpick-check.checked{background:var(--gd);border-color:var(--gd);color:#fff}
+.sgpick-info{flex:1}
+.sgpick-name{font-size:14px;font-weight:700;color:var(--g800)}
+.sgpick-meta{font-size:11px;color:var(--g600);margin-top:2px}
+.sgpick-tien{font-size:13px;font-weight:800;color:var(--gd)}
 </style>
 </head>
 <body>
@@ -361,7 +377,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="logo-ico">🌿</div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v5.5 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v5.8 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -579,21 +595,15 @@ input[type=date]:focus{border-color:var(--gl)}
 
   <div class="sec-title">📒 Sổ gửi &amp; Ứng tiền</div>
 
-  <!-- 2 DROPDOWN TRÊN CÙNG 1 HÀNG -->
-  <div class="sg-top-row">
-    <div style="position:relative">
-      <div class="sg-dd-btn" onclick="toggleSgKhDrop()">
-        <span id="sg-kh-dd-label">👤 Tên khách hàng</span><span>▾</span>
-      </div>
-      <div class="ac-drop" id="sg-kh-dropdown" style="display:none;max-height:260px;overflow-y:auto"></div>
-    </div>
-    <div style="position:relative">
-      <select class="fi sg-dd-select" onchange="onSgAddSelect(this)">
-        <option value="" selected disabled>➕ Thêm ghi chép</option>
-        <option value="gui">📒 Gửi sổ</option>
-        <option value="ung">💵 Ứng tiền</option>
-      </select>
-    </div>
+  <!-- 2 NÚT HÀNH ĐỘNG -->
+  <div class="sg-top-row" style="margin-bottom:12px">
+    <button class="btn-luu" style="background:linear-gradient(135deg,var(--gd),var(--gm))" onclick="openSgGuiMoi()">📒 Gửi sổ mới</button>
+    <button class="btn-luu" style="background:linear-gradient(135deg,#d97706,#f59e0b)" onclick="openSgUngTien()">💵 Ứng tiền</button>
+  </div>
+  <!-- Tìm kiếm / chọn KH -->
+  <div style="position:relative;margin-bottom:10px">
+    <input type="text" id="sg-kh-search" class="fi" placeholder="🔍 Tìm tên khách hàng..." oninput="onSgKhSearch()" autocomplete="off">
+    <div class="ac-drop" id="sg-kh-dropdown" style="display:none;max-height:220px;overflow-y:auto"></div>
   </div>
 
   <!-- NỘI DUNG: tổng quan HOẶC chi tiết 1 KH -->
@@ -608,12 +618,6 @@ input[type=date]:focus{border-color:var(--gl)}
     <div class="modal-handle"></div>
     <div class="modal-title" id="sgt-modal-title">📒 Ghi chép</div>
 
-    <!-- Chọn loại ghi chép -->
-    <div class="type-pick-row">
-      <button class="type-pick-btn" id="sgt-type-gui" onclick="setSgtType('gui')">📒 Gửi sổ</button>
-      <button class="type-pick-btn" id="sgt-type-ung" onclick="setSgtType('ung')">💵 Ứng tiền</button>
-    </div>
-
     <div class="fr">
       <label class="fl">Ngày</label>
       <input type="date" id="sgt-date" class="fi">
@@ -621,6 +625,7 @@ input[type=date]:focus{border-color:var(--gl)}
 
     <!-- FORM GỬI SỔ -->
     <div id="sgt-form-gui">
+      <button style="width:100%;padding:11px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;margin-bottom:10px" onclick="openSgPickFromMua()">📋 Lấy từ dữ liệu thu mua</button>
       <div class="g2">
         <div class="fr">
           <label class="fl">Loại mủ</label>
@@ -933,6 +938,21 @@ input[type=date]:focus{border-color:var(--gl)}
     <div class="cfm-btns">
       <button class="cfm-btn n" onclick="closeM('modal-doi-pw-thang')">Huỷ</button>
       <button class="cfm-btn y" onclick="doDoiPwThang()">Đổi mật khẩu</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CHỌN DỮ LIỆU THU MUA ĐỂ GỬI SỔ -->
+<div class="modal center" id="modal-sg-pick-mua">
+  <div class="modal-box center-box" style="max-width:400px;max-height:85vh;overflow-y:auto">
+    <div class="modal-handle"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="modal-title" style="margin:0">📋 Chọn từ thu mua</div>
+      <input type="date" id="sgpick-date" class="fi" style="width:140px;font-size:12px" onchange="renderSgPickList()">
+    </div>
+    <div id="sgpick-list"><div class="no-data">Chưa có giao dịch nào</div></div>
+    <div class="btn-row" style="margin-top:10px">
+      <button class="btn-huy" onclick="closeM('modal-sg-pick-mua')">Đóng</button>
     </div>
   </div>
 </div>
@@ -1262,7 +1282,9 @@ function switchTab(tab){
     if(typeof updBanHints==='function') setTimeout(updBanHints, 80);
   }
   if(tab==='sg') {
-    setTimeout(function(){ renderSgTabContent(); }, 50);
+    setTimeout(function(){
+      if(typeof renderSgTabContent==='function') renderSgTabContent();
+    }, 80);
   }
   if(tab==='ss') {
     // Luôn chọn mủ nước khi mở tab SS (nếu chưa có state lưu)
@@ -2228,8 +2250,19 @@ function updGDBar() {
   } else {
     ico.innerHTML = '&#x2601;&#xFE0F;';
     nm.textContent = 'Chưa đăng nhập Google';
-    st.textContent = 'Offline';
-    st.className = 'gd-status offline';
+    try {
+      var _total = (getGD('mua')||[]).length + (getGD('ban')||[]).length + (getSG()||[]).length + (getSU()||[]).length;
+      if (_total > 0) {
+        st.textContent = _total + ' chưa sao lưu';
+        st.className = 'gd-status syncing';
+      } else {
+        st.textContent = 'Chưa đăng nhập';
+        st.className = 'gd-status offline';
+      }
+    } catch(e) {
+      st.textContent = 'Offline';
+      st.className = 'gd-status offline';
+    }
   }
 }
 
@@ -2333,26 +2366,39 @@ function findFileInFolder(fname, cb) {
 function upsertSheet(fname, sheetsData, doneCb) {
   findFileInFolder(fname, function(existId) {
     if (existId) {
-      // Cập nhật nội dung các sheet
       batchUpdateSheets(existId, sheetsData, doneCb);
     } else {
-      // Tạo mới spreadsheet trong folder
       var sheetObjs = sheetsData.map(function(s) { return { properties: { title: s.name } }; });
       fetch('https://sheets.googleapis.com/v4/spreadsheets', {
         method: 'POST',
         headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
         body: JSON.stringify({ properties: { title: fname }, sheets: sheetObjs })
-      }).then(function(r) { return r.json(); }).then(function(data) {
+      })
+      .then(function(r) {
+        if (!r.ok) throw new Error('Tạo file thất bại: HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function(data) {
         var sid = data.spreadsheetId;
-        // Move to folder
-        fetch('https://www.googleapis.com/drive/v3/files/' + sid + '?addParents=' + gdFolderId + '&removeParents=root&fields=id', {
+        if (!sid) throw new Error('Không nhận được ID file');
+        // Move vào folder
+        return fetch('https://www.googleapis.com/drive/v3/files/' + sid
+          + '?addParents=' + gdFolderId + '&removeParents=root&fields=id', {
           method: 'PATCH',
           headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
           body: JSON.stringify({})
-        }).then(function() {
+        }).then(function(r2) {
+          if (!r2.ok) throw new Error('Move vào thư mục thất bại: HTTP ' + r2.status);
           batchUpdateSheets(sid, sheetsData, doneCb);
         });
-      }).catch(function(e) { toast('❌ Lỗi tạo file!'); console.error(e); });
+      })
+      .catch(function(e) {
+        gdSyncing = false;
+        incPendingCount();
+        updGDBarStatus('Lỗi sync (' + getPendingCount() + ')', 'offline');
+        toast('❌ ' + (e.message || 'Lỗi tạo file Drive!'));
+        console.error('upsertSheet error:', e);
+      });
     }
   });
 }
@@ -2405,10 +2451,16 @@ function batchUpdateSheets(sid, sheetsData, doneCb) {
         method: 'POST',
         headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
         body: JSON.stringify({ valueInputOption: 'RAW', data: data })
-      }).then(function() {
+      }).then(function(r) {
+        if (!r.ok) throw new Error('Ghi dữ liệu thất bại HTTP ' + r.status);
         applyAlignment();
         if (doneCb) doneCb(sid);
-      }).catch(function(e) { toast('❌ Lỗi ghi dữ liệu!'); console.error(e); });
+      }).catch(function(e) {
+        incPendingCount();
+        updGDBarStatus('Lỗi sync (' + getPendingCount() + ')', 'offline');
+        toast('❌ ' + (e.message || 'Lỗi ghi Drive!'));
+        console.error('batchUpdate error:', e);
+      });
     };
 
     if (addRequests.length > 0) {
@@ -3835,7 +3887,7 @@ function toggleSgKhDrop(){
   renderSgKhDropdown();
   dd.style.display='block';
 }
-function onSgAddSelect(sel){ var t=sel.value; sel.value=''; if(t) openSgEntryModal(t); }
+function onSgAddSelect(sel){ var t=sel.value; sel.value=''; if(t==='gui') openSgGuiMoi(); else if(t==='ung') openSgUngTien(); }
 document.addEventListener('click', function(e){
   var khDd=document.getElementById('sg-kh-dropdown');
   if(khDd && !e.target.closest('.sg-top-row')) khDd.style.display='none';
@@ -3853,14 +3905,14 @@ function renderSgKhDropdown(){
   var names=getAllSgKhNames();
   var dd=document.getElementById('sg-kh-dropdown');
   if(!names.length){ dd.innerHTML='<div class="ac-item" style="color:var(--g400)">Chưa có khách hàng nào</div>'; return; }
-  dd.innerHTML=names.map(function(n){
-    return '<div class="ac-item" onclick="selectSgKH(\'' + n.replace(/'/g, "\\'") + '\')">👤 '+n+'</div>';
+  window._sgKhDropList=names;
+  dd.innerHTML=names.map(function(n,idx){
+    return '<div class="ac-item" onclick="selectSgKHByIdx('+idx+')">👤 '+n+'</div>';
   }).join('');
 }
 
 function selectSgKH(ten){
   sgCurrentKH=ten;
-  document.getElementById('sg-kh-dd-label').textContent='👤 '+ten;
   document.getElementById('sg-kh-dropdown').style.display='none';
   renderSgTabContent();
 }
@@ -3871,22 +3923,9 @@ function renderSgOverview(){
   var ungNames=new Set(su.map(function(r){return r.ten;}));
   var guiTotal=sg.reduce(function(a,r){return a+(r.tt||0);},0);
   var ungTotal=su.reduce(function(a,r){return a+(parseFloat(r.tien)||0);},0);
-
   var html='';
-  html+='<div class="sg-overview-card sg-card-gui">'
-    +'<div class="sg-overview-title">📒 GỬI SỔ</div>'
-    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Số người gửi</span><span class="sg-overview-val" style="color:var(--gd)">'+guiNames.size+' người</span></div>'
-    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Số giao dịch</span><span class="sg-overview-val">'+sg.length+' lần</span></div>'
-    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Tổng tiền gửi</span><span class="sg-overview-val" style="color:var(--gd)">'+fmtNum(Math.round(guiTotal))+' ₫</span></div>'
-    +'</div>';
-  html+='<div class="sg-overview-card sg-card-ung">'
-    +'<div class="sg-overview-title">💵 ỨNG TIỀN</div>'
-    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Số người ứng</span><span class="sg-overview-val" style="color:#d97706">'+ungNames.size+' người</span></div>'
-    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Số giao dịch</span><span class="sg-overview-val">'+su.length+' lần</span></div>'
-    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Tổng tiền ứng</span><span class="sg-overview-val" style="color:#d97706">'+fmtNum(Math.round(ungTotal))+' ₫</span></div>'
-    +'</div>';
 
-  // Danh sách KH bên dưới 2 card
+  // Danh sách KH TRÊN CÙNG
   var sg2=getSG(), su2=getSU();
   var khMap={};
   sg2.forEach(function(r){
@@ -3915,9 +3954,24 @@ function renderSgOverview(){
     }).join('');
   }
 
+  // 2 card thống kê ở DƯỚI cùng
+  html+='<div class="sec-title" style="margin-top:14px">📊 Tổng quan</div>';
+  html+='<div class="sg-overview-card sg-card-gui">'
+    +'<div class="sg-overview-title">📒 GỬI SỔ</div>'
+    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Số người gửi</span><span class="sg-overview-val" style="color:var(--gd)">'+guiNames.size+' người</span></div>'
+    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Số giao dịch</span><span class="sg-overview-val">'+sg.length+' lần</span></div>'
+    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Tổng tiền gửi</span><span class="sg-overview-val" style="color:var(--gd)">'+fmtNum(Math.round(guiTotal))+' ₫</span></div>'
+    +'</div>';
+  html+='<div class="sg-overview-card sg-card-ung">'
+    +'<div class="sg-overview-title">💵 ỨNG TIỀN</div>'
+    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Số người ứng</span><span class="sg-overview-val" style="color:#d97706">'+ungNames.size+' người</span></div>'
+    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Số giao dịch</span><span class="sg-overview-val">'+su.length+' lần</span></div>'
+    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Tổng tiền ứng</span><span class="sg-overview-val" style="color:#d97706">'+fmtNum(Math.round(ungTotal))+' ₫</span></div>'
+    +'</div>';
+
   document.getElementById('sg-tab-content').innerHTML=html;
 }
-function selectSgKHByIdx(idx){ var k=window._sgKhList||[]; if(k[idx]) selectSgKH(k[idx]); }
+function selectSgKHByIdx(idx){ var k=window._sgKhList||window._sgKhDropList||[]; if(k[idx]) selectSgKH(k[idx]); }
 
 function renderSgKHDetail(ten){
   var sgList=getSG().filter(function(r){return r.ten===ten;});
@@ -3971,7 +4025,6 @@ function renderSgKHDetail(ten){
 
 function backToSgOverview(){
   sgCurrentKH=null;
-  document.getElementById('sg-kh-dd-label').textContent='👤 Tên khách hàng';
   renderSgTabContent();
 }
 
@@ -4034,9 +4087,10 @@ function openSgEntryEdit(id,type){
 
 function setSgtType(type){
   sgtType=type;
-  document.getElementById('sgt-type-gui').classList.toggle('active', type==='gui');
-  document.getElementById('sgt-type-ung').classList.toggle('active', type==='ung');
-  if(type==='ung') document.getElementById('sgt-type-ung').classList.add('ung');
+  var tgui=document.getElementById('sgt-type-gui');
+  var tung=document.getElementById('sgt-type-ung');
+  if(tgui) tgui.classList.toggle('active', type==='gui');
+  if(tung){ tung.classList.toggle('active', type==='ung'); if(type==='ung') tung.classList.add('ung'); }
   document.getElementById('sgt-form-gui').style.display = type==='gui' ? '' : 'none';
   document.getElementById('sgt-form-ung').style.display = type==='ung' ? '' : 'none';
   document.getElementById('sgt-modal-title').textContent = type==='gui' ? '📒 Gửi sổ' : '💵 Ứng tiền';
@@ -4131,7 +4185,7 @@ function luuSgEntry(){
     }
     setSG(sg);
     toast('📒 Đã '+(sgTabEditId?'cập nhật':'lưu')+' sổ gửi!');
-    if(sgCurrentKH!==ten){ sgCurrentKH=ten; document.getElementById('sg-kh-dd-label').textContent='👤 '+ten; }
+    if(sgCurrentKH!==ten){ sgCurrentKH=ten; }
   } else {
     var tenU=document.getElementById('sgu-ten').value.trim();
     var tienRaw=document.getElementById('sgu-tien').value.replace(/[^0-9]/g,'');
@@ -4148,7 +4202,7 @@ function luuSgEntry(){
     }
     setSU(su);
     toast('💵 Đã '+(sgTabEditId?'cập nhật':'lưu')+' ứng tiền!');
-    if(sgCurrentKH!==tenU){ sgCurrentKH=tenU; document.getElementById('sg-kh-dd-label').textContent='👤 '+tenU; }
+    if(sgCurrentKH!==tenU){ sgCurrentKH=tenU; }
   }
 
   closeM('modal-sg-tab');
@@ -4622,6 +4676,155 @@ function doDoiPwThang() {
   setThangPW(newPw);
   closeM('modal-doi-pw-thang');
   toast('✅ Đã đổi mật khẩu thống kê tháng!');
+}
+
+// ══════════════════════════════════════════
+// TAB SỔ GỬI - CÁC HÀM BỔ SUNG (v5.6)
+// ══════════════════════════════════════════
+
+// Tìm kiếm KH từ ô input
+function onSgKhSearch(){
+  var val=(document.getElementById('sg-kh-search')||{}).value||'';
+  var dd=document.getElementById('sg-kh-dropdown');
+  if(!val){ dd.style.display='none'; renderSgTabContent(); return; }
+  var names=getAllSgKhNames();
+  var khAll=[...new Set((getKH('mua')||[]).concat(getKH('ban')||[]))];
+  window._sgSearchList=[...new Set(names.concat(khAll))].filter(function(n){return n.toLowerCase().includes(val.toLowerCase());}).slice(0,8);
+  if(!window._sgSearchList.length){ dd.style.display='none'; renderSgTabContent(val); return; }
+  dd.innerHTML=window._sgSearchList.map(function(n,idx){
+    var isGreen=names.includes(n);
+    return '<div class="ac-item" style="color:'+(isGreen?'var(--gd)':'var(--g800)')+'" onclick="selectSgKHFromSearch('+idx+')">'+(isGreen?'✅ ':'👤 ')+n+'</div>';
+  }).join('');
+  dd.style.display='block';
+}
+function selectSgKHFromSearch(idx){
+  var ten=(window._sgSearchList||[])[idx]; if(!ten) return;
+  document.getElementById('sg-kh-search').value=ten;
+  document.getElementById('sg-kh-dropdown').style.display='none';
+  selectSgKH(ten);
+}
+
+// Mở popup Gửi sổ mới
+function openSgGuiMoi(){
+  sgTabEditId=null; sgTabEditType=null;
+  setSgtType('gui');
+  document.getElementById('sgt-date').value=today();
+  document.getElementById('sgt-loai').value='';
+  document.getElementById('sgt-gia').value='';
+  document.getElementById('sgt-ten').value=sgCurrentKH||'';
+  document.getElementById('sgt-kg').value='';
+  document.getElementById('sgt-do').value='';
+  document.getElementById('sgt-do-row').style.display='none';
+  document.getElementById('sgt-tt').textContent='0 ₫';
+  document.getElementById('sgt-chu').textContent='--';
+  document.getElementById('sgt-modal-title').textContent='📒 Gửi sổ mới';
+  document.getElementById('sgt-save-btn').textContent='📒 Lưu sổ gửi';
+  document.getElementById('sgt-form-gui').style.display='';
+  document.getElementById('sgt-form-ung').style.display='none';
+  openM('modal-sg-tab');
+}
+
+// Mở popup Ứng tiền
+function openSgUngTien(){
+  sgTabEditId=null; sgTabEditType=null;
+  setSgtType('ung');
+  document.getElementById('sgt-date').value=today();
+  document.getElementById('sgu-ten').value=sgCurrentKH||'';
+  document.getElementById('sgu-tien').value='';
+  document.getElementById('sgu-noidung').value='';
+  document.getElementById('sgt-modal-title').textContent='💵 Ứng tiền';
+  document.getElementById('sgt-save-btn').textContent='💵 Lưu ứng tiền';
+  document.getElementById('sgt-form-gui').style.display='none';
+  document.getElementById('sgt-form-ung').style.display='';
+  openM('modal-sg-tab');
+}
+
+// Mở popup chọn từ dữ liệu thu mua
+function openSgPickFromMua(){
+  document.getElementById('sgpick-date').value=today();
+  renderSgPickList();
+  openM('modal-sg-pick-mua');
+}
+
+function renderSgPickList(){
+  var date=document.getElementById('sgpick-date').value||today();
+  var list=getGDDate('mua',date);
+  var cont=document.getElementById('sgpick-list');
+  if(!list.length){ cont.innerHTML='<div class="no-data">Không có giao dịch nào ngày '+fmtDate(date)+'</div>'; return; }
+  cont.innerHTML=list.map(function(g){
+    var kt=kgThuc(g.loai,g.kg,g.do,g.bi||0);
+    var chatTxt=g.loai==='nuoc'?('Độ: '+(g.do||'--')):LOAI_LBL[g.loai];
+    return '<div class="sgpick-row" onclick="sgPickSelect(\''+g.id+'\',this)">'
+      +'<div class="sgpick-check" id="sgpick-chk-'+g.id+'">○</div>'
+      +'<div class="sgpick-info">'
+      +'<div class="sgpick-name">'+g.ten+'</div>'
+      +'<div class="sgpick-meta">'+LOAI_ICO[g.loai]+' '+LOAI_LBL[g.loai]+' · '+fmtKg(kt)+'kg · '+chatTxt+' · '+fmtNum(g.gia)+' đ</div>'
+      +'</div>'
+      +'<div class="sgpick-tien">'+fmtNum(g.tt)+' ₫</div>'
+      +'</div>';
+  }).join('');
+}
+
+var sgPickedId=null;
+function sgPickSelect(id, el){
+  // Bỏ chọn cũ
+  document.querySelectorAll('.sgpick-check').forEach(function(c){ c.classList.remove('checked'); c.textContent='○'; });
+  sgPickedId=id;
+  var chk=document.getElementById('sgpick-chk-'+id);
+  if(chk){ chk.classList.add('checked'); chk.textContent='✓'; }
+
+  // Đổ dữ liệu vào form gửi sổ
+  var date=document.getElementById('sgpick-date').value||today();
+  var g=getGDDate('mua',date).find(function(x){ return String(x.id)===String(id); });
+  if(!g) return;
+
+  // Popup xác nhận
+  var kt=kgThuc(g.loai,g.kg,g.do,g.bi||0);
+  var info=[
+    ['Tên',g.ten],
+    ['Loại mủ',LOAI_ICO[g.loai]+' '+LOAI_LBL[g.loai]],
+    ['Kg thực',fmtKg(kt)+' kg'],
+    ['Độ/Loại',g.do||'--'],
+    ['Đơn giá',fmtNum(g.gia)+' đ'],
+    ['Thành tiền',fmtNum(g.tt)+' ₫']
+  ];
+  showDetail('📒','Xác nhận gửi sổ?',info,null,'Xác nhận',function(){
+    closeM('modal-sg-pick-mua');
+    document.getElementById('sgt-date').value=date;
+    document.getElementById('sgt-loai').value=g.loai;
+    document.getElementById('sgt-ten').value=g.ten;
+    document.getElementById('sgt-kg').value=kt;
+    document.getElementById('sgt-do').value=g.do||'';
+    document.getElementById('sgt-gia').value=parseInt(g.gia).toLocaleString('vi-VN');
+    onSgtLoai(); calcSgt();
+    document.getElementById('sgt-modal-title').textContent='📒 Gửi sổ mới';
+    document.getElementById('sgt-save-btn').textContent='📒 Lưu sổ gửi';
+    document.getElementById('sgt-form-gui').style.display='';
+    document.getElementById('sgt-form-ung').style.display='none';
+    setSgtType('gui');
+    openM('modal-sg-tab');
+  });
+}
+
+// Chụp ảnh màn hình thật sự dùng html2canvas
+function chupAnhSS(){
+  var box=document.querySelector('#ss-popup .ss-popup-box');
+  if(!box){ toast('⚠️ Không tìm thấy nội dung!'); return; }
+  toast('📷 Đang chụp...');
+  // Dùng html2canvas nếu có, nếu không dùng Selection API
+  if(typeof html2canvas!=='undefined'){
+    html2canvas(box,{scale:2,backgroundColor:'#fff',useCORS:true}).then(function(canvas){
+      var link=document.createElement('a');
+      link.download='chi-tiet-thu-mua.png';
+      link.href=canvas.toDataURL('image/png');
+      link.click();
+      toast('✅ Đã tải ảnh!');
+    }).catch(function(){ toast('⚠️ Lưu ảnh thủ công: chụp màn hình điện thoại'); });
+  } else {
+    // Không có html2canvas - hướng dẫn chụp
+    box.scrollTop=0;
+    setTimeout(function(){ toast('📷 Nhấn nút nguồn + giảm âm để chụp màn hình!'); }, 300);
+  }
 }
 
 // ─── SERVICE WORKER ───
