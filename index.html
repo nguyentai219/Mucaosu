@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v5.9</title>
+<title>Mua Bán Mủ Cao Su v6.0</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -377,7 +377,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="logo-ico">🌿</div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v5.9 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v6.0 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -597,7 +597,7 @@ input[type=date]:focus{border-color:var(--gl)}
 
   <!-- 2 NÚT HÀNH ĐỘNG -->
   <div class="sg-top-row" style="margin-bottom:12px">
-    <button class="btn-luu" style="background:linear-gradient(135deg,var(--gd),var(--gm))" onclick="openSgGuiMoi()">📒 Gửi sổ mới</button>
+    <button class="btn-luu" style="background:linear-gradient(135deg,var(--gd),var(--gm))" onclick="openSgGuiMoiClean()">📒 Gửi sổ mới</button>
     <button class="btn-luu" style="background:linear-gradient(135deg,#d97706,#f59e0b)" onclick="openSgUngTien()">💵 Ứng tiền</button>
   </div>
   <!-- Tìm kiếm / chọn KH -->
@@ -679,8 +679,9 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
     </div>
 
-    <div class="btn-row" style="margin-top:10px">
-      <button class="btn-huy" onclick="closeM('modal-sg-tab')">Huỷ</button>
+    <button id="sgt-del-btn" onclick="xoaSgEntry()" style="display:none;width:100%;padding:11px;background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px">🗑️ Xoá ghi chép này</button>
+    <div class="btn-row" style="margin-top:8px">
+      <button class="btn-huy" onclick="closeSgModal()">Huỷ</button>
       <button class="btn-luu" id="sgt-save-btn" onclick="luuSgEntry()">📒 Lưu sổ gửi</button>
     </div>
   </div>
@@ -949,7 +950,7 @@ input[type=date]:focus{border-color:var(--gl)}
     <div class="modal-handle"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
       <div class="modal-title" style="margin:0">📋 Chọn từ thu mua</div>
-      <input type="date" id="sgpick-date" class="fi" style="width:140px;font-size:12px" onchange="renderSgPickList()">
+      <input type="date" id="sgpick-date" class="fi" style="width:140px;font-size:12px" onchange="renderSgPickList()" onfocus="markPickDateDots(this)">
     </div>
     <div id="sgpick-list"><div class="no-data">Chưa có giao dịch nào</div></div>
     <div class="btn-row" style="margin-top:10px">
@@ -2214,14 +2215,44 @@ function signInGoogle() {
   var client = google.accounts.oauth2.initTokenClient({
     client_id: GD_CLIENT_ID,
     scope: GD_SCOPES,
+    prompt: '',
     callback: function(resp) {
       if (resp.error) { toast('Đăng nhập thất bại: ' + resp.error); return; }
       gdToken = resp.access_token;
+      gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000; // 2 phút đệm
       localStorage.setItem('gd_token', gdToken);
-      fetchGoogleUser();
+      localStorage.setItem('gd_token_expiry', String(gdTokenExpiry));
+      if (!gdUser) fetchGoogleUser();
+      else { updGDBar(); if (gdFolderId) doAutoSync(); }
     }
   });
+  window._gdTokenClient = client;
   client.requestAccessToken();
+}
+
+// Kiểm tra và refresh token nếu gần hết hạn
+var gdTokenExpiry = parseInt(localStorage.getItem('gd_token_expiry') || '0');
+function ensureValidToken(cb) {
+  if (gdToken && Date.now() < gdTokenExpiry) { cb(); return; }
+  // Token hết hạn hoặc chưa có - refresh silent (không hiện popup)
+  if (window._gdTokenClient) {
+    var origCb = window._gdTokenClient.callback;
+    window._gdTokenClient.callback = function(resp) {
+      window._gdTokenClient.callback = origCb;
+      if (resp.error || !resp.access_token) {
+        // Silent refresh thất bại - cần đăng nhập lại
+        gdToken = null; updGDBar();
+        toast('⚠️ Phiên đăng nhập hết hạn - vui lòng đăng nhập lại');
+        return;
+      }
+      gdToken = resp.access_token;
+      gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000;
+      localStorage.setItem('gd_token', gdToken);
+      localStorage.setItem('gd_token_expiry', String(gdTokenExpiry));
+      cb();
+    };
+    window._gdTokenClient.requestAccessToken({ prompt: '' });
+  } else { cb(); }
 }
 
 function fetchGoogleUser() {
@@ -2380,6 +2411,7 @@ function findFileInFolder(fname, cb) {
 
 // ── Tạo hoặc cập nhật Spreadsheet ──
 function upsertSheet(fname, sheetsData, doneCb) {
+  ensureValidToken(function() {
   findFileInFolder(fname, function(existId) {
     if (existId) {
       batchUpdateSheets(existId, sheetsData, doneCb);
@@ -2417,6 +2449,7 @@ function upsertSheet(fname, sheetsData, doneCb) {
       });
     }
   });
+  }); // ensureValidToken
 }
 
 function batchUpdateSheets(sid, sheetsData, doneCb) {
@@ -2972,14 +3005,16 @@ function renderSSDetail(list, newKgs, newDos, newTiens, gia, isNuoc, totalKg, av
   var doTxt = isNuoc && avgDo>0 ? ' · Độ TB: <b>' + avgDo.toFixed(1) + '</b>' : '';
   var compact =
     '<div style="border-top:2px solid #7c3aed;margin:6px 0 8px"></div>'
-    + '<div style="display:flex;justify-content:space-between;align-items:center;padding:0 4px;font-size:12px">'
-    + '<span><b style="color:#5b21b6">' + fmtKg(totalKg) + ' kg</b>' + doTxt + '</span>'
-    + '<span style="font-size:14px;font-weight:800;color:#5b21b6">' + fmtNum(Math.round(totalTien)) + ' ₫</span>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;font-size:11px;padding:0 2px">'
+    + '<div><div style="color:var(--g400)">Tổng kg</div><div style="font-weight:800;color:#5b21b6">' + fmtKg(totalKg) + ' kg</div></div>'
+    + (isNuoc && avgDo > 0 ? '<div><div style="color:var(--g400)">Độ TB</div><div style="font-weight:800;color:#5b21b6">' + avgDo.toFixed(1) + '</div></div>' : '<div></div>')
+    + '<div style="text-align:right"><div style="color:var(--g400)">Tổng tiền</div><div style="font-weight:800;color:#5b21b6">' + fmtNum(Math.round(totalTien)) + ' ₫</div></div>'
     + '</div>';
 
   // BẢNG SO SÁNH
   var soSanh =
-    '<div style="margin-top:10px;border-radius:var(--r);overflow:hidden;border:1.5px solid #ede9fe">'
+    '<div class="sec-title" style="color:#7c3aed;margin-top:12px">📊 So sánh số liệu</div>'
+    + '<div style="border-radius:var(--r);overflow:hidden;border:1.5px solid #ede9fe">'
     + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;background:#5b21b6;color:#fff;font-size:10px;font-weight:700;text-align:center;padding:8px 4px">'
     + '<span style="text-align:left;padding-left:6px">Chỉ số</span>'
     + '<span>Số liệu cũ</span><span>Số liệu mới</span><span>Chênh lệch</span></div>'
@@ -3161,9 +3196,10 @@ function xemChiTietSS() {
   var doTxt = isNuoc && avgDo > 0 ? ' · Độ TB: <b>' + avgDo.toFixed(1) + '</b>' : '';
   document.getElementById('ss-popup-tk').innerHTML =
     '<div style="border-top:2px solid var(--gp);margin:8px 0 6px"></div>'
-    + '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:0 4px">'
-    + '<span><b>' + fmtKg(totalKg) + ' kg</b>' + doTxt + '</span>'
-    + '<span style="font-size:14px;font-weight:800;color:var(--gd)">' + fmtNum(Math.round(totalTien)) + ' ₫</span>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;font-size:11px;padding:0 2px">'
+    + '<div><div style="color:var(--g400)">Tổng kg</div><div style="font-weight:800;color:var(--gd)">' + fmtKg(totalKg) + ' kg</div></div>'
+    + (isNuoc && avgDo > 0 ? '<div><div style="color:var(--g400)">Độ TB</div><div style="font-weight:800;color:var(--gd)">' + avgDo.toFixed(1) + '</div></div>' : '<div></div>')
+    + '<div style="text-align:right"><div style="color:var(--g400)">Tổng tiền</div><div style="font-weight:800;color:var(--gd)">' + fmtNum(Math.round(totalTien)) + ' ₫</div></div>'
     + '</div>';
 
   document.getElementById('ss-popup').classList.add('show');
@@ -4093,6 +4129,9 @@ function openSgEntryEdit(id,type){
     document.getElementById('sgu-tien').value=parseInt(r2.tien).toLocaleString('vi-VN');
     document.getElementById('sgu-noidung').value=r2.noidung||'';
   }
+  // Hiện nút Xoá khi sửa
+  var delBtn=document.getElementById('sgt-del-btn');
+  if(delBtn) delBtn.style.display='';
   openM('modal-sg-tab');
 }
 
@@ -4840,6 +4879,43 @@ function chupAnhSS(){
     // Không có html2canvas - hướng dẫn chụp
     box.scrollTop=0;
     setTimeout(function(){ toast('📷 Nhấn nút nguồn + giảm âm để chụp màn hình!'); }, 300);
+  }
+}
+
+// Xoá ghi chép sổ gửi/ứng
+function closeSgModal(){
+  var delBtn=document.getElementById('sgt-del-btn');
+  if(delBtn) delBtn.style.display='none';
+  closeM('modal-sg-tab');
+}
+function openSgGuiMoiClean(){
+  var delBtn=document.getElementById('sgt-del-btn');
+  if(delBtn) delBtn.style.display='none';
+  openSgGuiMoi();
+}
+function xoaSgEntry(){
+  if(!sgTabEditId||!sgTabEditType) return;
+  var type=sgTabEditType, id=sgTabEditId;
+  showDetail('🗑️','Xoá ghi chép?',
+    [['Thao tác','Xoá ghi chép này khỏi sổ'],['Lưu ý','Không thể hoàn tác']],
+    null,'Xoá',function(){
+      if(type==='gui') setSG(getSG().filter(function(r){return String(r.id)!==String(id);}));
+      else setSU(getSU().filter(function(r){return String(r.id)!==String(id);}));
+      closeSgModal();
+      renderSgTabContent();
+      autoSync();
+      toast('🗑️ Đã xoá ghi chép!');
+    });
+}
+
+// markPickDateDots: hiện indicator ngày có thu mua
+function markPickDateDots(inp){
+  // Native date input không hỗ trợ dots - chỉ set min/max
+  var allDates=Object.keys(getGD('mua').reduce(function(a,g){a[g.date]=1;return a;},{}));
+  if(allDates.length){
+    allDates.sort();
+    inp.min=allDates[0];
+    inp.max=allDates[allDates.length-1];
   }
 }
 
