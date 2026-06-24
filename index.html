@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v6.0</title>
+<title>Mua Bán Mủ Cao Su v6.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -377,7 +377,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="logo-ico">🌿</div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v6.0 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v6.1 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -696,15 +696,14 @@ input[type=date]:focus{border-color:var(--gl)}
     <div id="ss-summary-content" style="font-size:12px;opacity:.85">Chưa có giao dịch nào</div>
   </div>
 
-  <!-- CHỌN LOẠI MỦ -->
-  <div class="fc" style="border-left:3px solid #7c3aed">
-    <label class="fl" style="font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:8px">🎯 Loại mủ cần tính toán</label>
-    <div class="ss-loai-select" id="ss-loai-select">
-      <button class="ss-loai-pill active" onclick="setSsLoai('nuoc')">💧 Mủ nước</button>
-      <button class="ss-loai-pill" onclick="setSsLoai('chen')">🥣 Mủ chén</button>
-      <button class="ss-loai-pill" onclick="setSsLoai('day')">🪢 Mủ dây</button>
-      <button class="ss-loai-pill" onclick="setSsLoai('dong')">🧱 Mủ đông</button>
-    </div>
+  <!-- CHỌN LOẠI MỦ - dropdown compact -->
+  <div style="margin-bottom:10px">
+    <select id="ss-loai-select" class="fi" style="font-weight:700;color:#7c3aed;border-color:#7c3aed" onchange="setSsLoai(this.value)">
+      <option value="nuoc">💧 Mủ nước</option>
+      <option value="chen">🥣 Mủ chén</option>
+      <option value="day">🪢 Mủ dây</option>
+      <option value="dong">🧱 Mủ đông</option>
+    </select>
   </div>
 
   <!-- NHẬP MỤC TIÊU -->
@@ -739,6 +738,8 @@ input[type=date]:focus{border-color:var(--gl)}
 
   <!-- KẾT QUẢ PHÂN BỔ -->
   <div id="ss-result" style="display:none">
+
+    <!-- 1. KẾT QUẢ PHÂN BỔ -->
     <div class="sec-title" style="color:#7c3aed">📋 Kết quả phân bổ <span class="ss-tab-badge" id="ss-result-count">0</span></div>
     <div class="ss-ok" id="ss-ok-msg"></div>
     <div class="tbl-wrap" style="border:1.5px solid #ede9fe">
@@ -756,18 +757,14 @@ input[type=date]:focus{border-color:var(--gl)}
     </div>
     <div class="ss-total-bar" id="ss-total-bar"></div>
 
-    <!-- BẢNG KIỂM TRA KẾT QUẢ - moved below, placeholder here -->
-    <div id="ss-compare-placeholder"></div>
+    <!-- 2. SO SÁNH + KIỂM TRA (render bởi renderSSDetail + renderSSCheck) -->
+    <div id="ss-detail-tk" style="margin-bottom:8px"></div>
+    <div class="sec-divider" style="margin-top:12px"></div>
+    <div class="sec-title" style="color:#7c3aed">🔍 Kiểm tra đạt yêu cầu</div>
+    <div class="ss-check-card" id="ss-check-card"></div>
+    <button class="btn-ss-phanbo" id="ss-btn-phanbo-lai" onclick="tinhToanSS()" style="display:none">🔄 Tính toán & Phân bổ lại</button>
 
-    <!-- 3 NÚT HÀNH ĐỘNG -->
-    <div class="ss-action-btns">
-      <button class="btn-ss-luu" onclick="luuSoSach()">💾 Lưu Sổ Sách</button>
-      <button class="btn-ss-tinh" onclick="tinhLaiSS()">🔄 Tính Lại</button>
-      <button class="btn-ss-xem" onclick="xemChiTietSS()">👁 Xem Chi Tiết</button>
-    </div>
-    <div class="ss-sync-info">💡 Dữ liệu tham khảo — không thay đổi giao dịch thực tế</div>
-
-    <!-- CHI TIẾT THU MUA THEO SỐ LIỆU MỚI -->
+    <!-- 3. CHI TIẾT THU MUA THEO SỐ LIỆU MỚI -->
     <div class="sec-divider" style="margin-top:14px"></div>
     <div class="sec-title" style="color:#7c3aed">📋 Chi tiết thu mua theo số liệu mới <span class="ss-tab-badge" id="ss-detail-count">0</span></div>
     <div class="tbl-wrap" style="border:1.5px solid #ede9fe;margin-bottom:8px">
@@ -782,13 +779,14 @@ input[type=date]:focus{border-color:var(--gl)}
         <tbody id="ss-detail-tbody"></tbody>
       </table>
     </div>
-    <!-- SO SÁNH (hiện ở đây) + KIỂM TRA (hiện bên dưới) -->
-    <div id="ss-detail-tk" style="margin-bottom:8px"></div>
-    <!-- BẢNG KIỂM TRA KẾT QUẢ -->
-    <div class="sec-divider" style="margin-top:12px"></div>
-    <div class="sec-title" style="color:#7c3aed">🔍 Kiểm tra đạt yêu cầu</div>
-    <div class="ss-check-card" id="ss-check-card"></div>
-    <button class="btn-ss-phanbo" id="ss-btn-phanbo-lai" onclick="tinhToanSS()" style="display:none">🔄 Tính toán & Phân bổ lại</button>
+
+    <!-- 4. 3 NÚT HÀNH ĐỘNG (ngay dưới chi tiết) -->
+    <div class="ss-action-btns">
+      <button class="btn-ss-luu" onclick="luuSoSach()">💾 Lưu Sổ Sách</button>
+      <button class="btn-ss-tinh" onclick="tinhLaiSS()">🔄 Tính Lại</button>
+      <button class="btn-ss-xem" onclick="xemChiTietSS()">👁 Xem Chi Tiết</button>
+    </div>
+    <div class="ss-sync-info">💡 Dữ liệu tham khảo — không thay đổi giao dịch thực tế</div>
   </div>
 
 </div>
@@ -1309,6 +1307,7 @@ function switchTab(tab){
     var _stParsed = _st ? JSON.parse(_st) : null;
     var _targetLoai = (_stParsed && _stParsed.date===curDate['mua'] && _stParsed.loai) ? _stParsed.loai : 'nuoc';
     if(ssLoai !== _targetLoai) setSsLoai(_targetLoai);
+    else { var _sel2=document.getElementById('ss-loai-select'); if(_sel2&&_sel2.tagName==='SELECT') _sel2.value=ssLoai; }
     updSSSummary();
     restoreSsState(curDate['mua']);
   }
@@ -2669,6 +2668,10 @@ var ssLoai = 'nuoc'; // loại mủ đang chọn
 
 function setSsLoai(loai) {
   ssLoai = loai;
+  // Cập nhật select dropdown (thay pills)
+  var sel = document.getElementById('ss-loai-select');
+  if (sel && sel.tagName === 'SELECT') sel.value = loai;
+  // Tương thích ngược với pills cũ nếu còn
   document.querySelectorAll('.ss-loai-pill').forEach(function(p,i){
     p.classList.toggle('active', ['nuoc','chen','day','dong'][i] === loai);
   });
@@ -3064,6 +3067,8 @@ function restoreSsState(forDate) {
     document.querySelectorAll('.ss-loai-pill').forEach(function(p,i){
       p.classList.toggle('active', ['nuoc','chen','day','dong'][i] === ssLoai);
     });
+    var _sel = document.getElementById('ss-loai-select');
+    if (_sel && _sel.tagName === 'SELECT') _sel.value = ssLoai;
     var doRow = document.getElementById('ss-do-row');
     if (doRow) doRow.style.display = ssLoai==='nuoc' ? 'grid' : 'none';
 
@@ -3357,10 +3362,11 @@ function syncToDrive_silent() {
   function suRows(){return [hdrUng].concat(getSU().map(function(r){return[fmtDateVN2(r.date),r.ten,fmtNum(Math.round(r.tien||0)),r.noidung||''];}));}
   var fname = 'backup_' + gdTodayStr();
   upsertSheet(fname, [
-    { name: 'Thu_Mua', rows: gdRows2('mua') },
-    { name: 'Ban_Ra',  rows: gdRows2('ban') },
-    { name: 'So_Gui',  rows: sgRows() },
-    { name: 'So_Ung',  rows: suRows() }
+    { name: 'Thu_Mua',   rows: gdRows2('mua') },
+    { name: 'Ban_Ra',    rows: gdRows2('ban') },
+    { name: 'So_Gui',    rows: sgRows() },
+    { name: 'So_Ung',    rows: suRows() },
+    { name: 'Tinh_Toan', rows: [['Dữ liệu tính toán được lưu khi nhấn Lưu Sổ Sách']] }
   ], function() {
     gdSyncing = false;
     syncQueue = false;
@@ -4857,6 +4863,8 @@ function sgPickSelect(id, el){
     renderSgPickList(); // cập nhật tick trong popup
     autoSync();
     closeM('modal-sg-pick-mua');
+    sgCurrentKH = null;         // về tổng quan
+    renderSgTabContent();
     toast('✅ Đã gửi sổ '+g.ten+'!');
   });
 }
