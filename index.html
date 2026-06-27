@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v6.7</title>
+<title>Mua Bán Mủ Cao Su v6.8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -382,7 +382,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="logo-ico">🌿</div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v6.7 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v6.8 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -625,7 +625,12 @@ input[type=date]:focus{border-color:var(--gl)}
 
     <div class="fr">
       <label class="fl">Ngày</label>
-      <input type="date" id="sgt-date" class="fi">
+      <div class="date-bar" onclick="openSgTabDate()" style="border:1.5px solid var(--gp);margin-bottom:0;cursor:pointer">
+        <span>📅</span>
+        <span class="date-val" id="sgt-date-val" style="color:var(--gd);font-size:13px;font-weight:700">--</span>
+        <span class="date-hint">Nhấn để chọn</span>
+      </div>
+      <input type="hidden" id="sgt-date">
     </div>
 
     <!-- FORM GỬI SỔ -->
@@ -676,7 +681,8 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div class="fr">
         <label class="fl">Số tiền ứng (đ)</label>
-        <input type="text" inputmode="numeric" id="sgu-tien" class="fi" placeholder="0" oninput="onSguTien()">
+        <input type="text" inputmode="numeric" id="sgu-tien" class="fi" placeholder="0" oninput="onSguTien()" onfocus="showSguTienSuggest()">
+        <div id="sgu-tien-suggest" style="display:none;margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;padding:4px 0"></div>
       </div>
       <div class="fr">
         <label class="fl">Nội dung ứng</label>
@@ -1020,6 +1026,23 @@ input[type=date]:focus{border-color:var(--gl)}
     <div class="cal-legend"><span class="cal-dot"></span> Ngày có dữ liệu thu mua</div>
     <button class="btn-ss" style="width:100%;margin-top:10px" onclick="applySsDate()">Xác nhận</button>
     <button class="btn-huy" style="width:100%;margin-top:6px" onclick="closeM('modal-ss-date')">Đóng</button>
+  </div>
+</div>
+
+<!-- MODAL DATE SG TAB (Gửi sổ / Ứng tiền) -->
+<div class="modal" id="modal-sgtab-date">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="color:var(--gd)">📅 Chọn ngày</div>
+    <div class="cal-header">
+      <button onclick="sgtCalNav(-1)" style="color:var(--gd);background:var(--gb)">‹</button>
+      <span id="sgtab-cal-month-label"></span>
+      <button onclick="sgtCalNav(1)" style="color:var(--gd);background:var(--gb)">›</button>
+    </div>
+    <div class="cal-grid" id="sgtab-cal-grid"></div>
+    <div class="cal-legend"><span class="cal-dot" style="background:var(--gd)"></span> Ngày có giao dịch sổ gửi/ứng</div>
+    <button class="btn-luu" style="width:100%;margin-top:10px" onclick="applySgtabDate()">Xác nhận</button>
+    <button class="btn-huy" style="width:100%;margin-top:6px" onclick="closeM('modal-sgtab-date')">Đóng</button>
   </div>
 </div>
 
@@ -4144,15 +4167,51 @@ function renderSgOverview(){
   if(!window._sgKhList.length){
     html+='<div class="no-data">Chưa có khách hàng nào</div>';
   } else {
-    html+=window._sgKhList.map(function(ten,idx){
+    // Nhóm theo loại: chỉ gửi / chỉ ứng / cả hai
+    var onlyGui=[], onlyUng=[], both=[];
+    window._sgKhList.forEach(function(ten){
+      var d=khMap[ten];
+      if(d.guiCnt&&d.ungCnt) both.push(ten);
+      else if(d.guiCnt) onlyGui.push(ten);
+      else onlyUng.push(ten);
+    });
+    function khCard(ten,idx){
       var d=khMap[ten]; var conLai=d.gui-d.ung;
       var meta=[]; if(d.guiCnt) meta.push(d.guiCnt+' lần gửi'); if(d.ungCnt) meta.push(d.ungCnt+' lần ứng');
-      return '<div class="sg-kh-btn" onclick="selectSgKHByIdx('+idx+')">'
-        +'<div><div class="sg-kh-name">👤 '+ten+'</div>'
+      // Màu nhãn theo loại
+      var borderColor, tagHtml, nameColor;
+      if(d.guiCnt&&d.ungCnt){
+        borderColor='#7c3aed'; nameColor='#5b21b6';
+        tagHtml='<span style="font-size:9px;padding:2px 6px;border-radius:8px;background:#ede9fe;color:#5b21b6;font-weight:700;margin-left:4px">GỬI+ỨNG</span>';
+      } else if(d.guiCnt){
+        borderColor='var(--gd)'; nameColor='var(--gd)';
+        tagHtml='<span style="font-size:9px;padding:2px 6px;border-radius:8px;background:var(--gb);color:var(--gd);font-weight:700;margin-left:4px">GỬI</span>';
+      } else {
+        borderColor='#d97706'; nameColor='#92400e';
+        tagHtml='<span style="font-size:9px;padding:2px 6px;border-radius:8px;background:#fffbeb;color:#92400e;font-weight:700;margin-left:4px">ỨNG</span>';
+      }
+      return '<div class="sg-kh-btn" onclick="selectSgKHByIdx('+idx+')" style="border-left:3px solid '+borderColor+'">'
+        +'<div><div class="sg-kh-name" style="color:'+nameColor+'">👤 '+ten+tagHtml+'</div>'
         +'<div class="sg-kh-meta">'+meta.join(' · ')+' · '+fmtDate(d.lastDate)+'</div></div>'
         +'<div><div class="sg-kh-total" style="color:'+(conLai>=0?'var(--gd)':'#dc2626')+'">'+fmtNum(Math.round(conLai))+' ₫</div><span style="color:var(--g400)">›</span></div>'
         +'</div>';
-    }).join('');
+    }
+    // Hiện theo thứ tự: GỬI+ỨNG → chỉ GỬI → chỉ ỨNG
+    var orderedList=both.concat(onlyGui).concat(onlyUng);
+    // Rebuild _sgKhList theo thứ tự mới để selectSgKHByIdx đúng
+    window._sgKhList=orderedList;
+    if(both.length){
+      html+='<div style="font-size:10px;color:#5b21b6;font-weight:700;margin:8px 0 3px;text-transform:uppercase;letter-spacing:.4px">🔄 Vừa gửi vừa ứng</div>';
+      html+=both.map(function(ten){return khCard(ten,orderedList.indexOf(ten));}).join('');
+    }
+    if(onlyGui.length){
+      html+='<div style="font-size:10px;color:var(--gd);font-weight:700;margin:8px 0 3px;text-transform:uppercase;letter-spacing:.4px">📒 Chỉ gửi sổ</div>';
+      html+=onlyGui.map(function(ten){return khCard(ten,orderedList.indexOf(ten));}).join('');
+    }
+    if(onlyUng.length){
+      html+='<div style="font-size:10px;color:#d97706;font-weight:700;margin:8px 0 3px;text-transform:uppercase;letter-spacing:.4px">💵 Chỉ ứng tiền</div>';
+      html+=onlyUng.map(function(ten){return khCard(ten,orderedList.indexOf(ten));}).join('');
+    }
   }
 
   // 2 card thống kê ở DƯỚI cùng
@@ -4243,7 +4302,7 @@ function onSgEntryTap(id,type){
 
 function openSgEntryModal(type, preTen){
   sgTabEditId=null; sgTabEditType=null;
-  document.getElementById('sgt-date').value=today();
+  setSgtDate(today());
   setSgtType(type);
   if(type==='gui'){
     document.getElementById('sgt-loai').value='';
@@ -4268,7 +4327,7 @@ function openSgEntryEdit(id,type){
   if(type==='gui'){
     var r=getSG().find(function(x){return String(x.id)===String(id);});
     if(!r) return;
-    document.getElementById('sgt-date').value=r.date;
+    setSgtDate(r.date);
     document.getElementById('sgt-loai').value=r.loai;
     document.getElementById('sgt-ten').value=r.ten;
     document.getElementById('sgt-kg').value=r.kg;
@@ -4278,7 +4337,7 @@ function openSgEntryEdit(id,type){
   } else {
     var r2=getSU().find(function(x){return String(x.id)===String(id);});
     if(!r2) return;
-    document.getElementById('sgt-date').value=r2.date;
+    setSgtDate(r2.date);
     document.getElementById('sgu-ten').value=r2.ten;
     document.getElementById('sgu-tien').value=parseInt(r2.tien).toLocaleString('vi-VN');
     document.getElementById('sgu-noidung').value=r2.noidung||'';
@@ -4338,13 +4397,49 @@ function calcSgt(){
 function onSguTen(){
   var val=document.getElementById('sgu-ten').value;
   var ac=document.getElementById('sgu-ac');
-  window.sgPickHandler = function(n){ document.getElementById('sgu-ten').value=n; ac.style.display='none'; };
+  window.sgPickHandler = function(n){
+    document.getElementById('sgu-ten').value=n;
+    ac.style.display='none';
+    // Cập nhật gợi ý tiền theo tên vừa chọn
+    showSguTienSuggest();
+  };
   renderNameAc(val, ac);
+  showSguTienSuggest();
 }
 function onSguTien(){
   var el=document.getElementById('sgu-tien');
   var d=el.value.replace(/[^0-9]/g,'');
   el.value=d?parseInt(d).toLocaleString('vi-VN'):'';
+  // KHÔNG gọi renderNameAc - tránh lỗi thay thế tên
+}
+function showSguTienSuggest(){
+  var box=document.getElementById('sgu-tien-suggest');
+  if(!box) return;
+  // Lấy các mức tiền từ lịch sử ứng của người này
+  var ten=(document.getElementById('sgu-ten').value||'').trim();
+  var suAll=getSU();
+  var amounts=[];
+  if(ten){
+    suAll.filter(function(r){return r.ten===ten;}).forEach(function(r){
+      var v=parseFloat(r.tien)||0;
+      if(v>0&&amounts.indexOf(v)<0) amounts.push(v);
+    });
+  }
+  // Thêm mức tiền nhanh phổ biến
+  [500000,1000000,2000000,3000000,5000000].forEach(function(v){
+    if(amounts.indexOf(v)<0) amounts.push(v);
+  });
+  amounts.sort(function(a,b){return a-b;}).splice(6);
+  box.style.display='flex';
+  box.innerHTML=amounts.map(function(v){
+    return '<span onclick="pickSguTien('+v+')" style="padding:4px 10px;border-radius:14px;border:1.5px solid #d97706;background:#fffbeb;color:#92400e;font-size:11px;font-weight:700;cursor:pointer">'+fmtNum(v)+'</span>';
+  }).join('');
+}
+function pickSguTien(v){
+  // Chỉ điền vào ô tiền, KHÔNG động đến ô tên
+  var el=document.getElementById('sgu-tien');
+  el.value=parseInt(v).toLocaleString('vi-VN');
+  el.focus();
 }
 
 function renderNameAc(val, acEl){
@@ -4922,10 +5017,67 @@ function selectSgKHFromSearch(idx){
 }
 
 // Mở popup Gửi sổ mới
+// ── Lịch tùy chỉnh cho popup Gửi sổ / Ứng tiền ──
+var sgtCalViewYear, sgtCalViewMonth, sgtCalSelected;
+
+function openSgTabDate(){
+  var cur = document.getElementById('sgt-date').value || today();
+  var d = new Date(cur + 'T00:00:00');
+  sgtCalViewYear  = d.getFullYear();
+  sgtCalViewMonth = d.getMonth();
+  sgtCalSelected  = cur;
+  renderSgtabCalendar();
+  openM('modal-sgtab-date');
+}
+function sgtCalNav(delta){
+  sgtCalViewMonth += delta;
+  if(sgtCalViewMonth<0){sgtCalViewMonth=11;sgtCalViewYear--;}
+  if(sgtCalViewMonth>11){sgtCalViewMonth=0;sgtCalViewYear++;}
+  renderSgtabCalendar();
+}
+function renderSgtabCalendar(){
+  // Đánh dấu ngày có giao dịch sổ gửi hoặc ứng tiền
+  var datesWithData={};
+  getSG().forEach(function(r){if(r.date) datesWithData[r.date]=true;});
+  getSU().forEach(function(r){if(r.date) datesWithData[r.date]=true;});
+  var todayD=today();
+  document.getElementById('sgtab-cal-month-label').textContent=
+    MONTH_NAMES_VN[sgtCalViewMonth]+' '+sgtCalViewYear;
+  var firstDay=new Date(sgtCalViewYear,sgtCalViewMonth,1);
+  var startWD=(firstDay.getDay()+6)%7;
+  var daysInM=new Date(sgtCalViewYear,sgtCalViewMonth+1,0).getDate();
+  var html='';
+  ['T2','T3','T4','T5','T6','T7','CN'].forEach(function(d){html+='<div class="cal-wd">'+d+'</div>';});
+  for(var i=0;i<startWD;i++) html+='<div class="cal-cell empty"></div>';
+  for(var day=1;day<=daysInM;day++){
+    var ds=sgtCalViewYear+'-'+String(sgtCalViewMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+    var cls='cal-cell';
+    if(ds===todayD) cls+=' today';
+    if(ds===sgtCalSelected) cls+=' selected';
+    var dot=datesWithData[ds]?'<span class="cal-dot" style="background:var(--gd)"></span>':'';
+    html+='<div class="'+cls+'" onclick="selectSgtabCalDay(&quot;'+ds+'&quot;)">'+day+dot+'</div>';
+  }
+  document.getElementById('sgtab-cal-grid').innerHTML=html;
+}
+function selectSgtabCalDay(ds){ sgtCalSelected=ds; renderSgtabCalendar(); }
+function applySgtabDate(){
+  if(!sgtCalSelected){closeM('modal-sgtab-date');return;}
+  document.getElementById('sgt-date').value=sgtCalSelected;
+  var lbl=document.getElementById('sgt-date-val');
+  if(lbl) lbl.textContent=fmtDate(sgtCalSelected);
+  closeM('modal-sgtab-date');
+}
+// Helper: cập nhật nhãn ngày hiển thị
+function setSgtDate(val){
+  document.getElementById('sgt-date').value=val;
+  var lbl=document.getElementById('sgt-date-val');
+  if(lbl) lbl.textContent=fmtDate(val);
+}
+
 function openSgGuiMoi(){
   sgTabEditId=null; sgTabEditType=null;
   setSgtType('gui');
-  document.getElementById('sgt-date').value=today();
+  setSgtDate(today());
   document.getElementById('sgt-loai').value='';
   document.getElementById('sgt-gia').value='';
   document.getElementById('sgt-ten').value=sgCurrentKH||'';
@@ -4945,7 +5097,7 @@ function openSgGuiMoi(){
 function openSgUngTien(){
   sgTabEditId=null; sgTabEditType=null;
   setSgtType('ung');
-  document.getElementById('sgt-date').value=today();
+  setSgtDate(today());
   document.getElementById('sgu-ten').value=sgCurrentKH||'';
   document.getElementById('sgu-tien').value='';
   document.getElementById('sgu-noidung').value='';
