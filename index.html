@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v6.2</title>
+<title>Mua Bán Mủ Cao Su v6.3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -297,6 +297,11 @@ input[type=date]:focus{border-color:var(--gl)}
 .col-do{color:#dc2626;font-weight:800}
 
 /* CUSTOM CALENDAR */
+#modal-ss-date .cal-cell.selected{background:#5b21b6}
+#modal-ss-date .cal-dot{background:#7c3aed}
+#modal-ss-date .cal-cell.selected .cal-dot{background:#fff}
+#modal-ss-date .cal-cell.today{color:#5b21b6}
+/* CUSTOM CALENDAR */
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin:8px 0 10px}
 .cal-header button{background:var(--gb);border:none;border-radius:8px;width:36px;height:36px;font-size:18px;color:var(--gd);font-weight:800;cursor:pointer}
 .cal-header span{font-size:14px;font-weight:800;color:var(--g800)}
@@ -377,7 +382,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="logo-ico">🌿</div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v6.2 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v6.3 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -709,7 +714,12 @@ input[type=date]:focus{border-color:var(--gl)}
     </div>
     <div>
       <label class="fl" style="font-size:11px;color:var(--g600);margin-bottom:3px">Ngày tính toán</label>
-      <input type="date" id="ss-date-select" class="fi" style="border-color:#7c3aed" onchange="onSsDateChange()">
+      <div class="date-bar" onclick="openSsDate()" style="border:1.5px solid #7c3aed;margin-bottom:0;cursor:pointer">
+        <span>📅</span>
+        <span class="date-val" id="ss-date-val" style="color:#5b21b6;font-size:13px;font-weight:700">--</span>
+        <span class="date-hint">Nhấn để chọn</span>
+      </div>
+      <input type="hidden" id="ss-date-select">
     </div>
   </div>
 
@@ -993,6 +1003,23 @@ input[type=date]:focus{border-color:var(--gl)}
     <div class="cal-legend"><span class="cal-dot"></span> Ngày có ghi chép</div>
     <button class="btn-luu" style="width:100%;margin-top:10px" onclick="applyDate()">Xác nhận</button>
     <button class="btn-huy" style="width:100%;margin-top:6px" onclick="closeM('modal-date')">Đóng</button>
+  </div>
+</div>
+
+<!-- MODAL DATE SS (Tính Toán) -->
+<div class="modal" id="modal-ss-date">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="color:#5b21b6">📅 Chọn ngày tính toán</div>
+    <div class="cal-header">
+      <button onclick="ssCalNav(-1)" style="color:#5b21b6;background:#ede9fe">‹</button>
+      <span id="ss-cal-month-label"></span>
+      <button onclick="ssCalNav(1)" style="color:#5b21b6;background:#ede9fe">›</button>
+    </div>
+    <div class="cal-grid" id="ss-cal-grid"></div>
+    <div class="cal-legend"><span class="cal-dot"></span> Ngày có dữ liệu thu mua</div>
+    <button class="btn-ss" style="width:100%;margin-top:10px" onclick="applySsDate()">Xác nhận</button>
+    <button class="btn-huy" style="width:100%;margin-top:6px" onclick="closeM('modal-ss-date')">Đóng</button>
   </div>
 </div>
 
@@ -2186,8 +2213,34 @@ function scrollInputUp(el) {
   }, 300); // chờ bàn phím hiện ra
 }
 
+// Kiểm tra và refresh token nếu gần hết hạn
+var gdTokenExpiry = parseInt(localStorage.getItem('gd_token_expiry') || '0');
+
+// ── Khởi tạo token client (gọi ngay khi Google API sẵn sàng) ──
+function _initTokenClient() {
+  if (typeof google === 'undefined' || typeof google.accounts === 'undefined') return;
+  if (window._gdTokenClient) return; // đã có rồi
+  window._gdTokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GD_CLIENT_ID,
+    scope: GD_SCOPES,
+    prompt: '',
+    callback: function(resp) {
+      // callback mặc định - sẽ bị override bởi signInGoogle / ensureValidToken
+      if (resp && resp.access_token) {
+        gdToken = resp.access_token;
+        gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000;
+        localStorage.setItem('gd_token', gdToken);
+        localStorage.setItem('gd_token_expiry', String(gdTokenExpiry));
+      }
+    }
+  });
+}
+
 function initGoogleAuth() {
   if (typeof google === 'undefined') { setTimeout(initGoogleAuth, 600); return; }
+  // Khởi tạo token client ngay lập tức (quan trọng: phải làm trước khi cần dùng)
+  _initTokenClient();
+
   var saved = localStorage.getItem('gd_user');
   var tok   = localStorage.getItem('gd_token');
   var fid   = localStorage.getItem('gd_folder_id');
@@ -2219,47 +2272,57 @@ function initGoogleAuth() {
 
 function signInGoogle() {
   if (typeof google === 'undefined') { toast('Đang tải Google API...'); return; }
-  var client = google.accounts.oauth2.initTokenClient({
-    client_id: GD_CLIENT_ID,
-    scope: GD_SCOPES,
-    prompt: '',
-    callback: function(resp) {
-      if (resp.error) { toast('Đăng nhập thất bại: ' + resp.error); return; }
-      gdToken = resp.access_token;
-      gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000; // 2 phút đệm
-      localStorage.setItem('gd_token', gdToken);
-      localStorage.setItem('gd_token_expiry', String(gdTokenExpiry));
-      if (!gdUser) fetchGoogleUser();
-      else { updGDBar(); if (gdFolderId) doAutoSync(); }
-    }
-  });
-  window._gdTokenClient = client;
-  client.requestAccessToken();
+  _initTokenClient(); // đảm bảo client đã khởi tạo
+  if (!window._gdTokenClient) { toast('Đang tải Google API...'); setTimeout(signInGoogle, 800); return; }
+  window._gdTokenClient.callback = function(resp) {
+    if (resp.error) { toast('Đăng nhập thất bại: ' + resp.error); return; }
+    gdToken = resp.access_token;
+    gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000;
+    localStorage.setItem('gd_token', gdToken);
+    localStorage.setItem('gd_token_expiry', String(gdTokenExpiry));
+    if (!gdUser) fetchGoogleUser();
+    else { updGDBar(); if (gdFolderId) doAutoSync(); }
+  };
+  window._gdTokenClient.requestAccessToken({ prompt: '' });
 }
 
-// Kiểm tra và refresh token nếu gần hết hạn
-var gdTokenExpiry = parseInt(localStorage.getItem('gd_token_expiry') || '0');
+// Đảm bảo token hợp lệ trước khi gọi API — tự refresh nếu hết hạn
 function ensureValidToken(cb) {
-  if (gdToken && Date.now() < gdTokenExpiry) { cb(); return; }
-  // Token hết hạn hoặc chưa có - refresh silent (không hiện popup)
-  if (window._gdTokenClient) {
-    var origCb = window._gdTokenClient.callback;
-    window._gdTokenClient.callback = function(resp) {
-      window._gdTokenClient.callback = origCb;
-      if (resp.error || !resp.access_token) {
-        // Silent refresh thất bại - cần đăng nhập lại
-        gdToken = null; updGDBar();
-        toast('⚠️ Phiên đăng nhập hết hạn - vui lòng đăng nhập lại');
-        return;
-      }
-      gdToken = resp.access_token;
-      gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000;
-      localStorage.setItem('gd_token', gdToken);
-      localStorage.setItem('gd_token_expiry', String(gdTokenExpiry));
-      cb();
-    };
-    window._gdTokenClient.requestAccessToken({ prompt: '' });
-  } else { cb(); }
+  // Token còn hạn: dùng luôn
+  if (gdToken && Date.now() < gdTokenExpiry - 30000) { cb(); return; }
+
+  // Cần refresh: _gdTokenClient phải tồn tại
+  _initTokenClient(); // tạo mới nếu chưa có (ví dụ sau reload)
+
+  if (!window._gdTokenClient) {
+    // Google API chưa tải xong, thử lại sau
+    toast('⏳ Đang kết nối Google...');
+    setTimeout(function(){ ensureValidToken(cb); }, 1000);
+    return;
+  }
+
+  // Lưu callback cũ để restore sau
+  var prevCb = window._gdTokenClient.callback;
+  window._gdTokenClient.callback = function(resp) {
+    // Restore callback gốc
+    window._gdTokenClient.callback = prevCb;
+    if (resp.error || !resp.access_token) {
+      // Silent refresh thất bại → yêu cầu đăng nhập lại
+      gdToken = null;
+      localStorage.removeItem('gd_token');
+      localStorage.removeItem('gd_token_expiry');
+      updGDBar();
+      toast('⚠️ Phiên đăng nhập hết hạn — vui lòng đăng nhập lại Google Drive');
+      return;
+    }
+    gdToken = resp.access_token;
+    gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000;
+    localStorage.setItem('gd_token', gdToken);
+    localStorage.setItem('gd_token_expiry', String(gdTokenExpiry));
+    cb();
+  };
+  // prompt:'' = silent refresh, không hiện popup nếu đã consent trước đó
+  window._gdTokenClient.requestAccessToken({ prompt: '' });
 }
 
 function fetchGoogleUser() {
@@ -4872,11 +4935,11 @@ function sgPickSelect(id, el){
     var sg=getSG();
     sg.push({id:Date.now()+Math.random(),date:date,ten:g.ten,loai:g.loai,kg:kt,do:g.do||0,gia:g.gia,tt:g.tt,src:'pick'});
     setSG(sg);
-    renderSgTabContent();
-    renderSgPickList(); // cập nhật tick trong popup
     autoSync();
+    // Đóng toàn bộ modal liên quan rồi quay về tổng quan
     closeM('modal-sg-pick-mua');
-    sgCurrentKH = null;         // về tổng quan
+    closeM('modal-sg-tab');
+    sgCurrentKH = null; // về tổng quan
     renderSgTabContent();
     toast('✅ Đã gửi sổ '+g.ten+'!');
   });
@@ -4920,8 +4983,34 @@ function xoaSgEntry(){
   showDetail('🗑️','Xoá ghi chép?',
     [['Thao tác','Xoá ghi chép này khỏi sổ'],['Lưu ý','Không thể hoàn tác']],
     null,'Xoá',function(){
-      if(type==='gui') setSG(getSG().filter(function(r){return String(r.id)!==String(id);}));
-      else setSU(getSU().filter(function(r){return String(r.id)!==String(id);}));
+      if(type==='gui'){
+        // Lấy thông tin ghi chép trước khi xoá
+        var sgAll=getSG();
+        var sgRec=sgAll.find(function(r){return String(r.id)===String(id);});
+        // Xoá khỏi sổ gửi
+        setSG(sgAll.filter(function(r){return String(r.id)!==String(id);}));
+        // Reset guiSo=false trên giao dịch thu mua tương ứng
+        if(sgRec){
+          var allMua=getGD('mua');
+          var changed=false;
+          // Ưu tiên khớp theo gdId (giao dịch lấy từ thu mua)
+          if(sgRec.gdId){
+            var mIdx=allMua.findIndex(function(g){return String(g.id)===String(sgRec.gdId);});
+            if(mIdx>=0&&allMua[mIdx].guiSo){ allMua[mIdx].guiSo=false; changed=true; }
+          }
+          // Fallback: khớp ten+date+tt (giao dịch gửi sổ từ pick không có gdId)
+          if(!changed){
+            var mIdx2=allMua.findIndex(function(g){
+              return g.ten===sgRec.ten && g.date===sgRec.date &&
+                     Math.round(g.tt)===Math.round(sgRec.tt) && g.guiSo;
+            });
+            if(mIdx2>=0){ allMua[mIdx2].guiSo=false; changed=true; }
+          }
+          if(changed){ setGD('mua',allMua); renderTbl('mua'); updTK('mua'); }
+        }
+      } else {
+        setSU(getSU().filter(function(r){return String(r.id)!==String(id);}));
+      }
       closeSgModal();
       renderSgTabContent();
       autoSync();
@@ -4940,10 +5029,69 @@ function markPickDateDots(inp){
   }
 }
 
+// ── Lịch tùy chỉnh cho tab SS ──
+var ssCalViewYear, ssCalViewMonth, ssCalSelected;
+
+function openSsDate(){
+  var cur = document.getElementById('ss-date-select').value || curDate['mua'] || today();
+  var d = new Date(cur + 'T00:00:00');
+  ssCalViewYear  = d.getFullYear();
+  ssCalViewMonth = d.getMonth();
+  ssCalSelected  = cur;
+  renderSsCalendar();
+  openM('modal-ss-date');
+}
+
+function ssCalNav(delta){
+  ssCalViewMonth += delta;
+  if(ssCalViewMonth < 0){ ssCalViewMonth = 11; ssCalViewYear--; }
+  if(ssCalViewMonth > 11){ ssCalViewMonth = 0; ssCalViewYear++; }
+  renderSsCalendar();
+}
+
+function renderSsCalendar(){
+  // Chỉ đánh dấu ngày có dữ liệu MUA (dùng cho tính toán)
+  var datesWithData = {};
+  getGD('mua').forEach(function(g){ if(g.date) datesWithData[g.date] = true; });
+  var todayD = today();
+  document.getElementById('ss-cal-month-label').textContent =
+    MONTH_NAMES_VN[ssCalViewMonth] + ' ' + ssCalViewYear;
+  var firstDay = new Date(ssCalViewYear, ssCalViewMonth, 1);
+  var startWeekday = (firstDay.getDay() + 6) % 7;
+  var daysInMonth  = new Date(ssCalViewYear, ssCalViewMonth + 1, 0).getDate();
+  var html = '';
+  ['T2','T3','T4','T5','T6','T7','CN'].forEach(function(d){ html += '<div class="cal-wd">'+d+'</div>'; });
+  for(var i = 0; i < startWeekday; i++) html += '<div class="cal-cell empty"></div>';
+  for(var day = 1; day <= daysInMonth; day++){
+    var ds = ssCalViewYear + '-' + String(ssCalViewMonth+1).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+    var cls = 'cal-cell';
+    if(ds === todayD)       cls += ' today';
+    if(ds === ssCalSelected) cls += ' selected';
+    var dot = datesWithData[ds] ? '<span class="cal-dot"></span>' : '';
+    html += '<div class="'+cls+'" onclick="selectSsCalDay(&quot;'+ds+'&quot;)">'+day+dot+'</div>';
+  }
+  document.getElementById('ss-cal-grid').innerHTML = html;
+}
+
+function selectSsCalDay(ds){
+  ssCalSelected = ds;
+  renderSsCalendar();
+}
+
+function applySsDate(){
+  if(!ssCalSelected){ closeM('modal-ss-date'); return; }
+  onSsDateChange(ssCalSelected);
+  closeM('modal-ss-date');
+}
+
 // Khi đổi ngày ở tab tính toán
-function onSsDateChange() {
-  var el = document.getElementById('ss-date-select');
-  if (!el) return;
+function onSsDateChange(newDate) {
+  var val = newDate || (document.getElementById('ss-date-select').value);
+  if(!val) return;
+  // Cập nhật hidden input và label hiển thị
+  document.getElementById('ss-date-select').value = val;
+  var lbl = document.getElementById('ss-date-val');
+  if(lbl) lbl.textContent = fmtDate(val);
   // Xoá dữ liệu nhập cũ để nhập lại cho ngày mới
   document.getElementById('ss-gia').value = '';
   document.getElementById('ss-kg-target').value = '';
@@ -4959,7 +5107,10 @@ function onSsDateChange() {
 function initSsDateSelect() {
   var el = document.getElementById('ss-date-select');
   if (!el) return;
-  if (!el.value) el.value = curDate['mua'] || today();
+  var val = el.value || curDate['mua'] || today();
+  el.value = val;
+  var lbl = document.getElementById('ss-date-val');
+  if(lbl) lbl.textContent = fmtDate(val);
 }
 
 // ─── SERVICE WORKER ───
