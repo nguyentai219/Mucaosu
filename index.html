@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v6.6</title>
+<title>Mua Bán Mủ Cao Su v6.7</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -382,7 +382,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="logo-ico">🌿</div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v6.6 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v6.7 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -573,7 +573,7 @@ input[type=date]:focus{border-color:var(--gl)}
         <th id="ban-th-chat">Chất</th>
         <th>Giá</th>
         <th>Tiền</th>
-        <th>Gửi</th>
+        <th>Đã TT</th>
       </tr></thead>
       <tbody id="ban-tbody"></tbody>
     </table>
@@ -1794,6 +1794,28 @@ function onGui(tab,id){
   });
 }
 
+// ─── THANH TOÁN BÁN RA ───
+function onThanhToan(id){
+  var all=getGD('ban');
+  var gd=all.find(function(g){return String(g.id)===String(id);});
+  if(!gd) return;
+  if(gd.thanhToan){ toast('ℹ️ Đã xác nhận thanh toán rồi!'); return; }
+  var rows=[
+    ['Người bán',gd.ten],
+    ['Loại mủ',LOAI_ICO[gd.loai]+' '+LOAI_LBL[gd.loai]],
+    ['Số kg',fmtKg(kgThuc(gd.loai,gd.kg,gd.do,gd.bi||0))+' kg'],
+    ['Thành tiền',fmtNum(gd.tt)+' ₫'],
+  ];
+  showDetail('💵','Xác nhận đã thanh toán?',rows,gd.tt,'Xác nhận',function(){
+    gd.thanhToan=true;
+    setGD('ban',all);
+    renderTbl('ban');
+    updTK('ban');
+    autoSync();
+    toast('✅ Đã xác nhận thanh toán!');
+  });
+}
+
 // ─── RENDER TABLE ───
 function renderTbl(tab){
   const listAsc=getGDDate(tab,curDate[tab]);
@@ -1812,8 +1834,19 @@ function renderTbl(tab){
     if(gd.loai==='nuoc') chat=gd.do||'--';
     else if(gd.loai==='dong') chat='Đông'+(gd.do?'/KH:'+gd.do:'');
     else chat=LOAI_LBL[gd.loai];
-    const guiCls='tc-gui'+(gd.guiSo?' done':'');
     const editCls=gd.edited?'edited':'';
+    if(tab==='ban'){
+      const ttCls='tc-gui'+(gd.thanhToan?' done':'');
+      return '<tr class="'+editCls+'" onclick="onRow(\''+tab+'\',\''+gd.id+'\')" ondblclick="editGD(\''+tab+'\',\''+gd.id+'\')">'
+        +'<td class="tc-ten" title="'+gd.ten+'">'+gd.ten+'</td>'
+        +'<td>'+fmtKg(kgThuc(gd.loai,gd.kg,gd.do,gd.bi||0))+'</td>'
+        +'<td>'+chat+'</td>'
+        +'<td>'+fmtNum(gd.gia)+'</td>'
+        +'<td>'+fmtNum(gd.tt)+'</td>'
+        +'<td class="'+ttCls+'" onclick="event.stopPropagation();onThanhToan(\''+gd.id+'\')">'+(gd.thanhToan?'✅':'○')+'</td>'
+        +'</tr>';
+    }
+    const guiCls='tc-gui'+(gd.guiSo?' done':'');
     return '<tr class="'+editCls+'" onclick="onRow(\''+tab+'\',\''+gd.id+'\')" ondblclick="editGD(\''+tab+'\',\''+gd.id+'\')">'
       +'<td class="tc-ten" title="'+gd.ten+'">'+gd.ten+'</td>'
       +'<td>'+fmtKg(kgThuc(gd.loai,gd.kg,gd.do,gd.bi||0))+'</td>'
@@ -1829,10 +1862,12 @@ function renderTbl(tab){
 function grpByLoai(list){
   var grp={};
   list.forEach(function(gd){
-    if(!grp[gd.loai]) grp[gd.loai]={kg:0,tt:0,dos:[]};
+    if(!grp[gd.loai]) grp[gd.loai]={kg:0,tt:0,dos:[],gias:[]};
     grp[gd.loai].kg+=kgThuc(gd.loai, gd.kg, gd.do, gd.bi||0);
     grp[gd.loai].tt+=parseFloat(gd.tt)||0;
     if(gd.loai==='nuoc'&&gd.do) grp[gd.loai].dos.push(parseFloat(gd.do));
+    var g=parseFloat(gd.gia)||0;
+    if(g&&grp[gd.loai].gias.indexOf(g)<0) grp[gd.loai].gias.push(g);
   });
   return grp;
 }
@@ -1846,6 +1881,10 @@ function updTK(tab){
   var cont=document.getElementById(tab+'-tk');
 
   // Helper: xây card thống kê 1 loại mủ
+  // Màu nhãn theo loại mủ (cùng tone xanh chủ đạo, đậm nhạt khác nhau)
+  var LOAI_COLOR_MUA = {nuoc:'#0e7490',chen:'#0f766e',day:'#16a34a',dong:'#1d4ed8'};
+  var LOAI_COLOR_BAN = {nuoc:'#c2410c',chen:'#b45309',day:'#7c3aed',dong:'#be185d'};
+
   function loaiCard(loai, mData, bData, isBanTab){
     var ico=LOAI_ICO[loai]; var lbl=LOAI_LBL[loai];
     var mTB=null, bTB=null;
@@ -1856,57 +1895,68 @@ function updTK(tab){
 
     if(!isBanTab){
       // ── Card MUA ──
-      var d=mData||{kg:0,tt:0,dos:[]};
+      var d=mData||{kg:0,tt:0,dos:[],gias:[]};
+      var accentM = LOAI_COLOR_MUA[loai]||'var(--gd)';
       if(loai==='nuoc'){
-        // Mủ nước: chi tiết hơn
         var doTBStr = mTB!=null ? fmtDo(mTB) : '--';
         var minDo = d.dos.length ? fmtDo(Math.min.apply(null,d.dos)) : '--';
         var maxDo = d.dos.length ? fmtDo(Math.max.apply(null,d.dos)) : '--';
-        return '<div class="tk-card" style="padding:0;overflow:hidden;border-left:3px solid var(--gp)">'
-          +'<div style="padding:7px 12px 5px;font-size:10px;font-weight:700;color:var(--g600);text-transform:uppercase;letter-spacing:.4px">'+ico+' '+lbl+'</div>'
+        return '<div class="tk-card" style="padding:0;overflow:hidden;border-left:3px solid '+accentM+'">'
+          +'<div style="padding:7px 12px 5px;font-size:10px;font-weight:700;color:'+accentM+';text-transform:uppercase;letter-spacing:.4px">'+ico+' '+lbl+'</div>'
           +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--g100)">'
-          // Cột 1: Tổng kg thực
           +'<div style="padding:8px 10px;border-right:1px solid var(--g100)">'
           +'<div style="font-size:9px;color:var(--g400);font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px">Tổng kg thực</div>'
-          +'<div style="font-size:17px;font-weight:800;color:var(--gd);line-height:1">'+fmtKg(d.kg)+'</div>'
+          +'<div style="font-size:17px;font-weight:800;color:'+accentM+';line-height:1">'+fmtKg(d.kg)+'</div>'
           +'<div style="font-size:10px;color:var(--g600);margin-top:1px">kg</div>'
           +'</div>'
-          // Cột 2: Độ TB
           +'<div style="padding:8px 10px;border-right:1px solid var(--g100);text-align:center">'
           +'<div style="font-size:9px;color:var(--g400);font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px">Độ TB</div>'
-          +'<div style="font-size:17px;font-weight:800;color:var(--gm);line-height:1">'+doTBStr+'</div>'
+          +'<div style="font-size:17px;font-weight:800;color:'+accentM+';line-height:1">'+doTBStr+'</div>'
           +(d.dos.length?'<div style="font-size:10px;color:var(--g600);margin-top:1px">'+minDo+' – '+maxDo+'</div>':'<div style="font-size:10px;color:var(--g400);margin-top:1px">--</div>')
           +'</div>'
-          // Cột 3: Tổng tiền
           +'<div style="padding:8px 10px;text-align:right">'
           +'<div style="font-size:9px;color:var(--g400);font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px">Tổng tiền</div>'
-          +'<div style="font-size:15px;font-weight:800;color:var(--gd);line-height:1">'+fmtNum(d.tt)+'</div>'
+          +'<div style="font-size:15px;font-weight:800;color:'+accentM+';line-height:1">'+fmtNum(d.tt)+'</div>'
           +'<div style="font-size:10px;color:var(--g600);margin-top:1px">đồng</div>'
           +'</div>'
           +'</div>'
           +'</div>';
       } else {
-        // Các loại mủ khác: 2 cột kg + tiền (không có độ)
-        return '<div class="tk-card" style="padding:0;overflow:hidden">'
-          +'<div style="padding:7px 12px 5px;font-size:10px;font-weight:700;color:var(--g600);text-transform:uppercase;letter-spacing:.4px">'+ico+' '+lbl+'</div>'
-          +'<div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--g100)">'
-          +'<div style="padding:8px 12px;border-right:1px solid var(--g100)">'
+        // Các loại mủ không có độ: 3 cột kg | giá mua | tổng tiền
+        var gias = d.gias||[];
+        var giaTBval = gias.length ? gias.reduce(function(a,b){return a+b;},0)/gias.length : 0;
+        var giaTBStr = giaTBval>0 ? fmtNum(Math.round(giaTBval)) : '--';
+        var giaNhieuGia = gias.length>1;
+        var giaSubTxt = giaNhieuGia
+          ? gias.map(function(g){return fmtNum(g);}).join(' · ')
+          : '₫/kg';
+        var giaMidLbl = giaNhieuGia ? 'Giá trung bình' : 'Giá mua';
+        return '<div class="tk-card" style="padding:0;overflow:hidden;border-left:3px solid '+accentM+'">'
+          +'<div style="padding:7px 12px 5px;font-size:10px;font-weight:700;color:'+accentM+';text-transform:uppercase;letter-spacing:.4px">'+ico+' '+lbl+'</div>'
+          +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-top:1px solid var(--g100)">'
+          +'<div style="padding:8px 10px;border-right:1px solid var(--g100)">'
           +'<div style="font-size:9px;color:var(--g400);font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px">Tổng kg thực</div>'
-          +'<div style="font-size:18px;font-weight:800;color:var(--gd);line-height:1">'+fmtKg(d.kg)+'</div>'
+          +'<div style="font-size:17px;font-weight:800;color:'+accentM+';line-height:1">'+fmtKg(d.kg)+'</div>'
           +'<div style="font-size:10px;color:var(--g600);margin-top:1px">kg</div>'
           +'</div>'
-          +'<div style="padding:8px 12px;text-align:right">'
+          +'<div style="padding:8px 10px;border-right:1px solid var(--g100);text-align:center">'
+          +'<div style="font-size:9px;color:var(--g400);font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px">'+giaMidLbl+'</div>'
+          +'<div style="font-size:15px;font-weight:800;color:'+accentM+';line-height:1">'+giaTBStr+'</div>'
+          +'<div style="font-size:9px;color:var(--g600);margin-top:1px;word-break:break-all">'+giaSubTxt+'</div>'
+          +'</div>'
+          +'<div style="padding:8px 10px;text-align:right">'
           +'<div style="font-size:9px;color:var(--g400);font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px">Tổng tiền</div>'
-          +'<div style="font-size:16px;font-weight:800;color:var(--gd);line-height:1">'+fmtNum(d.tt)+'</div>'
+          +'<div style="font-size:15px;font-weight:800;color:'+accentM+';line-height:1">'+fmtNum(d.tt)+'</div>'
           +'<div style="font-size:10px;color:var(--g600);margin-top:1px">đồng</div>'
           +'</div>'
           +'</div>'
           +'</div>';
       }
     } else {
-      // ── Card BAN: 2 cột so sánh ──
-      var m=mData||{kg:0,tt:0,dos:[]};
-      var b=bData||{kg:0,tt:0,dos:[]};
+      // ── Card BAN: so sánh mua vs bán ──
+      var m=mData||{kg:0,tt:0,dos:[],gias:[]};
+      var b=bData||{kg:0,tt:0,dos:[],gias:[]};
+      var accentB = LOAI_COLOR_BAN[loai]||'#b5341a';
       function cmpColor(bv,mv){ return bv>mv?'#22c55e':bv<mv?'#ef4444':'var(--g400)'; }
       var kgC=cmpColor(b.kg,m.kg);
       var ttC=cmpColor(b.tt,m.tt);
@@ -1926,30 +1976,24 @@ function updTK(tab){
           +'</div>';
       }
 
-      return '<div class="tk-card" style="grid-column:1/-1;padding:0;overflow:hidden">'
-        // Tiêu đề loại mủ
-        +'<div style="background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;padding:7px 10px;font-size:12px;font-weight:700">'+ico+' '+lbl+'</div>'
-        // Header cột
+      return '<div class="tk-card" style="grid-column:1/-1;padding:0;overflow:hidden;border-left:3px solid '+accentB+'">'
+        +'<div style="background:linear-gradient(135deg,'+accentB+'dd,'+accentB+'99);color:#fff;padding:7px 10px;font-size:12px;font-weight:700">'+ico+' '+lbl+'</div>'
         +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--g100);font-size:10px;font-weight:700;text-align:center;padding:5px 4px;color:var(--g600)">'
         +'<span style="text-align:left;padding-left:4px">Chỉ số</span>'
         +'<span style="color:var(--gm)">🛒 Mua vào</span>'
-        +'<span style="color:#b5341a">💰 Bán ra</span>'
+        +'<span style="color:'+accentB+'">💰 Bán ra</span>'
         +'</div>'
-        // Kg
         +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:6px 4px;border-top:1px solid var(--g100);font-size:12px;text-align:center;align-items:center">'
         +'<span style="text-align:left;padding-left:4px;font-weight:600;color:var(--g600)">Số kg</span>'
         +'<span style="color:var(--g800)">'+fmtKg(m.kg)+' kg</span>'
         +'<span style="font-weight:800;color:'+kgC+'">'+fmtKg(b.kg)+' kg</span>'
         +'</div>'
-        // Độ TB (chỉ nước)
         +doRow
-        // Tiền
         +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:6px 4px;border-top:1px solid var(--g100);font-size:12px;text-align:center;align-items:center">'
         +'<span style="text-align:left;padding-left:4px;font-weight:600;color:var(--g600)">Thành tiền</span>'
         +'<span style="color:var(--g800)">'+fmtNum(m.tt)+' ₫</span>'
         +'<span style="font-weight:800;color:'+ttC+'">'+fmtNum(b.tt)+' ₫</span>'
         +'</div>'
-        // Chênh lệch
         +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;padding:5px 4px;border-top:2px solid var(--g200);background:var(--g50);font-size:11px;text-align:center;align-items:center">'
         +'<span style="text-align:left;padding-left:4px;color:var(--g400);font-weight:600">Chênh lệch</span>'
         +'<span></span>'
@@ -2639,7 +2683,8 @@ function syncToDrive() {
         g.do||'',
         fmtNum(g.gia),
         fmtNum(g.tt),
-        g.guiSo?'Có':''
+        g.guiSo?'Có':'',
+        g.thanhToan?'Có':''
       ];
     }));
   }
@@ -2714,7 +2759,7 @@ function restoreFromFile(sid) {
     function parseRows(rows) {
       if (!rows || rows.length < 2) return [];
       return rows.slice(1).filter(function(r) { return r[2] && r[4]; }).map(function(r) {
-        return { id: r[0]||(Date.now()+Math.random()), date:r[1]||'', ten:r[2]||'', loai:loaiFromLbl(r[3]), kg:parseFloat(r[4])||0, do:parseFloat(r[5])||0, gia:parseFloat(r[6])||0, tt:parseFloat(r[7])||0, guiSo:r[8]==='Có', edited:r[9]==='Có' };
+        return { id: r[0]||(Date.now()+Math.random()), date:r[1]||'', ten:r[2]||'', loai:loaiFromLbl(r[3]), kg:parseFloat(r[4])||0, do:parseFloat(r[5])||0, gia:parseFloat(r[6])||0, tt:parseFloat(r[7])||0, guiSo:r[8]==='Có', edited:r[9]==='Có', thanhToan:r[10]==='Có' };
       });
     }
     setGD('mua', parseRows(vrs[0]?vrs[0].values:[]));
