@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v6.8</title>
+<title>Mua Bán Mủ Cao Su v6.9</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -382,7 +382,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="logo-ico">🌿</div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v6.8 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v6.9 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1158,6 +1158,32 @@ function setGD(t,v){ lsSet(gdKey(t),v) }
 function getGDDate(t,d){ return getGD(t).filter(g=>g.date===d) }
 function getKH(t){ return lsGet(khKey(t)) }
 function setKH(t,v){ lsSet(khKey(t),v) }
+
+// ── Danh sách KH chung (mua + gửi + ứng dùng chung) ──
+const KH_ALL_KEY = 'kh3_all';
+function getKHAll(){ return lsGet(KH_ALL_KEY); }
+function setKHAll(v){ lsSet(KH_ALL_KEY, v); }
+function saveKHShared(ten){
+  if(!ten || !ten.trim()) return;
+  ten = ten.trim();
+  var all = getKHAll();
+  if(!all.includes(ten)){ all.push(ten); setKHAll(all); }
+  // Đồng bộ ngược vào kh3_mua và kh3_ban để autocomplete cũ vẫn hoạt động
+  ['mua','ban'].forEach(function(t){
+    var kh=getKH(t); if(!kh.includes(ten)){ kh.push(ten); setKH(t,kh); }
+  });
+}
+// Khi load: gộp kh3_mua + kh3_ban vào kh3_all nếu chưa có
+function migrateKHAll(){
+  var all=getKHAll();
+  var changed=false;
+  ['mua','ban'].forEach(function(t){
+    getKH(t).forEach(function(n){
+      if(!all.includes(n)){ all.push(n); changed=true; }
+    });
+  });
+  if(changed) setKHAll(all);
+}
 function getGia(t){ return lsGetO(giaKey(t)) }
 function setGia(t,v){ lsSet(giaKey(t),v) }
 function getLoai(t){ return localStorage.getItem(loaiKey(t)) }
@@ -1366,6 +1392,7 @@ function switchTab(tab){
     if(ssLoai !== _targetLoai) setSsLoai(_targetLoai);
     else { var _sel2=document.getElementById('ss-loai-select'); if(_sel2&&_sel2.tagName==='SELECT') _sel2.value=ssLoai; }
     initSsDateSelect();
+    migrateKHAll(); // Gộp KH mua+ban vào danh sách chung
     updSSSummary();
     restoreSsState(curDate['mua']);
   }
@@ -1546,7 +1573,7 @@ function onTen(tab){
   const v=document.getElementById(tab+'-ten').value.trim();
   const ac=document.getElementById(tab+'-ac');
   if(!v){ ac.style.display='none'; return; }
-  const kh=getKH(tab).filter(k=>k.toLowerCase().includes(v.toLowerCase()));
+  const kh=getKHAll().filter(k=>k.toLowerCase().includes(v.toLowerCase()));
   if(!kh.length){ ac.style.display='none'; return; }
   ac.innerHTML=kh.map(k=>'<div class="ac-item" onmousedown="pickKH(\''+tab+'\',\''+k.replace(/'/g,"\\'")+'\')">' + '👤 '+k+'</div>').join('');
   ac.style.display='block';
@@ -1684,7 +1711,7 @@ function luuGD(tab){
     tt=r3>=500?Math.round(ttRaw)-r3+1000:Math.round(ttRaw)-r3;
   }
   const giaObj=getGia(tab); giaObj[loai]=gia; setGia(tab,giaObj);
-  const kh=getKH(tab); if(!kh.includes(ten)){ kh.push(ten); setKH(tab,kh); }
+  saveKHShared(ten); // Lưu vào danh sách KH chung
 
   // Xây rows chi tiết
   const rows=buildRows(loai,ten,kg,gia,doV,bi);
@@ -2214,36 +2241,61 @@ function xoaSgEdit(){
 
 // ─── KHACH HANG ───
 function openKH(){
-  const tab=curTab;
-  document.getElementById('modal-kh').dataset.tab=tab;
-  document.getElementById('kh-modal-title').textContent=tab==='mua'?'👥 KH bán cho mình':'👥 KH mua của mình';
+  document.getElementById('kh-modal-title').textContent='👥 Danh sách khách hàng';
   document.getElementById('kh-inp').value='';
-  renderKH(tab);
+  renderKH();
   openM('modal-kh');
 }
-function renderKH(tab){
-  const kh=getKH(tab);
-  const cont=document.getElementById('kh-list');
+function renderKH(){
+  var kh=getKHAll();
+  var cont=document.getElementById('kh-list');
   if(!kh.length){ cont.innerHTML='<div class="no-data">Chưa có khách hàng nào</div>'; return; }
-  cont.innerHTML=kh.map((k,i)=>'<div class="kh-item"><div class="kh-name">👤 '+k+'</div><div class="kh-acts"><button class="kh-btn e" onclick="editKH(\''+tab+'\','+i+')">✏️</button><button class="kh-btn d" onclick="delKH(\''+tab+'\','+i+')">🗑️</button></div></div>').join('');
+  var muaSet={},guiSet={},ungSet={};
+  getGD('mua').forEach(function(g){muaSet[g.ten]=true;});
+  getSG().forEach(function(r){guiSet[r.ten]=true;});
+  getSU().forEach(function(r){ungSet[r.ten]=true;});
+  cont.innerHTML=kh.map(function(k,i){
+    var tags='';
+    if(muaSet[k]) tags+='<span style="font-size:9px;padding:1px 5px;border-radius:6px;background:var(--gb);color:var(--gd);font-weight:700;margin-left:3px">MUA</span>';
+    if(guiSet[k]) tags+='<span style="font-size:9px;padding:1px 5px;border-radius:6px;background:#f0fdf4;color:#16a34a;font-weight:700;margin-left:3px">GỬI</span>';
+    if(ungSet[k]) tags+='<span style="font-size:9px;padding:1px 5px;border-radius:6px;background:#fffbeb;color:#92400e;font-weight:700;margin-left:3px">ỨNG</span>';
+    return '<div class="kh-item">'
+      +'<div class="kh-name">👤 '+k+tags+'</div>'
+      +'<div class="kh-acts">'
+      +'<button class="kh-btn e" onclick="editKH('+i+')">✏️</button>'
+      +'<button class="kh-btn d" onclick="delKH('+i+')">🗑️</button>'
+      +'</div></div>';
+  }).join('');
 }
 function themKH(){
-  const tab=document.getElementById('modal-kh').dataset.tab;
-  const name=document.getElementById('kh-inp').value.trim();
+  var name=document.getElementById('kh-inp').value.trim();
   if(!name) return;
-  const kh=getKH(tab); if(kh.includes(name)){ toast('⚠️ Tên đã có!'); return; }
-  kh.push(name); setKH(tab,kh); document.getElementById('kh-inp').value='';
-  renderKH(tab); toast('✅ Đã thêm!');
+  if(getKHAll().includes(name)){ toast('⚠️ Tên đã có!'); return; }
+  saveKHShared(name);
+  document.getElementById('kh-inp').value='';
+  renderKH(); toast('✅ Đã thêm!');
 }
-function editKH(tab,i){
-  const kh=getKH(tab);
-  const n=prompt('Sửa tên:',kh[i]);
+function editKH(i){
+  var kh=getKHAll();
+  var n=prompt('Sửa tên:',kh[i]);
   if(!n||!n.trim()) return;
-  kh[i]=n.trim(); setKH(tab,kh); renderKH(tab); toast('✅ Đã cập nhật!');
+  var oldName=kh[i]; var newName=n.trim();
+  kh[i]=newName; setKHAll(kh);
+  ['mua','ban'].forEach(function(t){
+    var arr=getKH(t); var idx=arr.indexOf(oldName);
+    if(idx>=0){ arr[idx]=newName; setKH(t,arr); }
+  });
+  renderKH(); toast('✅ Đã cập nhật!');
 }
-function delKH(tab,i){
-  showDetail('🗑️','Xoá khách hàng?',[],null,'Xoá',()=>{
-    const kh=getKH(tab); kh.splice(i,1); setKH(tab,kh); renderKH(tab); toast('🗑️ Đã xoá!');
+function delKH(i){
+  showDetail('🗑️','Xoá khách hàng?',[],null,'Xoá',function(){
+    var kh=getKHAll(); var name=kh[i];
+    kh.splice(i,1); setKHAll(kh);
+    ['mua','ban'].forEach(function(t){
+      var arr=getKH(t); var idx=arr.indexOf(name);
+      if(idx>=0){ arr.splice(idx,1); setKH(t,arr); }
+    });
+    renderKH(); toast('🗑️ Đã xoá!');
   });
 }
 
@@ -4444,16 +4496,15 @@ function pickSguTien(v){
 
 function renderNameAc(val, acEl){
   if(!val){ acEl.style.display='none'; return; }
-  var existNames=getAllSgKhNames();
-  var khAll=[...new Set((getKH('mua')||[]).concat(getKH('ban')||[]))];
+  var existNames=getAllSgKhNames(); // KH đã có giao dịch sg/su
   var lower=val.toLowerCase();
+  // Ưu tiên: KH đã có giao dịch gửi/ứng (xanh) → KH trong danh sách chung (đen)
   var green=existNames.filter(function(n){return n.toLowerCase().includes(lower);});
-  var black=khAll.filter(function(n){return !existNames.includes(n)&&n.toLowerCase().includes(lower);});
+  var black=getKHAll().filter(function(n){return !existNames.includes(n)&&n.toLowerCase().includes(lower);});
   var all=green.concat(black).slice(0,8);
   if(!all.length){ acEl.style.display='none'; return; }
-  acEl.innerHTML=all.map(function(n){
+  acEl.innerHTML=all.map(function(n,idx){
     var isGreen=existNames.includes(n);
-    var idx=all.indexOf(n);
     return '<div class="ac-item" style="color:'+(isGreen?'var(--gd)':'var(--g800)')+';font-weight:'+(isGreen?'700':'500')+'" onclick="window.sgPickHandler(window._sgAcList['+idx+'])">'+(isGreen?'✅ ':'👤 ')+n+'</div>';
   }).join('');
   window._sgAcList=all;
@@ -4483,6 +4534,7 @@ function luuSgEntry(){
       sg.push({id:Date.now()+Math.random(),date,ten,loai,kg,do:doV,gia,tt,src:'tab'});
     }
     setSG(sg);
+    saveKHShared(ten); // Lưu vào danh sách KH chung
     toast('📒 Đã '+(sgTabEditId?'cập nhật':'lưu')+' sổ gửi!');
     if(sgCurrentKH!==ten){ sgCurrentKH=ten; }
   } else {
@@ -4500,6 +4552,7 @@ function luuSgEntry(){
       su.push({id:Date.now()+Math.random(),date,ten:tenU,tien,noidung,src:'tab'});
     }
     setSU(su);
+    saveKHShared(tenU); // Lưu vào danh sách KH chung
     toast('💵 Đã '+(sgTabEditId?'cập nhật':'lưu')+' ứng tiền!');
     if(sgCurrentKH!==tenU){ sgCurrentKH=tenU; }
   }
