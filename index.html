@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v6.9</title>
+<title>Mua Bán Mủ Cao Su v7.5</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -113,7 +113,16 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g
 .tbl tr.edited td{background:#fffbea}
 .tbl tr.edited{outline:1px solid #ffd166}
 .tbl tr:active td{background:var(--gb)}
-.tc-ten{text-align:left!important;font-weight:600;font-size:11px;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-left:7px!important}
+.tc-ten{text-align:left!important;font-weight:600;font-size:11px;width:80px;max-width:80px;overflow:hidden;white-space:nowrap;padding-left:7px!important;padding-right:2px!important}
+/* Wrapper chứa tên + badge, không vượt quá chiều rộng ô */
+.tc-ten-wrap{display:flex;align-items:center;width:100%;overflow:hidden;gap:2px}
+/* Phần tên: co dãn nhưng không đẩy badge ra ngoài */
+.tc-ten-inner{flex:1;min-width:0;overflow:hidden;white-space:nowrap;display:block}
+/* Marquee: chạy từ vị trí 0 sang trái rồi về */
+.tc-ten-inner.marquee{overflow:visible;animation:mqSlide 5s linear infinite}
+@keyframes mqSlide{0%{transform:translateX(0)}80%{transform:translateX(var(--mq-d,0px))}100%{transform:translateX(var(--mq-d,0px))}}
+/* Badge số thứ tự: không co lại */
+.tc-ten-badges{display:inline-flex;align-items:center;gap:1px;flex-shrink:0;white-space:nowrap}
 .tc-gui{cursor:pointer;user-select:none;font-size:15px}
 .tc-gui.done{color:var(--gm)}
 
@@ -296,6 +305,21 @@ input[type=date]:focus{border-color:var(--gl)}
 .col-xanh{color:#16a34a;font-weight:800}
 .col-do{color:#dc2626;font-weight:800}
 
+/* FLASH ANIMATION - giao dịch mới */
+@keyframes rowFlash {
+  0%   { background:#86efac; }
+  20%  { background:#fff; }
+  40%  { background:#86efac; }
+  65%  { background:#dcfce7; }
+  100% { background:#e8fdf0; }
+}
+.tr-new-flash { animation: rowFlash 1.8s ease-out forwards; }
+.tr-new-keep  { background:#e8fdf0!important; }
+.tr-edited-icon { font-size:10px; margin-left:3px; opacity:.7; }
+.badge-rank { display:inline-flex;align-items:center;justify-content:center;
+  width:14px;height:14px;border-radius:50%;background:#ef4444;color:#fff;
+  font-size:9px;font-weight:800;margin-left:3px;vertical-align:middle;line-height:1; }
+
 /* CUSTOM CALENDAR */
 #modal-ss-date .cal-cell.selected{background:#5b21b6}
 #modal-ss-date .cal-dot{background:#7c3aed}
@@ -382,7 +406,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="logo-ico">🌿</div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v6.9 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v7.5 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -431,7 +455,8 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div class="fr">
         <label class="fl">Đơn giá (đ/kg)</label>
-        <input type="text" inputmode="numeric" id="mua-gia" class="fi" placeholder="0" oninput="onGia(this,'mua')" onkeydown="nf(event,'mua-ten')">
+        <input type="text" inputmode="numeric" id="mua-gia" class="fi" placeholder="0" oninput="onGia(this,'mua')" onkeydown="nf(event,'mua-ten')" onfocus="showGiaSuggest('mua')" onblur="hideGiaSuggest('mua')">
+        <div id="mua-gia-suggest" style="display:none;flex-wrap:wrap;gap:5px;margin-top:5px"></div>
       </div>
     </div>
     <div class="fr">
@@ -522,7 +547,8 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div class="fr">
         <label class="fl">Đơn giá (đ/kg)</label>
-        <input type="text" inputmode="numeric" id="ban-gia" class="fi ban-hint" placeholder="0" oninput="onGia(this,'ban')" onkeydown="nf(event,'ban-ten')">
+        <input type="text" inputmode="numeric" id="ban-gia" class="fi ban-hint" placeholder="0" oninput="onGia(this,'ban')" onkeydown="nf(event,'ban-ten')" onfocus="showGiaSuggest('ban')" onblur="hideGiaSuggest('ban')">
+        <div id="ban-gia-suggest" style="display:none;flex-wrap:wrap;gap:5px;margin-top:5px"></div>
       </div>
     </div>
     <div class="fr">
@@ -1012,6 +1038,16 @@ input[type=date]:focus{border-color:var(--gl)}
   </div>
 </div>
 
+<!-- MODAL CHI TIET MUA -->
+<div class="modal" id="modal-chitiet-mua">
+  <div class="modal-box" style="max-height:92vh;display:flex;flex-direction:column">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="color:var(--gd);flex-shrink:0" id="chitiet-mua-title">📋 Chi tiết thu mua</div>
+    <div id="chitiet-mua-body" style="flex:1;overflow-y:auto;padding-bottom:8px"></div>
+    <button class="btn-huy" style="width:100%;margin-top:8px;flex-shrink:0" onclick="closeM('modal-chitiet-mua')">Đóng</button>
+  </div>
+</div>
+
 <!-- MODAL DATE SS (Tính Toán) -->
 <div class="modal" id="modal-ss-date">
   <div class="modal-box">
@@ -1228,11 +1264,35 @@ function getGiaVal(tab){
   return parseFloat(String(raw).replace(/[^0-9]/g,''))||0;
 }
 function onGia(el, tab){
-  var pos = el.selectionStart;
   var raw = el.value.replace(/[^0-9]/g,'');
   var fmt = raw ? parseInt(raw,10).toLocaleString('vi-VN') : '';
   el.value = fmt;
   calc(tab);
+  // Lọc đề xuất theo giá đang nhập
+  filterGiaSuggest(tab, raw);
+}
+function filterGiaSuggest(tab, rawInput){
+  var box = document.getElementById(tab+'-gia-suggest');
+  if(!box) return;
+  var loai = getLoai(tab);
+  var ghKey = 'giaHistory3_'+tab+'_'+loai;
+  var ghArr = JSON.parse(localStorage.getItem(ghKey)||'[]');
+  if(!ghArr.length){ box.style.display='none'; return; }
+  var inputNum = parseInt(rawInput||'0',10)||0;
+  // Lọc: chỉ giữ giá mà chuỗi số của nó bắt đầu bằng rawInput
+  var filtered = ghArr.filter(function(v){
+    return !rawInput || String(v).startsWith(rawInput);
+  });
+  // Ẩn nếu không có kết quả hoặc đã nhập đúng đủ 1 giá
+  if(!filtered.length || (filtered.length===1 && filtered[0]===inputNum)){
+    box.style.display='none'; return;
+  }
+  var accentColor = tab==='ban'?'#b5341a':'var(--gd)';
+  var bgColor     = tab==='ban'?'#fff5f5':'var(--gb)';
+  box.style.display='flex';
+  box.innerHTML=[...filtered].reverse().map(function(v){
+    return '<span onmousedown="pickGia(&quot;'+tab+'&quot;,'+v+')" style="padding:4px 10px;border-radius:14px;border:1.5px solid '+accentColor+';background:'+bgColor+';color:'+accentColor+';font-size:11px;font-weight:700;cursor:pointer">'+fmtNum(v)+'</span>';
+  }).join('');
 }
 
 // ─── ĐỌC SỐ TIỀN BẰNG CHỮ TIẾNG VIỆT ───
@@ -1505,8 +1565,44 @@ var kbHideTimer = {};
 function chonLoai(tab, loai){
   closeLoaiDD(tab);
   setLoaiUI(tab, loai, true);
-  // Không tự focus/hiện bàn phím, chỉ đóng dropdown
-  // Người dùng tự nhấp vào ô cần nhập
+  // Hiện đề xuất giá ngay khi chọn loại mủ
+  setTimeout(function(){ showGiaSuggest(tab); }, 50);
+}
+function showGiaSuggest(tab){
+  var loai=getLoai(tab);
+  var box=document.getElementById(tab+'-gia-suggest');
+  if(!box||!loai) return;
+  var ghKey='giaHistory3_'+tab+'_'+loai;
+  var ghArr=JSON.parse(localStorage.getItem(ghKey)||'[]');
+  if(!ghArr.length){ box.style.display='none'; return; }
+  // Khi focus: hiện tất cả, không lọc
+  var el=document.getElementById(tab+'-gia');
+  var rawNow=el?el.value.replace(/[^0-9]/g,''):'';
+  if(rawNow){ filterGiaSuggest(tab, rawNow); return; } // đang có giá → lọc
+  var sorted=[...ghArr].reverse();
+  var accentColor = tab==='ban'?'#b5341a':'var(--gd)';
+  var bgColor = tab==='ban'?'#fff5f5':'var(--gb)';
+  box.style.display='flex';
+  box.innerHTML=sorted.map(function(v){
+    return '<span onmousedown="pickGia(&quot;'+tab+'&quot;,'+v+')" style="padding:4px 10px;border-radius:14px;border:1.5px solid '+accentColor+';background:'+bgColor+';color:'+accentColor+';font-size:11px;font-weight:700;cursor:pointer">'+fmtNum(v)+'</span>';
+  }).join('');
+}
+function pickGia(tab, v){
+  var el=document.getElementById(tab+'-gia');
+  el.value=parseInt(v).toLocaleString('vi-VN');
+  calc(tab);
+  // Ẩn ngay sau khi chọn
+  var box=document.getElementById(tab+'-gia-suggest');
+  if(box) box.style.display='none';
+  // Chuyển focus sang ô tên
+  setTimeout(function(){ var t=document.getElementById(tab+'-ten'); if(t) t.focus(); }, 80);
+}
+function hideGiaSuggest(tab){
+  // Delay nhỏ để pickGia (onmousedown) kịp chạy trước
+  setTimeout(function(){
+    var box=document.getElementById(tab+'-gia-suggest');
+    if(box) box.style.display='none';
+  }, 200);
 }
 function setLoaiUI(tab, loai, updateGia){
   setLoai(tab, loai);
@@ -1575,7 +1671,11 @@ function onTen(tab){
   if(!v){ ac.style.display='none'; return; }
   const kh=getKHAll().filter(k=>k.toLowerCase().includes(v.toLowerCase()));
   if(!kh.length){ ac.style.display='none'; return; }
-  ac.innerHTML=kh.map(k=>'<div class="ac-item" onmousedown="pickKH(\''+tab+'\',\''+k.replace(/'/g,"\\'")+'\')">' + '👤 '+k+'</div>').join('');
+  // Ẩn ngay nếu nhập khớp chính xác với 1 tên (không phân biệt hoa/thường)
+  if(kh.length===1 && kh[0].toLowerCase()===v.toLowerCase()){
+    ac.style.display='none'; return;
+  }
+  ac.innerHTML=kh.map(k=>'<div class="ac-item" onmousedown="pickKH(\''+tab+'\',\''+k.replace(/'/g,"\'")+'\')">👤 '+k+'</div>').join('');
   ac.style.display='block';
 }
 function tenKey(e,tab){
@@ -1710,7 +1810,14 @@ function luuGD(tab){
     var r3=Math.round(ttRaw)%1000;
     tt=r3>=500?Math.round(ttRaw)-r3+1000:Math.round(ttRaw)-r3;
   }
+  // Lưu giá vào giaObj (giá gần nhất)
   const giaObj=getGia(tab); giaObj[loai]=gia; setGia(tab,giaObj);
+  // Lưu lịch sử giá theo loại mủ (để đề xuất đúng loại)
+  var ghKey='giaHistory3_'+tab+'_'+loai;
+  var ghArr=JSON.parse(localStorage.getItem(ghKey)||'[]');
+  if(!ghArr.includes(gia)) ghArr.push(gia);
+  ghArr=ghArr.slice(-6); // giữ tối đa 6 mức giá gần nhất
+  localStorage.setItem(ghKey, JSON.stringify(ghArr));
   saveKHShared(ten); // Lưu vào danh sách KH chung
 
   // Xây rows chi tiết
@@ -1718,7 +1825,7 @@ function luuGD(tab){
   showDetail('✅','Xác nhận lưu giao dịch',rows,tt,'Lưu',()=>{
     const gd={id:Date.now()+Math.random(), date:curDate[tab], ten, loai, kg, do:doV, bi, gia, tt, guiSo:false, edited:false};
     const all=getGD(tab); all.push(gd); setGD(tab,all);
-    toast('✅ Đã lưu!'); resetF(tab); renderTbl(tab); updTK(tab); updTK('ban'); if(typeof updSSSummary==='function') updSSSummary(); if(typeof updThangData==='function') updThangData(); autoSync();
+    toast('✅ Đã lưu!'); resetF(tab); renderTbl(tab, gd.id); updTK(tab); updTK('ban'); if(typeof updSSSummary==='function') updSSSummary(); if(typeof updThangData==='function') updThangData(); autoSync();
   });
 }
 
@@ -1867,17 +1974,45 @@ function onThanhToan(id){
 }
 
 // ─── RENDER TABLE ───
-function renderTbl(tab){
+// lastNewId: id giao dịch vừa lưu để flash
+var _lastNewId = {};
+function renderTbl(tab, newId){
+  if(newId && _lastNewId[tab] && _lastNewId[tab]!==String(newId)){
+    // Xoá nền xanh giữ của giao dịch cũ trước khi render mới
+    var oldTr=document.getElementById('tr-'+tab+'-'+_lastNewId[tab]);
+    if(oldTr) oldTr.classList.remove('tr-new-keep');
+  }
+  if(newId) _lastNewId[tab] = String(newId);
   const listAsc=getGDDate(tab,curDate[tab]);
-  const list=[...listAsc].reverse(); // mới nhất lên trên
   const tbl=document.getElementById(tab+'-tbl');
   const nd=document.getElementById(tab+'-nodata');
   document.getElementById(tab+'-badge').textContent=listAsc.length;
   if(!listAsc.length){ tbl.style.display='none'; nd.style.display='block'; return; }
   tbl.style.display='table'; nd.style.display='none';
+
+  // Sắp xếp: giao dịch mới nhất lên đầu, sau đó nhóm cùng tên lại cạnh nhau
+  var flashId = _lastNewId[tab] || null;
+  var flashGd = flashId ? listAsc.find(function(g){return String(g.id)===flashId;}) : null;
+  var otherList = listAsc.filter(function(g){return String(g.id)!==flashId;});
+  // Nhóm otherList theo tên (giữ nguyên thứ tự lần xuất hiện đầu tiên, mới nhất trước)
+  var seenTen = [], grouped = [];
+  var reversed = [...otherList].reverse(); // mới nhất trước
+  reversed.forEach(function(g){
+    if(seenTen.indexOf(g.ten)<0) seenTen.push(g.ten);
+  });
+  seenTen.forEach(function(ten){
+    reversed.filter(function(g){return g.ten===ten;}).forEach(function(g){grouped.push(g);});
+  });
+  // Giao dịch flash (mới nhất) lên đầu tiên
+  var list = flashGd ? [flashGd].concat(grouped) : grouped;
+
   // header cột → luôn là "Độ/Loại"
   const thChat=document.getElementById(tab+'-th-chat');
   thChat.textContent='Độ/Loại';
+
+    // 3 giao dịch gần nhất theo thời gian lưu
+  var sortedByTime=[...listAsc].sort(function(a,b){return parseFloat(b.id)-parseFloat(a.id);});
+  var top3Ids=sortedByTime.slice(0,3).map(function(g){return String(g.id);});
 
   document.getElementById(tab+'-tbody').innerHTML=list.map(gd=>{
     let chat;
@@ -1885,10 +2020,20 @@ function renderTbl(tab){
     else if(gd.loai==='dong') chat='Đông'+(gd.do?'/KH:'+gd.do:'');
     else chat=LOAI_LBL[gd.loai];
     const editCls=gd.edited?'edited':'';
+    const isNew=(flashId&&String(gd.id)===flashId);
+    const rankIdx=top3Ids.indexOf(String(gd.id));
+    const rankBadge=rankIdx>=0?'<span class="badge-rank">'+(rankIdx+1)+'</span>':'';
+    const editIcon=gd.edited?'<span class="tr-edited-icon">✏️</span>':'';
+
     if(tab==='ban'){
       const ttCls='tc-gui'+(gd.thanhToan?' done':'');
-      return '<tr class="'+editCls+'" onclick="onRow(\''+tab+'\',\''+gd.id+'\')" ondblclick="editGD(\''+tab+'\',\''+gd.id+'\')">'
-        +'<td class="tc-ten" title="'+gd.ten+'">'+gd.ten+'</td>'
+      const trCls=[editCls, isNew?'tr-new-flash':''].filter(Boolean).join(' ');
+      return '<tr class="'+trCls+'" id="tr-'+tab+'-'+gd.id+'" onclick="onRow(\''+tab+'\',\''+gd.id+'\')" ondblclick="editGD(\''+tab+'\',\''+gd.id+'\')">'
+        +'<td class="tc-ten" title="'+gd.ten+'">'
+        +'<div class="tc-ten-wrap">'
+        +'<span class="tc-ten-inner" id="tni-'+gd.id+'">'+gd.ten+'</span>'
+        +'<span class="tc-ten-badges">'+editIcon+'</span>'
+        +'</div></td>'
         +'<td>'+fmtKg(kgThuc(gd.loai,gd.kg,gd.do,gd.bi||0))+'</td>'
         +'<td>'+chat+'</td>'
         +'<td>'+fmtNum(gd.gia)+'</td>'
@@ -1897,8 +2042,13 @@ function renderTbl(tab){
         +'</tr>';
     }
     const guiCls='tc-gui'+(gd.guiSo?' done':'');
-    return '<tr class="'+editCls+'" onclick="onRow(\''+tab+'\',\''+gd.id+'\')" ondblclick="editGD(\''+tab+'\',\''+gd.id+'\')">'
-      +'<td class="tc-ten" title="'+gd.ten+'">'+gd.ten+'</td>'
+    const trCls=[editCls, isNew?'tr-new-flash':''].filter(Boolean).join(' ');
+    return '<tr class="'+trCls+'" id="tr-'+tab+'-'+gd.id+'" onclick="onRow(\''+tab+'\',\''+gd.id+'\')" ondblclick="editGD(\''+tab+'\',\''+gd.id+'\')">'
+      +'<td class="tc-ten" title="'+gd.ten+'">'
+      +'<div class="tc-ten-wrap">'
+      +'<span class="tc-ten-inner" id="tni-'+gd.id+'">'+gd.ten+'</span>'
+      +'<span class="tc-ten-badges">'+editIcon+rankBadge+'</span>'
+      +'</div></td>'
       +'<td>'+fmtKg(kgThuc(gd.loai,gd.kg,gd.do,gd.bi||0))+'</td>'
       +'<td>'+chat+'</td>'
       +'<td>'+fmtNum(gd.gia)+'</td>'
@@ -1906,6 +2056,38 @@ function renderTbl(tab){
       +'<td class="'+guiCls+'" onclick="event.stopPropagation();onGui(\''+tab+'\',\''+gd.id+'\')">'+(gd.guiSo?'✅':'○')+'</td>'
       +'</tr>';
   }).join('');
+
+  // Sau animation, giữ nền xanh cho giao dịch mới nhất
+  if(flashId){
+    setTimeout(function(){
+      var trEl=document.getElementById('tr-'+tab+'-'+flashId);
+      if(trEl){ trEl.classList.remove('tr-new-flash'); trEl.classList.add('tr-new-keep'); }
+    }, 1900);
+  }
+  // Marquee cho tên quá dài (chạy trái rồi về phải)
+  setTimeout(function(){
+    list.forEach(function(gd){
+      var el=document.getElementById('tni-'+gd.id);
+      if(!el) return;
+      var wrap=el.parentElement; // .tc-ten-wrap
+      if(!wrap) return;
+      var badge=el.nextElementSibling; // .tc-ten-badges
+      var badgeW=badge?badge.offsetWidth+4:0;
+      var wrapW=wrap.offsetWidth||80;
+      var availW=wrapW-badgeW;
+      // scrollWidth = chiều rộng text thực (không bị clip)
+      var textW=el.scrollWidth;
+      if(textW>availW+2){
+        // Dịch chuyển sang trái đúng số pixel thừa
+        var dist=-(textW-availW+2);
+        el.style.setProperty('--mq-d', dist+'px');
+        el.classList.add('marquee');
+      } else {
+        el.classList.remove('marquee');
+        el.style.removeProperty('--mq-d');
+      }
+    });
+  }, 150);
 }
 
 // ─── THONG KE ───
@@ -2064,6 +2246,8 @@ function updTK(tab){
     });
     html+='<div class="tk-card full total"><div class="tk-lbl">Tổng tiền thu mua</div><div class="tk-val">'+fmtNum(total)+' ₫</div></div>';
     html+='</div>';
+    // Nút xem chi tiết
+    html+='<button onclick="openChiTietMua()" style="width:100%;margin-top:6px;padding:10px;background:#fff;border:1.5px solid var(--gd);border-radius:var(--r);color:var(--gd);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">📋 Xem chi tiết thu mua trong ngày</button>';
     cont.innerHTML=html;
 
   } else {
@@ -2096,6 +2280,97 @@ function updTK(tab){
     html+='</div>';
     cont.innerHTML=html;
   }
+}
+
+// ── Chi tiết thu mua popup ──
+function openChiTietMua(){
+  var date=curDate['mua'];
+  var list=getGDDate('mua', date);
+  var title=document.getElementById('chitiet-mua-title');
+  var body=document.getElementById('chitiet-mua-body');
+  title.textContent='📋 Thu mua '+fmtDate(date);
+
+  if(!list.length){
+    body.innerHTML='<div class="no-data">Chưa có giao dịch nào</div>';
+    openM('modal-chitiet-mua'); return;
+  }
+
+  // Nhóm theo loại mủ
+  var grp={}; var LOAIS=['nuoc','chen','day','dong'];
+  list.forEach(function(gd){
+    if(!grp[gd.loai]) grp[gd.loai]=[];
+    grp[gd.loai].push(gd);
+  });
+
+  var LOAI_COLOR={nuoc:'#0e7490',chen:'#0f766e',day:'#16a34a',dong:'#1d4ed8'};
+  var totalAll=0; list.forEach(function(g){totalAll+=parseFloat(g.tt)||0;});
+  var totalKgAll=0; list.forEach(function(g){totalKgAll+=kgThuc(g.loai,g.kg,g.do,g.bi||0);});
+
+  var html='';
+
+  LOAIS.forEach(function(loai){
+    if(!grp[loai]||!grp[loai].length) return;
+    var rows=grp[loai];
+    var accent=LOAI_COLOR[loai]||'var(--gd)';
+    var ico=LOAI_ICO[loai]; var lbl=LOAI_LBL[loai];
+
+    // Tính tổng loại
+    var tkgLoai=0,tttLoai=0,dos=[];
+    rows.forEach(function(g){
+      tkgLoai+=kgThuc(g.loai,g.kg,g.do,g.bi||0);
+      tttLoai+=parseFloat(g.tt)||0;
+      if(loai==='nuoc'&&g.do) dos.push(parseFloat(g.do)||0);
+    });
+    var doTBLoai=dos.length?dos.reduce(function(a,b){return a+b;})/dos.length:null;
+
+    // Header loại
+    html+='<div style="background:'+accent+';color:#fff;padding:7px 12px;font-size:11px;font-weight:700;margin-top:10px;border-radius:6px 6px 0 0">'+ico+' '+lbl+' — '+rows.length+' người</div>';
+
+    // Bảng giao dịch
+    html+='<div style="background:#fff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 6px 6px;overflow:hidden">';
+    html+='<table style="width:100%;border-collapse:collapse;font-size:11px">';
+    html+='<thead><tr style="background:#f8fafc">';
+    var tenStyle='max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle';
+    if(loai==='nuoc'){
+      html+='<th style="padding:5px 8px;text-align:left;color:#6b7280;font-weight:600;width:30%">Tên</th><th style="padding:5px 4px;color:#6b7280;font-weight:600">Kg</th><th style="padding:5px 4px;color:#6b7280;font-weight:600">Độ</th><th style="padding:5px 4px;color:#6b7280;font-weight:600">Giá</th><th style="padding:5px 8px;text-align:right;color:#6b7280;font-weight:600">Tiền</th>';
+    } else {
+      html+='<th style="padding:5px 8px;text-align:left;color:#6b7280;font-weight:600;width:35%">Tên</th><th style="padding:5px 4px;color:#6b7280;font-weight:600">Kg</th><th style="padding:5px 4px;color:#6b7280;font-weight:600">Giá</th><th style="padding:5px 8px;text-align:right;color:#6b7280;font-weight:600">Tiền</th>';
+    }
+    html+='</tr></thead><tbody>';
+    rows.forEach(function(g,i){
+      var kg=kgThuc(g.loai,g.kg,g.do,g.bi||0);
+      var bg=i%2===0?'#fff':'#f8fafc';
+      var editMark=g.edited?'<span style="font-size:9px;color:#d97706">✏️</span>':'';
+      var guiMark=g.guiSo?'<span style="font-size:9px;color:var(--gd)">📒</span>':'';
+      var tenHtml='<td style="padding:6px 8px;font-weight:600;max-width:0;overflow:hidden"><span title="'+g.ten+'" style="'+tenStyle+'">'+g.ten+'</span>'+editMark+guiMark+'</td>';
+      if(loai==='nuoc'){
+        html+='<tr style="background:'+bg+'">'+tenHtml+'<td style="padding:6px 4px;text-align:center;white-space:nowrap">'+fmtKg(kg)+'</td><td style="padding:6px 4px;text-align:center">'+fmtDo(g.do||0)+'</td><td style="padding:6px 4px;text-align:center;white-space:nowrap">'+fmtNum(g.gia)+'</td><td style="padding:6px 8px;text-align:right;font-weight:700;color:'+accent+';white-space:nowrap">'+fmtNum(g.tt)+'</td></tr>';
+      } else {
+        html+='<tr style="background:'+bg+'">'+tenHtml+'<td style="padding:6px 4px;text-align:center;white-space:nowrap">'+fmtKg(kg)+'</td><td style="padding:6px 4px;text-align:center;white-space:nowrap">'+fmtNum(g.gia)+'</td><td style="padding:6px 8px;text-align:right;font-weight:700;color:'+accent+';white-space:nowrap">'+fmtNum(g.tt)+'</td></tr>';
+      }
+    });
+    html+='</tbody></table>';
+
+    // Dòng tổng loại
+    var doTBTxt=doTBLoai!=null?' · Độ TB: '+fmtDo(doTBLoai):'';
+    html+='<div style="background:'+accent+'18;padding:6px 12px;font-size:11px;font-weight:700;color:'+accent+';display:flex;justify-content:space-between;border-top:1px solid '+accent+'33">'
+      +'<span>Tổng '+lbl+': '+fmtKg(tkgLoai)+' kg'+doTBTxt+'</span>'
+      +'<span>'+fmtNum(tttLoai)+' ₫</span>'
+      +'</div>';
+    html+='</div>';
+  });
+
+  // Tổng tất cả
+  html+='<div style="margin-top:12px;background:linear-gradient(135deg,var(--gd),var(--gl));border-radius:8px;padding:12px 14px;color:#fff">'
+    +'<div style="font-size:10px;opacity:.8;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Tổng cộng tất cả loại</div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:flex-end">'
+    +'<div><span style="font-size:20px;font-weight:800">'+fmtKg(totalKgAll)+'</span><span style="font-size:12px;margin-left:4px;opacity:.9">kg</span></div>'
+    +'<div style="text-align:right"><div style="font-size:11px;opacity:.8">'+list.length+' giao dịch</div><div style="font-size:18px;font-weight:800">'+fmtNum(totalAll)+' ₫</div></div>'
+    +'</div>'
+    +'</div>';
+
+  body.innerHTML=html;
+  openM('modal-chitiet-mua');
 }
 
 // ─── SỔ GỬI ───
@@ -2977,9 +3252,13 @@ function updSSSummary() {
   cont.innerHTML = list.length + ' người · ' + fmtKg(totalKg) + ' kg thực' + doTBstr + ' · ' + fmtNum(totalTien) + ' ₫' + savedInfo;
 
   // Cập nhật placeholder gợi ý cho từng ô input
+  // Gợi ý giá từ lịch sử tab mua đúng loại mủ
+  var ghKey2='giaHistory3_mua_'+ssLoai;
+  var ghArr2=JSON.parse(localStorage.getItem(ghKey2)||'[]');
   var giaTB = list[list.length-1].gia || 0;
+  var giaHint2 = ghArr2.length ? ghArr2[ghArr2.length-1] : giaTB;
   var doTBval = dos.length > 0 ? dos.reduce(function(a,b){return a+b;},0)/dos.length : 0;
-  if(giaEl  && !giaEl.value)  giaEl.placeholder  = giaTB > 0     ? fmtNum(giaTB)                    : NO_DATA;
+  if(giaEl  && !giaEl.value)  giaEl.placeholder  = giaHint2 > 0  ? fmtNum(giaHint2)                 : NO_DATA;
   if(kgEl   && !kgEl.value)   kgEl.placeholder   = totalKg > 0   ? fmtKg(totalKg)                   : NO_DATA;
   if(doEl   && !doEl.value)   doEl.placeholder   = doTBval > 0   ? fmtDo(doTBval)                   : NO_DATA;
   if(tienEl && !tienEl.value) tienEl.placeholder = totalTien > 0 ? fmtNum(Math.round(totalTien))     : NO_DATA;
@@ -3866,15 +4145,18 @@ function updBanHints() {
     if(doEl  && !doEl.value)  doEl.placeholder   = NO_DATA;
     return;
   }
-  var totalKg=0, totalTien=0, dos=[], giaLast=0;
+  var totalKg=0, dos=[], giaLast=0;
   muaList.forEach(function(g){
     totalKg += kgThuc(g.loai,g.kg,g.do,g.bi||0);
-    totalTien += parseFloat(g.tt)||0;
     if(loai==='nuoc'&&g.do) dos.push(parseFloat(g.do)||0);
     giaLast = parseFloat(g.gia)||giaLast;
   });
   var doTBval = dos.length ? dos.reduce(function(a,b){return a+b;})/dos.length : 0;
-  if(giaEl && !giaEl.value) giaEl.placeholder = giaLast>0 ? fmtNum(giaLast) : NO_DATA;
+  // Gợi ý giá từ lịch sử đúng loại mủ (tab ban)
+  var ghKey='giaHistory3_ban_'+loai;
+  var ghArr=JSON.parse(localStorage.getItem(ghKey)||'[]');
+  var giaHint=ghArr.length ? fmtNum(ghArr[ghArr.length-1]) : (giaLast>0 ? fmtNum(giaLast) : NO_DATA);
+  if(giaEl && !giaEl.value) giaEl.placeholder = giaHint;
   if(kgEl  && !kgEl.value)  kgEl.placeholder  = totalKg>0 ? fmtKg(totalKg)  : NO_DATA;
   if(doEl  && !doEl.value)  doEl.placeholder   = doTBval>0 ? fmtDo(doTBval)  : NO_DATA;
 }
@@ -4430,8 +4712,12 @@ function onSgtGia(){
 
 window.sgPickHandler = null;
 function onSgtTen(){
-  var val=document.getElementById('sgt-ten').value;
+  var val=document.getElementById('sgt-ten').value.trim();
   var ac=document.getElementById('sgt-ac');
+  var matches=getKHAll().filter(function(n){return n.toLowerCase().includes(val.toLowerCase());});
+  if(val && matches.length===1 && matches[0].toLowerCase()===val.toLowerCase()){
+    ac.style.display='none'; return;
+  }
   window.sgPickHandler = function(n){ document.getElementById('sgt-ten').value=n; ac.style.display='none'; };
   renderNameAc(val, ac);
 }
@@ -4447,12 +4733,18 @@ function calcSgt(){
 }
 
 function onSguTen(){
-  var val=document.getElementById('sgu-ten').value;
+  var val=document.getElementById('sgu-ten').value.trim();
   var ac=document.getElementById('sgu-ac');
+  // Ẩn nếu đang khớp chính xác với 1 tên
+  var matches=getKHAll().filter(function(n){return n.toLowerCase().includes(val.toLowerCase());});
+  if(val && matches.length===1 && matches[0].toLowerCase()===val.toLowerCase()){
+    ac.style.display='none';
+    showSguTienSuggest();
+    return;
+  }
   window.sgPickHandler = function(n){
     document.getElementById('sgu-ten').value=n;
     ac.style.display='none';
-    // Cập nhật gợi ý tiền theo tên vừa chọn
     showSguTienSuggest();
   };
   renderNameAc(val, ac);
