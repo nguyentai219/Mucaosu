@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v7.5</title>
+<title>Mua Bán Mủ Cao Su v7.9</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -100,6 +100,7 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g
 
 /* SECTION */
 .sec-title{font-size:12px;font-weight:700;color:var(--gd);margin:10px 0 6px;display:flex;align-items:center;gap:6px}
+.sec-hint{font-size:10px;font-weight:400;color:var(--g400);margin-left:auto;font-style:italic;white-space:nowrap}
 .sec-divider{height:6px;background:var(--g100);margin:14px -10px;border-top:1px solid var(--g200);border-bottom:1px solid var(--g200)}
 .sec-badge{background:var(--gl);color:#fff;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700}
 
@@ -305,6 +306,26 @@ input[type=date]:focus{border-color:var(--gl)}
 .col-xanh{color:#16a34a;font-weight:800}
 .col-do{color:#dc2626;font-weight:800}
 
+/* GD BAR - cần đăng nhập lại */
+@keyframes gd-relogin-pulse {
+  0%,100%{ opacity:1; }
+  50%{ opacity:.65; }
+}
+.gd-bar-relogin{
+  animation: gd-relogin-pulse 1.6s ease-in-out infinite;
+  cursor: pointer !important;
+}
+/* ỨNG TIỀN ĐÃ TRẢ NỢ */
+.ung-entry.da-tra{ opacity:.55; }
+.ung-entry.da-tra .ung-entry-tien{ text-decoration:line-through; color:var(--g400); }
+.ung-entry.da-tra .sg-entry-date{ text-decoration:line-through; color:var(--g400); }
+.ung-entry.da-tra .ung-entry-content{ text-decoration:line-through; color:var(--g400); }
+/* CHỐT SỔ */
+.sg-entry.chot, .ung-entry.chot{ opacity:.5; }
+.sg-entry.chot .sg-entry-tien, .sg-entry.chot .sg-entry-date, .sg-entry.chot .sg-entry-meta{ text-decoration:line-through; color:var(--g400); }
+.ung-entry.chot .ung-entry-tien, .ung-entry.chot .sg-entry-date, .ung-entry.chot .ung-entry-content{ text-decoration:line-through; color:var(--g400); }
+.chot-stamp{ display:inline-block; font-size:9px; font-weight:800; padding:1px 6px; border-radius:8px; background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; margin-left:5px; vertical-align:middle; }
+.tra-stamp{ display:inline-block; font-size:9px; font-weight:800; padding:1px 6px; border-radius:8px; background:#d1fae5; color:#065f46; border:1px solid #6ee7b7; margin-left:5px; vertical-align:middle; }
 /* FLASH ANIMATION - giao dịch mới */
 @keyframes rowFlash {
   0%   { background:#86efac; }
@@ -403,10 +424,12 @@ input[type=date]:focus{border-color:var(--gl)}
 <div class="hdr">
   <div class="hdr-top">
     <div class="logo">
-      <div class="logo-ico">🌿</div>
+      <div class="logo-ico" onclick="openHuongDan()" style="cursor:pointer;background:none;padding:0;width:40px;height:40px;border-radius:50%;overflow:hidden" title="Hướng dẫn sử dụng">
+        <img src="logo.png" style="width:40px;height:40px;object-fit:cover;border-radius:50%" alt="Logo">
+      </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v7.5 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v7.9 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -500,7 +523,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <button class="btn-xoa" onclick="xoaGD('mua')">🗑️</button>
     </div>
   </div>
-  <div class="sec-title">📋 Chi tiết thu mua trong ngày <span class="sec-badge" id="mua-badge">0</span></div>
+  <div class="sec-title">📋 Chi tiết thu mua trong ngày <span class="sec-badge" id="mua-badge">0</span><span class="sec-hint">nhấp đúp để sửa/xoá</span></div>
   <div class="tbl-wrap">
     <div class="no-data" id="mua-nodata">Chưa có giao dịch nào</div>
     <table class="tbl" id="mua-tbl" style="display:none">
@@ -589,7 +612,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <button class="btn-xoa" onclick="xoaGD('ban')">🗑️</button>
     </div>
   </div>
-  <div class="sec-title" style="color:var(--ad)">📋 Chi tiết bán ra trong ngày <span class="sec-badge" id="ban-badge" style="background:var(--ad)">0</span></div>
+  <div class="sec-title" style="color:var(--ad)">📋 Chi tiết bán ra trong ngày <span class="sec-badge" id="ban-badge" style="background:var(--ad)">0</span><span class="sec-hint">nhấp đúp để sửa/xoá</span></div>
   <div class="tbl-wrap">
     <div class="no-data" id="ban-nodata">Chưa có giao dịch nào</div>
     <table class="tbl ban-tbl" id="ban-tbl" style="display:none">
@@ -662,6 +685,13 @@ input[type=date]:focus{border-color:var(--gl)}
     <!-- FORM GỬI SỔ -->
     <div id="sgt-form-gui">
       <button style="width:100%;padding:11px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;margin-bottom:10px" onclick="openSgPickFromMua()">📋 Lấy từ dữ liệu thu mua</button>
+      <div class="fr">
+        <label class="fl">Tên khách hàng</label>
+        <div style="position:relative">
+          <input type="text" id="sgt-ten" class="fi" placeholder="Nhập tên..." oninput="onSgtTen()" autocomplete="off">
+          <div class="ac-drop" id="sgt-ac" style="display:none"></div>
+        </div>
+      </div>
       <div class="g2">
         <div class="fr">
           <label class="fl">Loại mủ</label>
@@ -676,13 +706,6 @@ input[type=date]:focus{border-color:var(--gl)}
         <div class="fr">
           <label class="fl">Đơn giá (đ/kg)</label>
           <input type="text" inputmode="numeric" id="sgt-gia" class="fi" placeholder="0" oninput="onSgtGia()">
-        </div>
-      </div>
-      <div class="fr">
-        <label class="fl">Tên khách hàng</label>
-        <div style="position:relative">
-          <input type="text" id="sgt-ten" class="fi" placeholder="Nhập tên..." oninput="onSgtTen()" autocomplete="off">
-          <div class="ac-drop" id="sgt-ac" style="display:none"></div>
         </div>
       </div>
       <div class="g2">
@@ -717,6 +740,10 @@ input[type=date]:focus{border-color:var(--gl)}
     </div>
 
     <button id="sgt-del-btn" onclick="xoaSgEntry()" style="display:none;width:100%;padding:11px;background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px">🗑️ Xoá ghi chép này</button>
+    <!-- NÚT ĐÃ TRẢ NỢ - chỉ hiện khi sửa ứng tiền -->
+    <div id="sgt-trano-wrap" style="display:none;margin-top:8px">
+      <button id="sgt-trano-btn" onclick="danhDauTraNo()" style="width:100%;padding:11px;border:1.5px solid #fcd34d;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;background:#fffbeb;color:#d97706">✅ Đánh dấu đã trả nợ</button>
+    </div>
     <div class="btn-row" style="margin-top:8px">
       <button class="btn-huy" onclick="closeSgModal()">Huỷ</button>
       <button class="btn-luu" id="sgt-save-btn" onclick="luuSgEntry()">📒 Lưu sổ gửi</button>
@@ -904,6 +931,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
     </div>
     <button class="btn-huy" style="width:100%;margin-top:10px" onclick="closeM('modal-settings')">Đóng</button>
+    <button onclick="closeM('modal-settings');openHuongDan()" style="width:100%;margin-top:8px;padding:11px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">📖 Hướng dẫn sử dụng</button>
   </div>
 </div>
 
@@ -945,11 +973,15 @@ input[type=date]:focus{border-color:var(--gl)}
     <div style="font-size:15px;font-weight:800;text-align:center;color:var(--g800);margin-bottom:8px">Sắp hết thời hạn sử dụng</div>
     <div style="font-size:14px;color:var(--g600);text-align:center;line-height:1.6;margin-bottom:14px">
       Bạn còn <b id="warn-expiry-days" style="font-size:18px"></b> ngày sử dụng.<br>
-      Vui lòng gia hạn để tiếp tục sử dụng.
+      Vui lòng gia hạn để tiếp tục sử dụng.<br>
+      <span style="font-size:12px;color:var(--g400)">Chi tiết gia hạn xem ở phần <b>Hướng dẫn</b></span><br>
+      <span style="font-size:12px;margin-top:4px;display:inline-block">
+        📧 <b>taidautieng@gmail.com</b><br>📞 <b>0987.656.701</b>
+      </span>
     </div>
     <div class="cfm-btns">
       <button class="cfm-btn n" onclick="closeM('modal-warn-expiry')">Để sau</button>
-      <button class="cfm-btn y" onclick="closeM('modal-warn-expiry');openGiaHan()">Gia hạn ngay</button>
+      <button class="cfm-btn y" onclick="closeM('modal-warn-expiry');openGiaHan()">🔑 Gia hạn ngay</button>
     </div>
   </div>
 </div>
@@ -1040,11 +1072,45 @@ input[type=date]:focus{border-color:var(--gl)}
 
 <!-- MODAL CHI TIET MUA -->
 <div class="modal" id="modal-chitiet-mua">
-  <div class="modal-box" style="max-height:92vh;display:flex;flex-direction:column">
+  <div class="modal-box" style="max-height:94vh;display:flex;flex-direction:column">
     <div class="modal-handle"></div>
-    <div class="modal-title" style="color:var(--gd);flex-shrink:0" id="chitiet-mua-title">📋 Chi tiết thu mua</div>
+    <div class="modal-title" style="color:var(--gd);flex-shrink:0;margin-bottom:8px">📋 Chi tiết thu mua</div>
+    <!-- Controls: ngày + loại mủ trên 1 hàng -->
+    <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;margin-bottom:8px">
+      <!-- Chọn ngày (lịch tùy chỉnh) -->
+      <div class="date-bar" onclick="openCtmDate()" style="flex:1;border:1.5px solid var(--gd);cursor:pointer;padding:7px 10px;min-width:0">
+        <span>📅</span>
+        <span id="ctm-date-val" style="color:var(--gd);font-size:12px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">--</span>
+      </div>
+      <!-- Chọn loại mủ -->
+      <select id="ctm-loai-sel" onchange="renderChiTietMua()" style="flex:1;padding:8px 6px;border:1.5px solid var(--gd);border-radius:var(--r);font-size:12px;font-weight:700;color:var(--gd);background:#fff;font-family:'Be Vietnam Pro',sans-serif;min-width:0">
+        <option value="all">🌿 Tất cả</option>
+        <option value="nuoc">💧 Mủ nước</option>
+        <option value="chen">🥣 Mủ chén</option>
+        <option value="day">🧵 Mủ dây</option>
+        <option value="dong">❄️ Mủ đông</option>
+      </select>
+    </div>
+    <input type="hidden" id="ctm-date">
     <div id="chitiet-mua-body" style="flex:1;overflow-y:auto;padding-bottom:8px"></div>
     <button class="btn-huy" style="width:100%;margin-top:8px;flex-shrink:0" onclick="closeM('modal-chitiet-mua')">Đóng</button>
+  </div>
+</div>
+
+<!-- MODAL DATE CHI TIET MUA -->
+<div class="modal" id="modal-ctm-date">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="color:var(--gd)">📅 Chọn ngày xem</div>
+    <div class="cal-header">
+      <button onclick="ctmCalNav(-1)" style="color:var(--gd);background:var(--gb)">‹</button>
+      <span id="ctm-cal-month-label"></span>
+      <button onclick="ctmCalNav(1)" style="color:var(--gd);background:var(--gb)">›</button>
+    </div>
+    <div class="cal-grid" id="ctm-cal-grid"></div>
+    <div class="cal-legend"><span class="cal-dot"></span> Ngày có giao dịch thu mua</div>
+    <button class="btn-luu" style="width:100%;margin-top:10px" onclick="applyCtmDate()">Xác nhận</button>
+    <button class="btn-huy" style="width:100%;margin-top:6px" onclick="closeM('modal-ctm-date')">Đóng</button>
   </div>
 </div>
 
@@ -1157,6 +1223,111 @@ input[type=date]:focus{border-color:var(--gl)}
   </div>
 </div>
 
+<!-- MODAL HƯỚNG DẪN SỬ DỤNG -->
+<div class="modal" id="modal-huong-dan" style="z-index:10000">
+  <div class="modal-box" style="max-height:88vh;overflow-y:auto;padding-bottom:24px">
+    <div class="modal-handle"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <span style="font-size:28px">🌿</span>
+      <div>
+        <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v7.9</div>
+      </div>
+    </div>
+
+    <!-- DÙNG THỬ & GIA HẠN -->
+    <div style="background:#f0fdf4;border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid #16a34a">
+      <div style="font-size:13px;font-weight:800;color:#15803d;margin-bottom:8px">🔑 DÙNG THỬ &amp; GIA HẠN</div>
+      <div style="font-size:12px;color:var(--g800);line-height:1.7">
+        • Phần mềm được <b>dùng thử miễn phí 3 ngày</b> kể từ lần đầu cài đặt<br>
+        • Khi còn 7 ngày: biểu tượng 🔑 chuyển <span style="color:#16a34a;font-weight:700">xanh</span> → cảnh báo sắp hết hạn<br>
+        • Khi còn 5 ngày: chuyển <span style="color:#d97706;font-weight:700">vàng</span> — nên gia hạn sớm<br>
+        • Khi còn 3 ngày: chuyển <span style="color:#dc2626;font-weight:700">đỏ nhấp nháy</span> — cần gia hạn ngay<br>
+        • Sau khi hết hạn: chỉ xem được dữ liệu, không thể ghi thêm<br><br>
+        <b>Cách gia hạn:</b><br>
+        Vào <b>⚙️ Cài đặt → 🔑 Gia hạn thời gian sử dụng</b><br>
+        Đọc <b>Mã máy</b> và liên hệ để nhận mã kích hoạt:<br>
+        📧 <b>taidautieng@gmail.com</b><br>
+        📞 <b>0987.656.701</b>
+      </div>
+    </div>
+
+    <!-- THU MUA -->
+    <div style="background:var(--gb);border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid var(--gd)">
+      <div style="font-size:13px;font-weight:800;color:var(--gd);margin-bottom:8px">🛒 Tab THU MUA</div>
+      <div style="font-size:12px;color:var(--g800);line-height:1.7">
+        • Ghi chép thu mua mủ theo ngày — chọn ngày trên thanh lịch<br>
+        • Nhập: tên người bán, loại mủ, số kg, đơn giá<br>
+        • <b>Mủ nước</b>: nhập thêm độ (VD: 0.35) → tự tính thành tiền<br>
+        • <b>Mủ đông</b>: nhập khấu hao bì (kg) → tự trừ vào kg thực<br>
+        • <b>Nhấp đúp</b> vào giao dịch để chỉnh sửa hoặc xoá<br>
+        • Tích ✅ "Gửi sổ" khi lưu để tự động đưa vào tab Sổ Gửi
+      </div>
+    </div>
+
+    <!-- BÁN RA -->
+    <div style="background:#fff8f0;border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid var(--ad,#f97316)">
+      <div style="font-size:13px;font-weight:800;color:var(--ad,#f97316);margin-bottom:8px">📤 Tab BÁN RA</div>
+      <div style="font-size:12px;color:var(--g800);line-height:1.7">
+        • Ghi chép bán mủ ra ngoài — nhập tên đơn vị mua, loại, kg, giá<br>
+        • Xem lợi nhuận mua vào / bán ra theo ngày<br>
+        • <b>Nhấp đúp</b> vào giao dịch để chỉnh sửa hoặc xoá<br>
+        • Thống kê tháng tổng hợp ở cuối tab
+      </div>
+    </div>
+
+    <!-- SỔ GỬI -->
+    <div style="background:#f0fdf4;border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid var(--gd)">
+      <div style="font-size:13px;font-weight:800;color:var(--gd);margin-bottom:8px">📒 Tab SỔ GỬI / ỨNG TIỀN</div>
+      <div style="font-size:12px;color:var(--g800);line-height:1.7">
+        • Quản lý tiền gửi sổ và ứng tiền cho từng khách hàng<br>
+        • Tổng quan: danh sách KH, số tiền còn lại (gửi − ứng)<br>
+        • Nhấn vào tên KH → xem chi tiết từng giao dịch<br>
+        • Trong chi tiết KH: nhấn <b>➕ Thêm giao dịch</b> → chọn Gửi sổ hoặc Ứng tiền<br>
+        • <b>Nhấp đúp</b> vào ghi chép → popup sửa/xoá/đánh dấu đã trả nợ<br>
+        • Khi <b>Đánh dấu đã trả nợ</b>: ghi chép bị gạch ngang, không tính vào tổng nhưng vẫn lưu để xem<br>
+        • <b>Chốt sổ</b>: toàn bộ ghi chép bị gạch ngang, KH chuyển vào mục "Đã chốt sổ" phía dưới<br>
+        • Mở rộng accordion <b>Đã chốt sổ</b> → nhấn 🗑️ để xoá hẳn ghi chép cũ
+      </div>
+    </div>
+
+    <!-- TÍNH TOÁN -->
+    <div style="background:#fffbeb;border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid #d97706">
+      <div style="font-size:13px;font-weight:800;color:#d97706;margin-bottom:8px">🧮 Tab TÍNH TOÁN</div>
+      <div style="font-size:12px;color:var(--g800);line-height:1.7">
+        • Tính nhanh thành tiền theo loại mủ và đơn giá<br>
+        • Không lưu dữ liệu — dùng để kiểm tra nhanh
+      </div>
+    </div>
+
+    <!-- GOOGLE DRIVE -->
+    <div style="background:#e8f0fe;border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid #4285f4">
+      <div style="font-size:13px;font-weight:800;color:#1a56db;margin-bottom:8px">☁️ ĐỒNG BỘ GOOGLE DRIVE</div>
+      <div style="font-size:12px;color:var(--g800);line-height:1.7">
+        • Nhấn thanh tài khoản Google phía trên để đăng nhập<br>
+        • Sau khi đăng nhập: mọi ghi chép tự động lưu lên Google Sheets<br>
+        • File <b>backup_ngày</b>: lưu Thu Mua + Bán Ra theo ngày<br>
+        • File <b>SoGui_TongHop</b>: tổng hợp sổ gửi + sheet riêng từng KH với tổng lũy kế<br>
+        • Cột <b>Ghi chú khác</b>: tự ghi "Đã chỉnh sửa", "Đã trả nợ", "Đã chốt sổ"<br>
+        • Token đăng nhập tự gia hạn — nếu hết hạn thanh sẽ <span style="color:#dc2626;font-weight:700">nhấp nháy đỏ</span>, nhấn vào để đăng nhập lại
+      </div>
+    </div>
+
+    <!-- MẸO -->
+    <div style="background:#f5f3ff;border-radius:var(--r);padding:12px;margin-bottom:14px;border-left:3px solid #7c3aed">
+      <div style="font-size:13px;font-weight:800;color:#5b21b6;margin-bottom:8px">💡 MẸO SỬ DỤNG</div>
+      <div style="font-size:12px;color:var(--g800);line-height:1.7">
+        • Cài app: mở trình duyệt → nhấn <b>"Thêm vào màn hình chính"</b> để dùng như app thật<br>
+        • Dữ liệu lưu trên thiết bị (localStorage) — không mất khi tắt app<br>
+        • Nhấp đúp nhanh 2 lần (trong 600ms) để sửa/xoá giao dịch<br>
+        • Nhấn biểu tượng 🌿 bất kỳ lúc nào để xem lại hướng dẫn này
+      </div>
+    </div>
+
+    <button onclick="closeM('modal-huong-dan')" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer">✅ Đã hiểu, bắt đầu sử dụng!</button>
+  </div>
+</div>
+
 <script>
 // ============================================================
 // MỦ CAO SU PRO v1.3
@@ -1168,6 +1339,8 @@ input[type=date]:focus{border-color:var(--gl)}
 
 const LOAI_LBL = {nuoc:'Mủ nước', chen:'Mủ chén', day:'Mủ dây', dong:'Mủ đông'};
 const LOAI_ICO = {nuoc:'💧', chen:'🥣', day:'🪢', dong:'🧱'};
+
+function openHuongDan(){ openM('modal-huong-dan'); }
 
 let curTab = 'mua';
 let curDate = {mua: today(), ban: today()}; // luôn lấy ngày hệ thống
@@ -1911,7 +2084,7 @@ function luuSua(tab){
   const all=getGD(tab);
   const idx=all.findIndex(g=>String(g.id)===String(id));
   if(idx>=0){ all[idx]={...all[idx],ten,loai,kg,do:doV,bi,gia,tt,edited:true}; setGD(tab,all); }
-  huySua(tab); renderTbl(tab); updTK(tab); updTK('ban'); toast('✅ Đã lưu thay đổi!');
+  huySua(tab); renderTbl(tab); updTK(tab); updTK('ban'); if(typeof updThangData==='function') updThangData(); toast('✅ Đã lưu thay đổi!'); autoSync();
 }
 function huySua(tab){
   editId[tab]=null;
@@ -1923,7 +2096,7 @@ function xoaGD(tab){
   if(guardLicense()) return;
   showDetail('🗑️','Xoá giao dịch?',[['Bạn có chắc muốn xoá?','']],null,'Xoá',()=>{
     const all=getGD(tab).filter(g=>String(g.id)!==String(editId[tab]));
-    setGD(tab,all); huySua(tab); renderTbl(tab); updTK(tab); updTK('ban'); if(typeof updThangData==='function') updThangData(); toast('🗑️ Đã xoá!');
+    setGD(tab,all); huySua(tab); renderTbl(tab); updTK(tab); updTK('ban'); if(typeof updThangData==='function') updThangData(); toast('🗑️ Đã xoá!'); autoSync();
   });
 }
 
@@ -2283,29 +2456,122 @@ function updTK(tab){
 }
 
 // ── Chi tiết thu mua popup ──
-function openChiTietMua(){
-  var date=curDate['mua'];
-  var list=getGDDate('mua', date);
-  var title=document.getElementById('chitiet-mua-title');
-  var body=document.getElementById('chitiet-mua-body');
-  title.textContent='📋 Thu mua '+fmtDate(date);
+// ── Lịch tùy chỉnh cho chi tiết mua ──
+var ctmCalYear, ctmCalMonth, ctmCalSel;
+function openCtmDate(){
+  var cur=document.getElementById('ctm-date').value||today();
+  var d=new Date(cur+'T00:00:00');
+  ctmCalYear=d.getFullYear(); ctmCalMonth=d.getMonth(); ctmCalSel=cur;
+  renderCtmCal();
+  openM('modal-ctm-date');
+}
+function ctmCalNav(delta){
+  ctmCalMonth+=delta;
+  if(ctmCalMonth<0){ctmCalMonth=11;ctmCalYear--;}
+  if(ctmCalMonth>11){ctmCalMonth=0;ctmCalYear++;}
+  renderCtmCal();
+}
+function renderCtmCal(){
+  var datesWithData={};
+  getGD('mua').forEach(function(g){if(g.date) datesWithData[g.date]=true;});
+  var todayD=today();
+  document.getElementById('ctm-cal-month-label').textContent=MONTH_NAMES_VN[ctmCalMonth]+' '+ctmCalYear;
+  var firstDay=new Date(ctmCalYear,ctmCalMonth,1);
+  var startWD=(firstDay.getDay()+6)%7;
+  var daysInM=new Date(ctmCalYear,ctmCalMonth+1,0).getDate();
+  var html='';
+  ['T2','T3','T4','T5','T6','T7','CN'].forEach(function(d){html+='<div class="cal-wd">'+d+'</div>';});
+  for(var i=0;i<startWD;i++) html+='<div class="cal-cell empty"></div>';
+  for(var day=1;day<=daysInM;day++){
+    var ds=ctmCalYear+'-'+String(ctmCalMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+    var cls='cal-cell';
+    if(ds===todayD) cls+=' today';
+    if(ds===ctmCalSel) cls+=' selected';
+    var dot=datesWithData[ds]?'<span class="cal-dot"></span>':'';
+    html+='<div class="'+cls+'" onclick="ctmCalSel=&quot;'+ds+'&quot;;renderCtmCal()">'+day+dot+'</div>';
+  }
+  document.getElementById('ctm-cal-grid').innerHTML=html;
+}
+function applyCtmDate(){
+  if(!ctmCalSel){closeM('modal-ctm-date');return;}
+  document.getElementById('ctm-date').value=ctmCalSel;
+  document.getElementById('ctm-date-val').textContent=fmtDate(ctmCalSel);
+  closeM('modal-ctm-date');
+  renderChiTietMua();
+}
 
+// Ghi nhớ loại mủ đã chọn
+var _ctmLastLoai='all';
+
+function openChiTietMua(){
+  // Mặc định ngày hiện tại
+  var date=curDate['mua']||today();
+  document.getElementById('ctm-date').value=date;
+  document.getElementById('ctm-date-val').textContent=fmtDate(date);
+  // Nhớ loại mủ đã chọn trước đó
+  var sel=document.getElementById('ctm-loai-sel');
+  if(sel) sel.value=_ctmLastLoai;
+  // Cập nhật trạng thái disabled của các option
+  updateCtmLoaiOptions(date);
+  renderChiTietMua();
+  openM('modal-chitiet-mua');
+}
+
+function updateCtmLoaiOptions(date){
+  var LOAIS=['nuoc','chen','day','dong'];
+  var listAll=getGDDate('mua',date);
+  var hasLoai={};
+  listAll.forEach(function(g){hasLoai[g.loai]=true;});
+  var sel=document.getElementById('ctm-loai-sel');
+  if(!sel) return;
+  Array.from(sel.options).forEach(function(opt){
+    if(opt.value==='all'){
+      opt.disabled=false; opt.style.color=''; opt.style.opacity='';
+      return;
+    }
+    var has=!!hasLoai[opt.value];
+    opt.disabled=!has;
+    opt.style.color=has?'':'#ccc';
+    opt.style.opacity=has?'1':'0.4';
+  });
+  // Nếu loại đang chọn không có dữ liệu → reset về "all"
+  if(sel.value!=='all'&&!hasLoai[sel.value]){
+    sel.value='all'; _ctmLastLoai='all';
+  }
+}
+
+function renderChiTietMua(){
+  var date=document.getElementById('ctm-date').value||today();
+  var sel=document.getElementById('ctm-loai-sel');
+  var loaiFilter=sel?sel.value:'all';
+  _ctmLastLoai=loaiFilter; // ghi nhớ
+  // Cập nhật disabled options khi đổi ngày
+  updateCtmLoaiOptions(date);
+
+  var listAll=getGDDate('mua',date);
+  var list=loaiFilter==='all'?listAll:listAll.filter(function(g){return g.loai===loaiFilter;});
+  var body=document.getElementById('chitiet-mua-body');
+
+  if(!listAll.length){
+    body.innerHTML='<div class="no-data">Chưa có giao dịch nào trong ngày này</div>'; return;
+  }
   if(!list.length){
-    body.innerHTML='<div class="no-data">Chưa có giao dịch nào</div>';
-    openM('modal-chitiet-mua'); return;
+    body.innerHTML='<div class="no-data">Không có giao dịch '+LOAI_LBL[loaiFilter]+' nào</div>'; return;
   }
 
-  // Nhóm theo loại mủ
-  var grp={}; var LOAIS=['nuoc','chen','day','dong'];
+  var LOAIS=['nuoc','chen','day','dong'];
+  var LOAI_COLOR={nuoc:'#0e7490',chen:'#0f766e',day:'#16a34a',dong:'#1d4ed8'};
+  var tenStyle='max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle';
+
+  // Nhóm theo loại để render
+  var grp={};
   list.forEach(function(gd){
     if(!grp[gd.loai]) grp[gd.loai]=[];
     grp[gd.loai].push(gd);
   });
 
-  var LOAI_COLOR={nuoc:'#0e7490',chen:'#0f766e',day:'#16a34a',dong:'#1d4ed8'};
-  var totalAll=0; list.forEach(function(g){totalAll+=parseFloat(g.tt)||0;});
-  var totalKgAll=0; list.forEach(function(g){totalKgAll+=kgThuc(g.loai,g.kg,g.do,g.bi||0);});
-
+  var totalAll=0,totalKgAll=0;
+  list.forEach(function(g){totalAll+=parseFloat(g.tt)||0; totalKgAll+=kgThuc(g.loai,g.kg,g.do,g.bi||0);});
   var html='';
 
   LOAIS.forEach(function(loai){
@@ -2313,8 +2579,6 @@ function openChiTietMua(){
     var rows=grp[loai];
     var accent=LOAI_COLOR[loai]||'var(--gd)';
     var ico=LOAI_ICO[loai]; var lbl=LOAI_LBL[loai];
-
-    // Tính tổng loại
     var tkgLoai=0,tttLoai=0,dos=[];
     rows.forEach(function(g){
       tkgLoai+=kgThuc(g.loai,g.kg,g.do,g.bi||0);
@@ -2323,14 +2587,10 @@ function openChiTietMua(){
     });
     var doTBLoai=dos.length?dos.reduce(function(a,b){return a+b;})/dos.length:null;
 
-    // Header loại
     html+='<div style="background:'+accent+';color:#fff;padding:7px 12px;font-size:11px;font-weight:700;margin-top:10px;border-radius:6px 6px 0 0">'+ico+' '+lbl+' — '+rows.length+' người</div>';
-
-    // Bảng giao dịch
     html+='<div style="background:#fff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 6px 6px;overflow:hidden">';
     html+='<table style="width:100%;border-collapse:collapse;font-size:11px">';
     html+='<thead><tr style="background:#f8fafc">';
-    var tenStyle='max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle';
     if(loai==='nuoc'){
       html+='<th style="padding:5px 8px;text-align:left;color:#6b7280;font-weight:600;width:30%">Tên</th><th style="padding:5px 4px;color:#6b7280;font-weight:600">Kg</th><th style="padding:5px 4px;color:#6b7280;font-weight:600">Độ</th><th style="padding:5px 4px;color:#6b7280;font-weight:600">Giá</th><th style="padding:5px 8px;text-align:right;color:#6b7280;font-weight:600">Tiền</th>';
     } else {
@@ -2350,19 +2610,19 @@ function openChiTietMua(){
       }
     });
     html+='</tbody></table>';
-
-    // Dòng tổng loại
     var doTBTxt=doTBLoai!=null?' · Độ TB: '+fmtDo(doTBLoai):'';
     html+='<div style="background:'+accent+'18;padding:6px 12px;font-size:11px;font-weight:700;color:'+accent+';display:flex;justify-content:space-between;border-top:1px solid '+accent+'33">'
-      +'<span>Tổng '+lbl+': '+fmtKg(tkgLoai)+' kg'+doTBTxt+'</span>'
+      +'<span>Tổng: '+fmtKg(tkgLoai)+' kg'+doTBTxt+'</span>'
       +'<span>'+fmtNum(tttLoai)+' ₫</span>'
       +'</div>';
     html+='</div>';
   });
 
-  // Tổng tất cả
+  // Card tổng cộng (chỉ hiện khi xem tất cả hoặc nhiều loại)
   html+='<div style="margin-top:12px;background:linear-gradient(135deg,var(--gd),var(--gl));border-radius:8px;padding:12px 14px;color:#fff">'
-    +'<div style="font-size:10px;opacity:.8;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Tổng cộng tất cả loại</div>'
+    +'<div style="font-size:10px;opacity:.8;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">'
+    +(loaiFilter==='all'?'Tổng cộng tất cả loại':'Tổng '+LOAI_LBL[loaiFilter])
+    +'</div>'
     +'<div style="display:flex;justify-content:space-between;align-items:flex-end">'
     +'<div><span style="font-size:20px;font-weight:800">'+fmtKg(totalKgAll)+'</span><span style="font-size:12px;margin-left:4px;opacity:.9">kg</span></div>'
     +'<div style="text-align:right"><div style="font-size:11px;opacity:.8">'+list.length+' giao dịch</div><div style="font-size:18px;font-weight:800">'+fmtNum(totalAll)+' ₫</div></div>'
@@ -2370,7 +2630,6 @@ function openChiTietMua(){
     +'</div>';
 
   body.innerHTML=html;
-  openM('modal-chitiet-mua');
 }
 
 // ─── SỔ GỬI ───
@@ -2622,16 +2881,20 @@ function scrollInputUp(el) {
 // Kiểm tra và refresh token nếu gần hết hạn
 var gdTokenExpiry = parseInt(localStorage.getItem('gd_token_expiry') || '0');
 
-// ── Khởi tạo token client (gọi ngay khi Google API sẵn sàng) ──
+// ── Trạng thái token refresh ──
+var _gdRefreshing = false;      // đang trong quá trình refresh
+var _gdRefreshCallbacks = [];   // hàng đợi callback chờ token mới
+var _gdAutoRefreshTimer = null; // timer proactive refresh
+
+// ── Khởi tạo token client ──
 function _initTokenClient() {
   if (typeof google === 'undefined' || typeof google.accounts === 'undefined') return;
-  if (window._gdTokenClient) return; // đã có rồi
+  if (window._gdTokenClient) return;
   window._gdTokenClient = google.accounts.oauth2.initTokenClient({
     client_id: GD_CLIENT_ID,
     scope: GD_SCOPES,
     prompt: '',
     callback: function(resp) {
-      // callback mặc định - sẽ bị override bởi signInGoogle / ensureValidToken
       if (resp && resp.access_token) {
         gdToken = resp.access_token;
         gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000;
@@ -2642,9 +2905,201 @@ function _initTokenClient() {
   });
 }
 
+// ── Hiện banner yêu cầu đăng nhập lại trên thanh GD ──
+function _showReloginBanner() {
+  updGDBarStatus('⚠️ Nhấn để đăng nhập lại', 'syncing');
+  var bar = document.getElementById('gd-bar');
+  if (bar) {
+    bar.classList.add('gd-bar-relogin');
+    bar.onclick = function() {
+      bar.classList.remove('gd-bar-relogin');
+      bar.onclick = function() { openGDModal(); };
+      signInGoogleManual();
+    };
+  }
+}
+
+// ── Phục hồi thanh GD về trạng thái bình thường ──
+function _restoreGDBar() {
+  var bar = document.getElementById('gd-bar');
+  if (bar) {
+    bar.classList.remove('gd-bar-relogin');
+    bar.onclick = function() { openGDModal(); };
+  }
+}
+
+// ── Đăng nhập thủ công (dùng khi auto-refresh thất bại) ──
+function signInGoogleManual() {
+  if (typeof google === 'undefined') { toast('Đang tải Google API...'); return; }
+  _initTokenClient();
+  if (!window._gdTokenClient) { setTimeout(signInGoogleManual, 800); return; }
+
+  updGDBarStatus('⏳ Đang xác thực...', 'syncing');
+
+  window._gdTokenClient.callback = function(resp) {
+    _gdRefreshing = false;
+    if (resp.error || !resp.access_token) {
+      toast('❌ Đăng nhập thất bại: ' + (resp.error || 'Không nhận được token'));
+      _showReloginBanner();
+      // Xả queue với lỗi
+      var cbs = _gdRefreshCallbacks.splice(0);
+      cbs.forEach(function(item) { if (item.fail) item.fail(); });
+      return;
+    }
+    _onTokenReceived(resp);
+    toast('✅ Đã kết nối lại Google Drive!');
+    _restoreGDBar();
+    updGDBar();
+  };
+  // prompt: '' = chọn account nếu cần (hiện UI chọn tài khoản)
+  window._gdTokenClient.requestAccessToken({ prompt: '' });
+}
+
+// ── Khi nhận được token mới (dùng chung cho auto và manual) ──
+function _onTokenReceived(resp) {
+  gdToken = resp.access_token;
+  gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000;
+  localStorage.setItem('gd_token', gdToken);
+  localStorage.setItem('gd_token_expiry', String(gdTokenExpiry));
+  // Xả hàng đợi callback
+  var cbs = _gdRefreshCallbacks.splice(0);
+  cbs.forEach(function(item) { if (item.ok) item.ok(); });
+  // Lên lịch proactive refresh lần tiếp theo (5 phút trước khi hết hạn)
+  _scheduleProactiveRefresh();
+}
+
+// ── Lên lịch tự refresh trước 5 phút ──
+function _scheduleProactiveRefresh() {
+  if (_gdAutoRefreshTimer) clearTimeout(_gdAutoRefreshTimer);
+  if (!gdToken || !gdTokenExpiry) return;
+  var delay = gdTokenExpiry - Date.now() - 5 * 60 * 1000; // 5 phút trước hết hạn
+  if (delay < 10000) delay = 10000; // tối thiểu 10 giây
+  if (delay > 55 * 60 * 1000) delay = 55 * 60 * 1000; // tối đa 55 phút
+  _gdAutoRefreshTimer = setTimeout(function() {
+    if (!gdUser) return; // chưa đăng nhập thì thôi
+    _doSilentRefresh(function(ok) {
+      if (ok) {
+        // Thành công im lặng — cập nhật thanh status nhẹ nhàng
+        updGDBarStatus('Đã kết nối', 'synced');
+      } else {
+        // Silent thất bại → hiện banner yêu cầu đăng nhập lại
+        toast('⚠️ Phiên Google Drive sắp hết — nhấn thanh tài khoản để đăng nhập lại');
+        _showReloginBanner();
+      }
+    });
+  }, delay);
+}
+
+// ── Silent refresh: thử lấy token mới không hiện UI ──
+function _doSilentRefresh(doneCb) {
+  if (!window._gdTokenClient) {
+    _initTokenClient();
+    if (!window._gdTokenClient) { doneCb(false); return; }
+  }
+  var prevCb = window._gdTokenClient.callback;
+  var _done = false;
+  var _timeout = setTimeout(function() {
+    if (_done) return; _done = true;
+    window._gdTokenClient.callback = prevCb;
+    doneCb(false);
+  }, 8000); // timeout 8 giây
+
+  window._gdTokenClient.callback = function(resp) {
+    if (_done) return; _done = true;
+    clearTimeout(_timeout);
+    window._gdTokenClient.callback = prevCb;
+    if (resp.error || !resp.access_token) { doneCb(false); return; }
+    _onTokenReceived(resp);
+    doneCb(true);
+  };
+  try {
+    window._gdTokenClient.requestAccessToken({ prompt: '' });
+  } catch(e) {
+    if (!_done) { _done = true; clearTimeout(_timeout); doneCb(false); }
+  }
+}
+
+// ── ensureValidToken: đảm bảo token hợp lệ trước khi gọi API ──
+function ensureValidToken(cb) {
+  // Token còn hạn (dư ít nhất 60 giây): dùng luôn
+  if (gdToken && Date.now() < gdTokenExpiry - 60000) { cb(); return; }
+
+  // Đang refresh rồi: xếp hàng chờ
+  if (_gdRefreshing) {
+    _gdRefreshCallbacks.push({ ok: cb, fail: function() {
+      // Không làm gì — sync sẽ bị skip, lần sau retry
+    }});
+    return;
+  }
+
+  _gdRefreshing = true;
+  updGDBarStatus('🔄 Đang làm mới phiên...', 'syncing');
+
+  _initTokenClient();
+  if (!window._gdTokenClient) {
+    _gdRefreshing = false;
+    toast('⏳ Đang kết nối Google...');
+    setTimeout(function() { ensureValidToken(cb); }, 1000);
+    return;
+  }
+
+  // Bước 1: thử silent refresh
+  _doSilentRefresh(function(ok) {
+    if (ok) {
+      _gdRefreshing = false;
+      updGDBarStatus('Đã kết nối', 'synced');
+      cb(); // gọi callback gốc
+      return;
+    }
+
+    // Bước 2: silent thất bại → thử lại với prompt khác (select_account silent)
+    var prevCb2 = window._gdTokenClient.callback;
+    var _done2 = false;
+    var _t2 = setTimeout(function() {
+      if (_done2) return; _done2 = true;
+      window._gdTokenClient.callback = prevCb2;
+      _gdRefreshing = false;
+      // Cả 2 lần silent đều thất bại → yêu cầu đăng nhập thủ công
+      toast('⚠️ Phiên đăng nhập hết hạn — nhấn thanh tài khoản để đăng nhập lại');
+      _showReloginBanner();
+      var cbs = _gdRefreshCallbacks.splice(0);
+      cbs.forEach(function(item) { if (item.fail) item.fail(); });
+    }, 6000);
+
+    window._gdTokenClient.callback = function(resp) {
+      if (_done2) return; _done2 = true;
+      clearTimeout(_t2);
+      window._gdTokenClient.callback = prevCb2;
+      _gdRefreshing = false;
+      if (resp.error || !resp.access_token) {
+        toast('⚠️ Phiên đăng nhập hết hạn — nhấn thanh tài khoản để đăng nhập lại');
+        _showReloginBanner();
+        var cbs2 = _gdRefreshCallbacks.splice(0);
+        cbs2.forEach(function(item) { if (item.fail) item.fail(); });
+        return;
+      }
+      _onTokenReceived(resp);
+      _restoreGDBar();
+      cb();
+    };
+    try {
+      window._gdTokenClient.requestAccessToken({ prompt: 'none' });
+    } catch(e) {
+      if (!_done2) {
+        _done2 = true; clearTimeout(_t2);
+        window._gdTokenClient.callback = prevCb2;
+        _gdRefreshing = false;
+        toast('⚠️ Phiên đăng nhập hết hạn — nhấn thanh tài khoản để đăng nhập lại');
+        _showReloginBanner();
+        var cbs3 = _gdRefreshCallbacks.splice(0);
+        cbs3.forEach(function(item) { if (item.fail) item.fail(); });
+      }
+    }
+  });
+}
+
 function initGoogleAuth() {
   if (typeof google === 'undefined') { setTimeout(initGoogleAuth, 600); return; }
-  // Khởi tạo token client ngay lập tức (quan trọng: phải làm trước khi cần dùng)
   _initTokenClient();
 
   var saved = localStorage.getItem('gd_user');
@@ -2652,17 +3107,18 @@ function initGoogleAuth() {
   var fid   = localStorage.getItem('gd_folder_id');
   if (saved) {
     gdUser = JSON.parse(saved); gdToken = tok; gdFolderId = fid;
-    // Kiểm tra dữ liệu cũ bị lỗi (do thiếu quyền email/profile hoặc lỗi tạo folder trước đây)
-    var badUser = !gdUser || !gdUser.email || gdUser.email === 'undefined';
+    var badUser   = !gdUser || !gdUser.email || gdUser.email === 'undefined';
     var badFolder = !gdFolderId || gdFolderId === 'undefined' || gdFolderId === 'null';
     if (badUser || badFolder) {
       ['gd_user','gd_token','gd_folder_id','gd_last_sync'].forEach(function(k){ localStorage.removeItem(k); });
       gdUser = null; gdToken = null; gdFolderId = null;
       updGDBar();
-      setTimeout(function(){ toast('⚠️ Vui lòng đăng nhập lại Google Drive để cấp đầy đủ quyền!'); }, 600);
+      setTimeout(function(){ toast('⚠️ Vui lòng đăng nhập lại Google Drive!'); }, 600);
       return;
     }
     updGDBar();
+    // Lên lịch proactive refresh ngay khi khởi động
+    _scheduleProactiveRefresh();
     if (navigator.onLine) {
       setTimeout(function(){
         syncLicenseOnConnect();
@@ -2678,7 +3134,7 @@ function initGoogleAuth() {
 
 function signInGoogle() {
   if (typeof google === 'undefined') { toast('Đang tải Google API...'); return; }
-  _initTokenClient(); // đảm bảo client đã khởi tạo
+  _initTokenClient();
   if (!window._gdTokenClient) { toast('Đang tải Google API...'); setTimeout(signInGoogle, 800); return; }
   window._gdTokenClient.callback = function(resp) {
     if (resp.error) { toast('Đăng nhập thất bại: ' + resp.error); return; }
@@ -2686,48 +3142,10 @@ function signInGoogle() {
     gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000;
     localStorage.setItem('gd_token', gdToken);
     localStorage.setItem('gd_token_expiry', String(gdTokenExpiry));
+    _scheduleProactiveRefresh(); // bắt đầu theo dõi token
     if (!gdUser) fetchGoogleUser();
-    else { updGDBar(); if (gdFolderId) doAutoSync(); }
+    else { updGDBar(); _restoreGDBar(); if (gdFolderId) doAutoSync(); }
   };
-  window._gdTokenClient.requestAccessToken({ prompt: '' });
-}
-
-// Đảm bảo token hợp lệ trước khi gọi API — tự refresh nếu hết hạn
-function ensureValidToken(cb) {
-  // Token còn hạn: dùng luôn
-  if (gdToken && Date.now() < gdTokenExpiry - 30000) { cb(); return; }
-
-  // Cần refresh: _gdTokenClient phải tồn tại
-  _initTokenClient(); // tạo mới nếu chưa có (ví dụ sau reload)
-
-  if (!window._gdTokenClient) {
-    // Google API chưa tải xong, thử lại sau
-    toast('⏳ Đang kết nối Google...');
-    setTimeout(function(){ ensureValidToken(cb); }, 1000);
-    return;
-  }
-
-  // Lưu callback cũ để restore sau
-  var prevCb = window._gdTokenClient.callback;
-  window._gdTokenClient.callback = function(resp) {
-    // Restore callback gốc
-    window._gdTokenClient.callback = prevCb;
-    if (resp.error || !resp.access_token) {
-      // Silent refresh thất bại → yêu cầu đăng nhập lại
-      gdToken = null;
-      localStorage.removeItem('gd_token');
-      localStorage.removeItem('gd_token_expiry');
-      updGDBar();
-      toast('⚠️ Phiên đăng nhập hết hạn — vui lòng đăng nhập lại Google Drive');
-      return;
-    }
-    gdToken = resp.access_token;
-    gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000;
-    localStorage.setItem('gd_token', gdToken);
-    localStorage.setItem('gd_token_expiry', String(gdTokenExpiry));
-    cb();
-  };
-  // prompt:'' = silent refresh, không hiện popup nếu đã consent trước đó
   window._gdTokenClient.requestAccessToken({ prompt: '' });
 }
 
@@ -2886,57 +3304,75 @@ function findFileInFolder(fname, cb) {
 }
 
 // ── Tạo hoặc cập nhật Spreadsheet ──
-function upsertSheet(fname, sheetsData, doneCb) {
+// _retry: cờ nội bộ, chỉ retry 1 lần sau khi refresh token
+function upsertSheet(fname, sheetsData, doneCb, _retry) {
   ensureValidToken(function() {
-  findFileInFolder(fname, function(existId) {
-    if (existId) {
-      batchUpdateSheets(existId, sheetsData, doneCb);
-    } else {
-      var sheetObjs = sheetsData.map(function(s) { return { properties: { title: s.name } }; });
-      fetch('https://sheets.googleapis.com/v4/spreadsheets', {
-        method: 'POST',
-        headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ properties: { title: fname }, sheets: sheetObjs })
-      })
-      .then(function(r) {
-        if (!r.ok) throw new Error('Tạo file thất bại: HTTP ' + r.status);
-        return r.json();
-      })
-      .then(function(data) {
-        var sid = data.spreadsheetId;
-        if (!sid) throw new Error('Không nhận được ID file');
-        // Move vào folder
-        return fetch('https://www.googleapis.com/drive/v3/files/' + sid
-          + '?addParents=' + gdFolderId + '&removeParents=root&fields=id', {
-          method: 'PATCH',
+    findFileInFolder(fname, function(existId) {
+      if (existId) {
+        batchUpdateSheets(existId, sheetsData, doneCb, _retry);
+      } else {
+        var sheetObjs = sheetsData.map(function(s) { return { properties: { title: s.name } }; });
+        fetch('https://sheets.googleapis.com/v4/spreadsheets', {
+          method: 'POST',
           headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
-          body: JSON.stringify({})
-        }).then(function(r2) {
-          if (!r2.ok) throw new Error('Move vào thư mục thất bại: HTTP ' + r2.status);
-          batchUpdateSheets(sid, sheetsData, doneCb);
+          body: JSON.stringify({ properties: { title: fname }, sheets: sheetObjs })
+        })
+        .then(function(r) {
+          // 401 = token hết hạn → thử refresh rồi retry 1 lần
+          if (r.status === 401 && !_retry) {
+            gdToken = null;
+            localStorage.removeItem('gd_token');
+            gdSyncing = false;
+            ensureValidToken(function() {
+              upsertSheet(fname, sheetsData, doneCb, true);
+            });
+            return null; // dừng chain này
+          }
+          if (!r.ok) throw new Error('Tạo file thất bại: HTTP ' + r.status);
+          return r.json();
+        })
+        .then(function(data) {
+          if (!data) return; // đã xử lý 401 ở trên
+          var sid = data.spreadsheetId;
+          if (!sid) throw new Error('Không nhận được ID file');
+          return fetch('https://www.googleapis.com/drive/v3/files/' + sid
+            + '?addParents=' + gdFolderId + '&removeParents=root&fields=id', {
+            method: 'PATCH',
+            headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+          }).then(function(r2) {
+            if (!r2.ok) throw new Error('Move vào thư mục thất bại: HTTP ' + r2.status);
+            batchUpdateSheets(sid, sheetsData, doneCb, _retry);
+          });
+        })
+        .catch(function(e) {
+          gdSyncing = false;
+          incPendingCount();
+          updGDBarStatus('Lỗi sync (' + getPendingCount() + ')', 'offline');
+          toast('❌ ' + (e.message || 'Lỗi tạo file Drive!'));
+          console.error('upsertSheet error:', e);
         });
-      })
-      .catch(function(e) {
-        gdSyncing = false;
-        incPendingCount();
-        updGDBarStatus('Lỗi sync (' + getPendingCount() + ')', 'offline');
-        toast('❌ ' + (e.message || 'Lỗi tạo file Drive!'));
-        console.error('upsertSheet error:', e);
-      });
-    }
-  });
+      }
+    });
   }); // ensureValidToken
 }
 
-function batchUpdateSheets(sid, sheetsData, doneCb) {
-  // Lấy tên + ID sheet thực tế (vì khi tạo sheet mới có thể bị đặt tên/ID khác)
+function batchUpdateSheets(sid, sheetsData, doneCb, _retry) {
   fetch('https://sheets.googleapis.com/v4/spreadsheets/' + sid + '?fields=sheets.properties', {
     headers: { Authorization: 'Bearer ' + gdToken }
-  }).then(function(r) { return r.json(); }).then(function(meta) {
+  }).then(function(r) {
+    // 401 ở bước đọc meta → refresh rồi retry toàn bộ
+    if (r.status === 401 && !_retry) {
+      gdToken = null; localStorage.removeItem('gd_token');
+      ensureValidToken(function() { batchUpdateSheets(sid, sheetsData, doneCb, true); });
+      return null;
+    }
+    return r.json();
+  }).then(function(meta) {
+    if (!meta) return; // đã xử lý 401
     var sheetIdMap = {};
     (meta.sheets || []).forEach(function(s) { sheetIdMap[s.properties.title] = s.properties.sheetId; });
     var actualSheets = Object.keys(sheetIdMap);
-    // Đảm bảo tất cả sheet cần thiết tồn tại
     var addRequests = [];
     sheetsData.forEach(function(s) {
       if (actualSheets.indexOf(s.name) === -1) {
@@ -2944,7 +3380,6 @@ function batchUpdateSheets(sid, sheetsData, doneCb) {
       }
     });
 
-    // Canh giữa toàn bộ ô dữ liệu (chữ + số) cho dễ nhìn
     function applyAlignment() {
       var fmtRequests = [];
       sheetsData.forEach(function(s) {
@@ -2977,10 +3412,22 @@ function batchUpdateSheets(sid, sheetsData, doneCb) {
         headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
         body: JSON.stringify({ valueInputOption: 'RAW', data: data })
       }).then(function(r) {
+        // 401 trong bước ghi → refresh và retry
+        if (r.status === 401 && !_retry) {
+          gdToken = null; localStorage.removeItem('gd_token');
+          ensureValidToken(function() { batchUpdateSheets(sid, sheetsData, doneCb, true); });
+          return null;
+        }
         if (!r.ok) throw new Error('Ghi dữ liệu thất bại HTTP ' + r.status);
         applyAlignment();
         if (doneCb) doneCb(sid);
+        gdSyncing = false;
+        syncQueue = false;
+        setPendingCount(0);
+        localStorage.setItem('gd_last_sync', Date.now().toString());
+        updGDBarStatus('Đã kết nối', 'synced');
       }).catch(function(e) {
+        gdSyncing = false;
         incPendingCount();
         updGDBarStatus('Lỗi sync (' + getPendingCount() + ')', 'offline');
         toast('❌ ' + (e.message || 'Lỗi ghi Drive!'));
@@ -4192,7 +4639,7 @@ function isLicenseExpired() {
 
 // Kiểm tra khi khởi động: nếu hết hạn → hiện popup
 function checkLicenseOnLoad() {
-  getDeviceCode(); // đảm bảo mã máy đã được sinh
+  getDeviceCode();
   updLicenseCountdown();
   if (isLicenseExpired()) {
     setTimeout(function(){ openM('modal-expired'); }, 400);
@@ -4202,26 +4649,31 @@ function checkLicenseOnLoad() {
       setTimeout(function(){
         document.getElementById('warn-expiry-days').textContent = days;
         var icon = document.getElementById('warn-expiry-icon');
-        icon.textContent = days <= 3 ? '🔴' : '🟡';
+        // Màu chìa khoá theo mức ngày
+        if (days <= 3)      { icon.textContent = '🔑'; icon.style.color='#dc2626'; }
+        else if (days <= 5) { icon.textContent = '🔑'; icon.style.color='#d97706'; }
+        else                { icon.textContent = '🔑'; icon.style.color='#16a34a'; }
         openM('modal-warn-expiry');
       }, 400);
     }
   }
 }
 
-// Hiện số ngày còn lại cạnh version
+// Hiện số ngày còn lại cạnh version — 🔑 đổi màu: xanh 7n / vàng 5n / đỏ 3n
 function updLicenseCountdown() {
   var el = document.getElementById('license-countdown');
   if (!el) return;
   var days = getRemainingDays();
   el.className = '';
+  el.style.color = '';
   if (days > 0) {
-    el.textContent = '· còn ' + days + ' ngày';
-    if (days <= 3) el.classList.add('lc-red');
-    else if (days <= 7) el.classList.add('lc-yellow');
-    else el.classList.add('lc-normal');
+    el.textContent = '🔑 còn ' + days + ' ngày';
+    if (days <= 3)      el.classList.add('lc-red');
+    else if (days <= 5) el.classList.add('lc-yellow');
+    else if (days <= 7) { el.classList.add('lc-normal'); el.style.color='#86efac'; }
+    else                el.classList.add('lc-normal');
   } else {
-    el.textContent = '· hết hạn';
+    el.textContent = '🔑 hết hạn';
     el.classList.add('lc-red');
   }
 }
@@ -4476,63 +4928,84 @@ function selectSgKH(ten){
 }
 
 function renderSgOverview(){
+  // Hiện lại thanh tìm kiếm và 2 nút khi về tổng quan
+  var searchEl=document.getElementById('sg-kh-search');
+  if(searchEl&&searchEl.parentElement) searchEl.parentElement.style.display='';
+  var topRow=document.querySelector('.sg-top-row');
+  if(topRow) topRow.style.display='';
   var sg=getSG(), su=getSU();
   var guiNames=new Set(sg.map(function(r){return r.ten;}));
   var ungNames=new Set(su.map(function(r){return r.ten;}));
-  var guiTotal=sg.reduce(function(a,r){return a+(r.tt||0);},0);
-  var ungTotal=su.reduce(function(a,r){return a+(parseFloat(r.tien)||0);},0);
+  // Chỉ tính ghi chép chưa chốt vào tổng quan
+  var guiTotal=sg.filter(function(r){return !r.chot;}).reduce(function(a,r){return a+(r.tt||0);},0);
+  var ungTotal=su.filter(function(r){return !r.chot&&!r.daTraNo;}).reduce(function(a,r){return a+(parseFloat(r.tien)||0);},0);
   var html='';
 
-  // Danh sách KH TRÊN CÙNG
+  // Danh sách KH
   var sg2=getSG(), su2=getSU();
   var khMap={};
   sg2.forEach(function(r){
     if(!khMap[r.ten]) khMap[r.ten]={gui:0,guiCnt:0,ung:0,ungCnt:0,lastDate:''};
-    khMap[r.ten].gui+=r.tt||0; khMap[r.ten].guiCnt++;
+    if(!r.chot){ khMap[r.ten].gui+=r.tt||0; }
+    khMap[r.ten].guiCnt++;
     if(!khMap[r.ten].lastDate||r.date>khMap[r.ten].lastDate) khMap[r.ten].lastDate=r.date;
   });
   su2.forEach(function(r){
     if(!khMap[r.ten]) khMap[r.ten]={gui:0,guiCnt:0,ung:0,ungCnt:0,lastDate:''};
-    khMap[r.ten].ung+=parseFloat(r.tien)||0; khMap[r.ten].ungCnt++;
+    if(!r.chot&&!r.daTraNo){ khMap[r.ten].ung+=parseFloat(r.tien)||0; }
+    khMap[r.ten].ungCnt++;
     if(!khMap[r.ten].lastDate||r.date>khMap[r.ten].lastDate) khMap[r.ten].lastDate=r.date;
   });
   window._sgKhList = Object.keys(khMap).sort();
+
+  // ── Tách KH chưa chốt / đã chốt ──
+  var sg3=getSG(), su3=getSU();
+  var chotSet={};
+  sg3.forEach(function(r){ if(r.chot) chotSet[r.ten]=true; });
+  su3.forEach(function(r){ if(r.chot) chotSet[r.ten]=true; });
+  // KH đã chốt = tất cả ghi chép của họ đều chốt
+  var activeSets={}, chotNames=[];
+  Object.keys(khMap).forEach(function(ten){
+    var sgK=sg3.filter(function(r){return r.ten===ten;});
+    var suK=su3.filter(function(r){return r.ten===ten;});
+    var allChot=sgK.every(function(r){return r.chot;})&&suK.every(function(r){return r.chot;});
+    if(allChot&&(sgK.length||suK.length)) chotNames.push(ten);
+    else activeSets[ten]=true;
+  });
+  // Sắp xếp đã chốt: mới nhất lên đầu
+  chotNames.sort(function(a,b){
+    var dA=khMap[a]?khMap[a].lastDate:''; var dB=khMap[b]?khMap[b].lastDate:'';
+    return dA<dB?1:dA>dB?-1:0;
+  });
+
   html+='<div class="sec-title" style="margin-top:14px">📋 Danh sách khách hàng</div>';
-  if(!window._sgKhList.length){
+  var activeList=Object.keys(activeSets);
+  if(!activeList.length&&!chotNames.length){
     html+='<div class="no-data">Chưa có khách hàng nào</div>';
   } else {
-    // Nhóm theo loại: chỉ gửi / chỉ ứng / cả hai
+    // Nhóm KH CHƯA chốt
     var onlyGui=[], onlyUng=[], both=[];
-    window._sgKhList.forEach(function(ten){
+    activeList.forEach(function(ten){
       var d=khMap[ten];
       if(d.guiCnt&&d.ungCnt) both.push(ten);
       else if(d.guiCnt) onlyGui.push(ten);
       else onlyUng.push(ten);
     });
     function khCard(ten,idx){
-      var d=khMap[ten]; var conLai=d.gui-d.ung;
+      var d=khMap[ten]||{gui:0,guiCnt:0,ung:0,ungCnt:0,lastDate:''};
+      var conLai=d.gui-d.ung;
       var meta=[]; if(d.guiCnt) meta.push(d.guiCnt+' lần gửi'); if(d.ungCnt) meta.push(d.ungCnt+' lần ứng');
-      // Màu nhãn theo loại
-      var borderColor, tagHtml, nameColor;
-      if(d.guiCnt&&d.ungCnt){
-        borderColor='#7c3aed'; nameColor='#5b21b6';
-        tagHtml='<span style="font-size:9px;padding:2px 6px;border-radius:8px;background:#ede9fe;color:#5b21b6;font-weight:700;margin-left:4px">GỬI+ỨNG</span>';
-      } else if(d.guiCnt){
-        borderColor='var(--gd)'; nameColor='var(--gd)';
-        tagHtml='<span style="font-size:9px;padding:2px 6px;border-radius:8px;background:var(--gb);color:var(--gd);font-weight:700;margin-left:4px">GỬI</span>';
-      } else {
-        borderColor='#d97706'; nameColor='#92400e';
-        tagHtml='<span style="font-size:9px;padding:2px 6px;border-radius:8px;background:#fffbeb;color:#92400e;font-weight:700;margin-left:4px">ỨNG</span>';
-      }
+      var borderColor,tagHtml,nameColor;
+      if(d.guiCnt&&d.ungCnt){ borderColor='#7c3aed'; nameColor='#5b21b6'; tagHtml='<span style="font-size:9px;padding:2px 6px;border-radius:8px;background:#ede9fe;color:#5b21b6;font-weight:700;margin-left:4px">GỬI+ỨNG</span>'; }
+      else if(d.guiCnt){ borderColor='var(--gd)'; nameColor='var(--gd)'; tagHtml='<span style="font-size:9px;padding:2px 6px;border-radius:8px;background:var(--gb);color:var(--gd);font-weight:700;margin-left:4px">GỬI</span>'; }
+      else { borderColor='#d97706'; nameColor='#92400e'; tagHtml='<span style="font-size:9px;padding:2px 6px;border-radius:8px;background:#fffbeb;color:#92400e;font-weight:700;margin-left:4px">ỨNG</span>'; }
       return '<div class="sg-kh-btn" onclick="selectSgKHByIdx('+idx+')" style="border-left:3px solid '+borderColor+'">'
         +'<div><div class="sg-kh-name" style="color:'+nameColor+'">👤 '+ten+tagHtml+'</div>'
         +'<div class="sg-kh-meta">'+meta.join(' · ')+' · '+fmtDate(d.lastDate)+'</div></div>'
         +'<div><div class="sg-kh-total" style="color:'+(conLai>=0?'var(--gd)':'#dc2626')+'">'+fmtNum(Math.round(conLai))+' ₫</div><span style="color:var(--g400)">›</span></div>'
         +'</div>';
     }
-    // Hiện theo thứ tự: GỬI+ỨNG → chỉ GỬI → chỉ ỨNG
     var orderedList=both.concat(onlyGui).concat(onlyUng);
-    // Rebuild _sgKhList theo thứ tự mới để selectSgKHByIdx đúng
     window._sgKhList=orderedList;
     if(both.length){
       html+='<div style="font-size:10px;color:#5b21b6;font-weight:700;margin:8px 0 3px;text-transform:uppercase;letter-spacing:.4px">🔄 Vừa gửi vừa ứng</div>';
@@ -4545,6 +5018,31 @@ function renderSgOverview(){
     if(onlyUng.length){
       html+='<div style="font-size:10px;color:#d97706;font-weight:700;margin:8px 0 3px;text-transform:uppercase;letter-spacing:.4px">💵 Chỉ ứng tiền</div>';
       html+=onlyUng.map(function(ten){return khCard(ten,orderedList.indexOf(ten));}).join('');
+    }
+
+    // ── Accordion KH đã chốt sổ ──
+    if(chotNames.length){
+      html+='<div onclick="toggleChotAccordion()" style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding:10px 12px;background:#fff0f0;border:1.5px solid #fca5a5;border-radius:var(--r);cursor:pointer;user-select:none">'
+        +'<span style="font-size:12px;font-weight:700;color:#dc2626">🔒 Đã chốt sổ <span style="background:#fee2e2;color:#dc2626;border-radius:8px;padding:1px 7px;font-size:11px;margin-left:4px">'+chotNames.length+'</span></span>'
+        +'<span id="chot-accordion-arrow" style="color:#dc2626;font-size:14px;transition:transform .2s">▼</span>'
+        +'</div>'
+        +'<div id="chot-accordion-body" style="display:none">';
+      chotNames.forEach(function(ten){
+        var d=khMap[ten]||{gui:0,guiCnt:0,ung:0,ungCnt:0,lastDate:''};
+        var idx=orderedList.length;
+        orderedList.push(ten);
+        window._sgKhList=orderedList;
+        var tenEsc2=ten.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+        html+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'
+          +'<div class="sg-kh-btn" onclick="selectSgKHByIdx('+idx+')" style="flex:1;border-left:3px solid #fca5a5;opacity:.75;margin-bottom:0">'
+            +'<div><div class="sg-kh-name" style="color:#dc2626">👤 '+ten+'<span style="font-size:9px;padding:2px 6px;border-radius:8px;background:#fee2e2;color:#dc2626;font-weight:700;margin-left:4px">ĐÃ CHỐT</span></div>'
+            +'<div class="sg-kh-meta">'+(d.lastDate?fmtDate(d.lastDate):'--')+'</div></div>'
+            +'<span style="color:var(--g400)">›</span>'
+          +'</div>'
+          +'<button onclick="xoaChotKH(\''+tenEsc2+'\')" style="flex:0 0 auto;padding:8px 10px;background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5;border-radius:var(--r);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">🗑️ Xoá</button>'
+        +'</div>';
+      });
+      html+='</div>';
     }
   }
 
@@ -4565,54 +5063,106 @@ function renderSgOverview(){
 
   document.getElementById('sg-tab-content').innerHTML=html;
 }
-function selectSgKHByIdx(idx){ var k=window._sgKhList||window._sgKhDropList||[]; if(k[idx]) selectSgKH(k[idx]); }
+function selectSgKHByIdx(idx){ var k=window._sgKhList||[]; if(k[idx]) selectSgKH(k[idx]); }
+
+function toggleChotAccordion(){
+  var body=document.getElementById('chot-accordion-body');
+  var arrow=document.getElementById('chot-accordion-arrow');
+  if(!body) return;
+  var open=body.style.display!=='none';
+  body.style.display=open?'none':'block';
+  if(arrow) arrow.style.transform=open?'':'rotate(180deg)';
+}
+
+function xoaChotKH(ten){
+  showDetail('🗑️','Xoá toàn bộ ghi chép của '+ten+'?',
+    [['Lưu ý','Xoá tất cả ghi chép đã chốt của khách hàng này'],['Không thể','Khôi phục lại sau khi xoá']],
+    null,'🗑️ Xoá tất cả',function(){
+      setSG(getSG().filter(function(r){return r.ten!==ten;}));
+      setSU(getSU().filter(function(r){return r.ten!==ten;}));
+      renderSgTabContent();
+      autoSync();
+      toast('🗑️ Đã xoá toàn bộ ghi chép của '+ten+'!');
+    });
+}
 
 function renderSgKHDetail(ten){
+  // Ẩn thanh tìm kiếm và 2 nút action khi vào chi tiết
+  var searchWrap=document.getElementById('sg-kh-search');
+  if(searchWrap&&searchWrap.parentElement) searchWrap.parentElement.style.display='none';
+  var topRow=document.querySelector('.sg-top-row');
+  if(topRow) topRow.style.display='none';
+
   var sgList=getSG().filter(function(r){return r.ten===ten;});
   var suList=getSU().filter(function(r){return r.ten===ten;});
-  var guiTotal=sgList.reduce(function(a,r){return a+(r.tt||0);},0);
-  var ungTotal=suList.reduce(function(a,r){return a+(parseFloat(r.tien)||0);},0);
+  var guiTotal=sgList.filter(function(r){return !r.chot;}).reduce(function(a,r){return a+(r.tt||0);},0);
+  var ungTotal=suList.filter(function(r){return !r.chot&&!r.daTraNo;}).reduce(function(a,r){return a+(parseFloat(r.tien)||0);},0);
   var conLai=guiTotal-ungTotal;
-  var guiDays=[...new Set(sgList.map(function(r){return r.date;}))].length;
+  var guiDays=[...new Set(sgList.filter(function(r){return !r.chot;}).map(function(r){return r.date;}))].length;
+  var tenEsc=ten.replace(/'/g,"\\'");
 
-  var html='<button class="btn-huy" style="width:100%;margin-bottom:10px" onclick="backToSgOverview()">← Quay lại tổng quan</button>';
+  // ── Hàng đầu: quay lại + dropdown thêm giao dịch ──
+  var html='<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">'
+    +'<button class="btn-huy" style="flex:0 0 auto;white-space:nowrap;padding:9px 12px" onclick="backToSgOverview()">← Quay lại</button>'
+    +'<div style="position:relative;flex:1">'
+      +'<button onclick="toggleSgAddMenu()" style="width:100%;padding:9px 12px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border:none;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">➕ Thêm giao dịch ▾</button>'
+      +'<div id="sg-add-menu" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid var(--gp);border-radius:var(--r);z-index:99;box-shadow:0 4px 16px rgba(0,0,0,.12);overflow:hidden">'
+        +'<button onclick="closeSgAddMenu();openSgGuiMoiForKH(\''+tenEsc+'\')" style="width:100%;padding:11px 14px;background:#fff;border:none;border-bottom:1px solid var(--g100);font-size:13px;font-weight:700;color:var(--gd);text-align:left;cursor:pointer">📒 Gửi sổ</button>'
+        +'<button onclick="closeSgAddMenu();openSgUngTienForKH(\''+tenEsc+'\')" style="width:100%;padding:11px 14px;background:#fff;border:none;font-size:13px;font-weight:700;color:#d97706;text-align:left;cursor:pointer">💵 Ứng tiền</button>'
+      +'</div>'
+    +'</div>'
+  +'</div>';
 
-  html+='<div class="sec-title" style="color:var(--gd)">📒 Gửi sổ ('+sgList.length+' lần)</div>';
+  // ── Thẻ tên KH ──
+  html+='<div style="background:linear-gradient(135deg,var(--gb),#e0f2e9);border:1.5px solid var(--gp);border-radius:var(--r);padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:8px">'
+    +'<span style="font-size:18px">👤</span>'
+    +'<div><div style="font-size:15px;font-weight:800;color:var(--gd)">'+ten+'</div>'
+    +'<div style="font-size:11px;color:var(--g600);margin-top:1px">Chi tiết sổ gửi &amp; ứng tiền</div></div>'
+    +'</div>';
+
   if(sgList.length){
+    html+='<div class="sec-title" style="color:var(--gd)">📒 Gửi sổ ('+sgList.length+' lần)<span class="sec-hint">nhấp đúp để sửa/xoá</span></div>';
     html+='<div class="card" style="padding:0;overflow:hidden;border:1.5px solid var(--gb);border-radius:var(--r);margin-bottom:8px">';
     html+=sgList.map(function(r){
       var chat=r.loai==='nuoc'?'Độ: '+(r.do||'--'):(r.loai==='dong'&&r.do?'KH: '+r.do+'kg':'');
-      return '<div class="sg-entry" ondblclick="openSgEntryEdit(\'' + r.id + '\',\'gui\')" onclick="onSgEntryTap(\'' + r.id + '\',\'gui\')">'
-        +'<div class="sg-entry-row"><span class="sg-entry-date">'+fmtDate(r.date)+'</span><span class="sg-entry-tien">'+fmtNum(r.tt)+' ₫</span></div>'
+      var chotCls=r.chot?' chot':'';
+      var stamp=r.chot?'<span class="chot-stamp">ĐÃ CHỐT</span>':'';
+      return '<div class="sg-entry'+chotCls+'" ondblclick="openSgEntryEdit(\'' + r.id + '\',\'gui\')" onclick="onSgEntryTap(\'' + r.id + '\',\'gui\')">'
+        +'<div class="sg-entry-row"><span class="sg-entry-date">'+fmtDate(r.date)+stamp+'</span><span class="sg-entry-tien">'+fmtNum(r.tt)+' ₫</span></div>'
         +'<div class="sg-entry-row"><span class="sg-entry-meta">'+LOAI_ICO[r.loai]+' '+LOAI_LBL[r.loai]+' · '+fmtKg(r.kg)+'kg'+(chat?' · '+chat:'')+'</span><span class="sg-entry-meta">'+fmtNum(r.gia)+' đ</span></div>'
         +'</div>';
     }).join('');
     html+='</div>';
-  } else {
-    html+='<div class="no-data" style="margin-bottom:8px">Chưa có ghi chép gửi sổ</div>';
   }
 
-  html+='<div class="sec-title" style="color:#d97706">💵 Ứng tiền ('+suList.length+' lần)</div>';
   if(suList.length){
+    html+='<div class="sec-title" style="color:#d97706">💵 Ứng tiền ('+suList.length+' lần)<span class="sec-hint" style="color:#d97706;opacity:.6">nhấp đúp để sửa/xoá</span></div>';
     html+='<div class="card" style="padding:0;overflow:hidden;border:1.5px solid #fde68a;border-radius:var(--r);margin-bottom:8px">';
     html+=suList.map(function(r){
-      return '<div class="ung-entry" ondblclick="openSgEntryEdit(\'' + r.id + '\',\'ung\')" onclick="onSgEntryTap(\'' + r.id + '\',\'ung\')">'
-        +'<div class="ung-entry-row"><span class="sg-entry-date">'+fmtDate(r.date)+'</span><span class="ung-entry-tien">-'+fmtNum(Math.round(r.tien))+' ₫</span></div>'
+      var extraCls=r.chot?' chot':r.daTraNo?' da-tra':'';
+      var stamp=r.chot?'<span class="chot-stamp">ĐÃ CHỐT</span>':r.daTraNo?'<span class="tra-stamp">ĐÃ TRẢ</span>':'';
+      return '<div class="ung-entry'+extraCls+'" ondblclick="openSgEntryEdit(\'' + r.id + '\',\'ung\')" onclick="onSgEntryTap(\'' + r.id + '\',\'ung\')">'
+        +'<div class="ung-entry-row"><span class="sg-entry-date">'+fmtDate(r.date)+stamp+'</span><span class="ung-entry-tien">-'+fmtNum(Math.round(r.tien))+' ₫</span></div>'
         +(r.noidung?'<div class="ung-entry-content">📝 '+r.noidung+'</div>':'')
         +'</div>';
     }).join('');
     html+='</div>';
-  } else {
-    html+='<div class="no-data" style="margin-bottom:8px">Chưa có ghi chép ứng tiền</div>';
   }
 
-  html+='<div class="sg-summary-final">'
-    +'<div class="sg-summary-row"><span>Tổng tiền gửi ('+guiDays+' ngày)</span><span>'+fmtNum(Math.round(guiTotal))+' ₫</span></div>'
-    +'<div class="sg-summary-row"><span>Tổng tiền đã ứng</span><span>-'+fmtNum(Math.round(ungTotal))+' ₫</span></div>'
-    +'<div class="sg-summary-row total"><span>CÒN LẠI</span><span style="color:'+(conLai>=0?'#86efac':'#fca5a5')+'">'+fmtNum(Math.round(conLai))+' ₫</span></div>'
-    +'</div>';
+  // Thống kê cuối — chỉ hiện nếu có ít nhất 1 loại dữ liệu
+  var hasGui=sgList.length>0, hasUng=suList.length>0;
+  if(hasGui||hasUng){
+    var hasChot=sgList.some(function(r){return r.chot;})||suList.some(function(r){return r.chot;});
+    var hasTra=suList.some(function(r){return r.daTraNo;});
+    html+='<div class="sg-summary-final">';
+    if(hasGui) html+='<div class="sg-summary-row"><span>Tổng tiền gửi ('+guiDays+' ngày)</span><span>'+fmtNum(Math.round(guiTotal))+' ₫</span></div>';
+    if(hasUng) html+='<div class="sg-summary-row"><span>Tổng tiền đã ứng (chưa trả)</span><span>-'+fmtNum(Math.round(ungTotal))+' ₫</span></div>';
+    html+='<div class="sg-summary-row total"><span>CÒN LẠI</span><span style="color:'+(conLai>=0?'#86efac':'#fca5a5')+'">'+fmtNum(Math.round(conLai))+' ₫</span></div>';
+    if(hasChot||hasTra) html+='<div style="font-size:10px;opacity:.65;margin-top:5px;text-align:center">📌 Ghi chép đã chốt/đã trả không tính vào tổng</div>';
+    html+='</div>';
+  }
 
-  html+='<button class="sg-chot-btn" style="width:100%;margin-top:10px" onclick="chotSoGuiKH(\'' + ten.replace(/'/g, "\\'") + '\')">🔒 Chốt sổ '+ten+'</button>';
+  html+='<button class="sg-chot-btn" style="width:100%;margin-top:10px" onclick="chotSoGuiKH(\''+ten.replace(/'/g,"\\'")+'\')">🔒 Chốt sổ '+ten+'</button>';
 
   document.getElementById('sg-tab-content').innerHTML=html;
 }
@@ -4620,6 +5170,27 @@ function renderSgKHDetail(ten){
 function backToSgOverview(){
   sgCurrentKH=null;
   renderSgTabContent();
+}
+
+function toggleSgAddMenu(){
+  var m=document.getElementById('sg-add-menu');
+  if(!m) return;
+  var isOpen=m.style.display!=='none';
+  m.style.display=isOpen?'none':'block';
+  if(!isOpen){
+    // Đóng khi click ra ngoài
+    setTimeout(function(){
+      document.addEventListener('click',function _close(e){
+        var menu=document.getElementById('sg-add-menu');
+        if(menu&&!menu.contains(e.target)) menu.style.display='none';
+        document.removeEventListener('click',_close);
+      });
+    },10);
+  }
+}
+function closeSgAddMenu(){
+  var m=document.getElementById('sg-add-menu');
+  if(m) m.style.display='none';
 }
 
 function renderSgTabContent(){
@@ -4668,6 +5239,9 @@ function openSgEntryEdit(id,type){
     document.getElementById('sgt-do').value=r.do||'';
     document.getElementById('sgt-gia').value=r.gia?parseInt(r.gia).toLocaleString('vi-VN'):'';
     onSgtLoai(); calcSgt();
+    // Ẩn nút trả nợ khi là gửi sổ
+    var traNoBtnWrap=document.getElementById('sgt-trano-wrap');
+    if(traNoBtnWrap) traNoBtnWrap.style.display='none';
   } else {
     var r2=getSU().find(function(x){return String(x.id)===String(id);});
     if(!r2) return;
@@ -4675,11 +5249,49 @@ function openSgEntryEdit(id,type){
     document.getElementById('sgu-ten').value=r2.ten;
     document.getElementById('sgu-tien').value=parseInt(r2.tien).toLocaleString('vi-VN');
     document.getElementById('sgu-noidung').value=r2.noidung||'';
+    // Hiện nút trả nợ khi là ứng tiền
+    var traNoBtnWrap2=document.getElementById('sgt-trano-wrap');
+    if(traNoBtnWrap2){
+      traNoBtnWrap2.style.display='';
+      var traNoBtn=document.getElementById('sgt-trano-btn');
+      if(traNoBtn){
+        if(r2.daTraNo){
+          traNoBtn.textContent='✅ Đã đánh dấu trả nợ';
+          traNoBtn.style.background='#d1fae5';
+          traNoBtn.style.color='#065f46';
+          traNoBtn.style.borderColor='#6ee7b7';
+          traNoBtn.disabled=true;
+        } else {
+          traNoBtn.textContent='✅ Đánh dấu đã trả nợ';
+          traNoBtn.style.background='#fffbeb';
+          traNoBtn.style.color='#d97706';
+          traNoBtn.style.borderColor='#fcd34d';
+          traNoBtn.disabled=false;
+        }
+      }
+    }
   }
   // Hiện nút Xoá khi sửa
   var delBtn=document.getElementById('sgt-del-btn');
   if(delBtn) delBtn.style.display='';
   openM('modal-sg-tab');
+}
+
+// Đánh dấu đã trả nợ (không xoá, chỉ gạch ngang + không tính vào tổng)
+function danhDauTraNo(){
+  if(!sgTabEditId||sgTabEditType!=='ung') return;
+  var id=sgTabEditId;
+  showDetail('✅','Xác nhận đã trả nợ?',
+    [['Thao tác','Ghi chép vẫn giữ để xem'],['Lưu ý','Không tính vào tổng tiền ứng nữa']],
+    null,'Xác nhận',function(){
+      var su=getSU();
+      var idx=su.findIndex(function(x){return String(x.id)===String(id);});
+      if(idx>=0){ su[idx].daTraNo=true; su[idx].ghiChuKhac='Đã trả nợ'; setSU(su); }
+      closeSgModal();
+      renderSgTabContent();
+      autoSync();
+      toast('✅ Đã đánh dấu trả nợ!');
+    });
 }
 
 function setSgtType(type){
@@ -4826,7 +5438,7 @@ function luuSgEntry(){
       sg.push({id:Date.now()+Math.random(),date,ten,loai,kg,do:doV,gia,tt,src:'tab'});
     }
     setSG(sg);
-    saveKHShared(ten); // Lưu vào danh sách KH chung
+    saveKHShared(ten);
     toast('📒 Đã '+(sgTabEditId?'cập nhật':'lưu')+' sổ gửi!');
     if(sgCurrentKH!==ten){ sgCurrentKH=ten; }
   } else {
@@ -4844,13 +5456,32 @@ function luuSgEntry(){
       su.push({id:Date.now()+Math.random(),date,ten:tenU,tien,noidung,src:'tab'});
     }
     setSU(su);
-    saveKHShared(tenU); // Lưu vào danh sách KH chung
+    saveKHShared(tenU);
     toast('💵 Đã '+(sgTabEditId?'cập nhật':'lưu')+' ứng tiền!');
     if(sgCurrentKH!==tenU){ sgCurrentKH=tenU; }
   }
 
+  // Reset sạch cả 2 form (tên + các trường) sau khi lưu
+  document.getElementById('sgt-ten').value='';
+  document.getElementById('sgt-loai').value='';
+  document.getElementById('sgt-kg').value='';
+  document.getElementById('sgt-do').value='';
+  document.getElementById('sgt-gia').value='';
+  document.getElementById('sgt-tt').textContent='0 ₫';
+  document.getElementById('sgt-chu').textContent='--';
+  document.getElementById('sgu-ten').value='';
+  document.getElementById('sgu-tien').value='';
+  document.getElementById('sgu-noidung').value='';
+
+  // Ẩn nút trả nợ và xóa
+  var delBtn=document.getElementById('sgt-del-btn');
+  if(delBtn) delBtn.style.display='none';
+  var traNoBtnWrap=document.getElementById('sgt-trano-wrap');
+  if(traNoBtnWrap) traNoBtnWrap.style.display='none';
+
+  sgTabEditId=null; sgTabEditType=null;
+  sgCurrentKH=null;  // quay về tổng quan
   closeM('modal-sg-tab');
-  sgCurrentKH = null;  // quay về tổng quan
   renderSgTabContent();
   autoSync();
 }
@@ -4878,146 +5509,19 @@ function doChot(){
     return;
   }
   closeM('modal-chot-so');
-  setSG(getSG().filter(function(r){return r.ten!==_chotTen;}));
-  setSU(getSU().filter(function(r){return r.ten!==_chotTen;}));
+  // Giữ lại ghi chép, chỉ đánh dấu chot:true + ghi chú
+  var sg=getSG();
+  sg.forEach(function(r){ if(r.ten===_chotTen&&!r.chot){ r.chot=true; r.ghiChuKhac='Đã chốt sổ'; } });
+  setSG(sg);
+  var su=getSU();
+  su.forEach(function(r){ if(r.ten===_chotTen&&!r.chot){ r.chot=true; r.ghiChuKhac='Đã chốt sổ'; } });
+  setSU(su);
   backToSgOverview();
-  toast('✅ Đã chốt sổ '+_chotTen+'!');
+  toast('✅ Đã chốt sổ '+_chotTen+'! Ghi chép vẫn giữ để xem.');
   autoSync();
 }
 
 
-// ══════════════════════════════════════════
-// THỐNG KÊ THÁNG
-// Lưu theo key: thang_data_{loai} = [{date, muaKg, muaDo, muaTien, banKg, banDo, banTien}]
-// ══════════════════════════════════════════
-var RESET_PW_DEFAULT = '234567';
-function getThangPW(){ return localStorage.getItem('thang_pw') || RESET_PW_DEFAULT; }
-function setThangPW(p){ localStorage.setItem('thang_pw', p); }
-var THANG_KEY = 'thang_v1';
-
-function getThangData(){ try{ return JSON.parse(localStorage.getItem(THANG_KEY))||[]; }catch{ return []; } }
-function setThangData(v){ localStorage.setItem(THANG_KEY, JSON.stringify(v)); }
-
-// Gọi sau mỗi lần lưu/sửa giao dịch để cập nhật thống kê tháng
-function updThangData(){
-  try{
-  // Gom dữ liệu tất cả các ngày đã có
-  var allGDs = getGD('mua').concat([]); // mua
-  var allGDBan = getGD('ban');
-
-  // Tập hợp các ngày có dữ liệu
-  var dates = {};
-  allGDs.forEach(function(g){ dates[g.date]=true; });
-  allGDBan.forEach(function(g){ dates[g.date]=true; });
-
-  var rows = [];
-  Object.keys(dates).sort().forEach(function(date){
-    ['nuoc','chen','day','dong'].forEach(function(loai){
-      var mList = allGDs.filter(function(g){return g.date===date&&g.loai===loai;});
-      var bList = allGDBan.filter(function(g){return g.date===date&&g.loai===loai;});
-      if(!mList.length&&!bList.length) return;
-      var mKg=0,mDos=[],mTien=0;
-      mList.forEach(function(g){ mKg+=kgThuc(g.loai,g.kg,g.do,g.bi||0); mTien+=parseFloat(g.tt)||0; if(loai==='nuoc'&&g.do) mDos.push(parseFloat(g.do)||0); });
-      var bKg=0,bDos=[],bTien=0;
-      bList.forEach(function(g){ bKg+=kgThuc(g.loai,g.kg,g.do,g.bi||0); bTien+=parseFloat(g.tt)||0; if(loai==='nuoc'&&g.do) bDos.push(parseFloat(g.do)||0); });
-      var bGiaList=[]; bList.forEach(function(g){ if(g.gia) bGiaList.push(parseFloat(g.gia)||0); });
-      var bGiaAvg = bGiaList.length ? bGiaList.reduce(function(a,b){return a+b;})/bGiaList.length : 0;
-      rows.push({date:date,loai:loai,mKg:mKg,mDo:mDos.length?mDos.reduce(function(a,b){return a+b;})/mDos.length:0,mTien:mTien,bKg:bKg,bDo:bDos.length?bDos.reduce(function(a,b){return a+b;})/bDos.length:0,bTien:bTien,bGia:bGiaAvg});
-    });
-  });
-  setThangData(rows);
-  renderThangTK();
-  }catch(e){ console.error('updThangData error:',e); }
-}
-
-function renderThangTK(){
-  var cont = document.getElementById('ban-thang-tk');
-  if(!cont) return;
-  var rows = getThangData();
-  if(!rows.length){ cont.innerHTML='<div class="no-data">Chưa có dữ liệu tháng</div>'; return; }
-
-  // Group by loai
-  var byLoai = {};
-  rows.forEach(function(r){ if(!byLoai[r.loai]) byLoai[r.loai]=[]; byLoai[r.loai].push(r); });
-
-  var html = '';
-  var grandMTien=0, grandBTien=0, totalDays=0;
-
-  ['nuoc','chen','day','dong'].forEach(function(loai){
-    var loaiRows = byLoai[loai];
-    if(!loaiRows||!loaiRows.length) return;
-    var isNuoc = loai==='nuoc';
-    var totalMKg=0,totalMTien=0,totalBKg=0,totalBTien=0,mDos=[],bDos=[];
-    loaiRows.forEach(function(r){
-      totalMKg+=r.mKg; totalMTien+=r.mTien; totalBKg+=r.bKg; totalBTien+=r.bTien;
-      if(isNuoc&&r.mDo) mDos.push(r.mDo);
-      if(isNuoc&&r.bDo) bDos.push(r.bDo);
-    });
-    grandMTien+=totalMTien; grandBTien+=totalBTien; totalDays=Math.max(totalDays,loaiRows.length);
-    var loi = totalBTien - totalMTien;
-    var loiColor = loi>0?'col-xanh':'col-do';
-
-    html += '<div class="thang-card">';
-    html += '<div class="thang-header"><span>'+(LOAI_ICO[loai]||'')+' '+(LOAI_LBL[loai]||loai)+'</span><span style="font-size:10px;opacity:.8">'+loaiRows.length+' ngày</span></div>';
-    // Header cột
-    var doHdr = isNuoc ? '<span>Độ bán</span>' : '';
-    var gridColsHdr = isNuoc?'1.1fr 1fr 1fr 1fr 1fr 1fr':'1.1fr 1fr 1fr 1fr 1fr';
-    html += '<div class="thang-row thang-row-hdr" style="grid-template-columns:'+gridColsHdr+'"><span style="text-align:left;padding-left:6px">Ngày</span><span>Kg bán</span>'+doHdr+'<span>Giá bán</span><span>Tiền bán</span><span>Lời/lỗ</span></div>';
-
-    loaiRows.forEach(function(r){
-      var rowLoi = r.bTien - r.mTien;
-      var rowLoiC = rowLoi>0?'col-xanh':'col-do';
-      var kgMuaC = r.bKg>r.mKg?'col-xanh':r.bKg<r.mKg?'col-do':'';
-      var kgBanC = r.bKg>r.mKg?'col-xanh':r.bKg<r.mKg?'col-do':'';
-      var doMuaC = isNuoc?(r.bDo>r.mDo?'col-xanh':r.bDo<r.mDo?'col-do':''):'';
-      var doBanC = isNuoc?(r.bDo>r.mDo?'col-xanh':r.bDo<r.mDo?'col-do':''):'';
-      var doTd = isNuoc?('<span class="'+doBanC+'">'+(r.bDo?fmtDo(r.bDo):'--')+'</span>'):'';
-      var gridCols = isNuoc?'1.1fr 1fr 1fr 1fr 1fr 1fr':'1.1fr 1fr 1fr 1fr 1fr';
-      // format date dd/mm
-      var dp=r.date.split('-'); var fmtD=dp.length===3?dp[2]+'/'+dp[1]:r.date;
-      html += '<div class="thang-row" style="grid-template-columns:'+gridCols+'">'
-        +'<span class="thang-td-left">'+fmtD+'</span>'
-        +'<span class="'+kgBanC+'">'+(r.bKg?fmtKg(r.bKg):'--')+'</span>'
-        +doTd
-        +'<span>'+(r.bGia?fmtNum(Math.round(r.bGia)):'--')+'</span>'
-        +'<span>'+(r.bTien?fmtNum(Math.round(r.bTien)):'--')+'</span>'
-        +'<span class="thang-loi '+rowLoiC+'">'+(rowLoi>0?'+':'')+fmtNum(Math.round(rowLoi))+'</span>'
-        +'</div>';
-    });
-    // Tổng loại
-    var bDoTB=bDos.length?bDos.reduce(function(a,b){return a+b;})/bDos.length:0;
-    var bGiaList2=loaiRows.map(function(r){return r.bGia;}).filter(function(g){return g>0;});
-    var bGiaAvgAll=bGiaList2.length?bGiaList2.reduce(function(a,b){return a+b;})/bGiaList2.length:0;
-    var doTotals=isNuoc?('<span style="font-weight:800">'+(bDoTB?fmtDo(bDoTB):'--')+'</span>'):'';
-    var gridCols2=isNuoc?'1.1fr 1fr 1fr 1fr 1fr 1fr':'1.1fr 1fr 1fr 1fr 1fr';
-    var loiLoai=totalBTien-totalMTien;
-    // Đường kẻ phân biệt dữ liệu hàng ngày với dòng TỔNG
-    html += '<div style="border-top:2px solid '+(loi>0?'#16a34a':'#dc2626')+';margin:0"></div>';
-    html += '<div class="thang-row" style="grid-template-columns:'+gridCols2+';background:var(--g50);font-weight:700;font-size:11px">'
-      +'<span class="thang-td-left" style="font-weight:800;color:var(--g800)">TỔNG</span>'
-      +'<span>'+fmtKg(totalBKg)+'</span>'
-      +doTotals
-      +'<span>'+(bGiaAvgAll?fmtNum(Math.round(bGiaAvgAll)):'--')+'</span>'
-      +'<span>'+fmtNum(Math.round(totalBTien))+'</span>'
-      +'<span class="thang-loi '+(loiLoai>0?'col-xanh':'col-do')+'">'+(loiLoai>0?'+':'')+fmtNum(Math.round(loiLoai))+'</span>'
-      +'</div>';
-    html += '<div class="thang-total"><span>TỔNG LÃI '+(LOAI_LBL[loai]||loai).toUpperCase()+' ('+loaiRows.length+' ngày)</span>'
-      +'<span class="'+(loiLoai>0?'col-xanh':'col-do')+'" style="color:'+(loiLoai>0?'#86efac':'#fca5a5')+'">'+(loiLoai>0?'+':'')+fmtNum(Math.round(loiLoai))+' ₫</span></div>';
-    html += '</div>';
-  });
-
-  // Tổng lãi tất cả
-  var grandLoi = grandBTien - grandMTien;
-  html += '<div style="background:linear-gradient(135deg,#7c1d06,#b5341a);color:#fff;border-radius:var(--r);padding:12px 14px;margin-top:4px">'
-    +'<div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>Tổng tiền mua</span><span>'+fmtNum(Math.round(grandMTien))+' ₫</span></div>'
-    +'<div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>Tổng tiền bán</span><span>'+fmtNum(Math.round(grandBTien))+' ₫</span></div>'
-    +'<div style="display:flex;justify-content:space-between;font-size:14px;font-weight:800;padding-top:6px;border-top:1px solid rgba(255,255,255,.3)">'
-    +'<span>TỔNG LÃI/LỖ ('+totalDays+' ngày)</span>'
-    +'<span style="color:'+(grandLoi>0?'#86efac':'#fca5a5')+'">'+(grandLoi>0?'+':'')+fmtNum(Math.round(grandLoi))+' ₫</span></div>'
-    +'</div>';
-
-  cont.innerHTML = html;
-}
 
 function resetThang(){
   document.getElementById('reset-pw-input').value='';
@@ -5100,7 +5604,7 @@ function isLicenseExpired() {
 
 // Kiểm tra khi khởi động: nếu hết hạn → hiện popup
 function checkLicenseOnLoad() {
-  getDeviceCode(); // đảm bảo mã máy đã được sinh
+  getDeviceCode();
   updLicenseCountdown();
   if (isLicenseExpired()) {
     setTimeout(function(){ openM('modal-expired'); }, 400);
@@ -5110,26 +5614,31 @@ function checkLicenseOnLoad() {
       setTimeout(function(){
         document.getElementById('warn-expiry-days').textContent = days;
         var icon = document.getElementById('warn-expiry-icon');
-        icon.textContent = days <= 3 ? '🔴' : '🟡';
+        // Màu chìa khoá theo mức ngày
+        if (days <= 3)      { icon.textContent = '🔑'; icon.style.color='#dc2626'; }
+        else if (days <= 5) { icon.textContent = '🔑'; icon.style.color='#d97706'; }
+        else                { icon.textContent = '🔑'; icon.style.color='#16a34a'; }
         openM('modal-warn-expiry');
       }, 400);
     }
   }
 }
 
-// Hiện số ngày còn lại cạnh version
+// Hiện số ngày còn lại cạnh version — 🔑 đổi màu: xanh 7n / vàng 5n / đỏ 3n
 function updLicenseCountdown() {
   var el = document.getElementById('license-countdown');
   if (!el) return;
   var days = getRemainingDays();
   el.className = '';
+  el.style.color = '';
   if (days > 0) {
-    el.textContent = '· còn ' + days + ' ngày';
-    if (days <= 3) el.classList.add('lc-red');
-    else if (days <= 7) el.classList.add('lc-yellow');
-    else el.classList.add('lc-normal');
+    el.textContent = '🔑 còn ' + days + ' ngày';
+    if (days <= 3)      el.classList.add('lc-red');
+    else if (days <= 5) el.classList.add('lc-yellow');
+    else if (days <= 7) { el.classList.add('lc-normal'); el.style.color='#86efac'; }
+    else                el.classList.add('lc-normal');
   } else {
-    el.textContent = '· hết hạn';
+    el.textContent = '🔑 hết hạn';
     el.classList.add('lc-red');
   }
 }
@@ -5425,7 +5934,10 @@ function openSgGuiMoi(){
   setSgtDate(today());
   document.getElementById('sgt-loai').value='';
   document.getElementById('sgt-gia').value='';
-  document.getElementById('sgt-ten').value=sgCurrentKH||'';
+  document.getElementById('sgt-ten').value='';
+  document.getElementById('sgu-ten').value='';   // reset cả bên ứng
+  document.getElementById('sgu-tien').value='';
+  document.getElementById('sgu-noidung').value='';
   document.getElementById('sgt-kg').value='';
   document.getElementById('sgt-do').value='';
   document.getElementById('sgt-do-row').style.display='none';
@@ -5435,6 +5947,10 @@ function openSgGuiMoi(){
   document.getElementById('sgt-save-btn').textContent='📒 Lưu sổ gửi';
   document.getElementById('sgt-form-gui').style.display='';
   document.getElementById('sgt-form-ung').style.display='none';
+  var delBtn=document.getElementById('sgt-del-btn');
+  if(delBtn) delBtn.style.display='none';
+  var wrap=document.getElementById('sgt-trano-wrap');
+  if(wrap) wrap.style.display='none';
   openM('modal-sg-tab');
 }
 
@@ -5443,16 +5959,42 @@ function openSgUngTien(){
   sgTabEditId=null; sgTabEditType=null;
   setSgtType('ung');
   setSgtDate(today());
-  document.getElementById('sgu-ten').value=sgCurrentKH||'';
+  document.getElementById('sgu-ten').value='';
+  document.getElementById('sgt-ten').value='';
+  document.getElementById('sgt-loai').value='';
+  document.getElementById('sgt-kg').value='';
+  document.getElementById('sgt-do').value='';
+  document.getElementById('sgt-gia').value='';
   document.getElementById('sgu-tien').value='';
   document.getElementById('sgu-noidung').value='';
   document.getElementById('sgt-modal-title').textContent='💵 Ứng tiền';
   document.getElementById('sgt-save-btn').textContent='💵 Lưu ứng tiền';
   document.getElementById('sgt-form-gui').style.display='none';
   document.getElementById('sgt-form-ung').style.display='';
+  var delBtn=document.getElementById('sgt-del-btn');
+  if(delBtn) delBtn.style.display='none';
+  var wrap=document.getElementById('sgt-trano-wrap');
+  if(wrap) wrap.style.display='none';
   openM('modal-sg-tab');
 }
 
+// Mở gửi sổ với tên KH mặc định (từ trang chi tiết)
+function openSgGuiMoiForKH(ten){
+  openSgGuiMoiClean();
+  setTimeout(function(){
+    var el=document.getElementById('sgt-ten');
+    if(el){ el.value=ten; el.style.background='#f0fdf4'; el.style.borderColor='var(--gp)'; }
+  },50);
+}
+
+// Mở ứng tiền với tên KH mặc định (từ trang chi tiết)
+function openSgUngTienForKH(ten){
+  openSgUngTien();
+  setTimeout(function(){
+    var el=document.getElementById('sgu-ten');
+    if(el){ el.value=ten; el.style.background='#fffbeb'; el.style.borderColor='#fcd34d'; }
+  },50);
+}
 // Mở popup chọn từ dữ liệu thu mua
 function openSgPickFromMua(){
   document.getElementById('sgpick-date').value=today();
@@ -5545,8 +6087,17 @@ function chupAnhSS(){
 
 // Xoá ghi chép sổ gửi/ứng
 function closeSgModal(){
+  // Reset sạch cả 2 form
+  ['sgt-ten','sgt-loai','sgt-kg','sgt-do','sgt-gia','sgu-ten','sgu-tien','sgu-noidung'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  var tt=document.getElementById('sgt-tt'); if(tt) tt.textContent='0 ₫';
+  var chu=document.getElementById('sgt-chu'); if(chu) chu.textContent='--';
   var delBtn=document.getElementById('sgt-del-btn');
   if(delBtn) delBtn.style.display='none';
+  var wrap=document.getElementById('sgt-trano-wrap');
+  if(wrap) wrap.style.display='none';
+  sgTabEditId=null; sgTabEditType=null;
   closeM('modal-sg-tab');
 }
 function openSgGuiMoiClean(){
