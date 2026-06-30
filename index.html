@@ -923,15 +923,16 @@ input[type=date]:focus{border-color:var(--gl)}
         <div id="settings-license-info" style="font-size:12px;color:var(--g600);margin-bottom:8px"></div>
         <button onclick="openGiaHan()" style="width:100%;padding:10px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">🔑 Gia hạn thời gian sử dụng</button>
       </div>
-      <!-- ĐỔI MẬT KHẨU THỐNG KÊ THÁNG -->
+      <!-- ĐỔI MẬT KHẨU QUẢN LÝ GIAO DỊCH -->
       <div style="padding:14px 4px;border-top:1px solid var(--g100)">
-        <div style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:2px">Mật khẩu thống kê tháng</div>
-        <div style="font-size:12px;color:var(--g600);margin-bottom:8px">Dùng khi nhấn "Chốt tháng"</div>
-        <button onclick="openDoiPwThang()" style="width:100%;padding:10px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">🔐 Đổi mật khẩu thống kê tháng</button>
+        <div style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:2px">Mật khẩu quản lý giao dịch</div>
+        <div style="font-size:12px;color:var(--g600);margin-bottom:8px">Dùng khi Chốt sổ, Huỷ chốt sổ, Chốt tháng, Huỷ chốt tháng</div>
+        <button onclick="openDoiPwThang()" style="width:100%;padding:10px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">🔐 Đổi mật khẩu quản lý giao dịch</button>
+        <button onclick="closeM('modal-settings');openQuenMatKhau()" style="width:100%;padding:10px;background:#fff7ed;color:#c2410c;border:1.5px solid #fdba74;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">❓ Quên mật khẩu</button>
       </div>
     </div>
-    <button class="btn-huy" style="width:100%;margin-top:10px" onclick="closeM('modal-settings')">Đóng</button>
-    <button onclick="closeM('modal-settings');openHuongDan()" style="width:100%;margin-top:8px;padding:11px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">📖 Hướng dẫn sử dụng</button>
+    <button onclick="closeM('modal-settings');openHuongDan()" style="width:100%;margin-top:10px;padding:11px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">📖 Hướng dẫn sử dụng</button>
+    <button class="btn-huy" style="width:100%;margin-top:8px" onclick="closeM('modal-settings')">Đóng</button>
   </div>
 </div>
 
@@ -1008,7 +1009,7 @@ input[type=date]:focus{border-color:var(--gl)}
 <div class="modal center" id="modal-doi-pw-thang">
   <div class="modal-box center-box" style="max-width:320px">
     <div style="font-size:32px;text-align:center;margin-bottom:8px">🔐</div>
-    <div style="font-size:15px;font-weight:800;text-align:center;color:var(--g800);margin-bottom:10px">Đổi mật khẩu thống kê tháng</div>
+    <div style="font-size:15px;font-weight:800;text-align:center;color:var(--g800);margin-bottom:10px">Đổi mật khẩu quản lý giao dịch</div>
     <input type="password" autocomplete="new-password" id="dpw-old" class="fi" placeholder="Mật khẩu cũ" style="margin-bottom:8px">
     <input type="password" autocomplete="new-password" id="dpw-new" class="fi" placeholder="Mật khẩu mới" style="margin-bottom:8px">
     <input type="password" autocomplete="new-password" id="dpw-confirm" class="fi" placeholder="Xác nhận mật khẩu mới" style="margin-bottom:8px">
@@ -1016,6 +1017,23 @@ input[type=date]:focus{border-color:var(--gl)}
     <div class="cfm-btns">
       <button class="cfm-btn n" onclick="closeM('modal-doi-pw-thang')">Huỷ</button>
       <button class="cfm-btn y" onclick="doDoiPwThang()">Đổi mật khẩu</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL QUÊN MẬT KHẨU (dùng mật khẩu quản trị mặc định 28082008) -->
+<div class="modal center" id="modal-quen-pw">
+  <div class="modal-box center-box" style="max-width:320px">
+    <div style="font-size:32px;text-align:center;margin-bottom:8px">❓</div>
+    <div style="font-size:15px;font-weight:800;text-align:center;color:var(--g800);margin-bottom:4px">Quên mật khẩu?</div>
+    <div style="font-size:11px;color:var(--g600);text-align:center;margin-bottom:10px">Nhập mật khẩu quản trị để đặt lại</div>
+    <input type="password" autocomplete="new-password" id="qpw-admin" class="fi" placeholder="Mật khẩu quản trị" style="margin-bottom:8px">
+    <input type="password" autocomplete="new-password" id="qpw-new" class="fi" placeholder="Mật khẩu mới" style="margin-bottom:8px">
+    <input type="password" autocomplete="new-password" id="qpw-confirm" class="fi" placeholder="Xác nhận mật khẩu mới" style="margin-bottom:8px">
+    <div id="qpw-err" style="color:#dc2626;font-size:11px;margin-bottom:8px;display:none"></div>
+    <div class="cfm-btns">
+      <button class="cfm-btn n" onclick="closeM('modal-quen-pw')">Huỷ</button>
+      <button class="cfm-btn y" onclick="doQuenPw()">Đặt lại mật khẩu</button>
     </div>
   </div>
 </div>
@@ -3007,7 +3025,8 @@ function _doSilentRefresh(doneCb) {
     doneCb(true);
   };
   try {
-    window._gdTokenClient.requestAccessToken({ prompt: '' });
+    // prompt:'none' = bắt buộc không hiện UI, fail ngay nếu cần tương tác người dùng
+    window._gdTokenClient.requestAccessToken({ prompt: 'none' });
   } catch(e) {
     if (!_done) { _done = true; clearTimeout(_timeout); doneCb(false); }
   }
@@ -3037,7 +3056,7 @@ function ensureValidToken(cb) {
     return;
   }
 
-  // Bước 1: thử silent refresh
+  // Bước 1: thử silent refresh (prompt:'none' — tuyệt đối không hiện UI)
   _doSilentRefresh(function(ok) {
     if (ok) {
       _gdRefreshing = false;
@@ -3046,15 +3065,16 @@ function ensureValidToken(cb) {
       return;
     }
 
-    // Bước 2: silent thất bại → thử lại với prompt khác (select_account silent)
+    // Bước 2: thử lại với prompt:'' — Google tự quyết định, có thể vẫn
+    // làm mới ẩn nếu phiên trình duyệt còn cookie hợp lệ, hiếm khi cần UI
     var prevCb2 = window._gdTokenClient.callback;
     var _done2 = false;
     var _t2 = setTimeout(function() {
       if (_done2) return; _done2 = true;
       window._gdTokenClient.callback = prevCb2;
       _gdRefreshing = false;
-      // Cả 2 lần silent đều thất bại → yêu cầu đăng nhập thủ công
-      toast('⚠️ Phiên đăng nhập hết hạn — nhấn thanh tài khoản để đăng nhập lại');
+      // Cả 2 lần đều thất bại → BẮT BUỘC thông báo, không bao giờ âm thầm bỏ qua
+      toast('⚠️ Phiên đăng nhập Google đã hết — nhấn thanh tài khoản để đăng nhập lại');
       _showReloginBanner();
       var cbs = _gdRefreshCallbacks.splice(0);
       cbs.forEach(function(item) { if (item.fail) item.fail(); });
@@ -3066,7 +3086,7 @@ function ensureValidToken(cb) {
       window._gdTokenClient.callback = prevCb2;
       _gdRefreshing = false;
       if (resp.error || !resp.access_token) {
-        toast('⚠️ Phiên đăng nhập hết hạn — nhấn thanh tài khoản để đăng nhập lại');
+        toast('⚠️ Phiên đăng nhập Google đã hết — nhấn thanh tài khoản để đăng nhập lại');
         _showReloginBanner();
         var cbs2 = _gdRefreshCallbacks.splice(0);
         cbs2.forEach(function(item) { if (item.fail) item.fail(); });
@@ -3077,13 +3097,13 @@ function ensureValidToken(cb) {
       cb();
     };
     try {
-      window._gdTokenClient.requestAccessToken({ prompt: 'none' });
+      window._gdTokenClient.requestAccessToken({ prompt: '' });
     } catch(e) {
       if (!_done2) {
         _done2 = true; clearTimeout(_t2);
         window._gdTokenClient.callback = prevCb2;
         _gdRefreshing = false;
-        toast('⚠️ Phiên đăng nhập hết hạn — nhấn thanh tài khoản để đăng nhập lại');
+        toast('⚠️ Phiên đăng nhập Google đã hết — nhấn thanh tài khoản để đăng nhập lại');
         _showReloginBanner();
         var cbs3 = _gdRefreshCallbacks.splice(0);
         cbs3.forEach(function(item) { if (item.fail) item.fail(); });
@@ -3111,8 +3131,15 @@ function initGoogleAuth() {
       return;
     }
     updGDBar();
-    // Lên lịch proactive refresh ngay khi khởi động
-    _scheduleProactiveRefresh();
+    // Kiểm tra ngay: nếu token đã hết hạn hoặc gần hết (< 5 phút) → refresh ngay lập tức
+    if (!gdToken || Date.now() >= gdTokenExpiry - 5*60*1000) {
+      ensureValidToken(function(){
+        // Token đã được làm mới (im lặng) — không cần làm gì thêm, ensureValidToken tự lo
+      });
+    } else {
+      // Token còn hạn lâu — chỉ cần lên lịch refresh cho lần tới
+      _scheduleProactiveRefresh();
+    }
     if (navigator.onLine) {
       setTimeout(function(){
         syncLicenseOnConnect();
@@ -4591,8 +4618,16 @@ function fmtDateVN_ss(ds){ var p=ds?ds.split('-'):[]; return p.length===3?p[2]+'
 // Lưu theo key: thang_data_{loai} = [{date, muaKg, muaDo, muaTien, banKg, banDo, banTien}]
 // ══════════════════════════════════════════
 var RESET_PW_DEFAULT = '234567';
+var ADMIN_PW_DEFAULT = '28082008'; // Mật khẩu quản trị — quyền cao nhất, luôn dùng được thay cho mật khẩu quản lý giao dịch
 function getThangPW(){ return localStorage.getItem('thang_pw') || RESET_PW_DEFAULT; }
 function setThangPW(p){ localStorage.setItem('thang_pw', p); }
+function getAdminPW(){ return localStorage.getItem('admin_pw') || ADMIN_PW_DEFAULT; }
+function setAdminPW(p){ localStorage.setItem('admin_pw', p); }
+// Kiểm tra mật khẩu hợp lệ cho mọi thao tác quản lý giao dịch (chốt sổ, huỷ chốt, chốt tháng...)
+// Chấp nhận: mật khẩu quản lý giao dịch HOẶC mật khẩu quản trị (quyền cao nhất)
+function checkManagePW(pw){
+  return pw === getThangPW() || pw === getAdminPW();
+}
 var THANG_KEY = 'thang_v1';
 
 function getThangData(){ try{ return JSON.parse(localStorage.getItem(THANG_KEY))||[]; }catch{ return []; } }
@@ -4726,7 +4761,7 @@ function resetThang(){
 }
 function doResetThang(){
   var pw = document.getElementById('reset-pw-input').value;
-  if(pw !== getThangPW()){
+  if(!checkManagePW(pw)){
     document.getElementById('reset-pw-err').style.display='block';
     return;
   }
@@ -5040,7 +5075,41 @@ function doDoiPwThang() {
   }
   setThangPW(newPw);
   closeM('modal-doi-pw-thang');
-  toast('✅ Đã đổi mật khẩu thống kê tháng!');
+  toast('✅ Đã đổi mật khẩu quản lý giao dịch!');
+}
+
+// ── QUÊN MẬT KHẨU (dùng mật khẩu quản trị để đặt lại) ──
+function openQuenMatKhau(){
+  document.getElementById('qpw-admin').value='';
+  document.getElementById('qpw-new').value='';
+  document.getElementById('qpw-confirm').value='';
+  document.getElementById('qpw-err').style.display='none';
+  openM('modal-quen-pw');
+}
+function doQuenPw(){
+  var adminPw = document.getElementById('qpw-admin').value;
+  var newPw = document.getElementById('qpw-new').value;
+  var confirmPw = document.getElementById('qpw-confirm').value;
+  var errEl = document.getElementById('qpw-err');
+
+  if (adminPw !== getAdminPW()) {
+    errEl.textContent = '❌ Mật khẩu quản trị không đúng!';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (!newPw || newPw.length < 4) {
+    errEl.textContent = '⚠️ Mật khẩu mới phải có ít nhất 4 ký tự!';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (newPw !== confirmPw) {
+    errEl.textContent = '❌ Xác nhận mật khẩu không khớp!';
+    errEl.style.display = 'block';
+    return;
+  }
+  setThangPW(newPw);
+  closeM('modal-quen-pw');
+  toast('✅ Đã đặt lại mật khẩu quản lý giao dịch!');
 }
 
 // ══════════════════════════════════════════
@@ -5269,7 +5338,7 @@ function huyChotSo(ten){
     function(){
       var pw=document.getElementById('huy-chot-pw');
       var val=pw?pw.value.trim():'';
-      if(val!==getThangPW()){ toast('❌ Mật khẩu không đúng!'); return; }
+      if(!checkManagePW(val)){ toast('❌ Mật khẩu không đúng!'); return; }
       var sg=getSG();
       sg.forEach(function(r){ if(r.ten===ten&&r.chot){ delete r.chot; if(r.ghiChuKhac==='Đã chốt sổ') delete r.ghiChuKhac; } });
       setSG(sg);
@@ -5740,7 +5809,7 @@ function chotSoGuiKH(ten){
 }
 function doChot(){
   var pw=document.getElementById('chot-so-pw').value;
-  if(pw!==getThangPW()){
+  if(!checkManagePW(pw)){
     document.getElementById('chot-so-err').style.display='block';
     return;
   }
@@ -5758,27 +5827,6 @@ function doChot(){
 }
 
 
-
-function resetThang(){
-  document.getElementById('reset-pw-input').value='';
-  document.getElementById('reset-pw-err').style.display='none';
-  openM('modal-reset-thang');
-}
-function doResetThang(){
-  var pw = document.getElementById('reset-pw-input').value;
-  if(pw !== getThangPW()){
-    document.getElementById('reset-pw-err').style.display='block';
-    return;
-  }
-  closeM('modal-reset-thang');
-  showDetail('🔄','Xác nhận đặt lại tháng?',
-    [['Thao tác','Xoá toàn bộ thống kê tháng'],['Lưu ý','Không thể hoàn tác']],
-    null,'Đặt lại',function(){
-      setThangData([]);
-      renderThangTK();
-      toast('✅ Đã đặt lại thống kê tháng!');
-    });
-}
 
 // ── CẬP NHẬT PLACEHOLDER GỢI Ý CHO FORM BÁN ──
 function updBanHints() {
@@ -6046,39 +6094,6 @@ function doGiaHan() {
 
 
 // ── ĐỔI MẬT KHẨU THỐNG KÊ THÁNG ──
-function openDoiPwThang() {
-  document.getElementById('dpw-old').value = '';
-  document.getElementById('dpw-new').value = '';
-  document.getElementById('dpw-confirm').value = '';
-  document.getElementById('dpw-err').style.display = 'none';
-  closeM('modal-settings');
-  openM('modal-doi-pw-thang');
-}
-function doDoiPwThang() {
-  var oldPw = document.getElementById('dpw-old').value;
-  var newPw = document.getElementById('dpw-new').value;
-  var confirmPw = document.getElementById('dpw-confirm').value;
-  var errEl = document.getElementById('dpw-err');
-
-  if (oldPw !== getThangPW()) {
-    errEl.textContent = '❌ Mật khẩu cũ không đúng!';
-    errEl.style.display = 'block';
-    return;
-  }
-  if (!newPw || newPw.length < 4) {
-    errEl.textContent = '⚠️ Mật khẩu mới phải có ít nhất 4 ký tự!';
-    errEl.style.display = 'block';
-    return;
-  }
-  if (newPw !== confirmPw) {
-    errEl.textContent = '❌ Xác nhận mật khẩu không khớp!';
-    errEl.style.display = 'block';
-    return;
-  }
-  setThangPW(newPw);
-  closeM('modal-doi-pw-thang');
-  toast('✅ Đã đổi mật khẩu thống kê tháng!');
-}
 
 // ══════════════════════════════════════════
 // TAB SỔ GỬI - CÁC HÀM BỔ SUNG (v5.6)
