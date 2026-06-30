@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#1a472a">
+<meta name="format-detection" content="telephone=no,email=no,address=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Mủ Cao Su">
@@ -12,7 +13,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v7.9</title>
+<title>Mua Bán Mủ Cao Su v8.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -58,6 +59,8 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g
 .fr{margin-bottom:8px;position:relative}
 .fl{font-size:11px;font-weight:600;color:var(--g600);margin-bottom:4px;display:block}
 .fi{width:100%;padding:9px 11px;border:1.5px solid var(--g200);border-radius:var(--rs);font-family:'Be Vietnam Pro',sans-serif;font-size:14px;color:var(--g800);background:var(--g50);outline:none;transition:border-color .2s;-webkit-appearance:none}
+input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
+input[type="search"]::-webkit-search-decoration{-webkit-appearance:none;appearance:none}
 .fi:focus{border-color:var(--gl);background:#fff;box-shadow:0 0 0 3px rgba(64,145,108,.1)}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 
@@ -429,7 +432,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v7.9 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v8.1 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -484,7 +487,7 @@ input[type=date]:focus{border-color:var(--gl)}
     </div>
     <div class="fr">
       <label class="fl">Tên người bán</label>
-      <input type="text" id="mua-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('mua')" autocomplete="off" onkeydown="tenKey(event,'mua')" onfocus="scrollInputUp(this)">
+      <input type="search" id="mua-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('mua')" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="q" onkeydown="tenKey(event,'mua')" onfocus="scrollInputUp(this)">
       <div class="ac-list" id="mua-ac"></div>
     </div>
     <div class="g2" id="mua-kg-row">
@@ -576,7 +579,7 @@ input[type=date]:focus{border-color:var(--gl)}
     </div>
     <div class="fr">
       <label class="fl">Tên người mua</label>
-      <input type="text" id="ban-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('ban')" autocomplete="off" onkeydown="tenKey(event,'ban')" onfocus="scrollInputUp(this)" onblur="var l=getLoai('ban');var t=this.value.trim();if(l&&t)saveLastBuyer(l,t);">
+      <input type="search" id="ban-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('ban')" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="q" onkeydown="tenKey(event,'ban')" onfocus="scrollInputUp(this)" onblur="var l=getLoai('ban');var t=this.value.trim();if(l&&t)saveLastBuyer(l,t);">
       <div class="ac-list" id="ban-ac"></div>
     </div>
     <div class="g2" id="ban-kg-row">
@@ -688,7 +691,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="fr">
         <label class="fl">Tên khách hàng</label>
         <div style="position:relative">
-          <input type="text" id="sgt-ten" class="fi" placeholder="Nhập tên..." oninput="onSgtTen()" autocomplete="off">
+          <input type="search" id="sgt-ten" class="fi" placeholder="Nhập tên..." oninput="onSgtTen()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="q1" onfocus="scrollInputUp(this)">
           <div class="ac-drop" id="sgt-ac" style="display:none"></div>
         </div>
       </div>
@@ -724,7 +727,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="fr">
         <label class="fl">Tên người ứng</label>
         <div style="position:relative">
-          <input type="text" id="sgu-ten" class="fi" placeholder="Nhập tên..." oninput="onSguTen()" autocomplete="off">
+          <input type="search" id="sgu-ten" class="fi" placeholder="Nhập tên..." oninput="onSguTen()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="q2" onfocus="scrollInputUp(this)">
           <div class="ac-drop" id="sgu-ac" style="display:none"></div>
         </div>
       </div>
@@ -1246,7 +1249,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v7.9</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v8.1</div>
       </div>
     </div>
 
@@ -2884,10 +2887,10 @@ function gdTodayStr() {
 // ── Kéo ô nhập tên lên khi focus để tránh bàn phím che đề xuất ──
 function scrollInputUp(el) {
   setTimeout(function() {
-    var rect = el.getBoundingClientRect();
-    var targetY = window.scrollY + rect.top - 120; // 120px từ top màn hình
-    window.scrollTo({ top: targetY, behavior: 'smooth' });
-  }, 300); // chờ bàn phím hiện ra
+    // scrollIntoView với block:'center' ổn định hơn nhiều so với tính toán scrollY thủ công
+    // trên WebView Android khi visualViewport co lại do bàn phím
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 320); // chờ bàn phím hiện ra ổn định
 }
 
 // Kiểm tra và refresh token nếu gần hết hạn
