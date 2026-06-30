@@ -424,7 +424,7 @@ input[type=date]:focus{border-color:var(--gl)}
 <div class="hdr">
   <div class="hdr-top">
     <div class="logo">
-      <div class="logo-ico" onclick="openHuongDan()" style="cursor:pointer;background:none;padding:0;width:40px;height:40px;border-radius:50%;overflow:hidden" title="Hướng dẫn sử dụng">
+      <div class="logo-ico" style="background:none;padding:0;width:40px;height:40px;border-radius:50%;overflow:hidden">
         <img src="logo.png" style="width:40px;height:40px;object-fit:cover;border-radius:50%" alt="Logo">
       </div>
       <div>
@@ -974,10 +974,7 @@ input[type=date]:focus{border-color:var(--gl)}
     <div style="font-size:14px;color:var(--g600);text-align:center;line-height:1.6;margin-bottom:14px">
       Bạn còn <b id="warn-expiry-days" style="font-size:18px"></b> ngày sử dụng.<br>
       Vui lòng gia hạn để tiếp tục sử dụng.<br>
-      <span style="font-size:12px;color:var(--g400)">Chi tiết gia hạn xem ở phần <b>Hướng dẫn</b></span><br>
-      <span style="font-size:12px;margin-top:4px;display:inline-block">
-        📧 <b>taidautieng@gmail.com</b><br>📞 <b>0987.656.701</b>
-      </span>
+      <span style="font-size:12px;color:var(--g400)">Chi tiết gia hạn xem ở phần <b>Hướng dẫn</b></span>
     </div>
     <div class="cfm-btns">
       <button class="cfm-btn n" onclick="closeM('modal-warn-expiry')">Để sau</button>
@@ -1235,23 +1232,6 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
     </div>
 
-    <!-- DÙNG THỬ & GIA HẠN -->
-    <div style="background:#f0fdf4;border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid #16a34a">
-      <div style="font-size:13px;font-weight:800;color:#15803d;margin-bottom:8px">🔑 DÙNG THỬ &amp; GIA HẠN</div>
-      <div style="font-size:12px;color:var(--g800);line-height:1.7">
-        • Phần mềm được <b>dùng thử miễn phí 3 ngày</b> kể từ lần đầu cài đặt<br>
-        • Khi còn 7 ngày: biểu tượng 🔑 chuyển <span style="color:#16a34a;font-weight:700">xanh</span> → cảnh báo sắp hết hạn<br>
-        • Khi còn 5 ngày: chuyển <span style="color:#d97706;font-weight:700">vàng</span> — nên gia hạn sớm<br>
-        • Khi còn 3 ngày: chuyển <span style="color:#dc2626;font-weight:700">đỏ nhấp nháy</span> — cần gia hạn ngay<br>
-        • Sau khi hết hạn: chỉ xem được dữ liệu, không thể ghi thêm<br><br>
-        <b>Cách gia hạn:</b><br>
-        Vào <b>⚙️ Cài đặt → 🔑 Gia hạn thời gian sử dụng</b><br>
-        Đọc <b>Mã máy</b> và liên hệ để nhận mã kích hoạt:<br>
-        📧 <b>taidautieng@gmail.com</b><br>
-        📞 <b>0987.656.701</b>
-      </div>
-    </div>
-
     <!-- THU MUA -->
     <div style="background:var(--gb);border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid var(--gd)">
       <div style="font-size:13px;font-weight:800;color:var(--gd);margin-bottom:8px">🛒 Tab THU MUA</div>
@@ -1321,6 +1301,20 @@ input[type=date]:focus{border-color:var(--gl)}
         • Dữ liệu lưu trên thiết bị (localStorage) — không mất khi tắt app<br>
         • Nhấp đúp nhanh 2 lần (trong 600ms) để sửa/xoá giao dịch<br>
         • Nhấn biểu tượng 🌿 bất kỳ lúc nào để xem lại hướng dẫn này
+      </div>
+    </div>
+
+    <!-- DÙNG THỬ & GIA HẠN -->
+    <div style="background:#f0fdf4;border-radius:var(--r);padding:12px;margin-bottom:14px;border-left:3px solid #16a34a">
+      <div style="font-size:13px;font-weight:800;color:#15803d;margin-bottom:8px">🔑 DÙNG THỬ &amp; GIA HẠN</div>
+      <div style="font-size:12px;color:var(--g800);line-height:1.7">
+        • Phần mềm được <b>dùng thử miễn phí 3 ngày</b> kể từ lần đầu cài đặt<br>
+        • Sau khi hết hạn: chỉ xem được dữ liệu, không thể ghi thêm<br><br>
+        <b>Cách gia hạn:</b><br>
+        Vào <b>⚙️ Cài đặt → 🔑 Gia hạn thời gian sử dụng</b><br>
+        Đọc <b>Mã máy</b> và liên hệ để nhận mã kích hoạt:<br>
+        📧 <b>taidautieng@gmail.com</b><br>
+        📞 <b>0987.656.701</b>
       </div>
     </div>
 
@@ -3501,34 +3495,195 @@ function syncToDrive() {
 }
 
 // ── ĐỒNG BỘ SỔ GỬI - mỗi KH 1 file ──
+// ── ĐỒNG BỘ SỔ GỬI/ỨNG THEO TỪNG KH ──
+// Thư mục "Gửi Ứng" nằm trong MuCaoSuPro
+// Thư mục "Đã Chốt Sổ" nằm trong MuCaoSuPro (KH chốt xong chuyển vào đây + khoá)
+var _gdGuiUngFolderId = null;
+var _gdDaChotFolderId = null;
+
+function _getOrCreateSubFolder(name, parentId, cb) {
+  var q = encodeURIComponent("name='" + name + "' and '" + parentId + "' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false");
+  fetch('https://www.googleapis.com/drive/v3/files?q=' + q + '&fields=files(id,name)', {
+    headers: { Authorization: 'Bearer ' + gdToken }
+  }).then(function(r){ return r.json(); }).then(function(data){
+    if (data.files && data.files.length) { cb(data.files[0].id); return; }
+    fetch('https://www.googleapis.com/drive/v3/files', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, mimeType: 'application/vnd.google-apps.folder', parents: [parentId] })
+    }).then(function(r){ return r.json(); }).then(function(d){ cb(d.id); }).catch(function(){ cb(null); });
+  }).catch(function(){ cb(null); });
+}
+
+// Tìm file theo tên trong 1 thư mục cụ thể
+function _findFileInFolder(fname, folderId, cb) {
+  var q = encodeURIComponent("name='" + fname + "' and '" + folderId + "' in parents and trashed=false");
+  fetch('https://www.googleapis.com/drive/v3/files?q=' + q + '&fields=files(id,name)', {
+    headers: { Authorization: 'Bearer ' + gdToken }
+  }).then(function(r){ return r.json(); }).then(function(data){
+    cb(data.files && data.files.length ? data.files[0].id : null);
+  }).catch(function(){ cb(null); });
+}
+
+// Tạo Spreadsheet mới trong 1 thư mục
+function _createSheetInFolder(fname, folderId, sheetName, cb) {
+  fetch('https://sheets.googleapis.com/v4/spreadsheets', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ properties: { title: fname }, sheets: [{ properties: { title: sheetName } }] })
+  }).then(function(r){ return r.json(); }).then(function(data){
+    var sid = data.spreadsheetId;
+    fetch('https://www.googleapis.com/drive/v3/files/' + sid + '?addParents=' + folderId + '&removeParents=root&fields=id', {
+      method: 'PATCH', headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' }, body: JSON.stringify({})
+    }).then(function(){ cb(sid); }).catch(function(){ cb(sid); });
+  }).catch(function(){ cb(null); });
+}
+
+// Ghi dữ liệu vào sheet (xoá cũ + ghi mới)
+function _writeSheet(sid, sheetName, rows, cb) {
+  fetch('https://sheets.googleapis.com/v4/spreadsheets/' + sid + '/values/' + encodeURIComponent(sheetName + '!A1') + '?valueRenderOption=RAW', {
+    headers: { Authorization: 'Bearer ' + gdToken }
+  }).then(function(){
+    return fetch('https://sheets.googleapis.com/v4/spreadsheets/' + sid + '/values/' + encodeURIComponent(sheetName + '!A1') + ':clear', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + gdToken }
+    });
+  }).then(function(){
+    return fetch('https://sheets.googleapis.com/v4/spreadsheets/' + sid + '/values/' + encodeURIComponent(sheetName + '!A1'), {
+      method: 'PUT',
+      headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ valueInputOption: 'RAW', values: rows })
+    });
+  }).then(function(){ if(cb) cb(); }).catch(function(){ if(cb) cb(); });
+}
+
+// Khoá Spreadsheet (chỉ đọc) bằng cách đặt Protected Range toàn bộ
+function _lockSheet(sid, cb) {
+  // Lấy sheetId đầu tiên
+  fetch('https://sheets.googleapis.com/v4/spreadsheets/' + sid + '?fields=sheets.properties', {
+    headers: { Authorization: 'Bearer ' + gdToken }
+  }).then(function(r){ return r.json(); }).then(function(meta){
+    var sheetId = (meta.sheets && meta.sheets[0]) ? meta.sheets[0].properties.sheetId : 0;
+    return fetch('https://sheets.googleapis.com/v4/spreadsheets/' + sid + ':batchUpdate', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ requests: [{ addProtectedRange: {
+        protectedRange: { range: { sheetId: sheetId }, description: 'Đã chốt sổ — chỉ đọc', warningOnly: true }
+      } }] })
+    });
+  }).then(function(){ if(cb) cb(); }).catch(function(){ if(cb) cb(); });
+}
+
+// Di chuyển file sang thư mục khác
+function _moveFile(fileId, fromFolderId, toFolderId, cb) {
+  fetch('https://www.googleapis.com/drive/v3/files/' + fileId + '?addParents=' + toFolderId + '&removeParents=' + fromFolderId + '&fields=id', {
+    method: 'PATCH', headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' }, body: JSON.stringify({})
+  }).then(function(){ if(cb) cb(); }).catch(function(){ if(cb) cb(); });
+}
+
+// Hàm chính: sync sổ gửi/ứng từng KH
 function syncSoGui() {
   var sg = getSG();
-  if (!sg.length) return;
-  // Group by tên KH
-  var byKH = {};
-  sg.forEach(function(r) {
-    if (!byKH[r.ten]) byKH[r.ten] = [];
-    byKH[r.ten].push(r);
-  });
-  var khs = Object.keys(byKH);
-  var idx = 0;
-  function next() {
-    if (idx >= khs.length) { toast('📒 Sổ gửi đã cập nhật!'); return; }
-    var ten = khs[idx++];
-    var rows = byKH[ten];
-    var hdr = ['Ngày','Loại mủ','Kg nhập','Trừ bì','Kg thực','Đơn giá','Thành tiền'];
-    var data = [hdr].concat(rows.map(function(r) {
-      var biSG = parseFloat(r.bi)||0;
-      return [fmtDateVN(r.date), LOAI_LBL[r.loai]||r.loai, fmtKg(r.kg), biSG>0?fmtKg(biSG):'', fmtKg(kgThuc(r.loai,r.kg,r.do,r.bi||0)), fmtNum(r.gia), fmtNum(r.tt)];
-    }));
-    // Tổng cộng
-    var total = rows.reduce(function(s,r) { return s + (parseFloat(r.tt)||0); }, 0);
-    data.push(['','','','','TỔNG CỘNG', fmtNum(total)]);
-    // Tên file = "SoGui_TenKH" (bỏ ký tự đặc biệt không hợp lệ)
-    var safeName = 'SoGui_' + ten.replace(/[\/\\?*[\]]/g,'_');
-    upsertSheet(safeName, [{ name: ten, rows: data }], function() { next(); });
+  var su = getSU();
+  if (!sg.length && !su.length) return;
+
+  function fmtDateVN(dateStr){
+    if(!dateStr) return '';
+    var p=dateStr.split('-');
+    return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:dateStr;
   }
-  next();
+
+  // Xác định KH đã chốt toàn bộ
+  var allNames = new Set(sg.map(function(r){return r.ten;}).concat(su.map(function(r){return r.ten;})));
+  var chotKH = {};
+  allNames.forEach(function(ten){
+    var sgK=sg.filter(function(r){return r.ten===ten;});
+    var suK=su.filter(function(r){return r.ten===ten;});
+    if((sgK.length||suK.length)&&sgK.every(function(r){return r.chot;})&&suK.every(function(r){return r.chot;}))
+      chotKH[ten]=true;
+  });
+
+  // Bước 1: đảm bảo thư mục "Gửi Ứng" và "Đã Chốt Sổ" tồn tại
+  _getOrCreateSubFolder('Gửi Ứng', gdFolderId, function(guiUngId){
+    if(!guiUngId){ toast('❌ Không tạo được thư mục Gửi Ứng'); return; }
+    _gdGuiUngFolderId = guiUngId;
+    _getOrCreateSubFolder('Đã Chốt Sổ', gdFolderId, function(daChotId){
+      if(!daChotId){ toast('❌ Không tạo được thư mục Đã Chốt Sổ'); return; }
+      _gdDaChotFolderId = daChotId;
+
+      // Bước 2: xử lý từng KH tuần tự
+      var names = Array.from(allNames);
+      var idx = 0;
+      function nextKH(){
+        if(idx >= names.length){ toast('📒 Sổ gửi/ứng đã đồng bộ!'); return; }
+        var ten = names[idx++];
+        var sgK = sg.filter(function(r){return r.ten===ten;});
+        var suK = su.filter(function(r){return r.ten===ten;});
+        var isChot = chotKH[ten];
+
+        // Tên file: TenKH_ngayDau
+        var firstDate = ([].concat(sgK,suK).map(function(r){return r.date;}).sort()[0]||'').replace(/-/g,'');
+        var safeTen = ten.replace(/[\/\\?*[\]:'"]/g,'_').substring(0,20);
+        var fname = safeTen + (firstDate?'_'+firstDate:'');
+
+        // Header và dữ liệu
+        var hdrGui=['Ngày','Loại mủ','Kg nhập','Trừ bì','Kg thực','Đơn giá','Thành tiền','Ghi chú'];
+        var hdrUng=['Ngày','Số tiền ứng','Nội dung','Ghi chú'];
+        function guiChu(r){ return r.chot?'Đã chốt sổ':r.edited?'Đã chỉnh sửa':r.ghiChuKhac||''; }
+        function ungChu(r){ return r.chot?'Đã chốt sổ':r.daTraNo?'Đã trả nợ':r.ghiChuKhac||''; }
+
+        var rows=[hdrGui];
+        sgK.forEach(function(r){
+          var bi=parseFloat(r.bi)||0;
+          rows.push([fmtDateVN(r.date),LOAI_LBL[r.loai]||r.loai,fmtKg(r.kg),bi>0?fmtKg(bi):'',fmtKg(kgThuc(r.loai,r.kg,r.do,r.bi||0)),fmtNum(r.gia),fmtNum(r.tt),guiChu(r)]);
+        });
+        var guiTotal=sgK.filter(function(r){return !r.chot;}).reduce(function(s,r){return s+(parseFloat(r.tt)||0);},0);
+        rows.push(['','','','','TỔNG GỬI',fmtNum(guiTotal),'','']);
+        if(suK.length){
+          rows.push(['']);
+          rows.push(hdrUng.concat(['','','','']));
+          suK.forEach(function(r){
+            rows.push([fmtDateVN(r.date),fmtNum(Math.round(r.tien)),r.noidung||'',ungChu(r),'','','','']);
+          });
+          var ungTotal=suK.filter(function(r){return !r.chot&&!r.daTraNo;}).reduce(function(s,r){return s+(parseFloat(r.tien)||0);},0);
+          rows.push(['TỔNG ỨNG (chưa trả)',fmtNum(ungTotal),'','','','','','']);
+          rows.push(['CÒN LẠI',fmtNum(guiTotal-ungTotal),'','','','','','']);
+        }
+
+        // Tìm file trong thư mục Gửi Ứng, nếu không có thì tìm trong Đã Chốt Sổ
+        _findFileInFolder(fname, guiUngId, function(sid){
+          _findFileInFolder(fname, daChotId, function(sidChot){
+            var existId = sid || sidChot;
+            var inChotFolder = !sid && !!sidChot;
+
+            if(existId){
+              // Ghi lại dữ liệu mới
+              _writeSheet(existId, ten.substring(0,100), rows, function(){
+                if(isChot && !inChotFolder){
+                  // Chốt: khoá + di chuyển sang "Đã Chốt Sổ"
+                  _lockSheet(existId, function(){
+                    _moveFile(existId, guiUngId, daChotId, function(){ nextKH(); });
+                  });
+                } else { nextKH(); }
+              });
+            } else {
+              // Tạo file mới trong "Gửi Ứng"
+              _createSheetInFolder(fname, guiUngId, ten.substring(0,100), function(newSid){
+                if(!newSid){ nextKH(); return; }
+                _writeSheet(newSid, ten.substring(0,100), rows, function(){
+                  if(isChot){
+                    _lockSheet(newSid, function(){
+                      _moveFile(newSid, guiUngId, daChotId, function(){ nextKH(); });
+                    });
+                  } else { nextKH(); }
+                });
+              });
+            }
+          });
+        });
+      }
+      nextKH();
+    });
+  });
 }
 
 // ── KHÔI PHỤC từ Drive ──
@@ -4933,15 +5088,32 @@ function renderSgOverview(){
   if(searchEl&&searchEl.parentElement) searchEl.parentElement.style.display='';
   var topRow=document.querySelector('.sg-top-row');
   if(topRow) topRow.style.display='';
+
   var sg=getSG(), su=getSU();
-  var guiNames=new Set(sg.map(function(r){return r.ten;}));
-  var ungNames=new Set(su.map(function(r){return r.ten;}));
-  // Chỉ tính ghi chép chưa chốt vào tổng quan
-  var guiTotal=sg.filter(function(r){return !r.chot;}).reduce(function(a,r){return a+(r.tt||0);},0);
-  var ungTotal=su.filter(function(r){return !r.chot&&!r.daTraNo;}).reduce(function(a,r){return a+(parseFloat(r.tien)||0);},0);
+
+  // Xác định trước tập KH đã chốt toàn bộ để loại khỏi thống kê
+  var _chotKH={};
+  var _allNames=new Set(sg.map(function(r){return r.ten;}).concat(su.map(function(r){return r.ten;})));
+  _allNames.forEach(function(ten){
+    var sgK=sg.filter(function(r){return r.ten===ten;});
+    var suK=su.filter(function(r){return r.ten===ten;});
+    if((sgK.length||suK.length)&&sgK.every(function(r){return r.chot;})&&suK.every(function(r){return r.chot;})){
+      _chotKH[ten]=true;
+    }
+  });
+
+  // Chỉ tính KH chưa chốt vào thống kê tổng quan
+  var sgActive=sg.filter(function(r){return !_chotKH[r.ten];});
+  var suActive=su.filter(function(r){return !_chotKH[r.ten];});
+  var guiNames=new Set(sgActive.filter(function(r){return !r.chot;}).map(function(r){return r.ten;}));
+  var ungNames=new Set(suActive.filter(function(r){return !r.chot&&!r.daTraNo;}).map(function(r){return r.ten;}));
+  var guiTotal=sgActive.filter(function(r){return !r.chot;}).reduce(function(a,r){return a+(r.tt||0);},0);
+  var ungTotal=suActive.filter(function(r){return !r.chot&&!r.daTraNo;}).reduce(function(a,r){return a+(parseFloat(r.tien)||0);},0);
+  var guiCount=sgActive.filter(function(r){return !r.chot;}).length;
+  var ungCount=suActive.filter(function(r){return !r.chot&&!r.daTraNo;}).length;
   var html='';
 
-  // Danh sách KH
+  // Danh sách KH cho khMap — dùng _chotKH đã xác định bên trên
   var sg2=getSG(), su2=getSU();
   var khMap={};
   sg2.forEach(function(r){
@@ -4958,18 +5130,12 @@ function renderSgOverview(){
   });
   window._sgKhList = Object.keys(khMap).sort();
 
-  // ── Tách KH chưa chốt / đã chốt ──
+  // ── Tách KH chưa chốt / đã chốt dùng _chotKH đã tính ──
   var sg3=getSG(), su3=getSU();
-  var chotSet={};
-  sg3.forEach(function(r){ if(r.chot) chotSet[r.ten]=true; });
-  su3.forEach(function(r){ if(r.chot) chotSet[r.ten]=true; });
-  // KH đã chốt = tất cả ghi chép của họ đều chốt
-  var activeSets={}, chotNames=[];
+  var chotNames=[];
+  var activeSets={};
   Object.keys(khMap).forEach(function(ten){
-    var sgK=sg3.filter(function(r){return r.ten===ten;});
-    var suK=su3.filter(function(r){return r.ten===ten;});
-    var allChot=sgK.every(function(r){return r.chot;})&&suK.every(function(r){return r.chot;});
-    if(allChot&&(sgK.length||suK.length)) chotNames.push(ten);
+    if(_chotKH[ten]) chotNames.push(ten);
     else activeSets[ten]=true;
   });
   // Sắp xếp đã chốt: mới nhất lên đầu
@@ -5051,13 +5217,13 @@ function renderSgOverview(){
   html+='<div class="sg-overview-card sg-card-gui">'
     +'<div class="sg-overview-title">📒 GỬI SỔ</div>'
     +'<div class="sg-overview-row"><span class="sg-overview-lbl">Số người gửi</span><span class="sg-overview-val" style="color:var(--gd)">'+guiNames.size+' người</span></div>'
-    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Số giao dịch</span><span class="sg-overview-val">'+sg.length+' lần</span></div>'
+    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Số giao dịch</span><span class="sg-overview-val">'+guiCount+' lần</span></div>'
     +'<div class="sg-overview-row"><span class="sg-overview-lbl">Tổng tiền gửi</span><span class="sg-overview-val" style="color:var(--gd)">'+fmtNum(Math.round(guiTotal))+' ₫</span></div>'
     +'</div>';
   html+='<div class="sg-overview-card sg-card-ung">'
     +'<div class="sg-overview-title">💵 ỨNG TIỀN</div>'
     +'<div class="sg-overview-row"><span class="sg-overview-lbl">Số người ứng</span><span class="sg-overview-val" style="color:#d97706">'+ungNames.size+' người</span></div>'
-    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Số giao dịch</span><span class="sg-overview-val">'+su.length+' lần</span></div>'
+    +'<div class="sg-overview-row"><span class="sg-overview-lbl">Số giao dịch</span><span class="sg-overview-val">'+ungCount+' lần</span></div>'
     +'<div class="sg-overview-row"><span class="sg-overview-lbl">Tổng tiền ứng</span><span class="sg-overview-val" style="color:#d97706">'+fmtNum(Math.round(ungTotal))+' ₫</span></div>'
     +'</div>';
 
@@ -5086,6 +5252,38 @@ function xoaChotKH(ten){
     });
 }
 
+function huyChotSo(ten){
+  showDetail('🔓','Huỷ chốt sổ '+ten+'?',
+    [['Khách hàng',ten],['Lưu ý','Toàn bộ ghi chép sẽ được khôi phục']],
+    null,
+    '🔓 Xác nhận huỷ chốt',
+    function(){
+      var pw=document.getElementById('huy-chot-pw');
+      var val=pw?pw.value.trim():'';
+      if(val!==getThangPW()){ toast('❌ Mật khẩu không đúng!'); return; }
+      var sg=getSG();
+      sg.forEach(function(r){ if(r.ten===ten&&r.chot){ delete r.chot; if(r.ghiChuKhac==='Đã chốt sổ') delete r.ghiChuKhac; } });
+      setSG(sg);
+      var su=getSU();
+      su.forEach(function(r){ if(r.ten===ten&&r.chot){ delete r.chot; if(r.ghiChuKhac==='Đã chốt sổ') delete r.ghiChuKhac; } });
+      setSU(su);
+      toast('🔓 Đã huỷ chốt sổ '+ten+'! Dữ liệu đã khôi phục.');
+      renderSgTabContent();
+      autoSync();
+    });
+  // Inject ô nhập mật khẩu vào modal sau khi mở
+  setTimeout(function(){
+    var det=document.getElementById('cfm-detail');
+    if(det){
+      det.insertAdjacentHTML('afterend',
+        '<div style="margin:10px 0 2px">'
+        +'<input id="huy-chot-pw" type="password" placeholder="Nhập mật khẩu chốt sổ..." '
+        +'style="width:100%;padding:10px 12px;border:1.5px solid var(--gp);border-radius:var(--r);font-size:14px;box-sizing:border-box" autofocus>'
+        +'</div>');
+    }
+  }, 80);
+}
+
 function renderSgKHDetail(ten){
   // Ẩn thanh tìm kiếm và 2 nút action khi vào chi tiết
   var searchWrap=document.getElementById('sg-kh-search');
@@ -5095,39 +5293,54 @@ function renderSgKHDetail(ten){
 
   var sgList=getSG().filter(function(r){return r.ten===ten;});
   var suList=getSU().filter(function(r){return r.ten===ten;});
+
+  // Kiểm tra KH đã chốt toàn bộ chưa
+  var isAllChot=(sgList.length||suList.length)
+    &&sgList.every(function(r){return r.chot;})
+    &&suList.every(function(r){return r.chot;});
+
+  // Tổng lịch sử (toàn bộ, bao gồm cả đã chốt) — để hiển thị khi đã chốt
+  var guiTotalAll=sgList.reduce(function(a,r){return a+(r.tt||0);},0);
+  var ungTotalAll=suList.reduce(function(a,r){return a+(parseFloat(r.tien)||0);},0);
+
+  // Tổng đang hoạt động (chưa chốt, chưa trả)
   var guiTotal=sgList.filter(function(r){return !r.chot;}).reduce(function(a,r){return a+(r.tt||0);},0);
   var ungTotal=suList.filter(function(r){return !r.chot&&!r.daTraNo;}).reduce(function(a,r){return a+(parseFloat(r.tien)||0);},0);
   var conLai=guiTotal-ungTotal;
   var guiDays=[...new Set(sgList.filter(function(r){return !r.chot;}).map(function(r){return r.date;}))].length;
   var tenEsc=ten.replace(/'/g,"\\'");
 
-  // ── Hàng đầu: quay lại + dropdown thêm giao dịch ──
+  // ── Hàng đầu: quay lại + dropdown thêm giao dịch (ẩn khi đã chốt) ──
   var html='<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">'
-    +'<button class="btn-huy" style="flex:0 0 auto;white-space:nowrap;padding:9px 12px" onclick="backToSgOverview()">← Quay lại</button>'
-    +'<div style="position:relative;flex:1">'
+    +'<button class="btn-huy" style="flex:0 0 auto;white-space:nowrap;padding:9px 12px" onclick="backToSgOverview()">← Quay lại</button>';
+  if(!isAllChot){
+    html+='<div style="position:relative;flex:1">'
       +'<button onclick="toggleSgAddMenu()" style="width:100%;padding:9px 12px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border:none;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">➕ Thêm giao dịch ▾</button>'
       +'<div id="sg-add-menu" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid var(--gp);border-radius:var(--r);z-index:99;box-shadow:0 4px 16px rgba(0,0,0,.12);overflow:hidden">'
         +'<button onclick="closeSgAddMenu();openSgGuiMoiForKH(\''+tenEsc+'\')" style="width:100%;padding:11px 14px;background:#fff;border:none;border-bottom:1px solid var(--g100);font-size:13px;font-weight:700;color:var(--gd);text-align:left;cursor:pointer">📒 Gửi sổ</button>'
         +'<button onclick="closeSgAddMenu();openSgUngTienForKH(\''+tenEsc+'\')" style="width:100%;padding:11px 14px;background:#fff;border:none;font-size:13px;font-weight:700;color:#d97706;text-align:left;cursor:pointer">💵 Ứng tiền</button>'
       +'</div>'
-    +'</div>'
-  +'</div>';
+    +'</div>';
+  }
+  html+='</div>';
 
   // ── Thẻ tên KH ──
-  html+='<div style="background:linear-gradient(135deg,var(--gb),#e0f2e9);border:1.5px solid var(--gp);border-radius:var(--r);padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:8px">'
+  html+='<div style="background:'+(isAllChot?'#fff0f0':'linear-gradient(135deg,var(--gb),#e0f2e9)')+';border:1.5px solid '+(isAllChot?'#fca5a5':'var(--gp)')+';border-radius:var(--r);padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:8px">'
     +'<span style="font-size:18px">👤</span>'
-    +'<div><div style="font-size:15px;font-weight:800;color:var(--gd)">'+ten+'</div>'
-    +'<div style="font-size:11px;color:var(--g600);margin-top:1px">Chi tiết sổ gửi &amp; ứng tiền</div></div>'
+    +'<div><div style="font-size:15px;font-weight:800;color:'+(isAllChot?'#dc2626':'var(--gd)')+'">'+ten+(isAllChot?'<span class="chot-stamp" style="font-size:10px;margin-left:6px">ĐÃ CHỐT SỔ</span>':'')+'</div>'
+    +'<div style="font-size:11px;color:var(--g600);margin-top:1px">'+(isAllChot?'Xem lịch sử — không thể chỉnh sửa':'Chi tiết sổ gửi &amp; ứng tiền')+'</div></div>'
     +'</div>';
 
+  // ── Gửi sổ ──
   if(sgList.length){
-    html+='<div class="sec-title" style="color:var(--gd)">📒 Gửi sổ ('+sgList.length+' lần)<span class="sec-hint">nhấp đúp để sửa/xoá</span></div>';
+    html+='<div class="sec-title" style="color:var(--gd)">📒 Gửi sổ ('+sgList.length+' lần)'+(isAllChot?'':'<span class="sec-hint">nhấp đúp để sửa/xoá</span>')+'</div>';
     html+='<div class="card" style="padding:0;overflow:hidden;border:1.5px solid var(--gb);border-radius:var(--r);margin-bottom:8px">';
     html+=sgList.map(function(r){
       var chat=r.loai==='nuoc'?'Độ: '+(r.do||'--'):(r.loai==='dong'&&r.do?'KH: '+r.do+'kg':'');
-      var chotCls=r.chot?' chot':'';
+      var entryCls=r.chot?'sg-entry chot':'sg-entry';
       var stamp=r.chot?'<span class="chot-stamp">ĐÃ CHỐT</span>':'';
-      return '<div class="sg-entry'+chotCls+'" ondblclick="openSgEntryEdit(\'' + r.id + '\',\'gui\')" onclick="onSgEntryTap(\'' + r.id + '\',\'gui\')">'
+      var dblEvt=isAllChot?'':' ondblclick="openSgEntryEdit(\''+r.id+'\',\'gui\')" onclick="onSgEntryTap(\''+r.id+'\',\'gui\')"';
+      return '<div class="'+entryCls+'"'+dblEvt+'>'
         +'<div class="sg-entry-row"><span class="sg-entry-date">'+fmtDate(r.date)+stamp+'</span><span class="sg-entry-tien">'+fmtNum(r.tt)+' ₫</span></div>'
         +'<div class="sg-entry-row"><span class="sg-entry-meta">'+LOAI_ICO[r.loai]+' '+LOAI_LBL[r.loai]+' · '+fmtKg(r.kg)+'kg'+(chat?' · '+chat:'')+'</span><span class="sg-entry-meta">'+fmtNum(r.gia)+' đ</span></div>'
         +'</div>';
@@ -5135,13 +5348,15 @@ function renderSgKHDetail(ten){
     html+='</div>';
   }
 
+  // ── Ứng tiền ──
   if(suList.length){
-    html+='<div class="sec-title" style="color:#d97706">💵 Ứng tiền ('+suList.length+' lần)<span class="sec-hint" style="color:#d97706;opacity:.6">nhấp đúp để sửa/xoá</span></div>';
+    html+='<div class="sec-title" style="color:#d97706">💵 Ứng tiền ('+suList.length+' lần)'+(isAllChot?'':'<span class="sec-hint" style="color:#d97706;opacity:.6">nhấp đúp để sửa/xoá</span>')+'</div>';
     html+='<div class="card" style="padding:0;overflow:hidden;border:1.5px solid #fde68a;border-radius:var(--r);margin-bottom:8px">';
     html+=suList.map(function(r){
       var extraCls=r.chot?' chot':r.daTraNo?' da-tra':'';
       var stamp=r.chot?'<span class="chot-stamp">ĐÃ CHỐT</span>':r.daTraNo?'<span class="tra-stamp">ĐÃ TRẢ</span>':'';
-      return '<div class="ung-entry'+extraCls+'" ondblclick="openSgEntryEdit(\'' + r.id + '\',\'ung\')" onclick="onSgEntryTap(\'' + r.id + '\',\'ung\')">'
+      var dblEvt=isAllChot?'':' ondblclick="openSgEntryEdit(\''+r.id+'\',\'ung\')" onclick="onSgEntryTap(\''+r.id+'\',\'ung\')"';
+      return '<div class="ung-entry'+extraCls+'"'+dblEvt+'>'
         +'<div class="ung-entry-row"><span class="sg-entry-date">'+fmtDate(r.date)+stamp+'</span><span class="ung-entry-tien">-'+fmtNum(Math.round(r.tien))+' ₫</span></div>'
         +(r.noidung?'<div class="ung-entry-content">📝 '+r.noidung+'</div>':'')
         +'</div>';
@@ -5149,20 +5364,32 @@ function renderSgKHDetail(ten){
     html+='</div>';
   }
 
-  // Thống kê cuối — chỉ hiện nếu có ít nhất 1 loại dữ liệu
+  // ── Thống kê ──
   var hasGui=sgList.length>0, hasUng=suList.length>0;
   if(hasGui||hasUng){
-    var hasChot=sgList.some(function(r){return r.chot;})||suList.some(function(r){return r.chot;});
     var hasTra=suList.some(function(r){return r.daTraNo;});
     html+='<div class="sg-summary-final">';
-    if(hasGui) html+='<div class="sg-summary-row"><span>Tổng tiền gửi ('+guiDays+' ngày)</span><span>'+fmtNum(Math.round(guiTotal))+' ₫</span></div>';
-    if(hasUng) html+='<div class="sg-summary-row"><span>Tổng tiền đã ứng (chưa trả)</span><span>-'+fmtNum(Math.round(ungTotal))+' ₫</span></div>';
-    html+='<div class="sg-summary-row total"><span>CÒN LẠI</span><span style="color:'+(conLai>=0?'#86efac':'#fca5a5')+'">'+fmtNum(Math.round(conLai))+' ₫</span></div>';
-    if(hasChot||hasTra) html+='<div style="font-size:10px;opacity:.65;margin-top:5px;text-align:center">📌 Ghi chép đã chốt/đã trả không tính vào tổng</div>';
+    if(isAllChot){
+      html+='<div style="font-size:10px;font-weight:700;color:#dc2626;text-align:center;margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px">📋 Lịch sử đã chốt sổ</div>';
+      if(hasGui) html+='<div class="sg-summary-row"><span>Tổng đã gửi ('+sgList.length+' lần)</span><span>'+fmtNum(Math.round(guiTotalAll))+' ₫</span></div>';
+      if(hasUng) html+='<div class="sg-summary-row"><span>Tổng đã ứng ('+suList.length+' lần)</span><span>-'+fmtNum(Math.round(ungTotalAll))+' ₫</span></div>';
+      var conLaiAll=guiTotalAll-ungTotalAll;
+      html+='<div class="sg-summary-row total"><span>KẾT TOÁN</span><span style="color:'+(conLaiAll>=0?'#86efac':'#fca5a5')+'">'+fmtNum(Math.round(conLaiAll))+' ₫</span></div>';
+    } else {
+      if(hasGui) html+='<div class="sg-summary-row"><span>Tổng tiền gửi ('+guiDays+' ngày)</span><span>'+fmtNum(Math.round(guiTotal))+' ₫</span></div>';
+      if(hasUng) html+='<div class="sg-summary-row"><span>Tổng tiền đã ứng (chưa trả)</span><span>-'+fmtNum(Math.round(ungTotal))+' ₫</span></div>';
+      html+='<div class="sg-summary-row total"><span>CÒN LẠI</span><span style="color:'+(conLai>=0?'#86efac':'#fca5a5')+'">'+fmtNum(Math.round(conLai))+' ₫</span></div>';
+      if(hasTra) html+='<div style="font-size:10px;opacity:.65;margin-top:5px;text-align:center">📌 Ghi chép đã trả không tính vào tổng</div>';
+    }
     html+='</div>';
   }
 
-  html+='<button class="sg-chot-btn" style="width:100%;margin-top:10px" onclick="chotSoGuiKH(\''+ten.replace(/'/g,"\\'")+'\')">🔒 Chốt sổ '+ten+'</button>';
+  // ── Nút chốt / huỷ chốt ──
+  if(isAllChot){
+    html+='<button onclick="huyChotSo(\''+tenEsc+'\')" style="width:100%;margin-top:10px;padding:11px;background:#fff0f0;color:#dc2626;border:1.5px solid #fca5a5;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer">🔓 Huỷ chốt sổ '+ten+'</button>';
+  } else {
+    html+='<button class="sg-chot-btn" style="width:100%;margin-top:10px" onclick="chotSoGuiKH(\''+tenEsc+'\')">🔒 Chốt sổ '+ten+'</button>';
+  }
 
   document.getElementById('sg-tab-content').innerHTML=html;
 }
