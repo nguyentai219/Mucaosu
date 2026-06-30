@@ -3511,8 +3511,11 @@ function _getOrCreateSubFolder(name, parentId, cb) {
       method: 'POST',
       headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: name, mimeType: 'application/vnd.google-apps.folder', parents: [parentId] })
-    }).then(function(r){ return r.json(); }).then(function(d){ cb(d.id); }).catch(function(){ cb(null); });
-  }).catch(function(){ cb(null); });
+    }).then(function(r){ return r.json(); }).then(function(d){
+      if(!d.id){ console.error('_getOrCreateSubFolder create failed', d); }
+      cb(d.id||null);
+    }).catch(function(e){ console.error('_getOrCreateSubFolder create error',e); cb(null); });
+  }).catch(function(e){ console.error('_getOrCreateSubFolder query error',e); cb(null); });
 }
 
 // Tìm file theo tên trong 1 thư mục cụ thể
@@ -3533,27 +3536,26 @@ function _createSheetInFolder(fname, folderId, sheetName, cb) {
     body: JSON.stringify({ properties: { title: fname }, sheets: [{ properties: { title: sheetName } }] })
   }).then(function(r){ return r.json(); }).then(function(data){
     var sid = data.spreadsheetId;
+    if(!sid){ console.error('_createSheetInFolder create failed', data); cb(null); return; }
     fetch('https://www.googleapis.com/drive/v3/files/' + sid + '?addParents=' + folderId + '&removeParents=root&fields=id', {
       method: 'PATCH', headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' }, body: JSON.stringify({})
-    }).then(function(){ cb(sid); }).catch(function(){ cb(sid); });
-  }).catch(function(){ cb(null); });
+    }).then(function(r){ if(!r.ok) console.error('_createSheetInFolder move failed', r.status); cb(sid); })
+    .catch(function(e){ console.error('_createSheetInFolder move error',e); cb(sid); });
+  }).catch(function(e){ console.error('_createSheetInFolder error',e); cb(null); });
 }
 
 // Ghi dữ liệu vào sheet (xoá cũ + ghi mới)
 function _writeSheet(sid, sheetName, rows, cb) {
-  fetch('https://sheets.googleapis.com/v4/spreadsheets/' + sid + '/values/' + encodeURIComponent(sheetName + '!A1') + '?valueRenderOption=RAW', {
-    headers: { Authorization: 'Bearer ' + gdToken }
-  }).then(function(){
-    return fetch('https://sheets.googleapis.com/v4/spreadsheets/' + sid + '/values/' + encodeURIComponent(sheetName + '!A1') + ':clear', {
-      method: 'POST', headers: { Authorization: 'Bearer ' + gdToken }
-    });
+  fetch('https://sheets.googleapis.com/v4/spreadsheets/' + sid + '/values/' + encodeURIComponent(sheetName + '!A1') + ':clear', {
+    method: 'POST', headers: { Authorization: 'Bearer ' + gdToken }
   }).then(function(){
     return fetch('https://sheets.googleapis.com/v4/spreadsheets/' + sid + '/values/' + encodeURIComponent(sheetName + '!A1'), {
       method: 'PUT',
       headers: { Authorization: 'Bearer ' + gdToken, 'Content-Type': 'application/json' },
       body: JSON.stringify({ valueInputOption: 'RAW', values: rows })
     });
-  }).then(function(){ if(cb) cb(); }).catch(function(){ if(cb) cb(); });
+  }).then(function(r){ if(!r.ok){ console.error('_writeSheet failed', r.status); } if(cb) cb(); })
+  .catch(function(e){ console.error('_writeSheet error', e); if(cb) cb(); });
 }
 
 // Khoá Spreadsheet (chỉ đọc) bằng cách đặt Protected Range toàn bộ
@@ -3585,7 +3587,12 @@ function syncSoGui() {
   var sg = getSG();
   var su = getSU();
   if (!sg.length && !su.length) return;
+  if (!gdFolderId) { console.error('syncSoGui: chưa có gdFolderId'); return; }
 
+  ensureValidToken(function(){ _syncSoGuiImpl(sg, su); });
+}
+
+function _syncSoGuiImpl(sg, su) {
   function fmtDateVN(dateStr){
     if(!dateStr) return '';
     var p=dateStr.split('-');
@@ -4470,6 +4477,8 @@ function syncToDrive_silent() {
     setPendingCount(0);
     localStorage.setItem('gd_last_sync', Date.now().toString());
     updGDBarStatus('Đã kết nối', 'synced');
+    // Đồng bộ file riêng từng KH (thư mục Gửi Ứng / Đã Chốt Sổ)
+    syncSoGui();
   });
 }
 
