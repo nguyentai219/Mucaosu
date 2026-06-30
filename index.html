@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v8.1</title>
+<title>Mua Bán Mủ Cao Su v8.2</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -432,7 +432,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v8.1 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v8.2 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1249,7 +1249,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v8.1</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v8.2</div>
       </div>
     </div>
 
@@ -4820,8 +4820,13 @@ var MS_PER_DAY = 24*60*60*1000;
 function getLicenseExpiry() {
   var v = localStorage.getItem('license_expiry');
   if (!v) {
-    // Lần đầu chạy: đặt hạn dùng thử = hôm nay + TRIAL_DAYS
-    var expiry = Date.now() + TRIAL_DAYS * MS_PER_DAY;
+    // Lần đầu chạy: hạn dùng thử = 0 giờ của ngày (hôm nay + TRIAL_DAYS)
+    // VD: cài lúc 15h ngày 1, TRIAL_DAYS=3 → hết hạn lúc 0h00 ngày 5
+    // (ngày 1 tính là ngày dùng thử thứ 1, ngày 2,3 tiếp theo, hết hạn khi sang ngày 4 lúc 0h)
+    var now = new Date();
+    var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // 0h hôm nay
+    var expiryDate = new Date(startOfToday.getTime() + (TRIAL_DAYS + 1) * MS_PER_DAY);
+    var expiry = expiryDate.getTime();
     localStorage.setItem('license_expiry', String(expiry));
     localStorage.setItem('license_is_new', '1'); // đánh dấu cần đồng bộ lên Drive khi có kết nối
     return expiry;
@@ -4829,10 +4834,16 @@ function getLicenseExpiry() {
   return parseInt(v);
 }
 
+// Số ngày còn lại — tính theo mốc 0 giờ: cứ qua 0h là tính sang ngày mới,
+// không cần đủ 24 giờ. VD: hết hạn 0h ngày 5, hiện tại là 23h ngày 3 → còn 2 ngày (ngày 4, ngày 5 chưa qua 0h)
 function getRemainingDays() {
   var expiry = getLicenseExpiry();
-  var diff = expiry - Date.now();
-  return Math.ceil(diff / MS_PER_DAY);
+  var now = new Date();
+  var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  var expiryDateObj = new Date(expiry);
+  var startOfExpiryDay = new Date(expiryDateObj.getFullYear(), expiryDateObj.getMonth(), expiryDateObj.getDate()).getTime();
+  var diffDays = Math.round((startOfExpiryDay - startOfToday) / MS_PER_DAY);
+  return diffDays;
 }
 
 function isLicenseExpired() {
@@ -5031,10 +5042,17 @@ function doGiaHan() {
     return;
   }
 
-  // Gia hạn thêm `days` ngày tính từ HIỆN TẠI (không cộng dồn vào hạn cũ nếu đã hết hạn)
+  // Gia hạn thêm `days` ngày — tính theo mốc 0 giờ, đồng nhất với cơ chế đếm ngày mới
+  // Nếu còn hạn: lấy ngày hết hạn cũ (đã ở mốc 0h) + days ngày
+  // Nếu đã hết hạn: lấy 0h hôm nay + days ngày
   var currentExpiry = getLicenseExpiry();
-  var base = Math.max(currentExpiry, Date.now());
-  var newExpiry = base + days * MS_PER_DAY;
+  var now = new Date();
+  var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  var baseDate = currentExpiry > Date.now() ? currentExpiry : startOfToday;
+  // Đưa base về đúng mốc 0h của ngày đó (đề phòng dữ liệu cũ không tròn mốc)
+  var baseDateObj = new Date(baseDate);
+  var baseStartOfDay = new Date(baseDateObj.getFullYear(), baseDateObj.getMonth(), baseDateObj.getDate()).getTime();
+  var newExpiry = baseStartOfDay + days * MS_PER_DAY;
   localStorage.setItem('license_expiry', String(newExpiry));
 
   if (isExtCode) markExtCodeUsed(pw);
@@ -5862,241 +5880,6 @@ function updBanHints() {
 
 // ══════════════════════════════════════════
 // HỆ THỐNG GIỚI HẠN THỜI GIAN SỬ DỤNG
-// ══════════════════════════════════════════
-var LICENSE_PW = '28082008';
-var TRIAL_DAYS = 3;
-var MS_PER_DAY = 24*60*60*1000;
-
-function getLicenseExpiry() {
-  var v = localStorage.getItem('license_expiry');
-  if (!v) {
-    // Lần đầu chạy: đặt hạn dùng thử = hôm nay + TRIAL_DAYS
-    var expiry = Date.now() + TRIAL_DAYS * MS_PER_DAY;
-    localStorage.setItem('license_expiry', String(expiry));
-    localStorage.setItem('license_is_new', '1'); // đánh dấu cần đồng bộ lên Drive khi có kết nối
-    return expiry;
-  }
-  return parseInt(v);
-}
-
-function getRemainingDays() {
-  var expiry = getLicenseExpiry();
-  var diff = expiry - Date.now();
-  return Math.ceil(diff / MS_PER_DAY);
-}
-
-function isLicenseExpired() {
-  return Date.now() >= getLicenseExpiry();
-}
-
-// Kiểm tra khi khởi động: nếu hết hạn → hiện popup
-function checkLicenseOnLoad() {
-  getDeviceCode();
-  updLicenseCountdown();
-  if (isLicenseExpired()) {
-    setTimeout(function(){ openM('modal-expired'); }, 400);
-  } else {
-    var days = getRemainingDays();
-    if (days <= 7) {
-      setTimeout(function(){
-        document.getElementById('warn-expiry-days').textContent = days;
-        var icon = document.getElementById('warn-expiry-icon');
-        // Màu chìa khoá theo mức ngày
-        if (days <= 3)      { icon.textContent = '🔑'; icon.style.color='#dc2626'; }
-        else if (days <= 5) { icon.textContent = '🔑'; icon.style.color='#d97706'; }
-        else                { icon.textContent = '🔑'; icon.style.color='#16a34a'; }
-        openM('modal-warn-expiry');
-      }, 400);
-    }
-  }
-}
-
-// Hiện số ngày còn lại cạnh version — 🔑 đổi màu: xanh 7n / vàng 5n / đỏ 3n
-function updLicenseCountdown() {
-  var el = document.getElementById('license-countdown');
-  if (!el) return;
-  var days = getRemainingDays();
-  el.className = '';
-  el.style.color = '';
-  if (days > 0) {
-    el.textContent = '🔑 còn ' + days + ' ngày';
-    if (days <= 3)      el.classList.add('lc-red');
-    else if (days <= 5) el.classList.add('lc-yellow');
-    else if (days <= 7) { el.classList.add('lc-normal'); el.style.color='#86efac'; }
-    else                el.classList.add('lc-normal');
-  } else {
-    el.textContent = '🔑 hết hạn';
-    el.classList.add('lc-red');
-  }
-}
-
-// Chặn ghi/sửa nếu hết hạn - gọi ở đầu các hàm luuGD, luuSua, xoaGD, luuSoSach
-function guardLicense() {
-  if (isLicenseExpired()) {
-    openM('modal-expired');
-    return true; // bị chặn
-  }
-  return false; // OK
-}
-
-// ── MỞ MODAL GIA HẠN ──
-function openGiaHan() {
-  document.getElementById('gh-pw-input').value = '';
-  var daysEl = document.getElementById('gh-days-input');
-  daysEl.value = '';
-  daysEl.disabled = true;
-  daysEl.placeholder = '—';
-  document.getElementById('gh-err').style.display = 'none';
-  document.getElementById('gh-device-code').textContent = getDeviceCode();
-  document.getElementById('gh-algo-ver').textContent = EXT_ALGO_VERSION;
-  var days = getRemainingDays();
-  var info = document.getElementById('gh-info');
-  if (info) {
-    info.textContent = days > 0 ? 'Hiện còn ' + days + ' ngày sử dụng' : 'Đã hết hạn sử dụng';
-  }
-  closeM('modal-settings');
-  openM('modal-gia-han');
-}
-
-// ══════════════════════════════════════════
-// MÃ MÁY + MÃ GIA HẠN (hash-based, theo từng máy)
-// ══════════════════════════════════════════
-// Phiên bản thuật toán mã gia hạn - chỉ đổi khi công thức tính mã thay đổi
-// (KHÔNG đổi theo version chung của app)
-var EXT_ALGO_VERSION = 'MG1';
-var EXT_SECRET = 'MuCaoSuTai0987656701-K7xQ2026Pro';
-
-// Mã máy: 4 số ngẫu nhiên, sinh 1 lần khi cài, không đổi
-function getDeviceCode() {
-  var dc = localStorage.getItem('device_code');
-  if (!dc) {
-    dc = String(Math.floor(1000 + Math.random()*9000));
-    localStorage.setItem('device_code', dc);
-  }
-  return dc;
-}
-
-// Hàm băm đơn giản
-function hashStr(s) {
-  var h = 0;
-  for (var i=0; i<s.length; i++) h = ((h<<5)-h+s.charCodeAt(i))|0;
-  return Math.abs(h);
-}
-
-// Dòng khoá (keystream) 3 số - phụ thuộc Mã máy
-function getKeystream(deviceCode) {
-  return hashStr(deviceCode + '|' + EXT_SECRET) % 1000;
-}
-// Checksum 3 số - phụ thuộc Mã máy + số ngày
-function getChecksum(deviceCode, days) {
-  return hashStr(deviceCode + '|' + String(days).padStart(3,'0') + '|' + EXT_SECRET + '|chk') % 1000;
-}
-
-// Sinh mã 6 số: 3 số đầu = checksum, 3 số sau = số ngày đã mã hoá (cộng với keystream)
-function genExtCode(deviceCode, days) {
-  var K = getKeystream(deviceCode);
-  var encDays = (days + K) % 1000;
-  var chk = getChecksum(deviceCode, days);
-  return String(chk).padStart(3,'0') + String(encDays).padStart(3,'0');
-}
-
-// Giải mã: trả về số ngày nếu hợp lệ (đúng máy), null nếu sai. Không phụ thuộc ngày tháng.
-function decodeExtCode(deviceCode, code) {
-  if (!/^\d{6}$/.test(code)) return null;
-  var chkPart = parseInt(code.substring(0,3),10);
-  var encDaysPart = parseInt(code.substring(3,6),10);
-  var K = getKeystream(deviceCode);
-  var days = ((encDaysPart - K) % 1000 + 1000) % 1000;
-  if (days < 1) return null;
-  var expectedChk = getChecksum(deviceCode, days);
-  if (expectedChk !== chkPart) return null;
-  return days;
-}
-
-// Danh sách mã gia hạn đã dùng (chống dùng lại)
-function getUsedExtCodes() {
-  try { return JSON.parse(localStorage.getItem('used_ext_codes')||'[]'); }
-  catch(e){ return []; }
-}
-function markExtCodeUsed(code) {
-  var used = getUsedExtCodes();
-  if (used.indexOf(code) === -1) {
-    used.push(code);
-    if (used.length > 200) used = used.slice(used.length-200);
-    localStorage.setItem('used_ext_codes', JSON.stringify(used));
-  }
-}
-function isExtCodeUsed(code) {
-  return getUsedExtCodes().indexOf(code) !== -1;
-}
-
-// Khi nhập mật khẩu: chỉ mở khoá ô "số ngày" khi gõ đúng mật khẩu cố định 8 số
-function onGhPwInput() {
-  document.getElementById('gh-err').style.display = 'none';
-  var pw = document.getElementById('gh-pw-input').value.trim();
-  var daysEl = document.getElementById('gh-days-input');
-  if (pw === LICENSE_PW) {
-    daysEl.disabled = false;
-    daysEl.placeholder = 'Số ngày muốn gia hạn (VD: 30)';
-  } else {
-    daysEl.disabled = true;
-    daysEl.value = '';
-    daysEl.placeholder = '—';
-  }
-}
-
-function doGiaHan() {
-  var pw = document.getElementById('gh-pw-input').value.trim();
-  var errEl = document.getElementById('gh-err');
-  var days = 0;
-  var isExtCode = false;
-
-  if (pw === LICENSE_PW) {
-    // Cách 1: mật khẩu cố định (chỉ bạn biết) + nhập số ngày tuỳ ý
-    var daysInput = parseInt(document.getElementById('gh-days-input').value)||0;
-    if (daysInput <= 0) {
-      toast('⚠️ Nhập số ngày hợp lệ!');
-      return;
-    }
-    days = daysInput;
-  } else if (/^\d{6}$/.test(pw)) {
-    // Cách 2: mã gia hạn 6 số - đã mã hoá số ngày, theo máy + theo ngày, dùng 1 lần
-    if (isExtCodeUsed(pw)) {
-      errEl.textContent = '⛔ Mã này đã được sử dụng!';
-      errEl.style.display = 'block';
-      return;
-    }
-    var deviceCode = getDeviceCode();
-    var decoded = decodeExtCode(deviceCode, pw);
-    if (decoded === null) {
-      errEl.textContent = '❌ Mã không đúng!';
-      errEl.style.display = 'block';
-      return;
-    }
-    days = decoded;
-    isExtCode = true;
-  } else {
-    errEl.textContent = '❌ Mật khẩu không đúng!';
-    errEl.style.display = 'block';
-    return;
-  }
-
-  // Gia hạn thêm `days` ngày tính từ HIỆN TẠI (không cộng dồn vào hạn cũ nếu đã hết hạn)
-  var currentExpiry = getLicenseExpiry();
-  var base = Math.max(currentExpiry, Date.now());
-  var newExpiry = base + days * MS_PER_DAY;
-  localStorage.setItem('license_expiry', String(newExpiry));
-
-  if (isExtCode) markExtCodeUsed(pw);
-
-  updLicenseCountdown();
-  closeM('modal-gia-han');
-  toast('✅ Đã gia hạn thêm ' + days + ' ngày!');
-  autoSync(); // đồng bộ thông tin bản quyền lên Drive (nếu đã kết nối)
-}
-
-
-// ── ĐỔI MẬT KHẨU THỐNG KÊ THÁNG ──
 
 // ══════════════════════════════════════════
 // TAB SỔ GỬI - CÁC HÀM BỔ SUNG (v5.6)
