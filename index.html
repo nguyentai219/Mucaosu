@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v8.2</title>
+<title>Mua Bán Mủ Cao Su v8.3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -432,7 +432,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v8.2 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v8.3 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1024,7 +1024,7 @@ input[type=date]:focus{border-color:var(--gl)}
   </div>
 </div>
 
-<!-- MODAL QUÊN MẬT KHẨU (dùng mật khẩu quản trị mặc định 28082008) -->
+<!-- MODAL QUÊN MẬT KHẨU -->
 <div class="modal center" id="modal-quen-pw">
   <div class="modal-box center-box" style="max-width:320px">
     <div style="font-size:32px;text-align:center;margin-bottom:8px">❓</div>
@@ -1249,7 +1249,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v8.2</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v8.3</div>
       </div>
     </div>
 
@@ -3149,7 +3149,7 @@ function initGoogleAuth() {
         if (getPendingCount() > 0) doAutoSync();
       }, 800);
     } else {
-      if (localStorage.getItem('license_expiry')) incPendingCount();
+      if (localStorage.getItem(_LSK)) incPendingCount();
       updGDBarStatus('Chờ kết nối...', 'syncing');
       syncQueue = true;
     }
@@ -4519,7 +4519,7 @@ function syncToDrive_silent() {
 // ══════════════════════════════════════════
 function getLicenseBackupRows() {
   return [['Key','Value'],
-    ['license_expiry', localStorage.getItem('license_expiry')||''],
+    ['license_expiry', localStorage.getItem(_LSK)||''],
     ['device_code', getDeviceCode()],
     ['used_ext_codes', localStorage.getItem('used_ext_codes')||'[]'],
     ['savedAt', String(Date.now())]
@@ -4557,11 +4557,11 @@ function restoreLicenseFromDrive(cb) {
 // - Nếu máy đã có -> đẩy lên Drive để backup/cập nhật
 function syncLicenseOnConnect() {
   if (!gdToken || !gdFolderId) return;
-  var localExpiry = localStorage.getItem('license_expiry');
+  var localExpiry = localStorage.getItem(_LSK);
   if (!localExpiry) {
     restoreLicenseFromDrive(function(data){
-      if (data && data.license_expiry) {
-        localStorage.setItem('license_expiry', data.license_expiry);
+      if (data && data[_LSK]) {
+        localStorage.setItem(_LSK, data[_LSK]);
         if(data.device_code) localStorage.setItem('device_code', data.device_code);
         if(data.used_ext_codes) localStorage.setItem('used_ext_codes', data.used_ext_codes);
         localStorage.removeItem('license_is_new');
@@ -4620,13 +4620,17 @@ function fmtDateVN_ss(ds){ var p=ds?ds.split('-'):[]; return p.length===3?p[2]+'
 // THỐNG KÊ THÁNG
 // Lưu theo key: thang_data_{loai} = [{date, muaKg, muaDo, muaTien, banKg, banDo, banTien}]
 // ══════════════════════════════════════════
-var RESET_PW_DEFAULT = '234567';
-var ADMIN_PW_DEFAULT = '28082008'; // Mật khẩu quản trị — quyền cao nhất, luôn dùng được thay cho mật khẩu quản lý giao dịch
-function getThangPW(){ return localStorage.getItem('thang_pw') || RESET_PW_DEFAULT; }
-function setThangPW(p){ localStorage.setItem('thang_pw', p); }
-function getAdminPW(){ return localStorage.getItem('admin_pw') || ADMIN_PW_DEFAULT; }
-function setAdminPW(p){ localStorage.setItem('admin_pw', p); }
-// Kiểm tra mật khẩu hợp lệ cho mọi thao tác quản lý giao dịch (chốt sổ, huỷ chốt, chốt tháng...)
+// ── Giải mã nội bộ (XOR + base64) — che khuất giá trị nhạy cảm khỏi plain text ──
+var _k = 'mcsr';
+function _dc(s){ try{ var b=atob(s),r=''; for(var i=0;i<b.length;i++) r+=String.fromCharCode(b.charCodeAt(i)^_k.charCodeAt(i%_k.length)); return r; }catch(e){ return ''; } }
+
+var RESET_PW_DEFAULT = _dc('X1BHR1tU');         // mật khẩu quản lý giao dịch mặc định
+var ADMIN_PW_DEFAULT = _dc('X1tDSl9TQ0o=');     // mật khẩu quản trị mặc định
+function getThangPW(){ var v=localStorage.getItem(_dc('GQsSHAo8AwU=')); return v||RESET_PW_DEFAULT; }
+function setThangPW(p){ localStorage.setItem(_dc('GQsSHAo8AwU='),p); }
+function getAdminPW(){ var v=localStorage.getItem(_dc('DAceGwM8AwU=')); return v||ADMIN_PW_DEFAULT; }
+function setAdminPW(p){ localStorage.setItem(_dc('DAceGwM8AwU='),p); }
+// Kiểm tra mật khẩu hợp lệ cho mọi thao tác quản lý giao dịch
 // Chấp nhận: mật khẩu quản lý giao dịch HOẶC mật khẩu quản trị (quyền cao nhất)
 function checkManagePW(pw){
   return pw === getThangPW() || pw === getAdminPW();
@@ -4813,21 +4817,22 @@ function updBanHints() {
 // ══════════════════════════════════════════
 // HỆ THỐNG GIỚI HẠN THỜI GIAN SỬ DỤNG
 // ══════════════════════════════════════════
-var LICENSE_PW = '28082008';
-var TRIAL_DAYS = 3;
+var _LPW = _dc('X1tDSl9TQ0o=');   // _LPW (mã hoá)
+var _TD  = parseInt(_dc('Xg=='));  // _TD (mã hoá)
+var _LSK = _dc('AQoQFwMQFi0IGwMbHxo='); // localStorage key cho license expiry (mã hoá)
 var MS_PER_DAY = 24*60*60*1000;
 
 function getLicenseExpiry() {
-  var v = localStorage.getItem('license_expiry');
+  var v = localStorage.getItem(_LSK);
   if (!v) {
-    // Lần đầu chạy: hạn dùng thử = 0 giờ của ngày (hôm nay + TRIAL_DAYS)
-    // VD: cài lúc 15h ngày 1, TRIAL_DAYS=3 → hết hạn lúc 0h00 ngày 5
+    // Lần đầu chạy: hạn dùng thử = 0 giờ của ngày (hôm nay + _TD)
+    // VD: cài lúc 15h ngày 1, _TD=3 → hết hạn lúc 0h00 ngày 5
     // (ngày 1 tính là ngày dùng thử thứ 1, ngày 2,3 tiếp theo, hết hạn khi sang ngày 4 lúc 0h)
     var now = new Date();
     var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // 0h hôm nay
-    var expiryDate = new Date(startOfToday.getTime() + (TRIAL_DAYS + 1) * MS_PER_DAY);
+    var expiryDate = new Date(startOfToday.getTime() + (_TD + 1) * MS_PER_DAY);
     var expiry = expiryDate.getTime();
-    localStorage.setItem('license_expiry', String(expiry));
+    localStorage.setItem(_LSK, String(expiry));
     localStorage.setItem('license_is_new', '1'); // đánh dấu cần đồng bộ lên Drive khi có kết nối
     return expiry;
   }
@@ -4996,7 +5001,7 @@ function onGhPwInput() {
   document.getElementById('gh-err').style.display = 'none';
   var pw = document.getElementById('gh-pw-input').value.trim();
   var daysEl = document.getElementById('gh-days-input');
-  if (pw === LICENSE_PW) {
+  if (pw === _LPW) {
     daysEl.disabled = false;
     daysEl.placeholder = 'Số ngày muốn gia hạn (VD: 30)';
   } else {
@@ -5012,7 +5017,7 @@ function doGiaHan() {
   var days = 0;
   var isExtCode = false;
 
-  if (pw === LICENSE_PW) {
+  if (pw === _LPW) {
     // Cách 1: mật khẩu cố định (chỉ bạn biết) + nhập số ngày tuỳ ý
     var daysInput = parseInt(document.getElementById('gh-days-input').value)||0;
     if (daysInput <= 0) {
@@ -5053,7 +5058,7 @@ function doGiaHan() {
   var baseDateObj = new Date(baseDate);
   var baseStartOfDay = new Date(baseDateObj.getFullYear(), baseDateObj.getMonth(), baseDateObj.getDate()).getTime();
   var newExpiry = baseStartOfDay + days * MS_PER_DAY;
-  localStorage.setItem('license_expiry', String(newExpiry));
+  localStorage.setItem(_LSK, String(newExpiry));
 
   if (isExtCode) markExtCodeUsed(pw);
 
