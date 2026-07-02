@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v8.5</title>
+<title>Mua Bán Mủ Cao Su v8.7</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -61,6 +61,9 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g
 .fi{width:100%;padding:9px 11px;border:1.5px solid var(--g200);border-radius:var(--rs);font-family:'Be Vietnam Pro',sans-serif;font-size:14px;color:var(--g800);background:var(--g50);outline:none;transition:border-color .2s;-webkit-appearance:none}
 input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
 input[type="search"]::-webkit-search-decoration{-webkit-appearance:none;appearance:none}
+/* Placeholder font nhỏ cho ô trừ bì cột hẹp */
+.fi-bi-hint::placeholder{font-size:10px;color:var(--g400);letter-spacing:-.2px}
+.fi-bi-hint{font-size:14px}
 .fi:focus{border-color:var(--gl);background:#fff;box-shadow:0 0 0 3px rgba(64,145,108,.1)}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
@@ -433,7 +436,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v8.5 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v8.7 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -502,7 +505,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div class="fr" id="mua-bi-inline" style="display:none">
         <label class="fl" id="mua-bi-lbl-inline">Trừ bì</label>
-        <input type="number" id="mua-bi-inline-inp" class="fi" placeholder="0 (bỏ trống được)" step="0.01" oninput="calcBi('mua')" onkeydown="biKey(event,'mua')">
+        <input type="number" id="mua-bi-inline-inp" class="fi fi-bi-hint" placeholder="có thể bỏ trống" step="0.01" oninput="calcBi('mua')" onkeydown="biKey(event,'mua')">
       </div>
     </div>
     <div class="tt-box" style="position:relative">
@@ -590,7 +593,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div class="fr" id="ban-bi-inline" style="display:none">
         <label class="fl" id="ban-bi-lbl-inline">Trừ bì</label>
-        <input type="number" id="ban-bi-inline-inp" class="fi" placeholder="0 (bỏ trống được)" step="0.01" oninput="calcBi('ban')" onkeydown="biKey(event,'ban')">
+        <input type="number" id="ban-bi-inline-inp" class="fi fi-bi-hint" placeholder="có thể bỏ trống" step="0.01" oninput="calcBi('ban')" onkeydown="biKey(event,'ban')">
       </div>
     </div>
     <div class="tt-box ban-tt">
@@ -1242,7 +1245,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v8.5</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v8.7</div>
       </div>
     </div>
 
@@ -2893,6 +2896,7 @@ var gdTokenExpiry = parseInt(localStorage.getItem('gd_token_expiry') || '0');
 var _gdRefreshing = false;      // đang trong quá trình refresh
 var _gdRefreshCallbacks = [];   // hàng đợi callback chờ token mới
 var _gdAutoRefreshTimer = null; // timer proactive refresh
+var _gdSilentFailed = false;    // đã thất bại silent 3 lần → không tự popup nữa
 
 // ── Khởi tạo token client ──
 function _initTokenClient() {
@@ -2924,6 +2928,7 @@ function _showReloginBanner() {
     bar.onclick = function() {
       bar.classList.remove('gd-bar-relogin');
       bar.onclick = function() { openGDModal(); };
+      _gdSilentFailed = false; // reset để sau khi đăng nhập thành công bình thường trở lại
       signInGoogleManual();
     };
   }
@@ -3006,10 +3011,15 @@ function _silentRefreshWithRetry(maxTries, doneCb) {
     attempt++;
     updGDBarStatus('🔄 Đang làm mới phiên (' + attempt + '/' + maxTries + ')...', 'syncing');
     _doSilentRefresh(function(ok) {
-      if (ok) { doneCb(true); return; }
+      if (ok) {
+        _gdSilentFailed = false; // reset cờ khi thành công
+        doneCb(true);
+        return;
+      }
       if (attempt < maxTries) {
-        setTimeout(tryOnce, 30000); // chờ 30 giây rồi thử lại
+        setTimeout(tryOnce, 30000);
       } else {
+        _gdSilentFailed = true; // đánh dấu: không tự thử popup nữa
         doneCb(false);
       }
     });
@@ -3075,25 +3085,34 @@ function ensureValidToken(cb) {
   _doSilentRefresh(function(ok) {
     if (ok) {
       _gdRefreshing = false;
+      _gdSilentFailed = false;
       updGDBarStatus('Đã kết nối', 'synced');
-      cb(); // gọi callback gốc
+      cb();
       return;
     }
 
-    // Bước 2: thử lại với prompt:'' — Google tự quyết định, có thể vẫn
-    // làm mới ẩn nếu phiên trình duyệt còn cookie hợp lệ, hiếm khi cần UI
+    // Đã thất bại từ trước → không thử popup, không gây phiền
+    if (_gdSilentFailed) {
+      _gdRefreshing = false;
+      _showReloginBanner();
+      var cbs0 = _gdRefreshCallbacks.splice(0);
+      cbs0.forEach(function(item) { if (item.fail) item.fail(); });
+      return;
+    }
+
+    // Bước 2: thử prompt:'' — ẩn nếu cookie còn, KHÔNG block UI
+    // Đặt timeout 5s: nếu Google hỏi người dùng thì fail ngay (không chờ user)
     var prevCb2 = window._gdTokenClient.callback;
     var _done2 = false;
     var _t2 = setTimeout(function() {
       if (_done2) return; _done2 = true;
       window._gdTokenClient.callback = prevCb2;
       _gdRefreshing = false;
-      // Cả 2 lần đều thất bại → BẮT BUỘC thông báo, không bao giờ âm thầm bỏ qua
-      toast('⚠️ Phiên đăng nhập Google đã hết — nhấn thanh tài khoản để đăng nhập lại');
+      _gdSilentFailed = true;
       _showReloginBanner();
       var cbs = _gdRefreshCallbacks.splice(0);
       cbs.forEach(function(item) { if (item.fail) item.fail(); });
-    }, 6000);
+    }, 5000);
 
     window._gdTokenClient.callback = function(resp) {
       if (_done2) return; _done2 = true;
@@ -3101,11 +3120,13 @@ function ensureValidToken(cb) {
       window._gdTokenClient.callback = prevCb2;
       _gdRefreshing = false;
       if (resp.error || !resp.access_token) {
-        _showReloginBanner(); // Không toast — chỉ hiện trên thanh GD, tránh popup phiền
+        _gdSilentFailed = true;
+        _showReloginBanner();
         var cbs2 = _gdRefreshCallbacks.splice(0);
         cbs2.forEach(function(item) { if (item.fail) item.fail(); });
         return;
       }
+      _gdSilentFailed = false;
       _onTokenReceived(resp);
       _restoreGDBar();
       cb();
@@ -3117,13 +3138,15 @@ function ensureValidToken(cb) {
         _done2 = true; clearTimeout(_t2);
         window._gdTokenClient.callback = prevCb2;
         _gdRefreshing = false;
-        _showReloginBanner(); // Không toast — chỉ hiện trên thanh GD, tránh popup phiền
+        _gdSilentFailed = true;
+        _showReloginBanner();
         var cbs3 = _gdRefreshCallbacks.splice(0);
         cbs3.forEach(function(item) { if (item.fail) item.fail(); });
       }
     }
   });
 }
+
 
 function initGoogleAuth() {
   if (typeof google === 'undefined') { setTimeout(initGoogleAuth, 600); return; }
@@ -3486,7 +3509,10 @@ function batchUpdateSheets(sid, sheetsData, doneCb, _retry) {
 
 // ── SÀO LƯU LÊN DRIVE ──
 function syncToDrive() {
-  if (!gdToken) { signInGoogle(); return; }
+  if (!gdToken) {
+    if (_gdSilentFailed) { _showReloginBanner(); return; }
+    signInGoogle(); return;
+  }
   if (!gdFolderId) { findOrCreateFolder(); setTimeout(syncToDriver, 3000); return; }
   if (gdSyncing) { toast('⏳ Đang sync...'); return; }
   gdSyncing = true;
