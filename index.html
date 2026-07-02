@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v8.8</title>
+<title>Mua Bán Mủ Cao Su v8.9</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -436,7 +436,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v8.8 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v8.9 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1245,7 +1245,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v8.8</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v8.9</div>
       </div>
     </div>
 
@@ -1812,13 +1812,13 @@ function setLoaiUI(tab, loai, updateGia){
     // Mủ đông: kg + trừ bì → 2 cột (không có độ)
     dr.style.display='none'; document.getElementById(tab+'-do').value='';
     bInline.style.display='block';
-    bLbl.textContent='Trừ bì/KH';
+    bLbl.textContent='Trừ bì';
     kgRow.className='g2';
   } else {
-    // Mủ chén, mủ dây: chỉ kg — không cần độ, không cần trừ bì
+    // Mủ chén, mủ dây: kg + trừ bì → 2 cột (không có độ)
     dr.style.display='none'; document.getElementById(tab+'-do').value='';
-    bInline.style.display='none';
-    document.getElementById(tab+'-bi-inline-inp').value='';
+    bInline.style.display='block';
+    bLbl.textContent='Trừ bì';
     kgRow.className='g2';
   }
 
@@ -2896,7 +2896,12 @@ var gdTokenExpiry = parseInt(localStorage.getItem('gd_token_expiry') || '0');
 var _gdRefreshing = false;      // đang trong quá trình refresh
 var _gdRefreshCallbacks = [];   // hàng đợi callback chờ token mới
 var _gdAutoRefreshTimer = null; // timer proactive refresh
-var _gdSilentFailed = false;    // đã thất bại silent 3 lần → không tự popup nữa
+var _gdSilentFailed = false;    // đã thất bại silent → không tự popup nữa
+function _setGdFailed(v){
+  _gdSilentFailed = v;
+  if(v) localStorage.setItem('gd_silent_failed','1');
+  else localStorage.removeItem('gd_silent_failed');
+}
 
 // ── Khởi tạo token client ──
 function _initTokenClient() {
@@ -2928,7 +2933,7 @@ function _showReloginBanner() {
     bar.onclick = function() {
       bar.classList.remove('gd-bar-relogin');
       bar.onclick = function() { openGDModal(); };
-      _gdSilentFailed = false; // reset để sau khi đăng nhập thành công bình thường trở lại
+      _setGdFailed(false); // reset để sau khi đăng nhập thành công bình thường trở lại
       signInGoogleManual();
     };
   }
@@ -2961,7 +2966,7 @@ function signInGoogleManual() {
       gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000;
       localStorage.setItem('gd_token', gdToken);
       localStorage.setItem('gd_token_expiry', String(gdTokenExpiry));
-      _gdSilentFailed = false;
+      _setGdFailed(false);
       _onTokenReceived(resp);
       toast('✅ Đã kết nối lại Google Drive!');
       _restoreGDBar();
@@ -3013,14 +3018,14 @@ function _silentRefreshWithRetry(maxTries, doneCb) {
     updGDBarStatus('🔄 Đang làm mới phiên (' + attempt + '/' + maxTries + ')...', 'syncing');
     _doSilentRefresh(function(ok) {
       if (ok) {
-        _gdSilentFailed = false; // reset cờ khi thành công
+        _setGdFailed(false); // reset cờ khi thành công
         doneCb(true);
         return;
       }
       if (attempt < maxTries) {
         setTimeout(tryOnce, 30000);
       } else {
-        _gdSilentFailed = true; // đánh dấu: không tự thử popup nữa
+        _setGdFailed(true); // đánh dấu: không tự thử popup nữa
         doneCb(false);
       }
     });
@@ -3060,14 +3065,17 @@ function _doSilentRefresh(doneCb) {
 
 // ── ensureValidToken: đảm bảo token hợp lệ trước khi gọi API ──
 function ensureValidToken(cb) {
+  // Nếu đã biết silent thất bại → không thử nữa, chỉ hiện banner
+  if (_gdSilentFailed) {
+    _showReloginBanner();
+    return;
+  }
   // Token còn hạn (dư ít nhất 60 giây): dùng luôn
   if (gdToken && Date.now() < gdTokenExpiry - 60000) { cb(); return; }
 
   // Đang refresh rồi: xếp hàng chờ
   if (_gdRefreshing) {
-    _gdRefreshCallbacks.push({ ok: cb, fail: function() {
-      // Không làm gì — sync sẽ bị skip, lần sau retry
-    }});
+    _gdRefreshCallbacks.push({ ok: cb, fail: function() {} });
     return;
   }
 
@@ -3077,7 +3085,6 @@ function ensureValidToken(cb) {
   _initTokenClient();
   if (!window._gdTokenClient) {
     _gdRefreshing = false;
-    toast('⏳ Đang kết nối Google...');
     setTimeout(function() { ensureValidToken(cb); }, 1000);
     return;
   }
@@ -3087,7 +3094,7 @@ function ensureValidToken(cb) {
   _doSilentRefresh(function(ok) {
     _gdRefreshing = false;
     if (ok) {
-      _gdSilentFailed = false;
+      _setGdFailed(false);
       updGDBarStatus('Đã kết nối', 'synced');
       // Xả hàng đợi callback
       var okCbs = _gdRefreshCallbacks.splice(0);
@@ -3096,7 +3103,7 @@ function ensureValidToken(cb) {
       return;
     }
     // Thất bại — set cờ, hiện banner, xả callback fail
-    _gdSilentFailed = true;
+    _setGdFailed(true);
     _showReloginBanner();
     var failCbs = _gdRefreshCallbacks.splice(0);
     failCbs.forEach(function(item){ if(item.fail) item.fail(); });
@@ -3124,13 +3131,14 @@ function initGoogleAuth() {
       return;
     }
     updGDBar();
-    // Kiểm tra ngay: nếu token đã hết hạn hoặc gần hết (< 5 phút) → refresh ngay lập tức
-    if (!gdToken || Date.now() >= gdTokenExpiry - 5*60*1000) {
-      ensureValidToken(function(){
-        // Token đã được làm mới (im lặng) — không cần làm gì thêm, ensureValidToken tự lo
-      });
+    // Đọc lại trạng thái failed từ phiên trước (lưu localStorage)
+    if (localStorage.getItem('gd_silent_failed') === '1') {
+      _setGdFailed(true);
+      _showReloginBanner();
+    } else if (!gdToken || Date.now() >= gdTokenExpiry - 5*60*1000) {
+      // Token hết/gần hết → thử silent refresh ngay
+      ensureValidToken(function(){});
     } else {
-      // Token còn hạn lâu — chỉ cần lên lịch refresh cho lần tới
       _scheduleProactiveRefresh();
     }
     if (navigator.onLine) {
@@ -3163,7 +3171,7 @@ function signInGoogle() {
       gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000;
       localStorage.setItem('gd_token', gdToken);
       localStorage.setItem('gd_token_expiry', String(gdTokenExpiry));
-      _gdSilentFailed = false;
+      _setGdFailed(false);
       _scheduleProactiveRefresh();
       if (!gdUser) fetchGoogleUser();
       else { updGDBar(); _restoreGDBar(); if (gdFolderId) doAutoSync(); }
@@ -4457,18 +4465,12 @@ function updGDBarStatus(msg, cls) {
 }
 
 function autoSync() {
-  if (!gdToken || !gdFolderId) return;
+  if (!gdToken || !gdFolderId) { incPendingCount(); updGDBarStatus('Chưa kết nối Drive', 'offline'); return; }
+  // Nếu đã thất bại silent → chỉ đếm pending, hiện banner, không thử sync
+  if (_gdSilentFailed) { incPendingCount(); _showReloginBanner(); return; }
   incPendingCount();
-  if (!getSetting('autosync', true)) {
-    updGDBarStatus('Đã kết nối', 'synced');
-    return;
-  }
-  if (!navigator.onLine) {
-    syncQueue = true;
-    updGDBarStatus('Chờ kết nối...', 'syncing');
-    toast('📶 Offline — sẽ đồng bộ khi có mạng');
-    return;
-  }
+  if (!getSetting('autosync', true)) { updGDBarStatus('Đã kết nối', 'synced'); return; }
+  if (!navigator.onLine) { syncQueue = true; updGDBarStatus('Chờ kết nối...', 'syncing'); toast('📶 Offline — sẽ đồng bộ khi có mạng'); return; }
   doAutoSync();
 }
 
@@ -4481,6 +4483,7 @@ function doAutoSync() {
 // Sync Drive không hiện toast (silent)
 function syncToDrive_silent() {
   if (!gdToken || !gdFolderId || gdSyncing) return;
+  if (_gdSilentFailed) { _showReloginBanner(); return; }
   gdSyncing = true;
   var hdrGD2 = ['Ngày','Tên','Loại mủ','Kg nhập','Trừ bì','Kg thực','Độ/KH','Đơn giá','Thành tiền','Gửi sổ'];
   function fmtDateVN2(ds){ var p=ds?ds.split('-'):[]; return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:ds||''; }
