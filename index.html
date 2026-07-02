@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v8.3</title>
+<title>Mua Bán Mủ Cao Su v8.5</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -63,6 +63,7 @@ input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:none;appea
 input[type="search"]::-webkit-search-decoration{-webkit-appearance:none;appearance:none}
 .fi:focus{border-color:var(--gl);background:#fff;box-shadow:0 0 0 3px rgba(64,145,108,.1)}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
 
 /* LOAI MU DROPDOWN */
 .loai-wrap{position:relative}
@@ -432,7 +433,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v8.3 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v8.5 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -500,13 +501,9 @@ input[type=date]:focus{border-color:var(--gl)}
         <input type="number" id="mua-do" class="fi" placeholder="0" step="0.01" oninput="calc('mua')" onkeydown="doKey(event,'mua')">
       </div>
       <div class="fr" id="mua-bi-inline" style="display:none">
-        <label class="fl" id="mua-bi-lbl-inline">Trừ bì/KH (kg)</label>
-        <input type="number" id="mua-bi-inline-inp" class="fi" placeholder="0" step="0.01" oninput="calcBi('mua')" onkeydown="biKey(event,'mua')">
+        <label class="fl" id="mua-bi-lbl-inline">Trừ bì</label>
+        <input type="number" id="mua-bi-inline-inp" class="fi" placeholder="0 (bỏ trống được)" step="0.01" oninput="calcBi('mua')" onkeydown="biKey(event,'mua')">
       </div>
-    </div>
-    <div class="fr" id="mua-bi-row" style="display:none">
-      <label class="fl" id="mua-bi-lbl">Trừ bì (kg) — tùy chọn</label>
-      <input type="number" id="mua-bi" class="fi" placeholder="0 (có thể bỏ trống)" step="0.01" oninput="calc('mua')" onkeydown="biKey(event,'mua')">
     </div>
     <div class="tt-box" style="position:relative">
       <div class="tt-lbl">Thành tiền</div>
@@ -592,13 +589,9 @@ input[type=date]:focus{border-color:var(--gl)}
         <input type="number" id="ban-do" class="fi ban-hint" placeholder="0" step="0.01" oninput="calc('ban')" onkeydown="doKey(event,'ban')">
       </div>
       <div class="fr" id="ban-bi-inline" style="display:none">
-        <label class="fl" id="ban-bi-lbl-inline">Trừ bì/KH (kg)</label>
-        <input type="number" id="ban-bi-inline-inp" class="fi" placeholder="0" step="0.01" oninput="calcBi('ban')" onkeydown="biKey(event,'ban')">
+        <label class="fl" id="ban-bi-lbl-inline">Trừ bì</label>
+        <input type="number" id="ban-bi-inline-inp" class="fi" placeholder="0 (bỏ trống được)" step="0.01" oninput="calcBi('ban')" onkeydown="biKey(event,'ban')">
       </div>
-    </div>
-    <div class="fr" id="ban-bi-row" style="display:none">
-      <label class="fl" id="ban-bi-lbl">Trừ bì (kg) — tùy chọn</label>
-      <input type="number" id="ban-bi" class="fi" placeholder="0 (có thể bỏ trống)" step="0.01" oninput="calc('ban')" onkeydown="biKey(event,'ban')">
     </div>
     <div class="tt-box ban-tt">
       <div class="tt-lbl">Thành tiền</div>
@@ -1249,7 +1242,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v8.3</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v8.5</div>
       </div>
     </div>
 
@@ -1799,23 +1792,33 @@ function setLoaiUI(tab, loai, updateGia){
   document.querySelectorAll('#'+tab+'-loai-dd .loai-opt').forEach((o,i)=>{
     o.classList.toggle('sel', ['nuoc','chen','day','dong'][i]===loai);
   });
-  // do row (chỉ hiện với mủ nước)
-  const dr=document.getElementById(tab+'-do-row');
-  const dl=document.getElementById(tab+'-do-lbl');
-  if(loai==='nuoc'){ dr.style.display='block'; dl.textContent='Độ'; }
-  else { dr.style.display='none'; document.getElementById(tab+'-do').value=''; }
-  // Mủ nước: bi hàng riêng (phía dưới)
-  // Mủ khác: bi inline cùng hàng kg (thay chỗ ô độ)
-  const brRow  = document.getElementById(tab+'-bi-row');    // hàng riêng (nước)
-  const bInline= document.getElementById(tab+'-bi-inline'); // inline (khác)
+
+  var kgRow = document.getElementById(tab+'-kg-row');
+  var dr    = document.getElementById(tab+'-do-row');
+  var dl    = document.getElementById(tab+'-do-lbl');
+  var bInline = document.getElementById(tab+'-bi-inline');
+  var bLbl    = document.getElementById(tab+'-bi-lbl-inline');
+
   if(loai==='nuoc'){
-    brRow.style.display='block'; bInline.style.display='none';
-    document.getElementById(tab+'-bi-lbl').textContent='Trừ bì (kg) — tùy chọn';
+    // Mủ nước: kg + độ + trừ bì → 3 cột
+    dr.style.display='block'; dl.textContent='Độ';
+    bInline.style.display='block';
+    bLbl.textContent='Trừ bì';
+    kgRow.className='g3';
+  } else if(loai==='dong'){
+    // Mủ đông: kg + trừ bì → 2 cột (không có độ)
+    dr.style.display='none'; document.getElementById(tab+'-do').value='';
+    bInline.style.display='block';
+    bLbl.textContent='Trừ bì/KH';
+    kgRow.className='g2';
   } else {
-    brRow.style.display='none'; bInline.style.display='block';
-    var inlineLbl = loai==='dong' ? 'Trừ bì/KH (kg)' : 'Trừ bì (kg)';
-    document.getElementById(tab+'-bi-lbl-inline').textContent=inlineLbl;
+    // Mủ chén, mủ dây: chỉ kg — không cần độ, không cần trừ bì
+    dr.style.display='none'; document.getElementById(tab+'-do').value='';
+    bInline.style.display='none';
+    document.getElementById(tab+'-bi-inline-inp').value='';
+    kgRow.className='g2';
   }
+
   if(updateGia){
     const gia=getGia(tab);
     var gv=gia[loai]; document.getElementById(tab+'-gia').value=gv!=null?parseInt(gv).toLocaleString('vi-VN'):'';
@@ -1906,27 +1909,22 @@ function kgKey(e,tab){
 function doKey(e,tab){
   if(e.key==='Enter'){
     e.preventDefault();
-    // nuoc: do → bi-row → lưu
-    document.getElementById(tab+'-bi').focus();
+    // nuoc: do → trừ bì inline → lưu
+    var biEl = document.getElementById(tab+'-bi-inline-inp');
+    if(biEl) biEl.focus(); else luuGD(tab);
   }
 }
 function biKey(e,tab){
   if(e.key==='Enter'){
     e.preventDefault();
-    // từ bất kỳ ô bi nào → hiện popup lưu
     luuGD(tab);
   }
 }
 
 // ─── CALC ───
 function getBiVal(tab){
-  // mủ nước dùng bi-row, loại khác dùng bi-inline
-  var loai=getLoai(tab);
-  if(loai==='nuoc'){
-    return parseFloat(document.getElementById(tab+'-bi').value)||0;
-  } else {
-    return parseFloat(document.getElementById(tab+'-bi-inline-inp').value)||0;
-  }
+  // tất cả loại đều dùng bi-inline-inp
+  return parseFloat(document.getElementById(tab+'-bi-inline-inp').value)||0;
 }
 function calcBi(tab){ calc(tab); } // alias
 
@@ -2049,7 +2047,6 @@ function resetF(tab){
   document.getElementById(tab+'-ten').value='';
   document.getElementById(tab+'-kg').value='';
   document.getElementById(tab+'-do').value='';
-  document.getElementById(tab+'-bi').value='';
   document.getElementById(tab+'-bi-inline-inp').value='';
   document.getElementById(tab+'-tt-so').textContent='0 ₫';
   document.getElementById(tab+'-tt-chu').textContent='--';
@@ -2069,12 +2066,8 @@ function editGD(tab,id){
   document.getElementById(tab+'-ten').value=gd.ten;
   document.getElementById(tab+'-kg').value=gd.kg;
   document.getElementById(tab+'-do').value=gd.do||'';
-  // restore bi vào đúng ô theo loại mủ
-  if(gd.loai==='nuoc'){
-    document.getElementById(tab+'-bi').value=gd.bi||'';
-  } else {
-    document.getElementById(tab+'-bi-inline-inp').value=gd.bi||'';
-  }
+  // restore bi vào bi-inline-inp (tất cả loại đều dùng chung 1 input)
+  document.getElementById(tab+'-bi-inline-inp').value=gd.bi||'';
   calc(tab);
   document.getElementById(tab+'-btns').style.display='none';
   document.getElementById(tab+'-edit-btns').style.display='flex';
@@ -2222,7 +2215,7 @@ function renderTbl(tab, newId){
         +'<span class="tc-ten-inner" id="tni-'+gd.id+'">'+gd.ten+'</span>'
         +'<span class="tc-ten-badges">'+editIcon+'</span>'
         +'</div></td>'
-        +'<td>'+fmtKg(kgThuc(gd.loai,gd.kg,gd.do,gd.bi||0))+'</td>'
+        +'<td>'+fmtKg(kgThuc(gd.loai,gd.kg,gd.do,gd.bi||0))+((gd.bi&&parseFloat(gd.bi)>0)?'<span style="font-size:10px;color:var(--g400)">('+fmtKg(gd.bi)+')</span>':'')+'</td>'
         +'<td>'+chat+'</td>'
         +'<td>'+fmtNum(gd.gia)+'</td>'
         +'<td>'+fmtNum(gd.tt)+'</td>'
@@ -2237,7 +2230,7 @@ function renderTbl(tab, newId){
       +'<span class="tc-ten-inner" id="tni-'+gd.id+'">'+gd.ten+'</span>'
       +'<span class="tc-ten-badges">'+editIcon+rankBadge+'</span>'
       +'</div></td>'
-      +'<td>'+fmtKg(kgThuc(gd.loai,gd.kg,gd.do,gd.bi||0))+'</td>'
+      +'<td>'+fmtKg(kgThuc(gd.loai,gd.kg,gd.do,gd.bi||0))+((gd.bi&&parseFloat(gd.bi)>0)?'<span style="font-size:10px;color:var(--g400)">('+fmtKg(gd.bi)+')</span>':'')+'</td>'
       +'<td>'+chat+'</td>'
       +'<td>'+fmtNum(gd.gia)+'</td>'
       +'<td>'+fmtNum(gd.tt)+'</td>'
@@ -2922,7 +2915,9 @@ function _initTokenClient() {
 
 // ── Hiện banner yêu cầu đăng nhập lại trên thanh GD ──
 function _showReloginBanner() {
-  updGDBarStatus('⚠️ Nhấn để đăng nhập lại', 'syncing');
+  var pending = getPendingCount();
+  var txt = '⚠️ Nhấp vào đây để đăng nhập lại' + (pending > 0 ? ' (' + pending + ' chưa sync)' : '');
+  updGDBarStatus(txt, 'syncing');
   var bar = document.getElementById('gd-bar');
   if (bar) {
     bar.classList.add('gd-bar-relogin');
@@ -2983,26 +2978,43 @@ function _onTokenReceived(resp) {
   _scheduleProactiveRefresh();
 }
 
-// ── Lên lịch tự refresh trước 5 phút ──
+// ── Lên lịch tự refresh trước 5 phút, thử silent tối đa 3 lần ──
 function _scheduleProactiveRefresh() {
   if (_gdAutoRefreshTimer) clearTimeout(_gdAutoRefreshTimer);
   if (!gdToken || !gdTokenExpiry) return;
-  var delay = gdTokenExpiry - Date.now() - 5 * 60 * 1000; // 5 phút trước hết hạn
-  if (delay < 10000) delay = 10000; // tối thiểu 10 giây
-  if (delay > 55 * 60 * 1000) delay = 55 * 60 * 1000; // tối đa 55 phút
+  var delay = gdTokenExpiry - Date.now() - 5 * 60 * 1000;
+  if (delay < 10000) delay = 10000;
+  if (delay > 55 * 60 * 1000) delay = 55 * 60 * 1000;
   _gdAutoRefreshTimer = setTimeout(function() {
-    if (!gdUser) return; // chưa đăng nhập thì thôi
-    _doSilentRefresh(function(ok) {
+    if (!gdUser) return;
+    _silentRefreshWithRetry(3, function(ok) {
       if (ok) {
-        // Thành công im lặng — cập nhật thanh status nhẹ nhàng
         updGDBarStatus('Đã kết nối', 'synced');
       } else {
-        // Silent thất bại → hiện banner yêu cầu đăng nhập lại
-        toast('⚠️ Phiên Google Drive sắp hết — nhấn thanh tài khoản để đăng nhập lại');
+        // 3 lần silent đều thất bại → hiện banner nhấp vào để đăng nhập
+        // KHÔNG popup — chỉ thay đổi text trên thanh GD bar
         _showReloginBanner();
       }
     });
   }, delay);
+}
+
+// Thử silent refresh tối đa maxTries lần, mỗi lần cách nhau 30 giây
+function _silentRefreshWithRetry(maxTries, doneCb) {
+  var attempt = 0;
+  function tryOnce() {
+    attempt++;
+    updGDBarStatus('🔄 Đang làm mới phiên (' + attempt + '/' + maxTries + ')...', 'syncing');
+    _doSilentRefresh(function(ok) {
+      if (ok) { doneCb(true); return; }
+      if (attempt < maxTries) {
+        setTimeout(tryOnce, 30000); // chờ 30 giây rồi thử lại
+      } else {
+        doneCb(false);
+      }
+    });
+  }
+  tryOnce();
 }
 
 // ── Silent refresh: thử lấy token mới không hiện UI ──
@@ -3089,8 +3101,7 @@ function ensureValidToken(cb) {
       window._gdTokenClient.callback = prevCb2;
       _gdRefreshing = false;
       if (resp.error || !resp.access_token) {
-        toast('⚠️ Phiên đăng nhập Google đã hết — nhấn thanh tài khoản để đăng nhập lại');
-        _showReloginBanner();
+        _showReloginBanner(); // Không toast — chỉ hiện trên thanh GD, tránh popup phiền
         var cbs2 = _gdRefreshCallbacks.splice(0);
         cbs2.forEach(function(item) { if (item.fail) item.fail(); });
         return;
@@ -3106,8 +3117,7 @@ function ensureValidToken(cb) {
         _done2 = true; clearTimeout(_t2);
         window._gdTokenClient.callback = prevCb2;
         _gdRefreshing = false;
-        toast('⚠️ Phiên đăng nhập Google đã hết — nhấn thanh tài khoản để đăng nhập lại');
-        _showReloginBanner();
+        _showReloginBanner(); // Không toast — chỉ hiện trên thanh GD, tránh popup phiền
         var cbs3 = _gdRefreshCallbacks.splice(0);
         cbs3.forEach(function(item) { if (item.fail) item.fail(); });
       }
