@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v8.7</title>
+<title>Mua Bán Mủ Cao Su v8.8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -436,7 +436,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v8.7 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v8.8 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1245,7 +1245,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v8.7</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v8.8</div>
       </div>
     </div>
 
@@ -2905,7 +2905,7 @@ function _initTokenClient() {
   window._gdTokenClient = google.accounts.oauth2.initTokenClient({
     client_id: GD_CLIENT_ID,
     scope: GD_SCOPES,
-    prompt: '',
+    prompt: 'none',
     callback: function(resp) {
       if (resp && resp.access_token) {
         gdToken = resp.access_token;
@@ -2946,28 +2946,29 @@ function _restoreGDBar() {
 // ── Đăng nhập thủ công (dùng khi auto-refresh thất bại) ──
 function signInGoogleManual() {
   if (typeof google === 'undefined') { toast('Đang tải Google API...'); return; }
-  _initTokenClient();
-  if (!window._gdTokenClient) { setTimeout(signInGoogleManual, 800); return; }
-
   updGDBarStatus('⏳ Đang xác thực...', 'syncing');
-
-  window._gdTokenClient.callback = function(resp) {
-    _gdRefreshing = false;
-    if (resp.error || !resp.access_token) {
-      toast('❌ Đăng nhập thất bại: ' + (resp.error || 'Không nhận được token'));
-      _showReloginBanner();
-      // Xả queue với lỗi
-      var cbs = _gdRefreshCallbacks.splice(0);
-      cbs.forEach(function(item) { if (item.fail) item.fail(); });
-      return;
+  var loginClient = google.accounts.oauth2.initTokenClient({
+    client_id: GD_CLIENT_ID,
+    scope: GD_SCOPES,
+    prompt: '',
+    callback: function(resp) {
+      if (resp.error || !resp.access_token) {
+        toast('❌ Đăng nhập thất bại: ' + (resp.error || 'Không nhận được token'));
+        _showReloginBanner();
+        return;
+      }
+      gdToken = resp.access_token;
+      gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000;
+      localStorage.setItem('gd_token', gdToken);
+      localStorage.setItem('gd_token_expiry', String(gdTokenExpiry));
+      _gdSilentFailed = false;
+      _onTokenReceived(resp);
+      toast('✅ Đã kết nối lại Google Drive!');
+      _restoreGDBar();
+      updGDBar();
     }
-    _onTokenReceived(resp);
-    toast('✅ Đã kết nối lại Google Drive!');
-    _restoreGDBar();
-    updGDBar();
-  };
-  // prompt: '' = chọn account nếu cần (hiện UI chọn tài khoản)
-  window._gdTokenClient.requestAccessToken({ prompt: '' });
+  });
+  loginClient.requestAccessToken({ prompt: '' });
 }
 
 // ── Khi nhận được token mới (dùng chung cho auto và manual) ──
@@ -3081,71 +3082,27 @@ function ensureValidToken(cb) {
     return;
   }
 
-  // Bước 1: thử silent refresh (prompt:'none' — tuyệt đối không hiện UI)
+  // Chỉ thử silent refresh (prompt:'none') — tuyệt đối không hiện UI
+  // Nếu thất bại: chỉ hiện banner, không popup bất kỳ trường hợp nào
   _doSilentRefresh(function(ok) {
+    _gdRefreshing = false;
     if (ok) {
-      _gdRefreshing = false;
       _gdSilentFailed = false;
       updGDBarStatus('Đã kết nối', 'synced');
+      // Xả hàng đợi callback
+      var okCbs = _gdRefreshCallbacks.splice(0);
+      okCbs.forEach(function(item){ if(item.ok) item.ok(); });
       cb();
       return;
     }
-
-    // Đã thất bại từ trước → không thử popup, không gây phiền
-    if (_gdSilentFailed) {
-      _gdRefreshing = false;
-      _showReloginBanner();
-      var cbs0 = _gdRefreshCallbacks.splice(0);
-      cbs0.forEach(function(item) { if (item.fail) item.fail(); });
-      return;
-    }
-
-    // Bước 2: thử prompt:'' — ẩn nếu cookie còn, KHÔNG block UI
-    // Đặt timeout 5s: nếu Google hỏi người dùng thì fail ngay (không chờ user)
-    var prevCb2 = window._gdTokenClient.callback;
-    var _done2 = false;
-    var _t2 = setTimeout(function() {
-      if (_done2) return; _done2 = true;
-      window._gdTokenClient.callback = prevCb2;
-      _gdRefreshing = false;
-      _gdSilentFailed = true;
-      _showReloginBanner();
-      var cbs = _gdRefreshCallbacks.splice(0);
-      cbs.forEach(function(item) { if (item.fail) item.fail(); });
-    }, 5000);
-
-    window._gdTokenClient.callback = function(resp) {
-      if (_done2) return; _done2 = true;
-      clearTimeout(_t2);
-      window._gdTokenClient.callback = prevCb2;
-      _gdRefreshing = false;
-      if (resp.error || !resp.access_token) {
-        _gdSilentFailed = true;
-        _showReloginBanner();
-        var cbs2 = _gdRefreshCallbacks.splice(0);
-        cbs2.forEach(function(item) { if (item.fail) item.fail(); });
-        return;
-      }
-      _gdSilentFailed = false;
-      _onTokenReceived(resp);
-      _restoreGDBar();
-      cb();
-    };
-    try {
-      window._gdTokenClient.requestAccessToken({ prompt: '' });
-    } catch(e) {
-      if (!_done2) {
-        _done2 = true; clearTimeout(_t2);
-        window._gdTokenClient.callback = prevCb2;
-        _gdRefreshing = false;
-        _gdSilentFailed = true;
-        _showReloginBanner();
-        var cbs3 = _gdRefreshCallbacks.splice(0);
-        cbs3.forEach(function(item) { if (item.fail) item.fail(); });
-      }
-    }
+    // Thất bại — set cờ, hiện banner, xả callback fail
+    _gdSilentFailed = true;
+    _showReloginBanner();
+    var failCbs = _gdRefreshCallbacks.splice(0);
+    failCbs.forEach(function(item){ if(item.fail) item.fail(); });
   });
 }
+
 
 
 function initGoogleAuth() {
@@ -3191,19 +3148,28 @@ function initGoogleAuth() {
 
 function signInGoogle() {
   if (typeof google === 'undefined') { toast('Đang tải Google API...'); return; }
-  _initTokenClient();
-  if (!window._gdTokenClient) { toast('Đang tải Google API...'); setTimeout(signInGoogle, 800); return; }
-  window._gdTokenClient.callback = function(resp) {
-    if (resp.error) { toast('Đăng nhập thất bại: ' + resp.error); return; }
-    gdToken = resp.access_token;
-    gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000;
-    localStorage.setItem('gd_token', gdToken);
-    localStorage.setItem('gd_token_expiry', String(gdTokenExpiry));
-    _scheduleProactiveRefresh(); // bắt đầu theo dõi token
-    if (!gdUser) fetchGoogleUser();
-    else { updGDBar(); _restoreGDBar(); if (gdFolderId) doAutoSync(); }
-  };
-  window._gdTokenClient.requestAccessToken({ prompt: '' });
+  // Tạo client riêng với prompt:'' chỉ cho lần đăng nhập chủ động của người dùng
+  // KHÔNG dùng _gdTokenClient (silent) để tránh ô nhiễm trạng thái
+  var loginClient = google.accounts.oauth2.initTokenClient({
+    client_id: GD_CLIENT_ID,
+    scope: GD_SCOPES,
+    prompt: '',
+    callback: function(resp) {
+      if (resp.error || !resp.access_token) {
+        toast('Đăng nhập thất bại: ' + (resp.error || 'Không nhận được token'));
+        return;
+      }
+      gdToken = resp.access_token;
+      gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000;
+      localStorage.setItem('gd_token', gdToken);
+      localStorage.setItem('gd_token_expiry', String(gdTokenExpiry));
+      _gdSilentFailed = false;
+      _scheduleProactiveRefresh();
+      if (!gdUser) fetchGoogleUser();
+      else { updGDBar(); _restoreGDBar(); if (gdFolderId) doAutoSync(); }
+    }
+  });
+  loginClient.requestAccessToken({ prompt: '' });
 }
 
 function fetchGoogleUser() {
