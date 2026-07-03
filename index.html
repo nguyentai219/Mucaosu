@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v9.1</title>
+<title>Mua Bán Mủ Cao Su v9.2</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -440,7 +440,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v9.1 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v9.2 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -448,16 +448,16 @@ input[type=date]:focus{border-color:var(--gl)}
       <button class="ico-btn" id="kh-btn" onclick="openKH()" title="Khách hàng">👥</button>
     </div>
   </div>
+  <div class="gd-bar" id="gd-bar" onclick="openGDModal()">
+    <span id="gd-bar-ico">&#x2601;&#xFE0F;</span>
+    <span class="gd-name" id="gd-bar-name">Chua dang nhap Google</span>
+    <span class="gd-status offline" id="gd-bar-status">Offline</span>
+  </div>
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('mua')">🛒 Thu Mua</button>
     <button class="tab-btn" onclick="switchTab('ban')">💰 Bán Ra</button>
     <button class="tab-btn" onclick="switchTab('sg')">📒 Sổ Gửi</button>
     <button class="tab-btn" onclick="switchTab('ss')">🧮 Tính Toán</button>
-  </div>
-  <div class="gd-bar" id="gd-bar" onclick="openGDModal()">
-    <span id="gd-bar-ico">&#x2601;&#xFE0F;</span>
-    <span class="gd-name" id="gd-bar-name">Chua dang nhap Google</span>
-    <span class="gd-status offline" id="gd-bar-status">Offline</span>
   </div>
 </div>
 
@@ -476,26 +476,27 @@ input[type=date]:focus{border-color:var(--gl)}
       🔒 Phần mềm đã hết hạn — Nhấn để gia hạn
     </div>
     <div id="mua-form-wrap">
-      <div class="fr">
-        <label class="fl">Loại mủ</label>
-        <div class="loai-wrap">
-          <button class="loai-btn" id="mua-loai-btn" onclick="toggleLoai('mua')">
-            <span id="mua-loai-txt">-- Chọn --</span><span class="loai-arrow" id="mua-loai-arr">▼</span>
-          </button>
-          <div class="loai-dropdown" id="mua-loai-dd">
-            <div class="loai-opt" onclick="chonLoai('mua','nuoc')">💧 Mủ nước</div>
-            <div class="loai-opt" onclick="chonLoai('mua','chen')">🥣 Mủ chén</div>
-            <div class="loai-opt" onclick="chonLoai('mua','day')">🪢 Mủ dây</div>
-            <div class="loai-opt" onclick="chonLoai('mua','dong')">🧱 Mủ đông</div>
+      <div class="g2" style="align-items:end">
+        <div class="fr">
+          <label class="fl">Loại mủ</label>
+          <div class="loai-wrap">
+            <button class="loai-btn" id="mua-loai-btn" onclick="toggleLoai('mua')">
+              <span id="mua-loai-txt">-- Chọn --</span><span class="loai-arrow" id="mua-loai-arr">▼</span>
+            </button>
+            <div class="loai-dropdown" id="mua-loai-dd">
+              <div class="loai-opt" onclick="chonLoai('mua','nuoc')">💧 Mủ nước</div>
+              <div class="loai-opt" onclick="chonLoai('mua','chen')">🥣 Mủ chén</div>
+              <div class="loai-opt" onclick="chonLoai('mua','day')">🪢 Mủ dây</div>
+              <div class="loai-opt" onclick="chonLoai('mua','dong')">🧱 Mủ đông</div>
+            </div>
           </div>
         </div>
+        <div class="fr">
+          <label class="fl">Đơn giá (đ/kg)</label>
+          <input type="text" inputmode="numeric" id="mua-gia" class="fi" placeholder="0" oninput="onGia(this,'mua')" onkeydown="nf(event,'mua-ten')" onfocus="showGiaSuggest('mua')" onblur="hideGiaSuggest('mua')">
+          <div id="mua-gia-suggest" style="display:none;flex-wrap:wrap;gap:5px;margin-top:5px"></div>
+        </div>
       </div>
-      <div class="fr">
-        <label class="fl">Đơn giá (đ/kg)</label>
-        <input type="text" inputmode="numeric" id="mua-gia" class="fi" placeholder="0" oninput="onGia(this,'mua')" onkeydown="nf(event,'mua-ten')" onfocus="showGiaSuggest('mua')" onblur="hideGiaSuggest('mua')">
-        <div id="mua-gia-suggest" style="display:none;flex-wrap:wrap;gap:5px;margin-top:5px"></div>
-      </div>
-    </div>
     <div class="fr">
       <label class="fl">Tên người bán</label>
       <input type="search" id="mua-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('mua')" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="q" onkeydown="tenKey(event,'mua')" onfocus="scrollInputUp(this)">
@@ -568,26 +569,27 @@ input[type=date]:focus{border-color:var(--gl)}
       🔒 Phần mềm đã hết hạn — Nhấn để gia hạn
     </div>
     <div id="ban-form-wrap">
-      <div class="fr">
-        <label class="fl">Loại mủ</label>
-        <div class="loai-wrap">
-          <button class="loai-btn ban-color" id="ban-loai-btn" onclick="toggleLoai('ban')">
-            <span id="ban-loai-txt">-- Chọn --</span><span class="loai-arrow" id="ban-loai-arr">▼</span>
-          </button>
-          <div class="loai-dropdown" id="ban-loai-dd">
-            <div class="loai-opt" onclick="chonLoai('ban','nuoc')">💧 Mủ nước</div>
-            <div class="loai-opt" onclick="chonLoai('ban','chen')">🥣 Mủ chén</div>
-            <div class="loai-opt" onclick="chonLoai('ban','day')">🪢 Mủ dây</div>
-            <div class="loai-opt" onclick="chonLoai('ban','dong')">🧱 Mủ đông</div>
+      <div class="g2" style="align-items:end">
+        <div class="fr">
+          <label class="fl">Loại mủ</label>
+          <div class="loai-wrap">
+            <button class="loai-btn ban-color" id="ban-loai-btn" onclick="toggleLoai('ban')">
+              <span id="ban-loai-txt">-- Chọn --</span><span class="loai-arrow" id="ban-loai-arr">▼</span>
+            </button>
+            <div class="loai-dropdown" id="ban-loai-dd">
+              <div class="loai-opt" onclick="chonLoai('ban','nuoc')">💧 Mủ nước</div>
+              <div class="loai-opt" onclick="chonLoai('ban','chen')">🥣 Mủ chén</div>
+              <div class="loai-opt" onclick="chonLoai('ban','day')">🪢 Mủ dây</div>
+              <div class="loai-opt" onclick="chonLoai('ban','dong')">🧱 Mủ đông</div>
+            </div>
           </div>
         </div>
+        <div class="fr">
+          <label class="fl">Đơn giá (đ/kg)</label>
+          <input type="text" inputmode="numeric" id="ban-gia" class="fi ban-hint" placeholder="0" oninput="onGia(this,'ban')" onkeydown="nf(event,'ban-ten')" onfocus="showGiaSuggest('ban')" onblur="hideGiaSuggest('ban')">
+          <div id="ban-gia-suggest" style="display:none;flex-wrap:wrap;gap:5px;margin-top:5px"></div>
+        </div>
       </div>
-      <div class="fr">
-        <label class="fl">Đơn giá (đ/kg)</label>
-        <input type="text" inputmode="numeric" id="ban-gia" class="fi ban-hint" placeholder="0" oninput="onGia(this,'ban')" onkeydown="nf(event,'ban-ten')" onfocus="showGiaSuggest('ban')" onblur="hideGiaSuggest('ban')">
-        <div id="ban-gia-suggest" style="display:none;flex-wrap:wrap;gap:5px;margin-top:5px"></div>
-      </div>
-    </div>
     <div class="fr">
       <label class="fl">Tên người mua</label>
       <input type="search" id="ban-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('ban')" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="q" onkeydown="tenKey(event,'ban')" onfocus="scrollInputUp(this)" onblur="var l=getLoai('ban');var t=this.value.trim();if(l&&t)saveLastBuyer(l,t);">
@@ -1013,6 +1015,16 @@ input[type=date]:focus{border-color:var(--gl)}
       <button class="cfm-btn n" onclick="closeM('modal-gia-han')">Huỷ</button>
       <button class="cfm-btn y" onclick="doGiaHan()">Gia hạn</button>
     </div>
+    <!-- ĐIỀU CHỈNH NGÀY BẰNG MẬT KHẨU QUẢN TRỊ -->
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--g100)">
+      <div style="font-size:11px;color:var(--g600);text-align:center;margin-bottom:8px">⚙️ Điều chỉnh ngày (chỉ quản trị)</div>
+      <div class="g2" style="gap:8px;margin-bottom:8px">
+        <input type="password" id="adj-admin-pw" class="fi" placeholder="Mật khẩu quản trị" autocomplete="off">
+        <input type="text" inputmode="numeric" id="adj-days" class="fi" placeholder="+n hoặc -n ngày">
+      </div>
+      <div id="adj-err" style="color:#dc2626;font-size:11px;margin-bottom:6px;display:none"></div>
+      <button onclick="doAdjDays()" style="width:100%;padding:9px;background:#f0fdf4;color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer">✅ Áp dụng điều chỉnh</button>
+    </div>
   </div>
 </div>
 
@@ -1257,7 +1269,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v9.1</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v9.2</div>
       </div>
     </div>
 
@@ -1760,9 +1772,39 @@ function closeLoaiDD(tab){
 var kbHideTimer = {};
 function chonLoai(tab, loai){
   closeLoaiDD(tab);
-  setLoaiUI(tab, loai, true);
-  // Hiện đề xuất giá ngay khi chọn loại mủ
-  setTimeout(function(){ showGiaSuggest(tab); }, 50);
+  setLoaiUI(tab, loai, false); // false: không overwrite giá bằng giaHistory cũ
+
+  // Tự điền đơn giá từ giao dịch trong ngày hiện tại (nếu có)
+  // Ưu tiên: giá từ GD cùng loại hôm nay > giaHistory > bỏ trống
+  var giaEl = document.getElementById(tab+'-gia');
+  if(giaEl) {
+    var today = getDate(tab) || todayStr();
+    var gdToday = getGD(tab).filter(function(g){ return g.date===today && g.loai===loai; });
+    var giaFromToday = gdToday.length ? (parseFloat(gdToday[gdToday.length-1].gia)||0) : 0;
+    if(giaFromToday > 0) {
+      giaEl.value = parseInt(giaFromToday).toLocaleString('vi-VN');
+      calc(tab);
+    } else {
+      // Không có GD hôm nay → lấy từ giaHistory (nếu có), không bỏ trống
+      var ghKey='giaHistory3_'+tab+'_'+loai;
+      var ghArr=JSON.parse(localStorage.getItem(ghKey)||'[]');
+      if(ghArr.length) {
+        var lastGia = ghArr[ghArr.length-1];
+        giaEl.value = parseInt(lastGia).toLocaleString('vi-VN');
+        calc(tab);
+      } else {
+        giaEl.value = ''; // loại chưa có GD nào → bỏ trống
+        giaEl.placeholder = '0';
+        calc(tab);
+      }
+    }
+  }
+
+  // Focus sang ô đơn giá ngay sau khi chọn loại
+  setTimeout(function(){
+    var gEl = document.getElementById(tab+'-gia');
+    if(gEl) { gEl.focus(); gEl.select(); }
+  }, 80);
 }
 function showGiaSuggest(tab){
   var loai=getLoai(tab);
@@ -4955,9 +4997,11 @@ function guardLicense() {
 function openGiaHan() {
   document.getElementById('gh-pw-input').value = '';
   var daysEl = document.getElementById('gh-days-input');
-  daysEl.value = '';
-  daysEl.disabled = true;
-  daysEl.placeholder = '—';
+  if(daysEl) {
+    daysEl.value = '';
+    daysEl.disabled = true;
+    daysEl.placeholder = '—';
+  }
   document.getElementById('gh-err').style.display = 'none';
   document.getElementById('gh-device-code').textContent = getDeviceCode();
   document.getElementById('gh-algo-ver').textContent = EXT_ALGO_VERSION;
@@ -4966,8 +5010,57 @@ function openGiaHan() {
   if (info) {
     info.textContent = days > 0 ? 'Hiện còn ' + days + ' ngày sử dụng' : 'Đã hết hạn sử dụng';
   }
+  // Reset phần điều chỉnh ngày
+  var adjPw = document.getElementById('adj-admin-pw');
+  var adjDays = document.getElementById('adj-days');
+  var adjErr = document.getElementById('adj-err');
+  if(adjPw) adjPw.value='';
+  if(adjDays) adjDays.value='';
+  if(adjErr) adjErr.style.display='none';
   closeM('modal-settings');
   openM('modal-gia-han');
+}
+
+// Điều chỉnh ngày sử dụng bằng mật khẩu quản trị (+n hoặc -n)
+function doAdjDays(){
+  var adminPw = document.getElementById('adj-admin-pw').value.trim();
+  var daysStr = document.getElementById('adj-days').value.trim();
+  var errEl = document.getElementById('adj-err');
+  errEl.style.display='none';
+
+  if(adminPw !== getAdminPW()){
+    errEl.textContent='❌ Mật khẩu quản trị không đúng!';
+    errEl.style.display='block'; return;
+  }
+  // Cho phép +n hoặc -n (có dấu trừ)
+  var days = parseInt(daysStr);
+  if(isNaN(days) || days === 0){
+    errEl.textContent='⚠️ Nhập số ngày cần điều chỉnh (VD: +30 hoặc -5)';
+    errEl.style.display='block'; return;
+  }
+
+  var currentExpiry = getLicenseExpiry();
+  var expDateObj = new Date(currentExpiry);
+  var expDay = new Date(expDateObj.getFullYear(), expDateObj.getMonth(), expDateObj.getDate()).getTime();
+  var newExpiry = expDay + days * MS_PER_DAY;
+
+  // Không cho giảm về quá khứ quá 1 ngày
+  var now = new Date();
+  var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  if(newExpiry < startOfToday){
+    errEl.textContent='⚠️ Không thể đặt ngày hết hạn trước hôm nay!';
+    errEl.style.display='block'; return;
+  }
+
+  localStorage.setItem(_LSK, String(newExpiry));
+  updLicenseCountdown();
+  checkLicenseOnLoad();
+
+  var newDays = getRemainingDays();
+  document.getElementById('adj-admin-pw').value='';
+  document.getElementById('adj-days').value='';
+  closeM('modal-gia-han');
+  toast('✅ Đã điều chỉnh '+(days>0?'+':'')+days+' ngày. Còn lại: '+newDays+' ngày');
 }
 
 // ══════════════════════════════════════════
