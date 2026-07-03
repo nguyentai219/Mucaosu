@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v8.9</title>
+<title>Mua Bán Mủ Cao Su v9.0</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -333,6 +333,10 @@ input[type=date]:focus{border-color:var(--gl)}
 .ung-entry.chot .ung-entry-tien, .ung-entry.chot .sg-entry-date, .ung-entry.chot .ung-entry-content{ text-decoration:line-through; color:var(--g400); }
 .chot-stamp{ display:inline-block; font-size:9px; font-weight:800; padding:1px 6px; border-radius:8px; background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; margin-left:5px; vertical-align:middle; }
 .tra-stamp{ display:inline-block; font-size:9px; font-weight:800; padding:1px 6px; border-radius:8px; background:#d1fae5; color:#065f46; border:1px solid #6ee7b7; margin-left:5px; vertical-align:middle; }
+/* LOCK OVERLAY khi hết hạn license */
+.license-locked{pointer-events:none!important;opacity:.45!important;user-select:none!important}
+.license-lock-banner{display:none;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;text-align:center;padding:10px 14px;font-size:13px;font-weight:700;border-radius:var(--r);margin:8px 0;cursor:pointer}
+.license-lock-banner.show{display:block}
 /* FLASH ANIMATION - giao dịch mới */
 @keyframes rowFlash {
   0%   { background:#86efac; }
@@ -436,7 +440,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v8.9 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v9.0 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -468,7 +472,10 @@ input[type=date]:focus{border-color:var(--gl)}
     <span class="date-hint">Nhấn để đổi ngày</span>
   </div>
   <div class="fc" id="mua-fc">
-    <div class="g2">
+    <div class="license-lock-banner" id="lock-banner-mua" onclick="openM('modal-expired')">
+      🔒 Phần mềm đã hết hạn — Nhấn để gia hạn
+    </div>
+    <div id="mua-form-wrap">
       <div class="fr">
         <label class="fl">Loại mủ</label>
         <div class="loai-wrap">
@@ -525,7 +532,8 @@ input[type=date]:focus{border-color:var(--gl)}
       <button class="btn-luu edit-mode" onclick="luuSua('mua')">💾 Lưu thay đổi</button>
       <button class="btn-xoa" onclick="xoaGD('mua')">🗑️</button>
     </div>
-  </div>
+  </div><!-- end mua-form-wrap -->
+  </div><!-- end mua-fc -->
   <div class="sec-title">📋 Chi tiết thu mua trong ngày <span class="sec-badge" id="mua-badge">0</span><span class="sec-hint">nhấp đúp để sửa/xoá</span></div>
   <div class="tbl-wrap">
     <div class="no-data" id="mua-nodata">Chưa có giao dịch nào</div>
@@ -556,7 +564,10 @@ input[type=date]:focus{border-color:var(--gl)}
     <span class="date-hint">Nhấn để đổi ngày</span>
   </div>
   <div class="fc ban-fc" id="ban-fc">
-    <div class="g2">
+    <div class="license-lock-banner" id="lock-banner-ban" onclick="openM('modal-expired')">
+      🔒 Phần mềm đã hết hạn — Nhấn để gia hạn
+    </div>
+    <div id="ban-form-wrap">
       <div class="fr">
         <label class="fl">Loại mủ</label>
         <div class="loai-wrap">
@@ -610,7 +621,8 @@ input[type=date]:focus{border-color:var(--gl)}
       <button class="btn-luu edit-mode" onclick="luuSua('ban')">💾 Lưu thay đổi</button>
       <button class="btn-xoa" onclick="xoaGD('ban')">🗑️</button>
     </div>
-  </div>
+  </div><!-- end ban-form-wrap -->
+  </div><!-- end ban-fc -->
   <div class="sec-title" style="color:var(--ad)">📋 Chi tiết bán ra trong ngày <span class="sec-badge" id="ban-badge" style="background:var(--ad)">0</span><span class="sec-hint">nhấp đúp để sửa/xoá</span></div>
   <div class="tbl-wrap">
     <div class="no-data" id="ban-nodata">Chưa có giao dịch nào</div>
@@ -1245,7 +1257,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v8.9</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v9.0</div>
       </div>
     </div>
 
@@ -2061,6 +2073,7 @@ function resetF(tab){
 
 // ─── CHINH SUA GIAO DICH ───
 function editGD(tab,id){
+  if(guardLicense()) return;
   const gd=getGD(tab).find(g=>String(g.id)===String(id));
   if(!gd) return;
   editId[tab]=id;
@@ -4865,6 +4878,7 @@ function checkLicenseOnLoad() {
   getDeviceCode();
   updLicenseCountdown();
   if (isLicenseExpired()) {
+    applyLicenseLock();
     setTimeout(function(){ openM('modal-expired'); }, 400);
   } else {
     var days = getRemainingDays();
@@ -4872,7 +4886,6 @@ function checkLicenseOnLoad() {
       setTimeout(function(){
         document.getElementById('warn-expiry-days').textContent = days;
         var icon = document.getElementById('warn-expiry-icon');
-        // Màu chìa khoá theo mức ngày
         if (days <= 3)      { icon.textContent = '🔑'; icon.style.color='#dc2626'; }
         else if (days <= 5) { icon.textContent = '🔑'; icon.style.color='#d97706'; }
         else                { icon.textContent = '🔑'; icon.style.color='#16a34a'; }
@@ -4880,6 +4893,27 @@ function checkLicenseOnLoad() {
       }, 400);
     }
   }
+}
+
+// Khoá toàn bộ form nhập liệu khi hết hạn
+// Chỉ để lại: date-bar (chọn ngày), bảng dữ liệu cũ (xem lại)
+function applyLicenseLock() {
+  // Khoá form wrap của tab mua và bán
+  ['mua-form-wrap','ban-form-wrap'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.classList.add('license-locked');
+  });
+  // Hiện banner hết hạn
+  ['lock-banner-mua','lock-banner-ban'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.classList.add('show');
+  });
+  // Khoá nút lưu sổ gửi, ứng tiền (tab Sổ Gửi)
+  var sgTopRow = document.querySelector('.sg-top-row');
+  if (sgTopRow) sgTopRow.classList.add('license-locked');
+  // Khoá tab Tính Toán nút lưu
+  var ttLuu = document.getElementById('tt-luu-btn');
+  if (ttLuu) ttLuu.classList.add('license-locked');
 }
 
 // Hiện số ngày còn lại cạnh version — 🔑 đổi màu: xanh 7n / vàng 5n / đỏ 3n
@@ -4904,6 +4938,7 @@ function updLicenseCountdown() {
 // Chặn ghi/sửa nếu hết hạn - gọi ở đầu các hàm luuGD, luuSua, xoaGD, luuSoSach
 function guardLicense() {
   if (isLicenseExpired()) {
+    applyLicenseLock();
     openM('modal-expired');
     return true; // bị chặn
   }
