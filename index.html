@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v9.0</title>
+<title>Mua Bán Mủ Cao Su v9.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -440,7 +440,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v9.0 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v9.1 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1257,7 +1257,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v9.0</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v9.1</div>
       </div>
     </div>
 
@@ -4843,34 +4843,34 @@ var MS_PER_DAY = 24*60*60*1000;
 function getLicenseExpiry() {
   var v = localStorage.getItem(_LSK);
   if (!v) {
-    // Lần đầu chạy: hạn dùng thử = 0 giờ của ngày (hôm nay + _TD)
-    // VD: cài lúc 15h ngày 1, _TD=3 → hết hạn lúc 0h00 ngày 5
-    // (ngày 1 tính là ngày dùng thử thứ 1, ngày 2,3 tiếp theo, hết hạn khi sang ngày 4 lúc 0h)
+    // Lần đầu chạy: cài ngày 1, dùng _TD=3 ngày → hết hạn 0h ngày 4
+    // Ngày 1,2,3 còn dùng (getRemainingDays >= 1), ngày 4 getRemainingDays = 0 → khoá
     var now = new Date();
-    var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // 0h hôm nay
-    var expiryDate = new Date(startOfToday.getTime() + (_TD + 1) * MS_PER_DAY);
+    var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var expiryDate = new Date(startOfToday.getTime() + _TD * MS_PER_DAY);
     var expiry = expiryDate.getTime();
     localStorage.setItem(_LSK, String(expiry));
-    localStorage.setItem('license_is_new', '1'); // đánh dấu cần đồng bộ lên Drive khi có kết nối
+    localStorage.setItem('license_is_new', '1');
     return expiry;
   }
   return parseInt(v);
 }
 
-// Số ngày còn lại — tính theo mốc 0 giờ: cứ qua 0h là tính sang ngày mới,
-// không cần đủ 24 giờ. VD: hết hạn 0h ngày 5, hiện tại là 23h ngày 3 → còn 2 ngày (ngày 4, ngày 5 chưa qua 0h)
+// Số ngày còn lại theo mốc 0h:
+// Ngày cài = ngày 1: còn _TD ngày
+// Ngày tiếp theo: còn _TD-1 ngày ... Khi còn 0 ngày → hết hạn, khoá ngay
 function getRemainingDays() {
   var expiry = getLicenseExpiry();
   var now = new Date();
   var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
   var expiryDateObj = new Date(expiry);
   var startOfExpiryDay = new Date(expiryDateObj.getFullYear(), expiryDateObj.getMonth(), expiryDateObj.getDate()).getTime();
-  var diffDays = Math.round((startOfExpiryDay - startOfToday) / MS_PER_DAY);
-  return diffDays;
+  return Math.round((startOfExpiryDay - startOfToday) / MS_PER_DAY);
 }
 
 function isLicenseExpired() {
-  return Date.now() >= getLicenseExpiry();
+  // Còn 0 ngày = hết hạn ngay (không cho dùng thêm)
+  return getRemainingDays() <= 0;
 }
 
 // Kiểm tra khi khởi động: nếu hết hạn → hiện popup
@@ -4923,15 +4923,21 @@ function updLicenseCountdown() {
   var days = getRemainingDays();
   el.className = '';
   el.style.color = '';
-  if (days > 0) {
-    el.textContent = '🔑 còn ' + days + ' ngày';
-    if (days <= 3)      el.classList.add('lc-red');
-    else if (days <= 5) el.classList.add('lc-yellow');
-    else if (days <= 7) { el.classList.add('lc-normal'); el.style.color='#86efac'; }
-    else                el.classList.add('lc-normal');
-  } else {
-    el.textContent = '🔑 hết hạn';
+  if (days <= 0) {
+    el.textContent = '🔑 HẾT HẠN';
     el.classList.add('lc-red');
+  } else if (days === 1) {
+    el.textContent = '🔑 còn 1 ngày';
+    el.classList.add('lc-red');
+  } else if (days <= 5) {
+    el.textContent = '🔑 còn ' + days + ' ngày';
+    el.classList.add('lc-yellow');
+  } else if (days <= 7) {
+    el.textContent = '🔑 còn ' + days + ' ngày';
+    el.classList.add('lc-normal'); el.style.color='#86efac';
+  } else {
+    el.textContent = '🔑 còn ' + days + ' ngày';
+    el.classList.add('lc-normal');
   }
 }
 
@@ -5087,17 +5093,17 @@ function doGiaHan() {
     return;
   }
 
-  // Gia hạn thêm `days` ngày — tính theo mốc 0 giờ, đồng nhất với cơ chế đếm ngày mới
-  // Nếu còn hạn: lấy ngày hết hạn cũ (đã ở mốc 0h) + days ngày
-  // Nếu đã hết hạn: lấy 0h hôm nay + days ngày
+  // Gia hạn thêm days ngày tính theo mốc 0h
+  // Nếu còn hạn: cộng từ 0h ngày hết hạn cũ
+  // Nếu đã hết: cộng từ 0h hôm nay (cho phép gia hạn kể từ ngày mai)
   var currentExpiry = getLicenseExpiry();
   var now = new Date();
   var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  var baseDate = currentExpiry > Date.now() ? currentExpiry : startOfToday;
-  // Đưa base về đúng mốc 0h của ngày đó (đề phòng dữ liệu cũ không tròn mốc)
-  var baseDateObj = new Date(baseDate);
-  var baseStartOfDay = new Date(baseDateObj.getFullYear(), baseDateObj.getMonth(), baseDateObj.getDate()).getTime();
-  var newExpiry = baseStartOfDay + days * MS_PER_DAY;
+  // baseDate: 0h của ngày hết hạn cũ (hoặc hôm nay nếu đã hết)
+  var rawBase = getRemainingDays() > 0 ? currentExpiry : startOfToday;
+  var baseDateObj = new Date(rawBase);
+  var baseDay = new Date(baseDateObj.getFullYear(), baseDateObj.getMonth(), baseDateObj.getDate()).getTime();
+  var newExpiry = baseDay + days * MS_PER_DAY;
   localStorage.setItem(_LSK, String(newExpiry));
 
   if (isExtCode) markExtCodeUsed(pw);
