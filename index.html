@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v9.2</title>
+<title>Mua Bán Mủ Cao Su v9.4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -440,7 +440,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v9.2 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v9.4 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1009,21 +1009,15 @@ input[type=date]:focus{border-color:var(--gl)}
     </div>
     <input type="text" inputmode="numeric" id="gh-pw-input" class="fi" placeholder="Mật khẩu hoặc Mã gia hạn 6 số" autocomplete="off" style="margin-bottom:8px" oninput="onGhPwInput()">
     <input type="text" inputmode="numeric" id="gh-days-input" class="fi" placeholder="—" style="margin-bottom:8px" disabled>
+    <!-- Ô nhập số ngày +/- chỉ hiện khi nhập đúng mật khẩu quản trị -->
+    <div id="gh-adj-wrap" style="display:none;margin-bottom:8px">
+      <input type="text" inputmode="numeric" id="gh-adj-days" class="fi" placeholder="+n thêm ngày, -n bớt ngày">
+    </div>
     <div id="gh-err" style="color:#dc2626;font-size:11px;margin-bottom:8px;display:none">❌ Mật khẩu không đúng!</div>
     <div id="gh-info" style="font-size:11px;color:var(--g600);margin-bottom:8px;text-align:center"></div>
     <div class="cfm-btns">
       <button class="cfm-btn n" onclick="closeM('modal-gia-han')">Huỷ</button>
-      <button class="cfm-btn y" onclick="doGiaHan()">Gia hạn</button>
-    </div>
-    <!-- ĐIỀU CHỈNH NGÀY BẰNG MẬT KHẨU QUẢN TRỊ -->
-    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--g100)">
-      <div style="font-size:11px;color:var(--g600);text-align:center;margin-bottom:8px">⚙️ Điều chỉnh ngày (chỉ quản trị)</div>
-      <div class="g2" style="gap:8px;margin-bottom:8px">
-        <input type="password" id="adj-admin-pw" class="fi" placeholder="Mật khẩu quản trị" autocomplete="off">
-        <input type="text" inputmode="numeric" id="adj-days" class="fi" placeholder="+n hoặc -n ngày">
-      </div>
-      <div id="adj-err" style="color:#dc2626;font-size:11px;margin-bottom:6px;display:none"></div>
-      <button onclick="doAdjDays()" style="width:100%;padding:9px;background:#f0fdf4;color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer">✅ Áp dụng điều chỉnh</button>
+      <button class="cfm-btn y" id="gh-btn-luu" onclick="doGiaHan()">Gia hạn</button>
     </div>
   </div>
 </div>
@@ -1269,7 +1263,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v9.2</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v9.4</div>
       </div>
     </div>
 
@@ -1772,39 +1766,29 @@ function closeLoaiDD(tab){
 var kbHideTimer = {};
 function chonLoai(tab, loai){
   closeLoaiDD(tab);
-  setLoaiUI(tab, loai, false); // false: không overwrite giá bằng giaHistory cũ
+  setLoaiUI(tab, loai, false);
 
-  // Tự điền đơn giá từ giao dịch trong ngày hiện tại (nếu có)
-  // Ưu tiên: giá từ GD cùng loại hôm nay > giaHistory > bỏ trống
   var giaEl = document.getElementById(tab+'-gia');
   if(giaEl) {
-    var today = getDate(tab) || todayStr();
+    // Lấy ngày đang chọn trên tab (không phải today() cứng)
+    var today = curDate[tab];
+    // Chỉ lấy giá từ GD cùng loại cùng ngày hôm nay
     var gdToday = getGD(tab).filter(function(g){ return g.date===today && g.loai===loai; });
-    var giaFromToday = gdToday.length ? (parseFloat(gdToday[gdToday.length-1].gia)||0) : 0;
-    if(giaFromToday > 0) {
-      giaEl.value = parseInt(giaFromToday).toLocaleString('vi-VN');
-      calc(tab);
+    if(gdToday.length > 0) {
+      var lastGia = parseFloat(gdToday[gdToday.length-1].gia)||0;
+      giaEl.value = lastGia > 0 ? parseInt(lastGia).toLocaleString('vi-VN') : '';
     } else {
-      // Không có GD hôm nay → lấy từ giaHistory (nếu có), không bỏ trống
-      var ghKey='giaHistory3_'+tab+'_'+loai;
-      var ghArr=JSON.parse(localStorage.getItem(ghKey)||'[]');
-      if(ghArr.length) {
-        var lastGia = ghArr[ghArr.length-1];
-        giaEl.value = parseInt(lastGia).toLocaleString('vi-VN');
-        calc(tab);
-      } else {
-        giaEl.value = ''; // loại chưa có GD nào → bỏ trống
-        giaEl.placeholder = '0';
-        calc(tab);
-      }
+      // Không có GD hôm nay → bỏ trống, không lấy lịch sử ngày khác
+      giaEl.value = '';
     }
-  }
+    calc(tab);
 
-  // Focus sang ô đơn giá ngay sau khi chọn loại
-  setTimeout(function(){
-    var gEl = document.getElementById(tab+'-gia');
-    if(gEl) { gEl.focus(); gEl.select(); }
-  }, 80);
+    // Focus sang ô giá
+    setTimeout(function(){
+      giaEl.focus();
+      if(giaEl.value) giaEl.select();
+    }, 100);
+  }
 }
 function showGiaSuggest(tab){
   var loai=getLoai(tab);
@@ -4995,73 +4979,30 @@ function guardLicense() {
 
 // ── MỞ MODAL GIA HẠN ──
 function openGiaHan() {
-  document.getElementById('gh-pw-input').value = '';
+  var pwEl = document.getElementById('gh-pw-input');
+  if(pwEl) pwEl.value='';
   var daysEl = document.getElementById('gh-days-input');
-  if(daysEl) {
-    daysEl.value = '';
-    daysEl.disabled = true;
-    daysEl.placeholder = '—';
-  }
-  document.getElementById('gh-err').style.display = 'none';
-  document.getElementById('gh-device-code').textContent = getDeviceCode();
-  document.getElementById('gh-algo-ver').textContent = EXT_ALGO_VERSION;
+  if(daysEl){ daysEl.value=''; daysEl.disabled=true; daysEl.placeholder='—'; }
+  var adjWrap = document.getElementById('gh-adj-wrap');
+  if(adjWrap) adjWrap.style.display='none';
+  var adjDaysEl = document.getElementById('gh-adj-days');
+  if(adjDaysEl) adjDaysEl.value='';
+  var btn = document.getElementById('gh-btn-luu');
+  if(btn) btn.textContent='Gia hạn';
+  var errEl = document.getElementById('gh-err');
+  if(errEl) errEl.style.display='none';
+  var dcEl = document.getElementById('gh-device-code');
+  if(dcEl) dcEl.textContent=getDeviceCode();
+  var avEl = document.getElementById('gh-algo-ver');
+  if(avEl) avEl.textContent=EXT_ALGO_VERSION;
   var days = getRemainingDays();
   var info = document.getElementById('gh-info');
-  if (info) {
-    info.textContent = days > 0 ? 'Hiện còn ' + days + ' ngày sử dụng' : 'Đã hết hạn sử dụng';
-  }
-  // Reset phần điều chỉnh ngày
-  var adjPw = document.getElementById('adj-admin-pw');
-  var adjDays = document.getElementById('adj-days');
-  var adjErr = document.getElementById('adj-err');
-  if(adjPw) adjPw.value='';
-  if(adjDays) adjDays.value='';
-  if(adjErr) adjErr.style.display='none';
+  if(info) info.textContent = days>0 ? 'Hiện còn '+days+' ngày sử dụng' : 'Đã hết hạn sử dụng';
   closeM('modal-settings');
+  closeM('modal-warn-expiry');
   openM('modal-gia-han');
 }
 
-// Điều chỉnh ngày sử dụng bằng mật khẩu quản trị (+n hoặc -n)
-function doAdjDays(){
-  var adminPw = document.getElementById('adj-admin-pw').value.trim();
-  var daysStr = document.getElementById('adj-days').value.trim();
-  var errEl = document.getElementById('adj-err');
-  errEl.style.display='none';
-
-  if(adminPw !== getAdminPW()){
-    errEl.textContent='❌ Mật khẩu quản trị không đúng!';
-    errEl.style.display='block'; return;
-  }
-  // Cho phép +n hoặc -n (có dấu trừ)
-  var days = parseInt(daysStr);
-  if(isNaN(days) || days === 0){
-    errEl.textContent='⚠️ Nhập số ngày cần điều chỉnh (VD: +30 hoặc -5)';
-    errEl.style.display='block'; return;
-  }
-
-  var currentExpiry = getLicenseExpiry();
-  var expDateObj = new Date(currentExpiry);
-  var expDay = new Date(expDateObj.getFullYear(), expDateObj.getMonth(), expDateObj.getDate()).getTime();
-  var newExpiry = expDay + days * MS_PER_DAY;
-
-  // Không cho giảm về quá khứ quá 1 ngày
-  var now = new Date();
-  var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  if(newExpiry < startOfToday){
-    errEl.textContent='⚠️ Không thể đặt ngày hết hạn trước hôm nay!';
-    errEl.style.display='block'; return;
-  }
-
-  localStorage.setItem(_LSK, String(newExpiry));
-  updLicenseCountdown();
-  checkLicenseOnLoad();
-
-  var newDays = getRemainingDays();
-  document.getElementById('adj-admin-pw').value='';
-  document.getElementById('adj-days').value='';
-  closeM('modal-gia-han');
-  toast('✅ Đã điều chỉnh '+(days>0?'+':'')+days+' ngày. Còn lại: '+newDays+' ngày');
-}
 
 // ══════════════════════════════════════════
 // MÃ MÁY + MÃ GIA HẠN (hash-based, theo từng máy)
@@ -5137,16 +5078,31 @@ function isExtCodeUsed(code) {
 
 // Khi nhập mật khẩu: chỉ mở khoá ô "số ngày" khi gõ đúng mật khẩu cố định 8 số
 function onGhPwInput() {
-  document.getElementById('gh-err').style.display = 'none';
+  var errEl = document.getElementById('gh-err');
+  if(errEl) errEl.style.display='none';
   var pw = document.getElementById('gh-pw-input').value.trim();
   var daysEl = document.getElementById('gh-days-input');
+  var adjWrap = document.getElementById('gh-adj-wrap');
+  var adjDaysEl = document.getElementById('gh-adj-days');
+  var btn = document.getElementById('gh-btn-luu');
+
   if (pw === _LPW) {
-    daysEl.disabled = false;
-    daysEl.placeholder = 'Số ngày muốn gia hạn (VD: 30)';
+    // Mật khẩu gia hạn cố định → mở ô số ngày
+    if(daysEl){ daysEl.disabled=false; daysEl.placeholder='Số ngày muốn gia hạn (VD: 30)'; }
+    if(adjWrap) adjWrap.style.display='none';
+    if(adjDaysEl) adjDaysEl.value='';
+    if(btn) btn.textContent='Gia hạn';
+  } else if (pw === getAdminPW()) {
+    // Mật khẩu quản trị → mở ô +/- điều chỉnh
+    if(daysEl){ daysEl.disabled=true; daysEl.value=''; daysEl.placeholder='—'; }
+    if(adjWrap) adjWrap.style.display='block';
+    if(btn) btn.textContent='Áp dụng';
   } else {
-    daysEl.disabled = true;
-    daysEl.value = '';
-    daysEl.placeholder = '—';
+    // Mã 6 số hoặc đang gõ → không mở gì thêm
+    if(daysEl){ daysEl.disabled=true; daysEl.value=''; daysEl.placeholder='—'; }
+    if(adjWrap) adjWrap.style.display='none';
+    if(adjDaysEl) adjDaysEl.value='';
+    if(btn) btn.textContent='Gia hạn';
   }
 }
 
@@ -5155,17 +5111,44 @@ function doGiaHan() {
   var errEl = document.getElementById('gh-err');
   var days = 0;
   var isExtCode = false;
+  var isAdj = false; // điều chỉnh +/-
 
-  if (pw === _LPW) {
-    // Cách 1: mật khẩu cố định (chỉ bạn biết) + nhập số ngày tuỳ ý
+  if (pw === getAdminPW()) {
+    // Mật khẩu quản trị → điều chỉnh +/- ngày
+    var adjStr = (document.getElementById('gh-adj-days').value||'').trim();
+    var adjDays = parseInt(adjStr);
+    if (isNaN(adjDays) || adjDays === 0) {
+      toast('⚠️ Nhập số ngày cần điều chỉnh (+n hoặc -n)');
+      return;
+    }
+    var currentExpiry = getLicenseExpiry();
+    var expDateObj = new Date(currentExpiry);
+    var expDay = new Date(expDateObj.getFullYear(), expDateObj.getMonth(), expDateObj.getDate()).getTime();
+    var newExpiry = expDay + adjDays * MS_PER_DAY;
+    var nowD = new Date();
+    var startOfToday = new Date(nowD.getFullYear(), nowD.getMonth(), nowD.getDate()).getTime();
+    if (newExpiry < startOfToday) {
+      toast('⚠️ Không thể đặt ngày hết hạn trước hôm nay!');
+      return;
+    }
+    localStorage.setItem(_LSK, String(newExpiry));
+    updLicenseCountdown();
+    checkLicenseOnLoad();
+    closeM('modal-gia-han');
+    toast('✅ Đã điều chỉnh ' + (adjDays>0?'+':'') + adjDays + ' ngày. Còn lại: ' + getRemainingDays() + ' ngày');
+    return;
+
+  } else if (pw === _LPW) {
+    // Mật khẩu gia hạn cố định + số ngày thêm bình thường
     var daysInput = parseInt(document.getElementById('gh-days-input').value)||0;
     if (daysInput <= 0) {
       toast('⚠️ Nhập số ngày hợp lệ!');
       return;
     }
     days = daysInput;
+
   } else if (/^\d{6}$/.test(pw)) {
-    // Cách 2: mã gia hạn 6 số - đã mã hoá số ngày, theo máy + theo ngày, dùng 1 lần
+    // Mã gia hạn 6 số theo máy
     if (isExtCodeUsed(pw)) {
       errEl.textContent = '⛔ Mã này đã được sử dụng!';
       errEl.style.display = 'block';
@@ -5180,6 +5163,7 @@ function doGiaHan() {
     }
     days = decoded;
     isExtCode = true;
+
   } else {
     errEl.textContent = '❌ Mật khẩu không đúng!';
     errEl.style.display = 'block';
@@ -5187,24 +5171,19 @@ function doGiaHan() {
   }
 
   // Gia hạn thêm days ngày tính theo mốc 0h
-  // Nếu còn hạn: cộng từ 0h ngày hết hạn cũ
-  // Nếu đã hết: cộng từ 0h hôm nay (cho phép gia hạn kể từ ngày mai)
-  var currentExpiry = getLicenseExpiry();
-  var now = new Date();
-  var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  // baseDate: 0h của ngày hết hạn cũ (hoặc hôm nay nếu đã hết)
-  var rawBase = getRemainingDays() > 0 ? currentExpiry : startOfToday;
+  var currentExpiry2 = getLicenseExpiry();
+  var now2 = new Date();
+  var startOfToday2 = new Date(now2.getFullYear(), now2.getMonth(), now2.getDate()).getTime();
+  var rawBase = getRemainingDays() > 0 ? currentExpiry2 : startOfToday2;
   var baseDateObj = new Date(rawBase);
   var baseDay = new Date(baseDateObj.getFullYear(), baseDateObj.getMonth(), baseDateObj.getDate()).getTime();
-  var newExpiry = baseDay + days * MS_PER_DAY;
-  localStorage.setItem(_LSK, String(newExpiry));
-
+  var newExpiry2 = baseDay + days * MS_PER_DAY;
+  localStorage.setItem(_LSK, String(newExpiry2));
   if (isExtCode) markExtCodeUsed(pw);
-
   updLicenseCountdown();
   closeM('modal-gia-han');
   toast('✅ Đã gia hạn thêm ' + days + ' ngày!');
-  autoSync(); // đồng bộ thông tin bản quyền lên Drive (nếu đã kết nối)
+  autoSync();
 }
 
 
