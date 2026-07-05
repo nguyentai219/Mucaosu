@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v9.4</title>
+<title>Mua Bán Mủ Cao Su v9.8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -62,7 +62,6 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g
 input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
 input[type="search"]::-webkit-search-decoration{-webkit-appearance:none;appearance:none}
 /* Placeholder font nhỏ cho ô trừ bì cột hẹp */
-.fi-bi-hint::placeholder{font-size:10px;color:var(--g400);letter-spacing:-.2px}
 .fi-bi-hint{font-size:14px}
 .fi:focus{border-color:var(--gl);background:#fff;box-shadow:0 0 0 3px rgba(64,145,108,.1)}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -333,7 +332,14 @@ input[type=date]:focus{border-color:var(--gl)}
 .ung-entry.chot .ung-entry-tien, .ung-entry.chot .sg-entry-date, .ung-entry.chot .ung-entry-content{ text-decoration:line-through; color:var(--g400); }
 .chot-stamp{ display:inline-block; font-size:9px; font-weight:800; padding:1px 6px; border-radius:8px; background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; margin-left:5px; vertical-align:middle; }
 .tra-stamp{ display:inline-block; font-size:9px; font-weight:800; padding:1px 6px; border-radius:8px; background:#d1fae5; color:#065f46; border:1px solid #6ee7b7; margin-left:5px; vertical-align:middle; }
-/* LOCK OVERLAY khi hết hạn license */
+/* Tab Mua: kg, độ placeholder màu xanh nhạt bình thường (cùng màu form) */
+.fi-num::placeholder{font-size:14px;color:var(--gp);opacity:.7;font-weight:400}
+/* Tab Bán: kg, độ có class ban-hint → màu cam mờ giống ô giá */
+.fi-num.ban-hint::placeholder{font-size:14px;color:var(--ad);opacity:.55;font-style:italic;font-weight:600}
+/* Trừ bì tab Mua: chữ "có thể bỏ trống" màu xanh nhạt */
+.fi-bi-hint::placeholder{font-size:10px;color:var(--gp);opacity:.7;font-weight:400}
+/* Trừ bì tab Bán: có class ban-hint → màu cam mờ */
+.fi-bi-hint.ban-hint::placeholder{font-size:10px;color:var(--ad);opacity:.55;font-style:italic;font-weight:600}
 .license-locked{pointer-events:none!important;opacity:.45!important;user-select:none!important}
 .license-lock-banner{display:none;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;text-align:center;padding:10px 14px;font-size:13px;font-weight:700;border-radius:var(--r);margin:8px 0;cursor:pointer}
 .license-lock-banner.show{display:block}
@@ -440,7 +446,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v9.4 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v9.8 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -505,15 +511,15 @@ input[type=date]:focus{border-color:var(--gl)}
     <div class="g2" id="mua-kg-row">
       <div class="fr">
         <label class="fl">Số kg</label>
-        <input type="number" id="mua-kg" class="fi" placeholder="0.0" step="0.01" oninput="calc('mua')" onkeydown="kgKey(event,'mua')">
+        <input type="text" inputmode="decimal" id="mua-kg" class="fi fi-num" placeholder="0.0" oninput="calc('mua')" onkeydown="kgKey(event,'mua')">
       </div>
       <div class="fr" id="mua-do-row" style="display:none">
         <label class="fl" id="mua-do-lbl">Độ</label>
-        <input type="number" id="mua-do" class="fi" placeholder="0" step="0.01" oninput="calc('mua')" onkeydown="doKey(event,'mua')">
+        <input type="text" inputmode="decimal" id="mua-do" class="fi fi-num" placeholder="0" oninput="calc('mua')" onkeydown="doKey(event,'mua')">
       </div>
       <div class="fr" id="mua-bi-inline" style="display:none">
         <label class="fl" id="mua-bi-lbl-inline">Trừ bì</label>
-        <input type="number" id="mua-bi-inline-inp" class="fi fi-bi-hint" placeholder="có thể bỏ trống" step="0.01" oninput="calcBi('mua')" onkeydown="biKey(event,'mua')">
+        <input type="text" inputmode="decimal" id="mua-bi-inline-inp" class="fi fi-bi-hint" placeholder="có thể bỏ trống" step="0.01" oninput="calcBi('mua')" onkeydown="biKey(event,'mua')">
       </div>
     </div>
     <div class="tt-box" style="position:relative">
@@ -598,15 +604,15 @@ input[type=date]:focus{border-color:var(--gl)}
     <div class="g2" id="ban-kg-row">
       <div class="fr">
         <label class="fl">Số kg</label>
-        <input type="number" id="ban-kg" class="fi ban-hint" placeholder="0.0" step="0.01" oninput="calc('ban')" onkeydown="kgKey(event,'ban')">
+        <input type="text" inputmode="decimal" id="ban-kg" class="fi fi-num ban-hint" placeholder="0.0" oninput="calc('ban')" onkeydown="kgKey(event,'ban')">
       </div>
       <div class="fr" id="ban-do-row" style="display:none">
         <label class="fl" id="ban-do-lbl">Độ</label>
-        <input type="number" id="ban-do" class="fi ban-hint" placeholder="0" step="0.01" oninput="calc('ban')" onkeydown="doKey(event,'ban')">
+        <input type="text" inputmode="decimal" id="ban-do" class="fi fi-num ban-hint" placeholder="0" oninput="calc('ban')" onkeydown="doKey(event,'ban')">
       </div>
       <div class="fr" id="ban-bi-inline" style="display:none">
         <label class="fl" id="ban-bi-lbl-inline">Trừ bì</label>
-        <input type="number" id="ban-bi-inline-inp" class="fi fi-bi-hint" placeholder="có thể bỏ trống" step="0.01" oninput="calcBi('ban')" onkeydown="biKey(event,'ban')">
+        <input type="text" inputmode="decimal" id="ban-bi-inline-inp" class="fi fi-bi-hint ban-hint" placeholder="có thể bỏ trống" step="0.01" oninput="calcBi('ban')" onkeydown="biKey(event,'ban')">
       </div>
     </div>
     <div class="tt-box ban-tt">
@@ -1009,10 +1015,7 @@ input[type=date]:focus{border-color:var(--gl)}
     </div>
     <input type="text" inputmode="numeric" id="gh-pw-input" class="fi" placeholder="Mật khẩu hoặc Mã gia hạn 6 số" autocomplete="off" style="margin-bottom:8px" oninput="onGhPwInput()">
     <input type="text" inputmode="numeric" id="gh-days-input" class="fi" placeholder="—" style="margin-bottom:8px" disabled>
-    <!-- Ô nhập số ngày +/- chỉ hiện khi nhập đúng mật khẩu quản trị -->
-    <div id="gh-adj-wrap" style="display:none;margin-bottom:8px">
-      <input type="text" inputmode="numeric" id="gh-adj-days" class="fi" placeholder="+n thêm ngày, -n bớt ngày">
-    </div>
+    <div id="gh-adj-hint" style="display:none;font-size:11px;color:var(--g600);margin-bottom:6px;text-align:center">Nhập số ngày để thêm, nhập <b>-n</b> để bớt (VD: 30 hoặc -5)</div>
     <div id="gh-err" style="color:#dc2626;font-size:11px;margin-bottom:8px;display:none">❌ Mật khẩu không đúng!</div>
     <div id="gh-info" style="font-size:11px;color:var(--g600);margin-bottom:8px;text-align:center"></div>
     <div class="cfm-btns">
@@ -1263,7 +1266,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v9.4</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v9.8</div>
       </div>
     </div>
 
@@ -1768,21 +1771,27 @@ function chonLoai(tab, loai){
   closeLoaiDD(tab);
   setLoaiUI(tab, loai, false);
 
+  var today = curDate[tab];
+  var gdToday = getGD(tab).filter(function(g){ return g.date===today && g.loai===loai; });
+
+  var kgEl = document.getElementById(tab+'-kg');
+  var doEl = document.getElementById(tab+'-do');
+  var biEl = document.getElementById(tab+'-bi-inline-inp');
+
+  if(kgEl){ kgEl.placeholder='0.0'; kgEl.classList.remove('fi-no-data'); }
+  if(doEl){ doEl.placeholder='0'; doEl.classList.remove('fi-no-data'); }
+  if(biEl){ biEl.placeholder='có thể bỏ trống'; biEl.classList.remove('fi-no-data'); }
+
+  // Set giá từ GD hôm nay nếu có
   var giaEl = document.getElementById(tab+'-gia');
   if(giaEl) {
-    // Lấy ngày đang chọn trên tab (không phải today() cứng)
-    var today = curDate[tab];
-    // Chỉ lấy giá từ GD cùng loại cùng ngày hôm nay
-    var gdToday = getGD(tab).filter(function(g){ return g.date===today && g.loai===loai; });
     if(gdToday.length > 0) {
       var lastGia = parseFloat(gdToday[gdToday.length-1].gia)||0;
       giaEl.value = lastGia > 0 ? parseInt(lastGia).toLocaleString('vi-VN') : '';
     } else {
-      // Không có GD hôm nay → bỏ trống, không lấy lịch sử ngày khác
       giaEl.value = '';
     }
     calc(tab);
-
     // Focus sang ô giá
     setTimeout(function(){
       giaEl.focus();
@@ -1914,11 +1923,10 @@ function tenKey(e,tab){
   if(e.key==='Enter'){
     document.getElementById(tab+'-ac').style.display='none';
     if(tab==='ban'){
-      // Lưu người mua gần nhất cho loại mủ hiện tại
       var loai=getLoai('ban');
       var ten=document.getElementById('ban-ten').value.trim();
       if(loai&&ten) saveLastBuyer(loai, ten);
-      document.getElementById('ban-gia').focus();
+      document.getElementById('ban-kg').focus(); // tên → kg (giá đã nhập trước)
     } else {
       document.getElementById(tab+'-kg').focus();
     }
@@ -1930,7 +1938,7 @@ function pickKH(tab,name){
   if(tab==='ban'){
     var loai=getLoai('ban');
     if(loai) saveLastBuyer(loai, name);
-    setTimeout(function(){ document.getElementById('ban-gia').focus(); }, 50);
+    setTimeout(function(){ document.getElementById('ban-kg').focus(); }, 50); // tên → kg
   } else {
     setTimeout(function(){ document.getElementById(tab+'-kg').focus(); }, 50);
   }
@@ -4983,10 +4991,8 @@ function openGiaHan() {
   if(pwEl) pwEl.value='';
   var daysEl = document.getElementById('gh-days-input');
   if(daysEl){ daysEl.value=''; daysEl.disabled=true; daysEl.placeholder='—'; }
-  var adjWrap = document.getElementById('gh-adj-wrap');
-  if(adjWrap) adjWrap.style.display='none';
-  var adjDaysEl = document.getElementById('gh-adj-days');
-  if(adjDaysEl) adjDaysEl.value='';
+  var adjHint = document.getElementById('gh-adj-hint');
+  if(adjHint) adjHint.style.display='none';
   var btn = document.getElementById('gh-btn-luu');
   if(btn) btn.textContent='Gia hạn';
   var errEl = document.getElementById('gh-err');
@@ -5082,26 +5088,22 @@ function onGhPwInput() {
   if(errEl) errEl.style.display='none';
   var pw = document.getElementById('gh-pw-input').value.trim();
   var daysEl = document.getElementById('gh-days-input');
-  var adjWrap = document.getElementById('gh-adj-wrap');
-  var adjDaysEl = document.getElementById('gh-adj-days');
+  var adjHint = document.getElementById('gh-adj-hint');
   var btn = document.getElementById('gh-btn-luu');
 
   if (pw === _LPW) {
-    // Mật khẩu gia hạn cố định → mở ô số ngày
+    // Mật khẩu cố định → nhập số ngày thêm (chỉ dương)
     if(daysEl){ daysEl.disabled=false; daysEl.placeholder='Số ngày muốn gia hạn (VD: 30)'; }
-    if(adjWrap) adjWrap.style.display='none';
-    if(adjDaysEl) adjDaysEl.value='';
+    if(adjHint) adjHint.style.display='none';
     if(btn) btn.textContent='Gia hạn';
   } else if (pw === getAdminPW()) {
-    // Mật khẩu quản trị → mở ô +/- điều chỉnh
-    if(daysEl){ daysEl.disabled=true; daysEl.value=''; daysEl.placeholder='—'; }
-    if(adjWrap) adjWrap.style.display='block';
+    // Mật khẩu quản trị → nhập số ngày, có thể âm để bớt
+    if(daysEl){ daysEl.disabled=false; daysEl.placeholder='Số ngày (VD: 20 hoặc -5)'; daysEl.value=''; }
+    if(adjHint) adjHint.style.display='block';
     if(btn) btn.textContent='Áp dụng';
   } else {
-    // Mã 6 số hoặc đang gõ → không mở gì thêm
     if(daysEl){ daysEl.disabled=true; daysEl.value=''; daysEl.placeholder='—'; }
-    if(adjWrap) adjWrap.style.display='none';
-    if(adjDaysEl) adjDaysEl.value='';
+    if(adjHint) adjHint.style.display='none';
     if(btn) btn.textContent='Gia hạn';
   }
 }
@@ -5114,11 +5116,11 @@ function doGiaHan() {
   var isAdj = false; // điều chỉnh +/-
 
   if (pw === getAdminPW()) {
-    // Mật khẩu quản trị → điều chỉnh +/- ngày
-    var adjStr = (document.getElementById('gh-adj-days').value||'').trim();
+    // Mật khẩu quản trị → điều chỉnh +/- ngày từ gh-days-input
+    var adjStr = (document.getElementById('gh-days-input').value||'').trim();
     var adjDays = parseInt(adjStr);
     if (isNaN(adjDays) || adjDays === 0) {
-      toast('⚠️ Nhập số ngày cần điều chỉnh (+n hoặc -n)');
+      toast('⚠️ Nhập số ngày cần điều chỉnh (VD: 20 hoặc -5)');
       return;
     }
     var currentExpiry = getLicenseExpiry();
@@ -5135,7 +5137,7 @@ function doGiaHan() {
     updLicenseCountdown();
     checkLicenseOnLoad();
     closeM('modal-gia-han');
-    toast('✅ Đã điều chỉnh ' + (adjDays>0?'+':'') + adjDays + ' ngày. Còn lại: ' + getRemainingDays() + ' ngày');
+    toast('✅ Đã ' + (adjDays>0?'thêm '+adjDays:'bớt '+Math.abs(adjDays)) + ' ngày. Còn lại: ' + getRemainingDays() + ' ngày');
     return;
 
   } else if (pw === _LPW) {
