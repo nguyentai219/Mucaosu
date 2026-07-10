@@ -1,4 +1,4 @@
-const CACHE = 'mu-cao-su-v9.8';
+const CACHE = 'mu-cao-su-v9.9';
 const FILES = ['/Mucaosu/','/Mucaosu/index.html','/Mucaosu/manifest.json','/Mucaosu/icon-192.png','/Mucaosu/icon-512.png','/Mucaosu/apple-touch-icon.png','/Mucaosu/logo.png'];
 
 self.addEventListener('install', e => {
