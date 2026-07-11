@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v10.0</title>
+<title>Mua Bán Mủ Cao Su v10.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -447,7 +447,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v10.0 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v10.1 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1277,7 +1277,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v10.0</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v10.1</div>
       </div>
     </div>
 
@@ -3500,13 +3500,8 @@ function openSbModal() {
       + '</div>'
       + '<div class="gd-opt" onclick="openSbDataView()">'
       + '<span class="gd-opt-ico">📊</span>'
-      + '<div class="gd-opt-txt"><div>Xem dữ liệu ghi chép</div>'
-      + '<div class="gd-opt-sub">Xem toàn bộ dữ liệu đang lưu trên Supabase</div></div>'
-      + '</div>'
-      + '<div class="gd-opt" onclick="exportSbPdf()">'
-      + '<span class="gd-opt-ico">📄</span>'
-      + '<div class="gd-opt-txt"><div>Tải PDF chi tiết</div>'
-      + '<div class="gd-opt-sub">Xuất báo cáo đầy đủ về điện thoại</div></div>'
+      + '<div class="gd-opt-txt"><div>Xem dữ liệu ghi chép và tải PDF chi tiết</div>'
+      + '<div class="gd-opt-sub">Lọc theo ngày/tháng/khách hàng, xuất PDF</div></div>'
       + '</div>'
       + '<div class="gd-opt" onclick="openSyncPickerModal()">'
       + '<span class="gd-opt-ico">🔀</span>'
@@ -3687,8 +3682,103 @@ function openSbDataView() {
   fetchSbAllData(function(data) { openSbDataViewModal(data); });
 }
 
+var _sbViewData = null; // dữ liệu đầy đủ đang xem (chưa lọc)
+
 function openSbDataViewModal(data) {
-  var mua=data.mua||[], ban=data.ban||[], sg=data.sg||[], su=data.su||[];
+  _sbViewData = data;
+  var html = ''
+    + '<div style="font-size:11.5px;color:var(--g400);margin-bottom:10px">Tài khoản: ' + (sbUser?sbUser.email:'') + '</div>'
+    + '<div style="display:flex;gap:6px;margin-bottom:8px">'
+    + '<select id="sbv-filter-type" onchange="onSbFilterTypeChange()" style="flex:1;padding:9px 8px;border:1.5px solid var(--g200);border-radius:var(--r);font-family:\'Be Vietnam Pro\',sans-serif;font-size:12.5px;background:#fff">'
+    + '<option value="all">📋 Xem tất cả</option>'
+    + '<option value="day">📅 Theo ngày</option>'
+    + '<option value="month">🗓️ Theo tháng</option>'
+    + '<option value="kh">👤 Theo khách hàng</option>'
+    + '</select>'
+    + '</div>'
+    + '<div id="sbv-filter-input-wrap" style="margin-bottom:10px"></div>'
+    + '<div id="sbv-results"></div>'
+    + '<button onclick="exportSbPdfFiltered()" style="width:100%;padding:11px;margin-top:8px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border:none;border-radius:var(--r);font-family:\'Be Vietnam Pro\',sans-serif;font-size:13.5px;font-weight:700;cursor:pointer">📄 Tải PDF (dữ liệu đang xem)</button>';
+
+  document.getElementById('sbv-modal-body').innerHTML = html;
+  openM('modal-sbv');
+  renderSbDataView();
+}
+
+function _sbUniqueNames(data) {
+  var set = {};
+  ['mua','ban','sg','su'].forEach(function(k) {
+    (data[k]||[]).forEach(function(r) { if (r.ten) set[r.ten] = true; });
+  });
+  return Object.keys(set).sort(function(a,b){ return a.localeCompare(b,'vi'); });
+}
+
+function onSbFilterTypeChange() {
+  var type = document.getElementById('sbv-filter-type').value;
+  var wrap = document.getElementById('sbv-filter-input-wrap');
+  if (type === 'day') {
+    wrap.innerHTML = '<input type="date" id="sbv-filter-day" onchange="renderSbDataView()" value="' + today() + '" style="width:100%;padding:9px 10px;border:1.5px solid var(--g200);border-radius:var(--r);font-family:\'Be Vietnam Pro\',sans-serif;font-size:13px;box-sizing:border-box">';
+  } else if (type === 'month') {
+    wrap.innerHTML = '<input type="month" id="sbv-filter-month" onchange="renderSbDataView()" value="' + today().slice(0,7) + '" style="width:100%;padding:9px 10px;border:1.5px solid var(--g200);border-radius:var(--r);font-family:\'Be Vietnam Pro\',sans-serif;font-size:13px;box-sizing:border-box">';
+  } else if (type === 'kh') {
+    var names = _sbUniqueNames(_sbViewData || {});
+    var opts = '<option value="">-- Chọn khách hàng --</option>' + names.map(function(n){ return '<option value="'+n.replace(/"/g,'&quot;')+'">'+n+'</option>'; }).join('');
+    wrap.innerHTML = '<select id="sbv-filter-kh" onchange="renderSbDataView()" style="width:100%;padding:9px 10px;border:1.5px solid var(--g200);border-radius:var(--r);font-family:\'Be Vietnam Pro\',sans-serif;font-size:13px;box-sizing:border-box">' + opts + '</select>';
+  } else {
+    wrap.innerHTML = '';
+  }
+  renderSbDataView();
+}
+
+function _sbFilterRows(rows) {
+  var typeEl = document.getElementById('sbv-filter-type');
+  var type = typeEl ? typeEl.value : 'all';
+  if (type === 'day') {
+    var d = document.getElementById('sbv-filter-day');
+    var val = d ? d.value : '';
+    if (!val) return rows;
+    return rows.filter(function(r){ return r.date === val; });
+  }
+  if (type === 'month') {
+    var m = document.getElementById('sbv-filter-month');
+    var val2 = m ? m.value : '';
+    if (!val2) return rows;
+    return rows.filter(function(r){ return (r.date||'').slice(0,7) === val2; });
+  }
+  if (type === 'kh') {
+    var k = document.getElementById('sbv-filter-kh');
+    var val3 = k ? k.value : '';
+    if (!val3) return rows;
+    return rows.filter(function(r){ return r.ten === val3; });
+  }
+  return rows;
+}
+
+function _sbFilterLabel() {
+  var typeEl = document.getElementById('sbv-filter-type');
+  var type = typeEl ? typeEl.value : 'all';
+  if (type === 'day') {
+    var v = document.getElementById('sbv-filter-day') ? document.getElementById('sbv-filter-day').value : '';
+    return v ? ('Ngày ' + v.split('-').reverse().join('/')) : 'Tất cả';
+  }
+  if (type === 'month') {
+    var v2 = document.getElementById('sbv-filter-month') ? document.getElementById('sbv-filter-month').value : '';
+    return v2 ? ('Tháng ' + v2.split('-').reverse().join('/')) : 'Tất cả';
+  }
+  if (type === 'kh') {
+    var v3 = document.getElementById('sbv-filter-kh') ? document.getElementById('sbv-filter-kh').value : '';
+    return v3 ? ('Khách hàng: ' + v3) : 'Tất cả';
+  }
+  return 'Tất cả';
+}
+
+function renderSbDataView() {
+  if (!_sbViewData) return;
+  var mua = _sbFilterRows(_sbViewData.mua||[]);
+  var ban = _sbFilterRows(_sbViewData.ban||[]);
+  var sg  = _sbFilterRows(_sbViewData.sg||[]);
+  var su  = _sbFilterRows(_sbViewData.su||[]);
+
   var tongMua=mua.reduce(function(s,x){return s+(x.tt||0);},0);
   var tongBan=ban.reduce(function(s,x){return s+(x.tt||0);},0);
   var tongSg =sg.reduce(function(s,x){return s+(x.tt||0);},0);
@@ -3707,7 +3797,7 @@ function openSbDataViewModal(data) {
     {key:'noidung',label:'Nội dung'}
   ];
 
-  var html = '<div style="font-size:11.5px;color:var(--g400);margin-bottom:10px">Tài khoản: ' + (sbUser?sbUser.email:'') + '</div>';
+  var html = '<div style="font-size:11px;color:var(--g500);font-weight:700;margin-bottom:8px">🔎 Đang lọc: ' + _sbFilterLabel() + '</div>';
   html += '<details open style="margin-bottom:6px;border-bottom:1px solid var(--g100);padding-bottom:6px">'
     + '<summary style="font-weight:700;font-size:13px;color:var(--g800);padding:6px 0;cursor:pointer">📥 Giao dịch Mua — ' + mua.length + ' bản ghi · ' + _fmtVND(tongMua) + 'đ</summary>'
     + _rowsToTableHtml(mua, colsGD) + '</details>';
@@ -3720,10 +3810,19 @@ function openSbDataViewModal(data) {
   html += '<details style="margin-bottom:6px">'
     + '<summary style="font-weight:700;font-size:13px;color:var(--g800);padding:6px 0;cursor:pointer">💵 Ứng tiền — ' + su.length + ' bản ghi · ' + _fmtVND(tongSu) + 'đ</summary>'
     + _rowsToTableHtml(su, colsSU) + '</details>';
-  html += '<button onclick="exportSbPdf()" style="width:100%;padding:11px;margin-top:8px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border:none;border-radius:var(--r);font-family:\'Be Vietnam Pro\',sans-serif;font-size:13.5px;font-weight:700;cursor:pointer">📄 Tải PDF chi tiết</button>';
 
-  document.getElementById('sbv-modal-body').innerHTML = html;
-  openM('modal-sbv');
+  document.getElementById('sbv-results').innerHTML = html;
+}
+
+function exportSbPdfFiltered() {
+  if (!_sbViewData) { toast('⚠️ Chưa có dữ liệu'); return; }
+  var filtered = {
+    mua: _sbFilterRows(_sbViewData.mua||[]),
+    ban: _sbFilterRows(_sbViewData.ban||[]),
+    sg:  _sbFilterRows(_sbViewData.sg||[]),
+    su:  _sbFilterRows(_sbViewData.su||[])
+  };
+  buildAndSaveSbPdf(filtered, 'Supabase (' + (sbUser?sbUser.email:'') + ') · ' + _sbFilterLabel());
 }
 
 // ── Xuất PDF chi tiết từ dữ liệu Supabase ──
@@ -3741,13 +3840,6 @@ function ensureJsPDF(cb) {
   };
   s1.onerror = function() { toast('❌ Không tải được thư viện PDF, kiểm tra kết nối mạng'); };
   document.head.appendChild(s1);
-}
-
-function exportSbPdf() {
-  toast('⏳ Đang chuẩn bị dữ liệu để xuất PDF...');
-  fetchSbAllData(function(data) {
-    buildAndSaveSbPdf(data, 'Supabase (' + (sbUser?sbUser.email:'') + ')');
-  });
 }
 
 function buildAndSaveSbPdf(data, sourceLabel) {
