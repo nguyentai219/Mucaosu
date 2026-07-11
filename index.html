@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v10.4</title>
+<title>Mua Bán Mủ Cao Su v10.6</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -447,7 +447,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v10.4 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v10.6 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1294,7 +1294,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v10.4</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v10.6</div>
       </div>
     </div>
 
@@ -5830,16 +5830,16 @@ function onGhPwInput() {
   var adjHint = document.getElementById('gh-adj-hint');
   var btn = document.getElementById('gh-btn-luu');
 
-  if (pw === _LPW) {
-    // Mật khẩu cố định → nhập số ngày thêm (chỉ dương)
-    if(daysEl){ daysEl.disabled=false; daysEl.placeholder='Số ngày muốn gia hạn (VD: 30)'; }
-    if(adjHint) adjHint.style.display='none';
-    if(btn) btn.textContent='Gia hạn';
-  } else if (pw === getAdminPW()) {
+  if (pw === getAdminPW()) {
     // Mật khẩu quản trị → nhập số ngày, có thể âm để bớt
     if(daysEl){ daysEl.disabled=false; daysEl.placeholder='Số ngày (VD: 20 hoặc -5)'; daysEl.value=''; }
     if(adjHint) adjHint.style.display='block';
     if(btn) btn.textContent='Áp dụng';
+  } else if (pw === _LPW) {
+    // Mật khẩu cố định → nhập số ngày thêm (chỉ dương)
+    if(daysEl){ daysEl.disabled=false; daysEl.placeholder='Số ngày muốn gia hạn (VD: 30)'; }
+    if(adjHint) adjHint.style.display='none';
+    if(btn) btn.textContent='Gia hạn';
   } else {
     if(daysEl){ daysEl.disabled=true; daysEl.value=''; daysEl.placeholder='—'; }
     if(adjHint) adjHint.style.display='none';
@@ -5848,6 +5848,15 @@ function onGhPwInput() {
 }
 
 function doGiaHan() {
+  try {
+    _doGiaHanInner();
+  } catch(err) {
+    console.error('doGiaHan error:', err);
+    toast('⚠️ Có lỗi xảy ra: ' + (err && err.message ? err.message : 'không xác định') + '. Vui lòng thử lại!');
+  }
+}
+
+function _doGiaHanInner() {
   var pw = document.getElementById('gh-pw-input').value.trim();
   var errEl = document.getElementById('gh-err');
   var days = 0;
@@ -5872,12 +5881,12 @@ function doGiaHan() {
       toast('⚠️ Không thể đặt ngày hết hạn trước hôm nay!');
       return;
     }
-    localStorage.setItem(_LSK, String(newExpiry));
-    _pushTrialToServer(getDeviceFingerprint(), newExpiry);
-    updLicenseCountdown();
-    checkLicenseOnLoad();
+    try { localStorage.setItem(_LSK, String(newExpiry)); } catch(e) {}
     closeM('modal-gia-han');
     toast('✅ Đã ' + (adjDays>0?'thêm '+adjDays:'bớt '+Math.abs(adjDays)) + ' ngày. Còn lại: ' + getRemainingDays() + ' ngày');
+    try { updLicenseCountdown(); } catch(e) {}
+    try { _pushTrialToServer(getDeviceFingerprint(), newExpiry); } catch(e) {}
+    try { checkLicenseOnLoad(); } catch(e) {}
     return;
 
   } else if (pw === _LPW) {
@@ -5920,13 +5929,13 @@ function doGiaHan() {
   var baseDateObj = new Date(rawBase);
   var baseDay = new Date(baseDateObj.getFullYear(), baseDateObj.getMonth(), baseDateObj.getDate()).getTime();
   var newExpiry2 = baseDay + days * MS_PER_DAY;
-  localStorage.setItem(_LSK, String(newExpiry2));
-  _pushTrialToServer(getDeviceFingerprint(), newExpiry2);
-  if (isExtCode) markExtCodeUsed(pw);
-  updLicenseCountdown();
+  try { localStorage.setItem(_LSK, String(newExpiry2)); } catch(e) {}
+  if (isExtCode) { try { markExtCodeUsed(pw); } catch(e) {} }
   closeM('modal-gia-han');
   toast('✅ Đã gia hạn thêm ' + days + ' ngày!');
-  autoSync();
+  try { updLicenseCountdown(); } catch(e) {}
+  try { _pushTrialToServer(getDeviceFingerprint(), newExpiry2); } catch(e) {}
+  try { autoSync(); } catch(e) {}
 }
 
 
