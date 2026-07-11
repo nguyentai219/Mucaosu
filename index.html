@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v10.1</title>
+<title>Mua Bán Mủ Cao Su v10.2</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -447,7 +447,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v10.1 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v10.2 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1204,6 +1204,23 @@ input[type=date]:focus{border-color:var(--gl)}
   </div>
 </div>
 
+<!-- MODAL CHỌN NGÀY - XEM DỮ LIỆU SUPABASE (lịch tùy chỉnh, đánh dấu ngày có ghi chép) -->
+<div class="modal" id="modal-sbv-date">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📅 Chọn ngày xem dữ liệu</div>
+    <div class="cal-header">
+      <button onclick="sbvCalNav(-1)">‹</button>
+      <span id="sbv-cal-month-label"></span>
+      <button onclick="sbvCalNav(1)">›</button>
+    </div>
+    <div class="cal-grid" id="sbv-cal-grid"></div>
+    <div class="cal-legend"><span class="cal-dot"></span> Ngày có ghi chép</div>
+    <button class="btn-luu" style="width:100%;margin-top:10px" onclick="applySbvDate()">Xác nhận</button>
+    <button class="btn-huy" style="width:100%;margin-top:6px" onclick="closeM('modal-sbv-date')">Đóng</button>
+  </div>
+</div>
+
 <!-- MODAL KH -->
 <div class="modal" id="modal-kh">
   <div class="modal-box">
@@ -1277,7 +1294,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v10.1</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v10.2</div>
       </div>
     </div>
 
@@ -3693,7 +3710,8 @@ function openSbDataViewModal(data) {
     + '<option value="all">📋 Xem tất cả</option>'
     + '<option value="day">📅 Theo ngày</option>'
     + '<option value="month">🗓️ Theo tháng</option>'
-    + '<option value="kh">👤 Theo khách hàng</option>'
+    + '<option value="kh">👤 Theo khách hàng (chưa chốt sổ)</option>'
+    + '<option value="kh_full">👤 Toàn bộ dữ liệu của khách hàng</option>'
     + '</select>'
     + '</div>'
     + '<div id="sbv-filter-input-wrap" style="margin-bottom:10px"></div>'
@@ -3717,48 +3735,123 @@ function onSbFilterTypeChange() {
   var type = document.getElementById('sbv-filter-type').value;
   var wrap = document.getElementById('sbv-filter-input-wrap');
   if (type === 'day') {
-    wrap.innerHTML = '<input type="date" id="sbv-filter-day" onchange="renderSbDataView()" value="' + today() + '" style="width:100%;padding:9px 10px;border:1.5px solid var(--g200);border-radius:var(--r);font-family:\'Be Vietnam Pro\',sans-serif;font-size:13px;box-sizing:border-box">';
+    var curVal = today();
+    wrap.innerHTML = '<div class="date-bar" onclick="openSbvCalDate()" style="border:1.5px solid var(--gd);cursor:pointer">'
+      + '<span>📅</span>'
+      + '<span id="sbv-filter-day-val" data-val="' + curVal + '" style="color:var(--gd);font-size:13px;font-weight:700">' + fmtDate(curVal) + '</span>'
+      + '</div>';
+    renderSbDataView();
   } else if (type === 'month') {
     wrap.innerHTML = '<input type="month" id="sbv-filter-month" onchange="renderSbDataView()" value="' + today().slice(0,7) + '" style="width:100%;padding:9px 10px;border:1.5px solid var(--g200);border-radius:var(--r);font-family:\'Be Vietnam Pro\',sans-serif;font-size:13px;box-sizing:border-box">';
-  } else if (type === 'kh') {
+    renderSbDataView();
+  } else if (type === 'kh' || type === 'kh_full') {
     var names = _sbUniqueNames(_sbViewData || {});
     var opts = '<option value="">-- Chọn khách hàng --</option>' + names.map(function(n){ return '<option value="'+n.replace(/"/g,'&quot;')+'">'+n+'</option>'; }).join('');
     wrap.innerHTML = '<select id="sbv-filter-kh" onchange="renderSbDataView()" style="width:100%;padding:9px 10px;border:1.5px solid var(--g200);border-radius:var(--r);font-family:\'Be Vietnam Pro\',sans-serif;font-size:13px;box-sizing:border-box">' + opts + '</select>';
+    renderSbDataView();
   } else {
     wrap.innerHTML = '';
+    renderSbDataView();
   }
+}
+
+// ── Lịch tùy chỉnh chọn ngày (đánh dấu ngày có ghi chép), dùng cho bộ lọc xem dữ liệu Supabase ──
+var sbvCalViewYear, sbvCalViewMonth, sbvCalSelectedDate;
+
+function _sbDatesWithData() {
+  var set = {};
+  if (_sbViewData) {
+    ['mua','ban','sg','su'].forEach(function(k) {
+      (_sbViewData[k]||[]).forEach(function(r) { if (r.date) set[r.date] = true; });
+    });
+  }
+  return set;
+}
+
+function openSbvCalDate() {
+  var bar = document.getElementById('sbv-filter-day-val');
+  var cur = (bar && bar.dataset.val) ? bar.dataset.val : today();
+  var d = new Date(cur + 'T00:00:00');
+  sbvCalViewYear = d.getFullYear();
+  sbvCalViewMonth = d.getMonth();
+  sbvCalSelectedDate = cur;
+  renderSbvCalendar();
+  openM('modal-sbv-date');
+}
+
+function sbvCalNav(delta) {
+  sbvCalViewMonth += delta;
+  if (sbvCalViewMonth < 0) { sbvCalViewMonth = 11; sbvCalViewYear--; }
+  if (sbvCalViewMonth > 11) { sbvCalViewMonth = 0; sbvCalViewYear++; }
+  renderSbvCalendar();
+}
+
+function renderSbvCalendar() {
+  var datesWithData = _sbDatesWithData();
+  var todayD = today();
+  document.getElementById('sbv-cal-month-label').textContent = MONTH_NAMES_VN[sbvCalViewMonth] + ' ' + sbvCalViewYear;
+  var firstDay = new Date(sbvCalViewYear, sbvCalViewMonth, 1);
+  var startWeekday = (firstDay.getDay()+6)%7;
+  var daysInMonth = new Date(sbvCalViewYear, sbvCalViewMonth+1, 0).getDate();
+  var html = '';
+  ['T2','T3','T4','T5','T6','T7','CN'].forEach(function(d){ html += '<div class="cal-wd">'+d+'</div>'; });
+  for (var i=0;i<startWeekday;i++) html += '<div class="cal-cell empty"></div>';
+  for (var day=1; day<=daysInMonth; day++) {
+    var dateStr = sbvCalViewYear + '-' + String(sbvCalViewMonth+1).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+    var cls = 'cal-cell';
+    if (dateStr === todayD) cls += ' today';
+    if (dateStr === sbvCalSelectedDate) cls += ' selected';
+    var dot = datesWithData[dateStr] ? '<span class="cal-dot"></span>' : '';
+    html += '<div class="'+cls+'" onclick="selectSbvCalDay(\''+dateStr+'\')">'+day+dot+'</div>';
+  }
+  document.getElementById('sbv-cal-grid').innerHTML = html;
+}
+
+function selectSbvCalDay(dateStr) {
+  sbvCalSelectedDate = dateStr;
+  renderSbvCalendar();
+}
+
+function applySbvDate() {
+  var v = sbvCalSelectedDate;
+  var bar = document.getElementById('sbv-filter-day-val');
+  if (bar) { bar.textContent = fmtDate(v); bar.dataset.val = v; }
+  closeM('modal-sbv-date');
   renderSbDataView();
 }
 
-function _sbFilterRows(rows) {
+function _sbFilterRows(rows, cat) {
   var typeEl = document.getElementById('sbv-filter-type');
   var type = typeEl ? typeEl.value : 'all';
+  var out = rows;
   if (type === 'day') {
-    var d = document.getElementById('sbv-filter-day');
-    var val = d ? d.value : '';
-    if (!val) return rows;
-    return rows.filter(function(r){ return r.date === val; });
-  }
-  if (type === 'month') {
+    var bar = document.getElementById('sbv-filter-day-val');
+    var val = bar ? bar.dataset.val : '';
+    if (val) out = out.filter(function(r){ return r.date === val; });
+  } else if (type === 'month') {
     var m = document.getElementById('sbv-filter-month');
     var val2 = m ? m.value : '';
-    if (!val2) return rows;
-    return rows.filter(function(r){ return (r.date||'').slice(0,7) === val2; });
-  }
-  if (type === 'kh') {
+    if (val2) out = out.filter(function(r){ return (r.date||'').slice(0,7) === val2; });
+  } else if (type === 'kh' || type === 'kh_full') {
     var k = document.getElementById('sbv-filter-kh');
     var val3 = k ? k.value : '';
-    if (!val3) return rows;
-    return rows.filter(function(r){ return r.ten === val3; });
+    if (val3) {
+      out = out.filter(function(r){ return r.ten === val3; });
+      // "Theo khách hàng (chưa chốt sổ)": chỉ áp dụng cho Sổ gửi & Ứng tiền (có khái niệm chốt sổ)
+      if (type === 'kh' && (cat === 'sg' || cat === 'su')) {
+        out = out.filter(function(r){ return !r.chot; });
+      }
+    }
   }
-  return rows;
+  return out;
 }
 
 function _sbFilterLabel() {
   var typeEl = document.getElementById('sbv-filter-type');
   var type = typeEl ? typeEl.value : 'all';
   if (type === 'day') {
-    var v = document.getElementById('sbv-filter-day') ? document.getElementById('sbv-filter-day').value : '';
+    var bar = document.getElementById('sbv-filter-day-val');
+    var v = bar ? bar.dataset.val : '';
     return v ? ('Ngày ' + v.split('-').reverse().join('/')) : 'Tất cả';
   }
   if (type === 'month') {
@@ -3767,17 +3860,21 @@ function _sbFilterLabel() {
   }
   if (type === 'kh') {
     var v3 = document.getElementById('sbv-filter-kh') ? document.getElementById('sbv-filter-kh').value : '';
-    return v3 ? ('Khách hàng: ' + v3) : 'Tất cả';
+    return v3 ? ('Khách hàng (chưa chốt sổ): ' + v3) : 'Tất cả';
+  }
+  if (type === 'kh_full') {
+    var v4 = document.getElementById('sbv-filter-kh') ? document.getElementById('sbv-filter-kh').value : '';
+    return v4 ? ('Toàn bộ dữ liệu khách hàng: ' + v4) : 'Tất cả';
   }
   return 'Tất cả';
 }
 
 function renderSbDataView() {
   if (!_sbViewData) return;
-  var mua = _sbFilterRows(_sbViewData.mua||[]);
-  var ban = _sbFilterRows(_sbViewData.ban||[]);
-  var sg  = _sbFilterRows(_sbViewData.sg||[]);
-  var su  = _sbFilterRows(_sbViewData.su||[]);
+  var mua = _sbFilterRows(_sbViewData.mua||[], 'mua');
+  var ban = _sbFilterRows(_sbViewData.ban||[], 'ban');
+  var sg  = _sbFilterRows(_sbViewData.sg||[], 'sg');
+  var su  = _sbFilterRows(_sbViewData.su||[], 'su');
 
   var tongMua=mua.reduce(function(s,x){return s+(x.tt||0);},0);
   var tongBan=ban.reduce(function(s,x){return s+(x.tt||0);},0);
@@ -3817,10 +3914,10 @@ function renderSbDataView() {
 function exportSbPdfFiltered() {
   if (!_sbViewData) { toast('⚠️ Chưa có dữ liệu'); return; }
   var filtered = {
-    mua: _sbFilterRows(_sbViewData.mua||[]),
-    ban: _sbFilterRows(_sbViewData.ban||[]),
-    sg:  _sbFilterRows(_sbViewData.sg||[]),
-    su:  _sbFilterRows(_sbViewData.su||[])
+    mua: _sbFilterRows(_sbViewData.mua||[], 'mua'),
+    ban: _sbFilterRows(_sbViewData.ban||[], 'ban'),
+    sg:  _sbFilterRows(_sbViewData.sg||[], 'sg'),
+    su:  _sbFilterRows(_sbViewData.su||[], 'su')
   };
   buildAndSaveSbPdf(filtered, 'Supabase (' + (sbUser?sbUser.email:'') + ') · ' + _sbFilterLabel());
 }
