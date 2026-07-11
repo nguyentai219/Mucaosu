@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v10.2</title>
+<title>Mua Bán Mủ Cao Su v10.4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -447,7 +447,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v10.2 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v10.4 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1294,7 +1294,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v10.2</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v10.4</div>
       </div>
     </div>
 
@@ -3882,14 +3882,14 @@ function renderSbDataView() {
   var tongSu =su.reduce(function(s,x){return s+(x.tien||0);},0);
 
   var colsGD = [
-    {key:'date',label:'Ngày'}, {key:'ten',label:'Khách hàng'},
+    {label:'Ngày',fmt:function(r){return fmtDateVN_ss(r.date);}}, {key:'ten',label:'Khách hàng'},
     {label:'Loại',fmt:function(r){return LOAI_LBL[r.loai]||r.loai||'';}},
     {key:'kg',label:'KG'}, {key:'do',label:'Độ'},
     {label:'Giá',fmt:function(r){return _fmtVND(r.gia);}},
     {label:'Thành tiền',fmt:function(r){return _fmtVND(r.tt)+'đ';}}
   ];
   var colsSU = [
-    {key:'date',label:'Ngày'}, {key:'ten',label:'Người ứng'},
+    {label:'Ngày',fmt:function(r){return fmtDateVN_ss(r.date);}}, {key:'ten',label:'Người ứng'},
     {label:'Số tiền',fmt:function(r){return _fmtVND(r.tien)+'đ';}},
     {key:'noidung',label:'Nội dung'}
   ];
@@ -3982,22 +3982,22 @@ function buildAndSaveSbPdf(data, sourceLabel) {
 
       section('1. Giao dich MUA', mua,
         ['Ngay','Khach hang','Loai mu','KG','Do','Bi','Gia','Thanh tien'],
-        function(r){ return [r.date||'', r.ten||'', LOAI_LBL[r.loai]||r.loai||'', r.kg||'', r.do||'', r.bi||'', _fmtVND(r.gia), _fmtVND(r.tt)]; },
+        function(r){ return [fmtDateVN_ss(r.date), r.ten||'', LOAI_LBL[r.loai]||r.loai||'', r.kg||'', r.do||'', r.bi||'', _fmtVND(r.gia), _fmtVND(r.tt)]; },
         'Tong thanh tien MUA', _fmtVND(tongMua)+' d');
 
       section('2. Giao dich BAN', ban,
         ['Ngay','Khach hang','Loai mu','KG','Do','Bi','Gia','Thanh tien'],
-        function(r){ return [r.date||'', r.ten||'', LOAI_LBL[r.loai]||r.loai||'', r.kg||'', r.do||'', r.bi||'', _fmtVND(r.gia), _fmtVND(r.tt)]; },
+        function(r){ return [fmtDateVN_ss(r.date), r.ten||'', LOAI_LBL[r.loai]||r.loai||'', r.kg||'', r.do||'', r.bi||'', _fmtVND(r.gia), _fmtVND(r.tt)]; },
         'Tong thanh tien BAN', _fmtVND(tongBan)+' d');
 
       section('3. So gui', sg,
         ['Ngay','Khach hang','Loai mu','KG','Do','Gia','Thanh tien'],
-        function(r){ return [r.date||'', r.ten||'', LOAI_LBL[r.loai]||r.loai||'', r.kg||'', r.do||'', _fmtVND(r.gia), _fmtVND(r.tt)]; },
+        function(r){ return [fmtDateVN_ss(r.date), r.ten||'', LOAI_LBL[r.loai]||r.loai||'', r.kg||'', r.do||'', _fmtVND(r.gia), _fmtVND(r.tt)]; },
         'Tong thanh tien so gui', _fmtVND(tongSg)+' d');
 
       section('4. Ung tien', su,
         ['Ngay','Nguoi ung','So tien','Noi dung'],
-        function(r){ return [r.date||'', r.ten||'', _fmtVND(r.tien)+' d', r.noidung||'']; },
+        function(r){ return [fmtDateVN_ss(r.date), r.ten||'', _fmtVND(r.tien)+' d', r.noidung||'']; },
         'Tong tien da ung', _fmtVND(tongSu)+' d');
 
       var fname = 'BaoCao_MuCaoSu_' + today() + '.pdf';
@@ -5560,11 +5560,11 @@ var MS_PER_DAY = 24*60*60*1000;
 function getLicenseExpiry() {
   var v = localStorage.getItem(_LSK);
   if (!v) {
-    // Lần đầu chạy: cài ngày 1, dùng _TD=3 ngày → hết hạn 0h ngày 4
-    // Ngày 1,2,3 còn dùng (getRemainingDays >= 1), ngày 4 getRemainingDays = 0 → khoá
+    // Lần đầu chạy: ngày cài đặt KHÔNG tính vào 3 ngày dùng thử (dùng miễn phí thêm ngày cài đặt)
+    // → hết hạn sau _TD+1 ngày kể từ 0h ngày cài. VD cài ngày 1: dùng được ngày 1 (miễn phí) + 2,3,4 (3 ngày dùng thử) → khoá 0h ngày 5
     var now = new Date();
     var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    var expiryDate = new Date(startOfToday.getTime() + _TD * MS_PER_DAY);
+    var expiryDate = new Date(startOfToday.getTime() + (_TD + 1) * MS_PER_DAY);
     var expiry = expiryDate.getTime();
     localStorage.setItem(_LSK, String(expiry));
     localStorage.setItem('license_is_new', '1');
@@ -5590,10 +5590,66 @@ function isLicenseExpired() {
   return getRemainingDays() <= 0;
 }
 
+// ══════════════════════════════════════════
+// CHỐNG GIAN LẬN: xoá dữ liệu duyệt web để reset hạn dùng thử
+// Dùng "dấu vân tay thiết bị" (không đổi khi xoá localStorage) + bảng
+// device_trials trên Supabase (project chung, không cần đăng nhập) để
+// ghi nhớ hạn dùng đã cấp cho từng máy. Nếu máy đã có lịch sử trên
+// server, luôn lấy hạn LỚN HƠN giữa máy và server (chặn reset lùi ngày,
+// vẫn giữ nguyên hạn nếu đã gia hạn hợp lệ).
+// ══════════════════════════════════════════
+function getDeviceFingerprint() {
+  try {
+    var parts = [
+      navigator.userAgent || '',
+      screen.width + 'x' + screen.height,
+      navigator.language || '',
+      (Intl.DateTimeFormat().resolvedOptions().timeZone) || '',
+      navigator.hardwareConcurrency || '',
+      navigator.platform || ''
+    ];
+    return 'fp_' + Math.abs(hashStr(parts.join('|'))).toString(36);
+  } catch(e) { return 'fp_unknown'; }
+}
+
+function _pushTrialToServer(fp, expiry) {
+  if (!sbClient) return;
+  sbClient.from('device_trials').upsert(
+    [{ fingerprint: fp, license_expiry: expiry, updated_at: new Date().toISOString() }],
+    { onConflict: 'fingerprint' }
+  ).catch(function(){});
+}
+
+function verifyLicenseAntiCheat() {
+  if (!navigator.onLine) return;
+  if (!sbClient) { setTimeout(verifyLicenseAntiCheat, 1500); return; }
+  var fp = getDeviceFingerprint();
+  var localExpiry = parseInt(localStorage.getItem(_LSK) || '0');
+  sbClient.from('device_trials').select('license_expiry').eq('fingerprint', fp).then(function(res) {
+    if (res.error) return; // lỗi mạng/bảng chưa có -> bỏ qua, không chặn người dùng
+    var rows = res.data || [];
+    if (rows.length) {
+      var remoteExpiry = parseInt(rows[0].license_expiry) || 0;
+      var finalExpiry = Math.max(localExpiry, remoteExpiry);
+      if (finalExpiry !== localExpiry) {
+        localStorage.setItem(_LSK, String(finalExpiry));
+        localStorage.removeItem('license_is_new');
+        updLicenseCountdown();
+        if (isLicenseExpired()) applyLicenseLock();
+      }
+      if (finalExpiry > remoteExpiry) _pushTrialToServer(fp, finalExpiry);
+    } else {
+      // Máy hoàn toàn mới trên server -> đăng ký lần đầu
+      _pushTrialToServer(fp, localExpiry || getLicenseExpiry());
+    }
+  }).catch(function(){});
+}
+
 // Kiểm tra khi khởi động: nếu hết hạn → hiện popup
 function checkLicenseOnLoad() {
   getDeviceCode();
   updLicenseCountdown();
+  verifyLicenseAntiCheat();
   if (isLicenseExpired()) {
     applyLicenseLock();
     setTimeout(function(){ openM('modal-expired'); }, 400);
@@ -5817,6 +5873,7 @@ function doGiaHan() {
       return;
     }
     localStorage.setItem(_LSK, String(newExpiry));
+    _pushTrialToServer(getDeviceFingerprint(), newExpiry);
     updLicenseCountdown();
     checkLicenseOnLoad();
     closeM('modal-gia-han');
@@ -5864,6 +5921,7 @@ function doGiaHan() {
   var baseDay = new Date(baseDateObj.getFullYear(), baseDateObj.getMonth(), baseDateObj.getDate()).getTime();
   var newExpiry2 = baseDay + days * MS_PER_DAY;
   localStorage.setItem(_LSK, String(newExpiry2));
+  _pushTrialToServer(getDeviceFingerprint(), newExpiry2);
   if (isExtCode) markExtCodeUsed(pw);
   updLicenseCountdown();
   closeM('modal-gia-han');
