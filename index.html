@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v9.9</title>
+<title>Mua Bán Mủ Cao Su v10.0</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -447,7 +447,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v9.9 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v10.0 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1194,6 +1194,16 @@ input[type=date]:focus{border-color:var(--gl)}
   </div>
 </div>
 
+<!-- MODAL XEM DỮ LIỆU SUPABASE -->
+<div class="modal" id="modal-sbv">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📊 Dữ liệu trên Supabase</div>
+    <div id="sbv-modal-body"></div>
+    <button class="btn-huy" style="width:100%;margin-top:10px" onclick="closeM('modal-sbv')">Đóng</button>
+  </div>
+</div>
+
 <!-- MODAL KH -->
 <div class="modal" id="modal-kh">
   <div class="modal-box">
@@ -1267,7 +1277,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v9.9</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v10.0</div>
       </div>
     </div>
 
@@ -3455,7 +3465,10 @@ function openSbModal() {
       + '<div style="font-size:12px;color:var(--g400)">Dùng chung 1 tài khoản trên nhiều thiết bị</div>'
       + '</div>'
       + '<input type="email" id="sb-email-input" placeholder="Email" autocomplete="email" style="width:100%;padding:11px 12px;margin-bottom:8px;border:1.5px solid var(--g200);border-radius:var(--r);font-family:\'Be Vietnam Pro\',sans-serif;font-size:14px;box-sizing:border-box">'
-      + '<input type="password" id="sb-pass-input" placeholder="Mật khẩu (tối thiểu 6 ký tự)" autocomplete="current-password" style="width:100%;padding:11px 12px;margin-bottom:12px;border:1.5px solid var(--g200);border-radius:var(--r);font-family:\'Be Vietnam Pro\',sans-serif;font-size:14px;box-sizing:border-box">'
+      + '<div style="position:relative;margin-bottom:12px">'
+      + '<input type="password" id="sb-pass-input" placeholder="Mật khẩu (tối thiểu 6 ký tự)" autocomplete="current-password" style="width:100%;padding:11px 40px 11px 12px;border:1.5px solid var(--g200);border-radius:var(--r);font-family:\'Be Vietnam Pro\',sans-serif;font-size:14px;box-sizing:border-box">'
+      + '<span onclick="toggleSbPassVisibility()" id="sb-pass-eye" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:17px;user-select:none">👁️</span>'
+      + '</div>'
       + '<button onclick="sbSignIn()" style="width:100%;padding:11px;margin-bottom:8px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border:none;border-radius:var(--r);font-family:\'Be Vietnam Pro\',sans-serif;font-size:14px;font-weight:700;cursor:pointer">Đăng nhập</button>'
       + '<button onclick="sbSignUp()" style="width:100%;padding:11px;background:#eff6ff;color:#1d4ed8;border:1.5px solid #bfdbfe;border-radius:var(--r);font-family:\'Be Vietnam Pro\',sans-serif;font-size:14px;font-weight:700;cursor:pointer">Đăng ký tài khoản mới</button>'
       + '<div class="gd-opt" onclick="openSyncPickerModal()" style="margin-top:14px">'
@@ -3485,6 +3498,16 @@ function openSbModal() {
       + '<div class="gd-opt-txt"><div>Khôi phục từ Supabase</div>'
       + '<div class="gd-opt-sub">Tải dữ liệu mới nhất về máy này</div></div>'
       + '</div>'
+      + '<div class="gd-opt" onclick="openSbDataView()">'
+      + '<span class="gd-opt-ico">📊</span>'
+      + '<div class="gd-opt-txt"><div>Xem dữ liệu ghi chép</div>'
+      + '<div class="gd-opt-sub">Xem toàn bộ dữ liệu đang lưu trên Supabase</div></div>'
+      + '</div>'
+      + '<div class="gd-opt" onclick="exportSbPdf()">'
+      + '<span class="gd-opt-ico">📄</span>'
+      + '<div class="gd-opt-txt"><div>Tải PDF chi tiết</div>'
+      + '<div class="gd-opt-sub">Xuất báo cáo đầy đủ về điện thoại</div></div>'
+      + '</div>'
       + '<div class="gd-opt" onclick="openSyncPickerModal()">'
       + '<span class="gd-opt-ico">🔀</span>'
       + '<div class="gd-opt-txt"><div>Đổi phương án đồng bộ</div>'
@@ -3496,6 +3519,14 @@ function openSbModal() {
       + '</div>';
   }
   openM('modal-gd');
+}
+
+function toggleSbPassVisibility() {
+  var inp = document.getElementById('sb-pass-input');
+  var eye = document.getElementById('sb-pass-eye');
+  if (!inp || !eye) return;
+  if (inp.type === 'password') { inp.type = 'text'; eye.textContent = '🙈'; }
+  else { inp.type = 'password'; eye.textContent = '👁️'; }
 }
 
 function sbSignUp() {
@@ -3618,6 +3649,175 @@ function autoSyncSupabase() {
   if (!navigator.onLine) { updGDBarStatus('Chờ kết nối...', 'syncing'); toast('📶 Offline — sẽ đồng bộ khi có mạng'); return; }
   updGDBarStatus('Đang đồng bộ...', 'syncing');
   syncToSupabase_silent();
+}
+
+// ── Tải dữ liệu đầy đủ từ Supabase (dùng chung cho Xem dữ liệu & Xuất PDF) ──
+function fetchSbAllData(cb) {
+  if (!sbClient || !sbUser) { toast('⚠️ Chưa đăng nhập Supabase'); return; }
+  sbClient.from('mucaosu_data').select('data_key,data_value').eq('user_id', sbUser.id).then(function(res) {
+    if (res.error) { toast('❌ Lỗi tải dữ liệu: ' + res.error.message); return; }
+    var map = {};
+    (res.data||[]).forEach(function(r) { map[r.data_key] = r.data_value; });
+    cb({
+      mua: map['gd3_mua'] || [],
+      ban: map['gd3_ban'] || [],
+      sg:  map['sg3'] || [],
+      su:  map['su_data'] || []
+    });
+  }).catch(function(e) { toast('❌ Lỗi kết nối: ' + e.message); });
+}
+
+function _fmtVND(n) { return Math.round(n||0).toLocaleString('vi-VN'); }
+
+function _rowsToTableHtml(rows, cols) {
+  if (!rows.length) return '<div style="padding:12px 4px;color:var(--g400);font-size:12px">Chưa có dữ liệu</div>';
+  var head = '<tr>' + cols.map(function(c){ return '<th style="padding:5px 7px;border-bottom:1.5px solid var(--g200);text-align:left;font-size:10.5px;color:var(--g600);white-space:nowrap">'+c.label+'</th>'; }).join('') + '</tr>';
+  var sorted = rows.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||'') || (b.id||0)-(a.id||0); });
+  var body = sorted.map(function(r) {
+    return '<tr>' + cols.map(function(c) {
+      var v = c.fmt ? c.fmt(r) : (r[c.key]!=null ? r[c.key] : '');
+      return '<td style="padding:5px 7px;border-bottom:1px solid var(--g100);font-size:11.5px;white-space:nowrap">'+v+'</td>';
+    }).join('') + '</tr>';
+  }).join('');
+  return '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table style="width:100%;border-collapse:collapse">' + head + body + '</table></div>';
+}
+
+function openSbDataView() {
+  toast('⏳ Đang tải dữ liệu...');
+  fetchSbAllData(function(data) { openSbDataViewModal(data); });
+}
+
+function openSbDataViewModal(data) {
+  var mua=data.mua||[], ban=data.ban||[], sg=data.sg||[], su=data.su||[];
+  var tongMua=mua.reduce(function(s,x){return s+(x.tt||0);},0);
+  var tongBan=ban.reduce(function(s,x){return s+(x.tt||0);},0);
+  var tongSg =sg.reduce(function(s,x){return s+(x.tt||0);},0);
+  var tongSu =su.reduce(function(s,x){return s+(x.tien||0);},0);
+
+  var colsGD = [
+    {key:'date',label:'Ngày'}, {key:'ten',label:'Khách hàng'},
+    {label:'Loại',fmt:function(r){return LOAI_LBL[r.loai]||r.loai||'';}},
+    {key:'kg',label:'KG'}, {key:'do',label:'Độ'},
+    {label:'Giá',fmt:function(r){return _fmtVND(r.gia);}},
+    {label:'Thành tiền',fmt:function(r){return _fmtVND(r.tt)+'đ';}}
+  ];
+  var colsSU = [
+    {key:'date',label:'Ngày'}, {key:'ten',label:'Người ứng'},
+    {label:'Số tiền',fmt:function(r){return _fmtVND(r.tien)+'đ';}},
+    {key:'noidung',label:'Nội dung'}
+  ];
+
+  var html = '<div style="font-size:11.5px;color:var(--g400);margin-bottom:10px">Tài khoản: ' + (sbUser?sbUser.email:'') + '</div>';
+  html += '<details open style="margin-bottom:6px;border-bottom:1px solid var(--g100);padding-bottom:6px">'
+    + '<summary style="font-weight:700;font-size:13px;color:var(--g800);padding:6px 0;cursor:pointer">📥 Giao dịch Mua — ' + mua.length + ' bản ghi · ' + _fmtVND(tongMua) + 'đ</summary>'
+    + _rowsToTableHtml(mua, colsGD) + '</details>';
+  html += '<details style="margin-bottom:6px;border-bottom:1px solid var(--g100);padding-bottom:6px">'
+    + '<summary style="font-weight:700;font-size:13px;color:var(--g800);padding:6px 0;cursor:pointer">📤 Giao dịch Bán — ' + ban.length + ' bản ghi · ' + _fmtVND(tongBan) + 'đ</summary>'
+    + _rowsToTableHtml(ban, colsGD) + '</details>';
+  html += '<details style="margin-bottom:6px;border-bottom:1px solid var(--g100);padding-bottom:6px">'
+    + '<summary style="font-weight:700;font-size:13px;color:var(--g800);padding:6px 0;cursor:pointer">📒 Sổ gửi — ' + sg.length + ' bản ghi · ' + _fmtVND(tongSg) + 'đ</summary>'
+    + _rowsToTableHtml(sg, colsGD) + '</details>';
+  html += '<details style="margin-bottom:6px">'
+    + '<summary style="font-weight:700;font-size:13px;color:var(--g800);padding:6px 0;cursor:pointer">💵 Ứng tiền — ' + su.length + ' bản ghi · ' + _fmtVND(tongSu) + 'đ</summary>'
+    + _rowsToTableHtml(su, colsSU) + '</details>';
+  html += '<button onclick="exportSbPdf()" style="width:100%;padding:11px;margin-top:8px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border:none;border-radius:var(--r);font-family:\'Be Vietnam Pro\',sans-serif;font-size:13.5px;font-weight:700;cursor:pointer">📄 Tải PDF chi tiết</button>';
+
+  document.getElementById('sbv-modal-body').innerHTML = html;
+  openM('modal-sbv');
+}
+
+// ── Xuất PDF chi tiết từ dữ liệu Supabase ──
+function ensureJsPDF(cb) {
+  if (window.jspdf && window.jspdf.jsPDF) { cb(); return; }
+  var s1 = document.createElement('script');
+  s1.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  s1.onload = function() {
+    if (window.jspdf.jsPDF.API.autoTable) { cb(); return; }
+    var s2 = document.createElement('script');
+    s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js';
+    s2.onload = cb;
+    s2.onerror = function() { toast('❌ Không tải được thư viện PDF, kiểm tra kết nối mạng'); };
+    document.head.appendChild(s2);
+  };
+  s1.onerror = function() { toast('❌ Không tải được thư viện PDF, kiểm tra kết nối mạng'); };
+  document.head.appendChild(s1);
+}
+
+function exportSbPdf() {
+  toast('⏳ Đang chuẩn bị dữ liệu để xuất PDF...');
+  fetchSbAllData(function(data) {
+    buildAndSaveSbPdf(data, 'Supabase (' + (sbUser?sbUser.email:'') + ')');
+  });
+}
+
+function buildAndSaveSbPdf(data, sourceLabel) {
+  ensureJsPDF(function() {
+    try {
+      var jsPDF = window.jspdf.jsPDF;
+      var doc = new jsPDF({ orientation:'landscape', unit:'pt', format:'a4' });
+      var pageW = doc.internal.pageSize.getWidth();
+      var pageH = doc.internal.pageSize.getHeight();
+      var y = 42;
+      doc.setFontSize(16);
+      doc.text('BAO CAO MUA BAN MU CAO SU', pageW/2, y, {align:'center'});
+      y += 18;
+      doc.setFontSize(10);
+      doc.text('Nguon: ' + sourceLabel + '  -  Xuat luc: ' + new Date().toLocaleString('vi-VN'), pageW/2, y, {align:'center'});
+      y += 22;
+
+      var mua=data.mua||[], ban=data.ban||[], sg=data.sg||[], su=data.su||[];
+      var tongMua=mua.reduce(function(s,x){return s+(x.tt||0);},0);
+      var tongBan=ban.reduce(function(s,x){return s+(x.tt||0);},0);
+      var tongSg =sg.reduce(function(s,x){return s+(x.tt||0);},0);
+      var tongSu =su.reduce(function(s,x){return s+(x.tien||0);},0);
+
+      function section(title, rows, head, mapper, totalLabel, totalVal) {
+        if (y > pageH - 80) { doc.addPage(); y = 42; }
+        doc.setFontSize(12);
+        doc.text(title + ' (' + rows.length + ' ban ghi)', 40, y);
+        doc.autoTable({
+          startY: y + 8,
+          head: [head],
+          body: rows.length ? rows.slice().sort(function(a,b){ return (a.date||'').localeCompare(b.date||''); }).map(mapper) : [['—','—','—','—','—','—','—','—'].slice(0, head.length)],
+          styles: { fontSize: 8, cellPadding: 4 },
+          headStyles: { fillColor: [26,71,42], textColor: 255 },
+          margin: { left: 40, right: 40 }
+        });
+        y = doc.lastAutoTable.finalY + 14;
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'bold');
+        doc.text(totalLabel + ': ' + totalVal, 40, y);
+        doc.setFont(undefined, 'normal');
+        y += 24;
+      }
+
+      section('1. Giao dich MUA', mua,
+        ['Ngay','Khach hang','Loai mu','KG','Do','Bi','Gia','Thanh tien'],
+        function(r){ return [r.date||'', r.ten||'', LOAI_LBL[r.loai]||r.loai||'', r.kg||'', r.do||'', r.bi||'', _fmtVND(r.gia), _fmtVND(r.tt)]; },
+        'Tong thanh tien MUA', _fmtVND(tongMua)+' d');
+
+      section('2. Giao dich BAN', ban,
+        ['Ngay','Khach hang','Loai mu','KG','Do','Bi','Gia','Thanh tien'],
+        function(r){ return [r.date||'', r.ten||'', LOAI_LBL[r.loai]||r.loai||'', r.kg||'', r.do||'', r.bi||'', _fmtVND(r.gia), _fmtVND(r.tt)]; },
+        'Tong thanh tien BAN', _fmtVND(tongBan)+' d');
+
+      section('3. So gui', sg,
+        ['Ngay','Khach hang','Loai mu','KG','Do','Gia','Thanh tien'],
+        function(r){ return [r.date||'', r.ten||'', LOAI_LBL[r.loai]||r.loai||'', r.kg||'', r.do||'', _fmtVND(r.gia), _fmtVND(r.tt)]; },
+        'Tong thanh tien so gui', _fmtVND(tongSg)+' d');
+
+      section('4. Ung tien', su,
+        ['Ngay','Nguoi ung','So tien','Noi dung'],
+        function(r){ return [r.date||'', r.ten||'', _fmtVND(r.tien)+' d', r.noidung||'']; },
+        'Tong tien da ung', _fmtVND(tongSu)+' d');
+
+      var fname = 'BaoCao_MuCaoSu_' + today() + '.pdf';
+      doc.save(fname);
+      toast('✅ Đã tải file: ' + fname);
+    } catch(e) {
+      toast('❌ Lỗi tạo PDF: ' + e.message);
+    }
+  });
 }
 
 // ── Tạo / tìm thư mục MuCaoSuPro trong Drive ──
