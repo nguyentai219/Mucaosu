@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v11.3</title>
+<title>Mua Bán Mủ Cao Su v11.4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -447,7 +447,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v11.3 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v11.4 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1308,7 +1308,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v11.3</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v11.4</div>
       </div>
     </div>
 
@@ -2994,8 +2994,9 @@ try {
 function confirmExitApp() {
   closeM('modal-exit-confirm');
   window.removeEventListener('popstate', _exitPopstateHandler);
-  try { window.close(); } catch(e){}
-  try { history.go(-2); } catch(e){}
+  setTimeout(function(){
+    try { history.back(); } catch(e){}
+  }, 50);
 }
 
 function cancelExitApp() {
