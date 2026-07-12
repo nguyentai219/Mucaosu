@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v10.7</title>
+<title>Mua Bán Mủ Cao Su v10.9</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -36,6 +36,7 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g
 .logo-txt{font-size:15px;font-weight:800}
 .logo-ver{font-size:9px;opacity:.6}
 .hdr-acts{display:flex;gap:6px}
+.logo-ver-row{font-size:9px;opacity:.6;padding:0 14px 8px;margin-top:-4px}
 .ico-btn{width:34px;height:34px;background:rgba(255,255,255,.15);border:none;border-radius:10px;color:#fff;font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s}
 .ico-btn:active{background:rgba(255,255,255,.3)}
 
@@ -445,16 +446,14 @@ input[type=date]:focus{border-color:var(--gl)}
       <div class="logo-ico" style="background:none;padding:0;width:40px;height:40px;border-radius:50%;overflow:hidden">
         <img src="logo.png" style="width:40px;height:40px;object-fit:cover;border-radius:50%" alt="Logo">
       </div>
-      <div>
-        <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v10.7 <span id="license-countdown"></span></div>
-      </div>
+      <div class="logo-txt">Mua Bán Mủ Cao Su</div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
       <button class="ico-btn" id="settings-btn" onclick="openSettings()" title="Cài đặt">⚙️</button>
       <button class="ico-btn" id="kh-btn" onclick="openKH()" title="Khách hàng">👥</button>
     </div>
   </div>
+  <div class="logo-ver-row">taidautieng@gmail.com · v10.9 <span id="license-countdown"></span></div>
   <div class="gd-bar" id="gd-bar" onclick="openSyncModal()">
     <span id="gd-bar-ico">&#x2601;&#xFE0F;</span>
     <span class="gd-name" id="gd-bar-name">Chua dang nhap Google</span>
@@ -1294,7 +1293,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v10.7</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v10.9</div>
       </div>
     </div>
 
@@ -1346,16 +1345,43 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
     </div>
 
+    <!-- CHỌN PHƯƠNG ÁN ĐỒNG BỘ -->
+    <div style="background:#f5f3ff;border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid #7c3aed">
+      <div style="font-size:13px;font-weight:800;color:#5b21b6;margin-bottom:8px">🔀 ĐỒNG BỘ &amp; SAO LƯU DỮ LIỆU</div>
+      <div style="font-size:12px;color:var(--g800);line-height:1.7">
+        • Nhấn vào thanh trạng thái phía trên (dưới tên app) để chọn phương án đồng bộ<br>
+        • Có <b>2 phương án</b>, chọn 1 để dùng: <b>☁️ Google Drive</b> hoặc <b>⚡ Supabase</b><br>
+        • Có thể đổi qua lại giữa 2 phương án bất cứ lúc nào trong menu đồng bộ, không mất dữ liệu<br>
+        • Khi đang đồng bộ: thanh trạng thái hiện <b>"Đang đồng bộ..."</b>; nếu lỗi sẽ hiện <b>"Lỗi đồng bộ (n)"</b> kèm số ghi chép chưa lưu, và tự thử lại ở lần ghi chép/cài đặt tiếp theo
+      </div>
+    </div>
+
     <!-- GOOGLE DRIVE -->
     <div style="background:#e8f0fe;border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid #4285f4">
       <div style="font-size:13px;font-weight:800;color:#1a56db;margin-bottom:8px">☁️ ĐỒNG BỘ GOOGLE DRIVE</div>
       <div style="font-size:12px;color:var(--g800);line-height:1.7">
-        • Nhấn thanh tài khoản Google phía trên để đăng nhập<br>
+        • Đăng nhập bằng tài khoản Google<br>
         • Sau khi đăng nhập: mọi ghi chép tự động lưu lên Google Sheets<br>
         • File <b>backup_ngày</b>: lưu Thu Mua + Bán Ra theo ngày<br>
         • File <b>SoGui_TongHop</b>: tổng hợp sổ gửi + sheet riêng từng KH với tổng lũy kế<br>
         • Cột <b>Ghi chú khác</b>: tự ghi "Đã chỉnh sửa", "Đã trả nợ", "Đã chốt sổ"<br>
         • Token đăng nhập tự gia hạn — nếu hết hạn thanh sẽ <span style="color:#dc2626;font-weight:700">nhấp nháy đỏ</span>, nhấn vào để đăng nhập lại
+      </div>
+    </div>
+
+    <!-- SUPABASE -->
+    <div style="background:#eff6ff;border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid #2563eb">
+      <div style="font-size:13px;font-weight:800;color:#1d4ed8;margin-bottom:8px">⚡ ĐỒNG BỘ SUPABASE (MỚI)</div>
+      <div style="font-size:12px;color:var(--g800);line-height:1.7">
+        • Đăng nhập/đăng ký bằng <b>email + mật khẩu</b> — dùng chung được nhiều thiết bị cùng lúc<br>
+        • Có nút hiện/ẩn mật khẩu 👁️ khi gõ để kiểm tra lại<br>
+        • Mọi ghi chép và thay đổi cài đặt tự động đồng bộ ngay lập tức<br>
+        • <b>Xem dữ liệu ghi chép và tải PDF chi tiết</b>: xem lại toàn bộ Mua/Bán/Sổ gửi/Ứng tiền ngay trong app, có bộ lọc:<br>
+        &nbsp;&nbsp;– <i>Theo ngày</i> (lịch có chấm đánh dấu ngày có ghi chép), <i>Theo tháng</i><br>
+        &nbsp;&nbsp;– <i>Theo khách hàng (chưa chốt sổ)</i>: chỉ hiện sổ gửi/ứng tiền còn hiệu lực<br>
+        &nbsp;&nbsp;– <i>Toàn bộ dữ liệu của khách hàng</i>: hiện cả phần đã chốt sổ<br>
+        • Nút <b>"Tải PDF"</b> xuất đúng phần dữ liệu đang lọc trên màn hình về điện thoại<br>
+        • "Khôi phục từ Supabase": tải lại dữ liệu mới nhất về máy (dùng khi đổi máy hoặc cài lại app)
       </div>
     </div>
 
@@ -1374,7 +1400,7 @@ input[type=date]:focus{border-color:var(--gl)}
     <div style="background:#f0fdf4;border-radius:var(--r);padding:12px;margin-bottom:14px;border-left:3px solid #16a34a">
       <div style="font-size:13px;font-weight:800;color:#15803d;margin-bottom:8px">🔑 DÙNG THỬ &amp; GIA HẠN</div>
       <div style="font-size:12px;color:var(--g800);line-height:1.7">
-        • Phần mềm được <b>dùng thử miễn phí 3 ngày</b> kể từ lần đầu cài đặt<br>
+        • Ngày cài đặt <b>dùng miễn phí</b>, cộng thêm <b>3 ngày dùng thử</b> — tổng cộng 4 ngày trước khi cần gia hạn<br>
         • Sau khi hết hạn: chỉ xem được dữ liệu, không thể ghi thêm<br><br>
         <b>Cách gia hạn:</b><br>
         Vào <b>⚙️ Cài đặt → 🔑 Gia hạn thời gian sử dụng</b><br>
@@ -3295,7 +3321,7 @@ function updGDBar() {
   if (provider === 'supabase') {
     if (sbUser) {
       ico.innerHTML = '&#x26A1;&#xFE0F;';
-      nm.textContent = sbUser.email || 'Supabase';
+      nm.textContent = 'Đã kết nối mạng - sẵn sàng lưu trữ online';
       st.textContent = 'Đã kết nối';
       st.className = 'gd-status synced';
     } else {
@@ -3307,8 +3333,8 @@ function updGDBar() {
   }
 
   if (gdUser) {
-    ico.innerHTML = '<img class="gd-avatar" src="' + (gdUser.avatar||'') + '" onerror="this.style.display=\'none\'">';
-    nm.textContent = gdUser.name || gdUser.email || 'Google Drive';
+    ico.innerHTML = '&#x2601;&#xFE0F;';
+    nm.textContent = gdFolderId ? 'Đã kết nối mạng - sẵn sàng lưu trữ online' : 'Chờ sync';
     st.textContent = gdFolderId ? 'Đã kết nối' : 'Chờ sync';
     st.className = 'gd-status ' + (gdFolderId ? 'synced' : 'syncing');
   } else {
@@ -3442,7 +3468,7 @@ var SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 var sbClient = null;
 var sbUser = null;
 var sbSyncing = false;
-var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','sg3','su_data','thang_v1','setting_round','setting_autosync'];
+var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','sg3','su_data','thang_v1','setting_round','setting_autosync','license_expiry'];
 
 function initSupabase() {
   if (typeof window.supabase === 'undefined') { setTimeout(initSupabase, 600); return; }
@@ -3597,7 +3623,11 @@ function _sbRowsPayload() {
   return SB_DATA_KEYS.map(function(k) {
     var raw = localStorage.getItem(k);
     var val;
-    try { val = raw ? JSON.parse(raw) : []; } catch(e) { val = []; }
+    if (raw == null) {
+      val = (k === 'license_expiry') ? null : [];
+    } else {
+      try { val = JSON.parse(raw); } catch(e) { val = raw; }
+    }
     return { user_id: sbUser.id, data_key: k, data_value: val, updated_at: now };
   });
 }
@@ -5909,6 +5939,7 @@ function _doGiaHanInner() {
     toast('✅ Đã ' + (adjDays>0?'thêm '+adjDays:'bớt '+Math.abs(adjDays)) + ' ngày. Còn lại: ' + getRemainingDays() + ' ngày');
     try { updLicenseCountdown(); } catch(e) {}
     try { _pushTrialToServer(getDeviceFingerprint(), newExpiry); } catch(e) {}
+    try { autoSync(); } catch(e) {}
     try { checkLicenseOnLoad(); } catch(e) {}
     return;
 
@@ -6274,7 +6305,7 @@ function huyChotSo(ten){
     if(det){
       det.insertAdjacentHTML('afterend',
         '<div style="margin:10px 0 2px">'
-        +'<input id="huy-chot-pw" type="password" placeholder="Nhập mật khẩu chốt sổ..." '
+        +'<input id="huy-chot-pw" type="password" placeholder="Nhập mật khẩu giao dịch..." '
         +'style="width:100%;padding:10px 12px;border:1.5px solid var(--gp);border-radius:var(--r);font-size:14px;box-sizing:border-box" autofocus>'
         +'</div>');
     }
