@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v11.2</title>
+<title>Mua Bán Mủ Cao Su v11.3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -447,7 +447,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v11.2 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v11.3 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -988,6 +988,19 @@ input[type=date]:focus{border-color:var(--gl)}
   </div>
 </div>
 
+<!-- MODAL XÁC NHẬN THOÁT APP -->
+<div class="modal center" id="modal-exit-confirm">
+  <div class="modal-box center-box" style="max-width:300px">
+    <div style="font-size:40px;text-align:center;margin-bottom:10px">🚪</div>
+    <div style="font-size:15px;font-weight:800;text-align:center;color:var(--g800);margin-bottom:8px">Thoát ứng dụng?</div>
+    <div style="font-size:13px;color:var(--g600);text-align:center;line-height:1.6;margin-bottom:16px">
+      Bạn có chắc muốn thoát khỏi app Mua Bán Mủ Cao Su không?
+    </div>
+    <button class="btn-luu" style="width:100%;margin-bottom:8px;background:linear-gradient(135deg,#dc2626,#b91c1c)" onclick="confirmExitApp()">🚪 Thoát ứng dụng</button>
+    <button class="btn-huy" style="width:100%" onclick="cancelExitApp()">Ở lại</button>
+  </div>
+</div>
+
 <!-- MODAL CẢNH BÁO SẮP HẾT HẠN -->
 <div class="modal center" id="modal-warn-expiry">
   <div class="modal-box center-box" style="max-width:320px">
@@ -1295,7 +1308,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v11.2</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v11.3</div>
       </div>
     </div>
 
@@ -2949,8 +2962,46 @@ function delKH(i){
 function openM(id){ document.getElementById(id).classList.add('show'); }
 function closeM(id){ document.getElementById(id).classList.remove('show'); }
 document.querySelectorAll('.modal').forEach(m=>{
-  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('show'); });
+  m.addEventListener('click',e=>{
+    if(e.target===m){
+      m.classList.remove('show');
+      if (m.id === 'modal-exit-confirm') { try { history.pushState({app:true}, '', location.href); } catch(e2){} }
+    }
+  });
 });
+
+// ─── CHẶN NÚT QUAY LẠI CỦA ĐIỆN THOẠI: hỏi xác nhận trước khi thoát app ───
+function _exitPopstateHandler() {
+  var openModal = document.querySelector('.modal.show:not(#modal-exit-confirm)');
+  if (openModal) {
+    closeM(openModal.id);
+    try { history.pushState({app:true}, '', location.href); } catch(e){}
+    return;
+  }
+  var confirmModal = document.getElementById('modal-exit-confirm');
+  if (confirmModal && confirmModal.classList.contains('show')) {
+    try { history.pushState({app:true}, '', location.href); } catch(e){}
+    return;
+  }
+  openM('modal-exit-confirm');
+  try { history.pushState({app:true}, '', location.href); } catch(e){}
+}
+try {
+  history.pushState({app:true}, '', location.href);
+  window.addEventListener('popstate', _exitPopstateHandler);
+} catch(e){}
+
+function confirmExitApp() {
+  closeM('modal-exit-confirm');
+  window.removeEventListener('popstate', _exitPopstateHandler);
+  try { window.close(); } catch(e){}
+  try { history.go(-2); } catch(e){}
+}
+
+function cancelExitApp() {
+  closeM('modal-exit-confirm');
+  try { history.pushState({app:true}, '', location.href); } catch(e){}
+}
 
 // ─── TOAST ───
 function toast(msg){
