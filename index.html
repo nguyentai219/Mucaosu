@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v10.9</title>
+<title>Mua Bán Mủ Cao Su v11.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -30,14 +30,13 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g
 
 /* HEADER */
 .hdr{background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;position:sticky;top:0;z-index:100;box-shadow:var(--s2)}
-.hdr-top{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 6px}
-.logo{display:flex;align-items:center;gap:8px}
-.logo-ico{width:34px;height:34px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
-.logo-txt{font-size:15px;font-weight:800}
+.hdr-top{display:flex;align-items:flex-start;justify-content:space-between;padding:10px 14px 8px}
+.logo{display:flex;align-items:center;gap:10px;min-width:0}
+.logo-ico{width:52px;height:52px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.logo-txt{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .logo-ver{font-size:9px;opacity:.6}
-.hdr-acts{display:flex;gap:6px}
-.logo-ver-row{font-size:9px;opacity:.6;padding:0 14px 8px;margin-top:-4px}
-.ico-btn{width:34px;height:34px;background:rgba(255,255,255,.15);border:none;border-radius:10px;color:#fff;font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s}
+.hdr-acts{display:flex;gap:5px;flex-shrink:0;margin-top:2px}
+.ico-btn{width:26px;height:26px;background:rgba(255,255,255,.15);border:none;border-radius:8px;color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;flex-shrink:0}
 .ico-btn:active{background:rgba(255,255,255,.3)}
 
 /* TABS */
@@ -205,7 +204,7 @@ input[type="search"]::-webkit-search-decoration{-webkit-appearance:none;appearan
 input[type=date]{width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:var(--rs);font-family:'Be Vietnam Pro',sans-serif;font-size:16px;color:var(--g800);background:var(--g50);outline:none;-webkit-appearance:none}
 input[type=date]:focus{border-color:var(--gl)}
 /* GOOGLE DRIVE */
-.gd-bar{background:rgba(255,255,255,.12);border-radius:8px;padding:4px 10px;display:flex;align-items:center;gap:6px;cursor:pointer;border:1px solid rgba(255,255,255,.2);margin:0 14px 8px}
+.gd-bar{background:rgba(255,255,255,.12);border-radius:8px;padding:4px 10px;display:flex;align-items:center;gap:6px;cursor:pointer;border:1px solid rgba(255,255,255,.2);margin:2px 14px 6px}
 .gd-bar:active{background:rgba(255,255,255,.2)}
 .gd-avatar{width:22px;height:22px;border-radius:50%;object-fit:cover}
 .gd-name{font-size:11px;font-weight:600;color:rgba(255,255,255,.9);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -443,17 +442,19 @@ input[type=date]:focus{border-color:var(--gl)}
 <div class="hdr">
   <div class="hdr-top">
     <div class="logo">
-      <div class="logo-ico" style="background:none;padding:0;width:40px;height:40px;border-radius:50%;overflow:hidden">
-        <img src="logo.png" style="width:40px;height:40px;object-fit:cover;border-radius:50%" alt="Logo">
+      <div class="logo-ico" style="background:none;padding:0;width:52px;height:52px;border-radius:50%;overflow:hidden">
+        <img src="logo.png" style="width:52px;height:52px;object-fit:cover;border-radius:50%" alt="Logo">
       </div>
-      <div class="logo-txt">Mua Bán Mủ Cao Su</div>
+      <div>
+        <div class="logo-txt">Mua Bán Mủ Cao Su</div>
+        <div class="logo-ver">taidautieng@gmail.com · v11.1 <span id="license-countdown"></span></div>
+      </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
       <button class="ico-btn" id="settings-btn" onclick="openSettings()" title="Cài đặt">⚙️</button>
       <button class="ico-btn" id="kh-btn" onclick="openKH()" title="Khách hàng">👥</button>
     </div>
   </div>
-  <div class="logo-ver-row">taidautieng@gmail.com · v10.9 <span id="license-countdown"></span></div>
   <div class="gd-bar" id="gd-bar" onclick="openSyncModal()">
     <span id="gd-bar-ico">&#x2601;&#xFE0F;</span>
     <span class="gd-name" id="gd-bar-name">Chua dang nhap Google</span>
@@ -1293,7 +1294,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v10.9</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v11.1</div>
       </div>
     </div>
 
@@ -1396,13 +1397,10 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
     </div>
 
-    <!-- DÙNG THỬ & GIA HẠN -->
+    <!-- GIA HẠN -->
     <div style="background:#f0fdf4;border-radius:var(--r);padding:12px;margin-bottom:14px;border-left:3px solid #16a34a">
-      <div style="font-size:13px;font-weight:800;color:#15803d;margin-bottom:8px">🔑 DÙNG THỬ &amp; GIA HẠN</div>
+      <div style="font-size:13px;font-weight:800;color:#15803d;margin-bottom:8px">🔑 GIA HẠN THỜI GIAN SỬ DỤNG</div>
       <div style="font-size:12px;color:var(--g800);line-height:1.7">
-        • Ngày cài đặt <b>dùng miễn phí</b>, cộng thêm <b>3 ngày dùng thử</b> — tổng cộng 4 ngày trước khi cần gia hạn<br>
-        • Sau khi hết hạn: chỉ xem được dữ liệu, không thể ghi thêm<br><br>
-        <b>Cách gia hạn:</b><br>
         Vào <b>⚙️ Cài đặt → 🔑 Gia hạn thời gian sử dụng</b><br>
         Đọc <b>Mã máy</b> và liên hệ để nhận mã kích hoạt:<br>
         📧 <b>taidautieng@gmail.com</b><br>
@@ -5613,12 +5611,10 @@ var MS_PER_DAY = 24*60*60*1000;
 function getLicenseExpiry() {
   var v = localStorage.getItem(_LSK);
   if (!v) {
-    // Lần đầu chạy: ngày cài đặt KHÔNG tính vào 3 ngày dùng thử (dùng miễn phí thêm ngày cài đặt)
-    // → hết hạn sau _TD+1 ngày kể từ 0h ngày cài. VD cài ngày 1: dùng được ngày 1 (miễn phí) + 2,3,4 (3 ngày dùng thử) → khoá 0h ngày 5
+    // Lần đầu chạy: KHÔNG cấp ngày dùng thử miễn phí nào — khoá ngay từ đầu, bắt buộc gia hạn mới dùng được
     var now = new Date();
     var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    var expiryDate = new Date(startOfToday.getTime() + (_TD + 1) * MS_PER_DAY);
-    var expiry = expiryDate.getTime();
+    var expiry = startOfToday.getTime();
     localStorage.setItem(_LSK, String(expiry));
     localStorage.setItem('license_is_new', '1');
     return expiry;
