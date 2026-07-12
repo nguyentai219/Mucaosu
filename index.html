@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v10.6</title>
+<title>Mua Bán Mủ Cao Su v10.7</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -447,7 +447,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v10.6 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v10.7 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1294,7 +1294,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v10.6</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v10.7</div>
       </div>
     </div>
 
@@ -3442,7 +3442,7 @@ var SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 var sbClient = null;
 var sbUser = null;
 var sbSyncing = false;
-var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','sg3','su_data','thang_v1'];
+var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','sg3','su_data','thang_v1','setting_round','setting_autosync'];
 
 function initSupabase() {
   if (typeof window.supabase === 'undefined') { setTimeout(initSupabase, 600); return; }
@@ -3609,7 +3609,7 @@ function syncToSupabase() {
   updGDBarStatus('Đang đồng bộ...', 'syncing');
   sbClient.from('mucaosu_data').upsert(_sbRowsPayload(), { onConflict: 'user_id,data_key' }).then(function(res) {
     sbSyncing = false;
-    if (res.error) { toast('❌ Lỗi đồng bộ: ' + res.error.message); updGDBarStatus('Lỗi đồng bộ', 'offline'); return; }
+    if (res.error) { toast('❌ Lỗi đồng bộ: ' + res.error.message); updGDBarStatus('Lỗi đồng bộ (' + getPendingCount() + ')', 'offline'); return; }
     setPendingCount(0);
     localStorage.setItem('sb_last_sync', String(Date.now()));
     updGDBarStatus('Đã kết nối', 'synced');
@@ -3617,7 +3617,7 @@ function syncToSupabase() {
   }).catch(function(e) {
     sbSyncing = false;
     toast('❌ Lỗi kết nối: ' + e.message);
-    updGDBarStatus('Lỗi kết nối', 'offline');
+    updGDBarStatus('Lỗi đồng bộ (' + getPendingCount() + ')', 'offline');
   });
 }
 
@@ -3627,13 +3627,13 @@ function syncToSupabase_silent() {
   sbSyncing = true;
   sbClient.from('mucaosu_data').upsert(_sbRowsPayload(), { onConflict: 'user_id,data_key' }).then(function(res) {
     sbSyncing = false;
-    if (res.error) { updGDBarStatus('Lỗi đồng bộ', 'offline'); return; }
+    if (res.error) { updGDBarStatus('Lỗi đồng bộ (' + getPendingCount() + ')', 'offline'); return; }
     setPendingCount(0);
     localStorage.setItem('sb_last_sync', String(Date.now()));
     updGDBarStatus('Đã kết nối', 'synced');
   }).catch(function() {
     sbSyncing = false;
-    updGDBarStatus('Lỗi kết nối', 'offline');
+    updGDBarStatus('Lỗi đồng bộ (' + getPendingCount() + ')', 'offline');
   });
 }
 
@@ -3680,6 +3680,23 @@ function fetchSbAllData(cb) {
 }
 
 function _fmtVND(n) { return Math.round(n||0).toLocaleString('vi-VN'); }
+
+// Ngày cùng năm hệ thống -> dd/mm; khác năm -> dd/mm/yyyy
+function _fmtDateSmart(ds) {
+  if (!ds) return '';
+  var p = ds.split('-');
+  if (p.length !== 3) return ds;
+  var y = p[0], m = p[1], d = p[2];
+  var curYear = new Date().getFullYear();
+  return (parseInt(y) === curYear) ? (d + '/' + m) : (d + '/' + m + '/' + y);
+}
+
+// Mủ chén/dây/đông -> hiện tên loại thay cho số độ; mủ nước -> hiện số độ như thường
+var _DO_LOAI_LBL = { chen:'Chén', day:'Dây', dong:'Đông' };
+function _fmtDoOrLoai(r) {
+  if (r.loai === 'nuoc') return (r.do!=null && r.do!=='') ? r.do : '';
+  return _DO_LOAI_LBL[r.loai] || r.loai || '';
+}
 
 function _rowsToTableHtml(rows, cols) {
   if (!rows.length) return '<div style="padding:12px 4px;color:var(--g400);font-size:12px">Chưa có dữ liệu</div>';
@@ -3882,14 +3899,13 @@ function renderSbDataView() {
   var tongSu =su.reduce(function(s,x){return s+(x.tien||0);},0);
 
   var colsGD = [
-    {label:'Ngày',fmt:function(r){return fmtDateVN_ss(r.date);}}, {key:'ten',label:'Khách hàng'},
-    {label:'Loại',fmt:function(r){return LOAI_LBL[r.loai]||r.loai||'';}},
-    {key:'kg',label:'KG'}, {key:'do',label:'Độ'},
+    {label:'Ngày',fmt:function(r){return _fmtDateSmart(r.date);}}, {key:'ten',label:'Khách hàng'},
+    {key:'kg',label:'KG'}, {label:'Độ',fmt:_fmtDoOrLoai},
     {label:'Giá',fmt:function(r){return _fmtVND(r.gia);}},
     {label:'Thành tiền',fmt:function(r){return _fmtVND(r.tt)+'đ';}}
   ];
   var colsSU = [
-    {label:'Ngày',fmt:function(r){return fmtDateVN_ss(r.date);}}, {key:'ten',label:'Người ứng'},
+    {label:'Ngày',fmt:function(r){return _fmtDateSmart(r.date);}}, {key:'ten',label:'Người ứng'},
     {label:'Số tiền',fmt:function(r){return _fmtVND(r.tien)+'đ';}},
     {key:'noidung',label:'Nội dung'}
   ];
@@ -3980,24 +3996,30 @@ function buildAndSaveSbPdf(data, sourceLabel) {
         y += 24;
       }
 
+      var DO_LOAI_PDF = { chen:'Chen', day:'Day', dong:'Dong' };
+      function doOrLoaiPdf(r) {
+        if (r.loai === 'nuoc') return (r.do!=null && r.do!=='') ? r.do : '';
+        return DO_LOAI_PDF[r.loai] || r.loai || '';
+      }
+
       section('1. Giao dich MUA', mua,
-        ['Ngay','Khach hang','Loai mu','KG','Do','Bi','Gia','Thanh tien'],
-        function(r){ return [fmtDateVN_ss(r.date), r.ten||'', LOAI_LBL[r.loai]||r.loai||'', r.kg||'', r.do||'', r.bi||'', _fmtVND(r.gia), _fmtVND(r.tt)]; },
+        ['Ngay','Khach hang','KG','Do','Bi','Gia','Thanh tien'],
+        function(r){ return [_fmtDateSmart(r.date), r.ten||'', r.kg||'', doOrLoaiPdf(r), r.bi||'', _fmtVND(r.gia), _fmtVND(r.tt)]; },
         'Tong thanh tien MUA', _fmtVND(tongMua)+' d');
 
       section('2. Giao dich BAN', ban,
-        ['Ngay','Khach hang','Loai mu','KG','Do','Bi','Gia','Thanh tien'],
-        function(r){ return [fmtDateVN_ss(r.date), r.ten||'', LOAI_LBL[r.loai]||r.loai||'', r.kg||'', r.do||'', r.bi||'', _fmtVND(r.gia), _fmtVND(r.tt)]; },
+        ['Ngay','Khach hang','KG','Do','Bi','Gia','Thanh tien'],
+        function(r){ return [_fmtDateSmart(r.date), r.ten||'', r.kg||'', doOrLoaiPdf(r), r.bi||'', _fmtVND(r.gia), _fmtVND(r.tt)]; },
         'Tong thanh tien BAN', _fmtVND(tongBan)+' d');
 
       section('3. So gui', sg,
-        ['Ngay','Khach hang','Loai mu','KG','Do','Gia','Thanh tien'],
-        function(r){ return [fmtDateVN_ss(r.date), r.ten||'', LOAI_LBL[r.loai]||r.loai||'', r.kg||'', r.do||'', _fmtVND(r.gia), _fmtVND(r.tt)]; },
+        ['Ngay','Khach hang','KG','Do','Gia','Thanh tien'],
+        function(r){ return [_fmtDateSmart(r.date), r.ten||'', r.kg||'', doOrLoaiPdf(r), _fmtVND(r.gia), _fmtVND(r.tt)]; },
         'Tong thanh tien so gui', _fmtVND(tongSg)+' d');
 
       section('4. Ung tien', su,
         ['Ngay','Nguoi ung','So tien','Noi dung'],
-        function(r){ return [fmtDateVN_ss(r.date), r.ten||'', _fmtVND(r.tien)+' d', r.noidung||'']; },
+        function(r){ return [_fmtDateSmart(r.date), r.ten||'', _fmtVND(r.tien)+' d', r.noidung||'']; },
         'Tong tien da ung', _fmtVND(tongSu)+' d');
 
       var fname = 'BaoCao_MuCaoSu_' + today() + '.pdf';
@@ -5143,6 +5165,7 @@ function saveSetting(key, val) {
     // Tính lại thành tiền hiện tại
     ['mua','ban'].forEach(function(t){ calc(t); });
   }
+  autoSync();
 }
 function openSettings() {
   document.getElementById('setting-round').checked = getSetting('round', false);
