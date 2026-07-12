@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v11.4</title>
+<title>Mua Bán Mủ Cao Su v11.5</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -447,7 +447,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v11.4 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v11.5 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -926,17 +926,6 @@ input[type=date]:focus{border-color:var(--gl)}
           <span class="toggle-slider"></span>
         </label>
       </div>
-      <!-- AUTO SYNC -->
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 4px">
-        <div>
-          <div style="font-size:14px;font-weight:700;color:var(--g800)">Tự đồng bộ sau khi lưu</div>
-          <div style="font-size:11px;color:var(--g400);margin-top:2px">Đồng bộ ngay khi có thay đổi (Drive hoặc Supabase)</div>
-        </div>
-        <label class="toggle-sw">
-          <input type="checkbox" id="setting-autosync" checked onchange="saveSetting('autosync',this.checked)">
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
       <!-- GIA HẠN -->
       <div style="padding:14px 4px;border-top:1px solid var(--g100)">
         <div style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:2px">Thời hạn sử dụng</div>
@@ -988,18 +977,7 @@ input[type=date]:focus{border-color:var(--gl)}
   </div>
 </div>
 
-<!-- MODAL XÁC NHẬN THOÁT APP -->
-<div class="modal center" id="modal-exit-confirm">
-  <div class="modal-box center-box" style="max-width:300px">
-    <div style="font-size:40px;text-align:center;margin-bottom:10px">🚪</div>
-    <div style="font-size:15px;font-weight:800;text-align:center;color:var(--g800);margin-bottom:8px">Thoát ứng dụng?</div>
-    <div style="font-size:13px;color:var(--g600);text-align:center;line-height:1.6;margin-bottom:16px">
-      Bạn có chắc muốn thoát khỏi app Mua Bán Mủ Cao Su không?
-    </div>
-    <button class="btn-luu" style="width:100%;margin-bottom:8px;background:linear-gradient(135deg,#dc2626,#b91c1c)" onclick="confirmExitApp()">🚪 Thoát ứng dụng</button>
-    <button class="btn-huy" style="width:100%" onclick="cancelExitApp()">Ở lại</button>
-  </div>
-</div>
+
 
 <!-- MODAL CẢNH BÁO SẮP HẾT HẠN -->
 <div class="modal center" id="modal-warn-expiry">
@@ -1308,7 +1286,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v11.4</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v11.5</div>
       </div>
     </div>
 
@@ -1436,6 +1414,7 @@ input[type=date]:focus{border-color:var(--gl)}
 // ============================================================
 
 const LOAI_LBL = {nuoc:'Mủ nước', chen:'Mủ chén', day:'Mủ dây', dong:'Mủ đông'};
+const LOAI_LBL_SHORT = {nuoc:'Nước', chen:'Chén', day:'Dây', dong:'Đông'};
 const LOAI_ICO = {nuoc:'💧', chen:'🥣', day:'🪢', dong:'🧱'};
 
 function openHuongDan(){ openM('modal-huong-dan'); }
@@ -2332,7 +2311,7 @@ function renderTbl(tab, newId){
         +'<span class="tc-ten-inner" id="tni-'+gd.id+'">'+gd.ten+'</span>'
         +'<span class="tc-ten-badges">'+editIcon+'</span>'
         +'</div></td>'
-        +'<td>'+fmtKg(kgThuc(gd.loai,gd.kg,gd.do,gd.bi||0))+((gd.bi&&parseFloat(gd.bi)>0)?'<span style="font-size:10px;color:var(--g400)">('+fmtKg(gd.bi)+')</span>':'')+'</td>'
+        +'<td>'+fmtKg(kgThuc(gd.loai,gd.kg,gd.do,gd.bi||0))+((gd.bi&&parseFloat(gd.bi)>0)?'<span style="font-size:10px;color:#e57373;font-weight:700">('+fmtKg(gd.bi)+')</span>':'')+'</td>'
         +'<td>'+chat+'</td>'
         +'<td>'+fmtNum(gd.gia)+'</td>'
         +'<td>'+fmtNum(gd.tt)+'</td>'
@@ -2347,7 +2326,7 @@ function renderTbl(tab, newId){
       +'<span class="tc-ten-inner" id="tni-'+gd.id+'">'+gd.ten+'</span>'
       +'<span class="tc-ten-badges">'+editIcon+rankBadge+'</span>'
       +'</div></td>'
-      +'<td>'+fmtKg(kgThuc(gd.loai,gd.kg,gd.do,gd.bi||0))+((gd.bi&&parseFloat(gd.bi)>0)?'<span style="font-size:10px;color:var(--g400)">('+fmtKg(gd.bi)+')</span>':'')+'</td>'
+      +'<td>'+fmtKg(kgThuc(gd.loai,gd.kg,gd.do,gd.bi||0))+((gd.bi&&parseFloat(gd.bi)>0)?'<span style="font-size:10px;color:#e57373;font-weight:700">('+fmtKg(gd.bi)+')</span>':'')+'</td>'
       +'<td>'+chat+'</td>'
       +'<td>'+fmtNum(gd.gia)+'</td>'
       +'<td>'+fmtNum(gd.tt)+'</td>'
@@ -2959,50 +2938,42 @@ function delKH(i){
 }
 
 // ─── MODAL ───
-function openM(id){ document.getElementById(id).classList.add('show'); }
-function closeM(id){ document.getElementById(id).classList.remove('show'); }
-document.querySelectorAll('.modal').forEach(m=>{
-  m.addEventListener('click',e=>{
-    if(e.target===m){
-      m.classList.remove('show');
-      if (m.id === 'modal-exit-confirm') { try { history.pushState({app:true}, '', location.href); } catch(e2){} }
+// Mỗi lần mở modal sẽ đẩy 1 mốc lịch sử; đóng modal (dù bằng nút X, bấm ra ngoài,
+// hay bằng nút quay lại điện thoại) đều lùi lại đúng 1 mốc đó — nhờ vậy nút quay lại
+// của điện thoại luôn đóng đúng popup đang mở, và khi không còn popup nào thì nút quay
+// lại lần tiếp theo sẽ thoát app một cách tự nhiên (không cần popup xác nhận vì trình
+// duyệt không cho phép JS tự đóng app một cách chắc chắn).
+var _modalHistoryDepth = 0;
+var _consumingPop = false;
+
+function openM(id){
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('show');
+  _modalHistoryDepth++;
+  try { history.pushState({mcsModal:true}, '', location.href); } catch(e){}
+}
+function closeM(id){
+  var el = document.getElementById(id);
+  if (!el || !el.classList.contains('show')) return;
+  el.classList.remove('show');
+  if (_modalHistoryDepth > 0) {
+    _modalHistoryDepth--;
+    if (!_consumingPop) {
+      try { history.back(); } catch(e){}
     }
-  });
+  }
+}
+document.querySelectorAll('.modal').forEach(m=>{
+  m.addEventListener('click',e=>{ if(e.target===m) closeM(m.id); });
 });
 
-// ─── CHẶN NÚT QUAY LẠI CỦA ĐIỆN THOẠI: hỏi xác nhận trước khi thoát app ───
-function _exitPopstateHandler() {
-  var openModal = document.querySelector('.modal.show:not(#modal-exit-confirm)');
-  if (openModal) {
-    closeM(openModal.id);
-    try { history.pushState({app:true}, '', location.href); } catch(e){}
-    return;
-  }
-  var confirmModal = document.getElementById('modal-exit-confirm');
-  if (confirmModal && confirmModal.classList.contains('show')) {
-    try { history.pushState({app:true}, '', location.href); } catch(e){}
-    return;
-  }
-  openM('modal-exit-confirm');
-  try { history.pushState({app:true}, '', location.href); } catch(e){}
-}
-try {
-  history.pushState({app:true}, '', location.href);
-  window.addEventListener('popstate', _exitPopstateHandler);
-} catch(e){}
-
-function confirmExitApp() {
-  closeM('modal-exit-confirm');
-  window.removeEventListener('popstate', _exitPopstateHandler);
-  setTimeout(function(){
-    try { history.back(); } catch(e){}
-  }, 50);
-}
-
-function cancelExitApp() {
-  closeM('modal-exit-confirm');
-  try { history.pushState({app:true}, '', location.href); } catch(e){}
-}
+window.addEventListener('popstate', function(){
+  _consumingPop = true;
+  var openModal = document.querySelector('.modal.show');
+  if (openModal) { closeM(openModal.id); }
+  _consumingPop = false;
+});
 
 // ─── TOAST ───
 function toast(msg){
@@ -3519,7 +3490,7 @@ var SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 var sbClient = null;
 var sbUser = null;
 var sbSyncing = false;
-var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','sg3','su_data','thang_v1','setting_round','setting_autosync','license_expiry'];
+var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','sg3','su_data','thang_v1','setting_round','license_expiry'];
 
 function initSupabase() {
   if (typeof window.supabase === 'undefined') { setTimeout(initSupabase, 600); return; }
@@ -3738,7 +3709,6 @@ function restoreFromSupabase(silent) {
 function autoSyncSupabase() {
   if (!sbUser) { incPendingCount(); updGDBarStatus('Chưa đăng nhập Supabase', 'offline'); return; }
   incPendingCount();
-  if (!getSetting('autosync', true)) { updGDBarStatus('Đã kết nối', 'synced'); return; }
   if (!navigator.onLine) { updGDBarStatus('Chờ kết nối...', 'syncing'); toast('📶 Offline — sẽ đồng bộ khi có mạng'); return; }
   updGDBarStatus('Đang đồng bộ...', 'syncing');
   syncToSupabase_silent();
@@ -4952,7 +4922,7 @@ function renderSSDetail(list, newKgs, newDos, newTiens, gia, isNuoc, totalKg, av
 
   // Bảng chi tiết
   tbody.innerHTML = list.map(function(g, i) {
-    var doStr = isNuoc ? newDos[i].toFixed(1) : LOAI_LBL[g.loai];
+    var doStr = isNuoc ? newDos[i].toFixed(1) : LOAI_LBL_SHORT[g.loai];
     return '<tr>'
       + '<td style="text-align:left;padding-left:7px;font-weight:600">' + g.ten + '</td>'
       + '<td style="font-weight:700;color:#5b21b6">' + fmtKg(newKgs[i]) + '</td>'
@@ -5250,7 +5220,6 @@ function saveSetting(key, val) {
 }
 function openSettings() {
   document.getElementById('setting-round').checked = getSetting('round', false);
-  document.getElementById('setting-autosync').checked = getSetting('autosync', true);
   var info = document.getElementById('settings-license-info');
   if (info) {
     var days = getRemainingDays();
@@ -5299,7 +5268,6 @@ function autoSync() {
   // Nếu đã thất bại silent → chỉ đếm pending, hiện banner, không thử sync
   if (_gdSilentFailed) { incPendingCount(); _showReloginBanner(); return; }
   incPendingCount();
-  if (!getSetting('autosync', true)) { updGDBarStatus('Đã kết nối', 'synced'); return; }
   if (!navigator.onLine) { syncQueue = true; updGDBarStatus('Chờ kết nối...', 'syncing'); toast('📶 Offline — sẽ đồng bộ khi có mạng'); return; }
   doAutoSync();
 }
