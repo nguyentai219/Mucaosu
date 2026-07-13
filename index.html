@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v11.6</title>
+<title>Mua Bán Mủ Cao Su v11.7</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -447,7 +447,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v11.6 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v11.7 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -937,10 +937,10 @@ input[type=date]:focus{border-color:var(--gl)}
         <div style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:2px">Mật khẩu quản lý giao dịch</div>
         <div style="font-size:12px;color:var(--g600);margin-bottom:8px">Dùng khi Chốt sổ, Huỷ chốt sổ, Chốt tháng, Huỷ chốt tháng</div>
         <button onclick="openDoiPwThang()" style="width:100%;padding:10px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">🔐 Đổi mật khẩu quản lý giao dịch</button>
-        <button onclick="closeM('modal-settings');openQuenMatKhau()" style="width:100%;padding:10px;background:#fff7ed;color:#c2410c;border:1.5px solid #fdba74;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">❓ Quên mật khẩu</button>
+        <button onclick="openQuenMatKhau()" style="width:100%;padding:10px;background:#fff7ed;color:#c2410c;border:1.5px solid #fdba74;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">❓ Quên mật khẩu</button>
       </div>
     </div>
-    <button onclick="closeM('modal-settings');openHuongDan()" style="width:100%;margin-top:10px;padding:11px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">📖 Hướng dẫn sử dụng</button>
+    <button onclick="openHuongDan()" style="width:100%;margin-top:10px;padding:11px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">📖 Hướng dẫn sử dụng</button>
     <button class="btn-huy" style="width:100%;margin-top:8px" onclick="closeM('modal-settings')">Đóng</button>
   </div>
 </div>
@@ -972,7 +972,7 @@ input[type=date]:focus{border-color:var(--gl)}
     <div style="font-size:11px;color:var(--g400);text-align:center;margin-bottom:12px">
       Bạn vẫn có thể xem lại dữ liệu cũ, nhưng không thể ghi/sửa dữ liệu mới.
     </div>
-    <button class="btn-luu" style="width:100%;margin-bottom:8px" onclick="closeM('modal-expired');openGiaHan();">🔑 Gia hạn ngay</button>
+    <button class="btn-luu" style="width:100%;margin-bottom:8px" onclick="openGiaHan();">🔑 Gia hạn ngay</button>
     <button class="btn-huy" style="width:100%" onclick="closeM('modal-expired')">OK, đã hiểu</button>
   </div>
 </div>
@@ -991,7 +991,7 @@ input[type=date]:focus{border-color:var(--gl)}
     </div>
     <div class="cfm-btns">
       <button class="cfm-btn n" onclick="closeM('modal-warn-expiry')">Để sau</button>
-      <button class="cfm-btn y" onclick="closeM('modal-warn-expiry');openGiaHan()">🔑 Gia hạn ngay</button>
+      <button class="cfm-btn y" onclick="openGiaHan()">🔑 Gia hạn ngay</button>
     </div>
   </div>
 </div>
@@ -1286,7 +1286,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v11.6</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v11.7</div>
       </div>
     </div>
 
@@ -1417,7 +1417,7 @@ const LOAI_LBL = {nuoc:'Mủ nước', chen:'Mủ chén', day:'Mủ dây', dong:
 const LOAI_LBL_SHORT = {nuoc:'Nước', chen:'Chén', day:'Dây', dong:'Đông'};
 const LOAI_ICO = {nuoc:'💧', chen:'🥣', day:'🪢', dong:'🧱'};
 
-function openHuongDan(){ openM('modal-huong-dan'); }
+function openHuongDan(){ swapM('modal-settings', 'modal-huong-dan'); }
 
 let curTab = 'mua';
 let curDate = {mua: today(), ban: today()}; // luôn lấy ngày hệ thống
@@ -2962,6 +2962,26 @@ function closeM(id){
     if (!_consumingPop) {
       try { history.back(); } catch(e){}
     }
+  }
+}
+// Chuyển thẳng từ (các) modal đang mở sang 1 modal khác, KHÔNG điều hướng lịch sử.
+// Dùng khi 1 hành động của người dùng vừa đóng modal cũ vừa mở modal mới cùng lúc — nếu dùng
+// closeM()+openM() riêng lẻ sẽ dính lỗi: closeM() gọi history.back() bất đồng bộ, popstate xảy ra
+// SAU khi modal mới đã hiện, khiến modal mới bị đóng nhầm ngay khi vừa mở (như không bấm được).
+function swapM(fromIds, toId){
+  var hadOpen = false;
+  (Array.isArray(fromIds) ? fromIds : [fromIds]).forEach(function(id){
+    var el = document.getElementById(id);
+    if (el && el.classList.contains('show')) { el.classList.remove('show'); hadOpen = true; }
+  });
+  var toEl = document.getElementById(toId);
+  if (!toEl) return;
+  toEl.classList.add('show');
+  if (hadOpen) {
+    // Swap giữa 2 modal: giữ nguyên độ sâu lịch sử hiện có, không push thêm
+  } else {
+    _modalHistoryDepth++;
+    try { history.pushState({mcsModal:true}, '', location.href); } catch(e){}
   }
 }
 document.querySelectorAll('.modal').forEach(m=>{
@@ -5903,10 +5923,7 @@ function openGiaHan() {
   var days = getRemainingDays();
   var info = document.getElementById('gh-info');
   if(info) info.textContent = neverActivated ? 'Nhập mã kích hoạt để bắt đầu sử dụng' : (days>0 ? 'Hiện còn '+days+' ngày sử dụng' : 'Đã hết hạn sử dụng');
-  closeM('modal-settings');
-  closeM('modal-warn-expiry');
-  closeM('modal-expired');
-  openM('modal-gia-han');
+  swapM(['modal-settings','modal-warn-expiry','modal-expired'], 'modal-gia-han');
 }
 
 
@@ -6110,8 +6127,7 @@ function openDoiPwThang() {
   document.getElementById('dpw-new').value = '';
   document.getElementById('dpw-confirm').value = '';
   document.getElementById('dpw-err').style.display = 'none';
-  closeM('modal-settings');
-  openM('modal-doi-pw-thang');
+  swapM('modal-settings', 'modal-doi-pw-thang');
 }
 function doDoiPwThang() {
   var oldPw = document.getElementById('dpw-old').value;
@@ -6145,7 +6161,7 @@ function openQuenMatKhau(){
   document.getElementById('qpw-new').value='';
   document.getElementById('qpw-confirm').value='';
   document.getElementById('qpw-err').style.display='none';
-  openM('modal-quen-pw');
+  swapM('modal-settings', 'modal-quen-pw');
 }
 function doQuenPw(){
   var adminPw = document.getElementById('qpw-admin').value;
