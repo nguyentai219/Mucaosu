@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v11.5</title>
+<title>Mua Bán Mủ Cao Su v11.6</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -447,7 +447,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v11.5 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v11.6 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1286,7 +1286,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v11.5</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v11.6</div>
       </div>
     </div>
 
@@ -3749,17 +3749,48 @@ function _fmtDoOrLoai(r) {
   return _DO_LOAI_LBL[r.loai] || r.loai || '';
 }
 
-function _rowsToTableHtml(rows, cols) {
+function _rowsToTableHtml(rows, cols, opts) {
+  opts = opts || {};
   if (!rows.length) return '<div style="padding:12px 4px;color:var(--g400);font-size:12px">Chưa có dữ liệu</div>';
   var head = '<tr>' + cols.map(function(c){ return '<th style="padding:5px 7px;border-bottom:1.5px solid var(--g200);text-align:left;font-size:10.5px;color:var(--g600);white-space:nowrap">'+c.label+'</th>'; }).join('') + '</tr>';
   var sorted = rows.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||'') || (b.id||0)-(a.id||0); });
-  var body = sorted.map(function(r) {
+  function rowHtml(r) {
     return '<tr>' + cols.map(function(c) {
       var v = c.fmt ? c.fmt(r) : (r[c.key]!=null ? r[c.key] : '');
       return '<td style="padding:5px 7px;border-bottom:1px solid var(--g100);font-size:11.5px;white-space:nowrap">'+v+'</td>';
     }).join('') + '</tr>';
-  }).join('');
-  return '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table style="width:100%;border-collapse:collapse">' + head + body + '</table></div>';
+  }
+  var body = '';
+  if (opts.groupByDate) {
+    // Xem tất cả: chèn hàng in đậm phân biệt giữa các ngày
+    var lastDate = null;
+    sorted.forEach(function(r) {
+      if (r.date !== lastDate) {
+        lastDate = r.date;
+        body += '<tr><td colspan="' + cols.length + '" style="padding:5px 7px;background:var(--g100);font-weight:800;font-size:11px;color:var(--g800);border-top:1.5px solid var(--g200);border-bottom:1.5px solid var(--g200)">📅 ' + _fmtDateSmart(r.date) + '</td></tr>';
+      }
+      body += rowHtml(r);
+    });
+  } else {
+    body = sorted.map(rowHtml).join('');
+  }
+  var foot = '';
+  if (opts.showTotal && opts.sumKey) {
+    // Xem theo ngày/tháng/khách hàng: thêm hàng tổng cuối bảng
+    var sumColIdx = 0;
+    cols.forEach(function(c,i){ if (c.isSum) sumColIdx = i; });
+    var total = rows.reduce(function(s,x){ return s + (x[opts.sumKey]||0); }, 0);
+    var totalText = _fmtVND(total) + 'đ';
+    foot += '<tr>';
+    if (sumColIdx > 0) {
+      foot += '<td colspan="' + sumColIdx + '" style="padding:6px 7px;font-weight:800;font-size:11.5px;color:var(--g800);border-top:2px solid var(--g200);text-align:right">Tổng cộng:</td>';
+    }
+    foot += '<td style="padding:6px 7px;font-weight:800;font-size:11.5px;color:var(--gd);border-top:2px solid var(--g200);white-space:nowrap">' + totalText + '</td>';
+    var after = cols.length - sumColIdx - 1;
+    if (after > 0) foot += '<td colspan="' + after + '" style="border-top:2px solid var(--g200)"></td>';
+    foot += '</tr>';
+  }
+  return '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table style="width:100%;border-collapse:collapse">' + head + body + foot + '</table></div>';
 }
 
 function openSbDataView() {
@@ -3953,27 +3984,34 @@ function renderSbDataView() {
     {label:'Ngày',fmt:function(r){return _fmtDateSmart(r.date);}}, {key:'ten',label:'Khách hàng'},
     {key:'kg',label:'KG'}, {label:'Độ',fmt:_fmtDoOrLoai},
     {label:'Giá',fmt:function(r){return _fmtVND(r.gia);}},
-    {label:'Thành tiền',fmt:function(r){return _fmtVND(r.tt)+'đ';}}
+    {label:'Thành tiền',fmt:function(r){return _fmtVND(r.tt)+'đ';},isSum:true}
   ];
   var colsSU = [
     {label:'Ngày',fmt:function(r){return _fmtDateSmart(r.date);}}, {key:'ten',label:'Người ứng'},
-    {label:'Số tiền',fmt:function(r){return _fmtVND(r.tien)+'đ';}},
+    {label:'Số tiền',fmt:function(r){return _fmtVND(r.tien)+'đ';},isSum:true},
     {key:'noidung',label:'Nội dung'}
   ];
+
+  // Theo ngày/tháng/khách hàng: hiện hàng tổng cuối bảng. Xem tất cả: hiện hàng phân biệt theo ngày.
+  var filterType = document.getElementById('sbv-filter-type') ? document.getElementById('sbv-filter-type').value : 'all';
+  var showTotal = (filterType !== 'all');
+  var groupByDate = (filterType === 'all');
+  var optsGD = {sumKey:'tt', showTotal:showTotal, groupByDate:groupByDate};
+  var optsSU = {sumKey:'tien', showTotal:showTotal, groupByDate:groupByDate};
 
   var html = '<div style="font-size:11px;color:var(--g500);font-weight:700;margin-bottom:8px">🔎 Đang lọc: ' + _sbFilterLabel() + '</div>';
   html += '<details open style="margin-bottom:6px;border-bottom:1px solid var(--g100);padding-bottom:6px">'
     + '<summary style="font-weight:700;font-size:13px;color:var(--g800);padding:6px 0;cursor:pointer">📥 Giao dịch Mua — ' + mua.length + ' bản ghi · ' + _fmtVND(tongMua) + 'đ</summary>'
-    + _rowsToTableHtml(mua, colsGD) + '</details>';
+    + _rowsToTableHtml(mua, colsGD, optsGD) + '</details>';
   html += '<details style="margin-bottom:6px;border-bottom:1px solid var(--g100);padding-bottom:6px">'
     + '<summary style="font-weight:700;font-size:13px;color:var(--g800);padding:6px 0;cursor:pointer">📤 Giao dịch Bán — ' + ban.length + ' bản ghi · ' + _fmtVND(tongBan) + 'đ</summary>'
-    + _rowsToTableHtml(ban, colsGD) + '</details>';
+    + _rowsToTableHtml(ban, colsGD, optsGD) + '</details>';
   html += '<details style="margin-bottom:6px;border-bottom:1px solid var(--g100);padding-bottom:6px">'
     + '<summary style="font-weight:700;font-size:13px;color:var(--g800);padding:6px 0;cursor:pointer">📒 Sổ gửi — ' + sg.length + ' bản ghi · ' + _fmtVND(tongSg) + 'đ</summary>'
-    + _rowsToTableHtml(sg, colsGD) + '</details>';
+    + _rowsToTableHtml(sg, colsGD, optsGD) + '</details>';
   html += '<details style="margin-bottom:6px">'
     + '<summary style="font-weight:700;font-size:13px;color:var(--g800);padding:6px 0;cursor:pointer">💵 Ứng tiền — ' + su.length + ' bản ghi · ' + _fmtVND(tongSu) + 'đ</summary>'
-    + _rowsToTableHtml(su, colsSU) + '</details>';
+    + _rowsToTableHtml(su, colsSU, optsSU) + '</details>';
 
   document.getElementById('sbv-results').innerHTML = html;
 }
