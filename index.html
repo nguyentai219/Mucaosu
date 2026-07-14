@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v11.7</title>
+<title>Mua Bán Mủ Cao Su v11.12</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -400,6 +400,39 @@ input[type=date]:focus{border-color:var(--gl)}
 .sg-dd-btn{background:#fff;border:1.5px solid var(--gp)
 .sg-dd-select{width:100%;background:#fff;border:1.5px solid var(--gp);border-radius:var(--r);padding:11px 12px;font-size:13px;font-weight:700;color:var(--gd);cursor:pointer;-webkit-appearance:none};border-radius:var(--r);padding:11px 12px;font-size:13px;font-weight:700;color:var(--gd);display:flex;align-items:center;justify-content:space-between;cursor:pointer}
 .sg-overview-card{background:#fff;border-radius:var(--r);box-shadow:var(--s1);padding:14px;margin-bottom:10px}
+
+/* SUB-TAB SỔ GỬI & CHẤM CÔNG v11.12 */
+.sg-subtab-bar{display:flex;gap:6px;background:var(--g100);padding:3px;border-radius:10px;margin-bottom:14px}
+.sg-subtab-btn{flex:1;padding:8px 0;background:transparent;border:none;color:var(--g600);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;border-radius:8px;cursor:pointer;transition:all .2s}
+.sg-subtab-btn.active{background:#fff;color:var(--gd);box-shadow:var(--s1)}
+.cc-card{background:#fff;border-radius:var(--r);box-shadow:var(--s1);padding:14px;margin-bottom:10px;cursor:pointer}
+.cc-card-name{font-size:14px;font-weight:800;color:var(--gd)}
+.cc-card-sub{font-size:11.5px;color:var(--g600);margin-top:3px}
+.cc-card-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:12px}
+.cc-card-row b{color:var(--g800)}
+.cc-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;margin-top:10px}
+.cc-stat{display:flex;justify-content:space-between;align-items:center;background:var(--g50);border-radius:8px;padding:6px 9px;font-size:11px}
+.cc-stat-lbl{color:var(--g600);font-weight:600}
+.cc-stat-val{font-weight:800}
+#modal-cc-detail .cal-cell.offday{background:#dc2626;color:#fff!important}
+#modal-cc-detail .cal-cell.offday .cal-dot{display:none}
+#modal-cc-detail .cal-legend .cal-dot{background:#dc2626}
+/* Lịch chi tiết chấm công v11.12: nhiều trạng thái/ngày */
+#cc-detail-cal-grid .cal-cell{padding-bottom:17px}
+#cc-detail-cal-grid .cal-cell.cc-out{color:var(--g200);cursor:default}
+#cc-detail-cal-grid .cc-badge{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:9px;line-height:1;min-width:14px;height:14px;padding:0 2px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800}
+#cc-detail-cal-grid .cc-badge.lam{background:#16a34a}
+#cc-detail-cal-grid .cc-badge.nghi{background:#dc2626}
+#cc-detail-cal-grid .cc-badge.ung{background:#f59e0b}
+#cc-detail-cal-grid .cc-badge.thuong{background:#16a34a}
+#cc-detail-cal-grid .cc-badge.khac{background:#dc2626}
+.cc-legend-grid{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:10.5px;color:var(--g600);margin:6px 0 2px}
+.cc-legend-grid i.cc-ic{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;color:#fff;font-size:9px;font-weight:800;margin-right:3px;font-style:normal}
+.cc-legend-grid i.cc-ic.lam{background:#16a34a}
+.cc-legend-grid i.cc-ic.nghi{background:#dc2626}
+.cc-legend-grid i.cc-ic.ung{background:#f59e0b}
+.cc-legend-grid i.cc-ic.thuong{background:#16a34a}
+.cc-legend-grid i.cc-ic.khac{background:#dc2626}
 .sg-overview-title{font-size:12px;font-weight:800;color:var(--g600);margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .sg-overview-row{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0}
 .sg-overview-lbl{font-size:12px;color:var(--g600)}
@@ -447,7 +480,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v11.7 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v11.12 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -667,6 +700,15 @@ input[type=date]:focus{border-color:var(--gl)}
 <div class="tab-pane" id="tab-sg">
 <div class="page">
 
+  <!-- SUB-TAB: SỔ GỬI & ỨNG TIỀN / CHẤM CÔNG -->
+  <div class="sg-subtab-bar">
+    <button class="sg-subtab-btn active" id="sg-subtab-btn-sg" onclick="switchSgSubtab('sg')">📒 Sổ Gửi &amp; Ứng Tiền</button>
+    <button class="sg-subtab-btn" id="sg-subtab-btn-cc" onclick="switchSgSubtab('cc')">⏱️ Chấm Công</button>
+  </div>
+
+  <!-- SUB-TAB 1: SỔ GỬI & ỨNG TIỀN (giữ nguyên như cũ) -->
+  <div id="sg-subtab-sg">
+
   <div class="sec-title">📒 Sổ gửi &amp; Ứng tiền</div>
 
   <!-- 2 NÚT HÀNH ĐỘNG -->
@@ -682,6 +724,15 @@ input[type=date]:focus{border-color:var(--gl)}
 
   <!-- NỘI DUNG: tổng quan HOẶC chi tiết 1 KH -->
   <div id="sg-tab-content"></div>
+
+  </div>
+
+  <!-- SUB-TAB 2: CHẤM CÔNG -->
+  <div id="sg-subtab-cc" style="display:none">
+    <div class="sec-title">⏱️ Chấm công</div>
+    <button class="btn-luu" style="width:100%;margin-bottom:12px;background:linear-gradient(135deg,var(--gd),var(--gm))" onclick="openCcNew()">➕ Tạo chấm công mới</button>
+    <div id="cc-list"></div>
+  </div>
 
 </div>
 </div>
@@ -1176,6 +1227,148 @@ input[type=date]:focus{border-color:var(--gl)}
   </div>
 </div>
 
+<!-- MODAL TẠO CHẤM CÔNG MỚI -->
+<div class="modal" id="modal-cc-new">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⏱️ Tạo chấm công mới</div>
+
+    <div class="fr">
+      <label class="fl">Ngày</label>
+      <div class="date-bar" onclick="openCcNewDate()" style="border:1.5px solid var(--gp);margin-bottom:0;cursor:pointer">
+        <span>📅</span>
+        <span class="date-val" id="cc-date-val" style="color:var(--gd);font-size:13px;font-weight:700">--</span>
+        <span class="date-hint">Nhấn để chọn</span>
+      </div>
+      <input type="hidden" id="cc-date">
+    </div>
+
+    <div class="fr">
+      <label class="fl">Tên công nhân</label>
+      <input type="text" id="cc-ten" class="fi" placeholder="Nhập tên..." autocomplete="off" onfocus="scrollInputUp(this)">
+    </div>
+
+    <div class="fr">
+      <label class="fl">Tiền công tháng (đ)</label>
+      <input type="text" inputmode="numeric" id="cc-luong-thang" class="fi" placeholder="0" oninput="onCcLuongThang()">
+    </div>
+
+    <div class="tt-box">
+      <div class="tt-lbl">Tiền công / ngày</div>
+      <div class="tt-so" id="cc-luong-ngay">0 ₫</div>
+      <div class="tt-chu">= Tiền công tháng ÷ 30 ngày</div>
+    </div>
+
+    <div id="cc-new-err" style="display:none;color:#dc2626;font-size:12px;font-weight:700;margin-top:8px"></div>
+
+    <div class="btn-row" style="margin-top:10px">
+      <button class="btn-huy" onclick="closeM('modal-cc-new')">Huỷ</button>
+      <button class="btn-luu" onclick="luuCcNew()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CHỌN NGÀY CHO CHẤM CÔNG MỚI -->
+<div class="modal" id="modal-cc-new-date">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="color:var(--gd)">📅 Chọn ngày</div>
+    <div class="cal-header">
+      <button onclick="ccNewCalNav(-1)" style="color:var(--gd);background:var(--gb)">‹</button>
+      <span id="cc-new-cal-month-label"></span>
+      <button onclick="ccNewCalNav(1)" style="color:var(--gd);background:var(--gb)">›</button>
+    </div>
+    <div class="cal-grid" id="cc-new-cal-grid"></div>
+    <div class="cal-legend"><span class="cal-dot" style="background:var(--gd)"></span> Ngày đã có chấm công</div>
+    <button class="btn-luu" style="width:100%;margin-top:10px" onclick="applyCcNewDate()">Xác nhận</button>
+    <button class="btn-huy" style="width:100%;margin-top:6px" onclick="closeM('modal-cc-new-date')">Đóng</button>
+  </div>
+</div>
+
+<!-- MODAL CHI TIẾT CHẤM CÔNG: lịch chấm công, ghi chép, tổng kết, chốt công -->
+<div class="modal" id="modal-cc-detail">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="cc-detail-title">⏱️ Chấm công</div>
+
+    <div class="cal-header">
+      <button onclick="ccDetailCalNav(-1)" style="color:var(--gd);background:var(--gb)">‹</button>
+      <span id="cc-detail-cal-month-label"></span>
+      <button onclick="ccDetailCalNav(1)" style="color:var(--gd);background:var(--gb)">›</button>
+    </div>
+    <div class="cal-grid" id="cc-detail-cal-grid"></div>
+    <div class="cc-legend-grid">
+      <span><i class="cc-ic lam">✔</i>Có làm</span>
+      <span><i class="cc-ic nghi">✗</i>Nghỉ</span>
+      <span><i class="cc-ic ung">💵</i>Ứng tiền</span>
+      <span><i class="cc-ic thuong">💵</i>Thưởng</span>
+      <span><i class="cc-ic khac">!</i>Khác</span>
+    </div>
+    <div style="font-size:11px;color:var(--g400);margin:2px 0 8px">👆 Nhấn vào 1 ngày để xem/chỉnh sửa ghi chép ngày đó</div>
+
+    <!-- KHUNG NHẬP LIỆU GHI CHÉP -->
+    <div id="cc-gc-box" style="border-top:1.5px dashed var(--g200);border-bottom:1.5px dashed var(--g200);padding:10px 0;margin-bottom:10px">
+      <div class="fr">
+        <label class="fl">Ngày</label>
+        <div class="date-bar" onclick="openCcGcDate()" style="border:1.5px solid var(--gp);margin-bottom:0;cursor:pointer">
+          <span>📅</span>
+          <span class="date-val" id="cc-gc-date-val" style="color:var(--gd);font-size:13px;font-weight:700">--</span>
+          <span class="date-hint">Nhấn để chọn</span>
+        </div>
+        <input type="hidden" id="cc-gc-date">
+      </div>
+      <div class="fr">
+        <label class="fl">Chọn ghi chép</label>
+        <select id="cc-gc-loai" class="fi" onchange="onCcGcLoaiChange()">
+          <option value="lam">✔ Chấm công</option>
+          <option value="nghi">✗ Chấm nghỉ</option>
+          <option value="ung">💵 Ứng tiền</option>
+          <option value="thuong">💵 Thưởng tiền</option>
+          <option value="khac">❗ Khác</option>
+        </select>
+      </div>
+      <div class="fr" id="cc-gc-tien-row" style="display:none">
+        <label class="fl">Số tiền</label>
+        <input type="text" inputmode="numeric" id="cc-gc-tien" class="fi" placeholder="0" oninput="onCcGcTien()">
+      </div>
+      <div class="fr" id="cc-gc-lydo-row">
+        <label class="fl">Lý do</label>
+        <input type="text" id="cc-gc-lydo" class="fi" placeholder="VD: ốm, nghỉ phép, ứng lương...">
+      </div>
+      <div id="cc-gc-err" style="display:none;color:#dc2626;font-size:12px;font-weight:700;margin-bottom:6px"></div>
+      <div class="btn-row">
+        <button class="btn-huy" onclick="huyCcGhiChep()">Huỷ</button>
+        <button class="btn-luu" onclick="luuCcGhiChep()">💾 Lưu chỉnh sửa</button>
+      </div>
+    </div>
+
+    <!-- CHI TIẾT ĐẦY ĐỦ -->
+    <div id="cc-detail-summary"></div>
+
+    <button id="cc-detail-chot-btn" onclick="try{chotCcCong()}catch(e){toast('⚠️ Lỗi: '+e.message)}" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13.5px;font-weight:700;cursor:pointer;margin-top:10px">✅ Chốt công</button>
+    <div id="cc-detail-chot-label" style="display:none;text-align:center;padding:10px;background:var(--g100);border-radius:var(--r);font-size:12.5px;font-weight:700;color:var(--g600);margin-top:10px"></div>
+
+    <button id="cc-detail-del-btn" onclick="try{xoaCc()}catch(e){toast('⚠️ Lỗi: '+e.message)}" style="width:100%;padding:11px;background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px">🗑️ Xoá chấm công này</button>
+    <button class="btn-huy" style="width:100%;margin-top:8px" onclick="closeM('modal-cc-detail')">Đóng</button>
+  </div>
+</div>
+
+<!-- MODAL CHỌN NGÀY CHO KHUNG GHI CHÉP CHẤM CÔNG -->
+<div class="modal" id="modal-cc-gc-date">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="color:var(--gd)">📅 Chọn ngày ghi chép</div>
+    <div class="cal-header">
+      <button onclick="ccGcCalNav(-1)" style="color:var(--gd);background:var(--gb)">‹</button>
+      <span id="cc-gc-cal-month-label"></span>
+      <button onclick="ccGcCalNav(1)" style="color:var(--gd);background:var(--gb)">›</button>
+    </div>
+    <div class="cal-grid" id="cc-gc-cal-grid"></div>
+    <button class="btn-luu" style="width:100%;margin-top:10px" onclick="applyCcGcDate()">Xác nhận</button>
+    <button class="btn-huy" style="width:100%;margin-top:6px" onclick="closeM('modal-cc-gc-date')">Đóng</button>
+  </div>
+</div>
+
 <!-- MODAL GOOGLE DRIVE -->
 <div class="modal" id="modal-gd">
   <div class="modal-box">
@@ -1286,7 +1479,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v11.7</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v11.12</div>
       </div>
     </div>
 
@@ -1693,6 +1886,7 @@ function switchTab(tab){
   if(tab==='sg') {
     setTimeout(function(){
       if(typeof renderSgTabContent==='function') renderSgTabContent();
+      if(typeof renderCcList==='function') renderCcList();
     }, 80);
   }
   if(tab==='ss') {
@@ -2944,12 +3138,14 @@ function delKH(i){
 // lại lần tiếp theo sẽ thoát app một cách tự nhiên (không cần popup xác nhận vì trình
 // duyệt không cho phép JS tự đóng app một cách chắc chắn).
 var _modalHistoryDepth = 0;
-var _consumingPop = false;
+var _modalStack = [];           // Ngăn xếp các modal đang mở, theo đúng thứ tự mở (hỗ trợ modal chồng modal)
+var _pendingProgrammaticBacks = 0; // Đếm số lần history.back() do chính app gọi (không phải do bấm nút back thật)
 
 function openM(id){
   var el = document.getElementById(id);
   if (!el) return;
   el.classList.add('show');
+  _modalStack.push(id);
   _modalHistoryDepth++;
   try { history.pushState({mcsModal:true}, '', location.href); } catch(e){}
 }
@@ -2957,11 +3153,12 @@ function closeM(id){
   var el = document.getElementById(id);
   if (!el || !el.classList.contains('show')) return;
   el.classList.remove('show');
+  var idx = _modalStack.lastIndexOf(id);
+  if (idx >= 0) _modalStack.splice(idx, 1);
   if (_modalHistoryDepth > 0) {
     _modalHistoryDepth--;
-    if (!_consumingPop) {
-      try { history.back(); } catch(e){}
-    }
+    _pendingProgrammaticBacks++;
+    try { history.back(); } catch(e){ _pendingProgrammaticBacks--; }
   }
 }
 // Chuyển thẳng từ (các) modal đang mở sang 1 modal khác, KHÔNG điều hướng lịch sử.
@@ -2972,11 +3169,17 @@ function swapM(fromIds, toId){
   var hadOpen = false;
   (Array.isArray(fromIds) ? fromIds : [fromIds]).forEach(function(id){
     var el = document.getElementById(id);
-    if (el && el.classList.contains('show')) { el.classList.remove('show'); hadOpen = true; }
+    if (el && el.classList.contains('show')) {
+      el.classList.remove('show');
+      var idx = _modalStack.lastIndexOf(id);
+      if (idx >= 0) _modalStack.splice(idx, 1);
+      hadOpen = true;
+    }
   });
   var toEl = document.getElementById(toId);
   if (!toEl) return;
   toEl.classList.add('show');
+  _modalStack.push(toId);
   if (hadOpen) {
     // Swap giữa 2 modal: giữ nguyên độ sâu lịch sử hiện có, không push thêm
   } else {
@@ -2988,11 +3191,23 @@ document.querySelectorAll('.modal').forEach(m=>{
   m.addEventListener('click',e=>{ if(e.target===m) closeM(m.id); });
 });
 
+// popstate xảy ra do 2 nguyên nhân: (1) chính app gọi history.back() bên trong closeM() — trường hợp
+// này DOM đã được cập nhật đồng bộ từ trước, popstate chỉ là hệ quả nên KHÔNG được đóng thêm modal nào
+// nữa (nếu không sẽ đóng nhầm 1 modal khác đang mở phía dưới, ví dụ modal chi tiết chấm công bị đóng
+// theo ngay sau khi xác nhận ở popup "Chốt công"/"Xoá"). (2) người dùng bấm nút back thật của Android
+// — trường hợp này mới cần đóng đúng modal đang ở TRÊN CÙNG ngăn xếp.
 window.addEventListener('popstate', function(){
-  _consumingPop = true;
-  var openModal = document.querySelector('.modal.show');
-  if (openModal) { closeM(openModal.id); }
-  _consumingPop = false;
+  if (_pendingProgrammaticBacks > 0) {
+    _pendingProgrammaticBacks--;
+    return;
+  }
+  var topId = _modalStack[_modalStack.length - 1];
+  if (topId) {
+    var el = document.getElementById(topId);
+    if (el) el.classList.remove('show');
+    _modalStack.pop();
+    if (_modalHistoryDepth > 0) _modalHistoryDepth--;
+  }
 });
 
 // ─── TOAST ───
@@ -3510,7 +3725,7 @@ var SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 var sbClient = null;
 var sbUser = null;
 var sbSyncing = false;
-var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','sg3','su_data','thang_v1','setting_round','license_expiry'];
+var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','sg3','su_data','cc_data','thang_v1','setting_round','license_expiry'];
 
 function initSupabase() {
   if (typeof window.supabase === 'undefined') { setTimeout(initSupabase, 600); return; }
@@ -3745,7 +3960,8 @@ function fetchSbAllData(cb) {
       mua: map['gd3_mua'] || [],
       ban: map['gd3_ban'] || [],
       sg:  map['sg3'] || [],
-      su:  map['su_data'] || []
+      su:  map['su_data'] || [],
+      cc:  map['cc_data'] || []
     });
   }).catch(function(e) { toast('❌ Lỗi kết nối: ' + e.message); });
 }
@@ -3847,6 +4063,7 @@ function _sbUniqueNames(data) {
   ['mua','ban','sg','su'].forEach(function(k) {
     (data[k]||[]).forEach(function(r) { if (r.ten) set[r.ten] = true; });
   });
+  (data.cc||[]).forEach(function(w) { var n=w.tenGoc||w.ten; if (n) set[n] = true; });
   return Object.keys(set).sort(function(a,b){ return a.localeCompare(b,'vi'); });
 }
 
@@ -3882,6 +4099,9 @@ function _sbDatesWithData() {
   if (_sbViewData) {
     ['mua','ban','sg','su'].forEach(function(k) {
       (_sbViewData[k]||[]).forEach(function(r) { if (r.date) set[r.date] = true; });
+    });
+    (_sbViewData.cc||[]).forEach(function(w) {
+      Object.keys(w.ghiChep||{}).forEach(function(ds) { set[ds] = true; });
     });
   }
   return set;
@@ -3988,6 +4208,50 @@ function _sbFilterLabel() {
   return 'Tất cả';
 }
 
+function _sbCcWorkerList() {
+  var list = (_sbViewData.cc||[]).slice();
+  var typeEl = document.getElementById('sbv-filter-type');
+  var type = typeEl ? typeEl.value : 'all';
+  if (type === 'kh' || type === 'kh_full') {
+    var k = document.getElementById('sbv-filter-kh');
+    var val = k ? k.value : '';
+    list = val ? list.filter(function(w){ return (w.tenGoc||w.ten) === val; }) : [];
+  } else if (type === 'day' || type === 'month') {
+    // Theo ngày/tháng: không hiện thẻ tổng quan công nhân (không khớp ngữ nghĩa), chỉ hiện bảng ghi chép bên dưới
+    list = [];
+  }
+  return list.sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+}
+function _sbCcGhiChepFlat() {
+  var out = [];
+  (_sbViewData.cc||[]).forEach(function(w) {
+    var gc = w.ghiChep || {};
+    Object.keys(gc).forEach(function(ds) {
+      var g = gc[ds];
+      out.push({ date: ds, ten: (w.tenGoc||w.ten), tenHienThi: w.ten, loai: g.loai, soTien: g.soTien||0, lyDo: g.lyDo||'' });
+    });
+  });
+  return out;
+}
+function _sbCcSummaryHtml(list) {
+  if (!list.length) return '<div style="padding:10px 4px;color:var(--g400);font-size:12px">Không có công nhân nào khớp bộ lọc</div>';
+  return list.map(function(w) {
+    var t = ccCalcTotals(w);
+    var trangThai = w.chotCong ? ('🔒 Đã chốt ' + _fmtDateSmart(w.chotDate)) : '🟢 Đang mở';
+    return '<div style="background:var(--g50);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:12px">'
+      + '<div style="font-weight:800;color:var(--gd);font-size:13px">👷 ' + w.ten + ' <span style="font-size:10px;color:var(--g600);font-weight:600">' + trangThai + '</span></div>'
+      + '<div style="color:var(--g600);margin-top:2px">Bắt đầu ' + _fmtDateSmart(w.date) + ' · ' + _fmtVND(t.luongNgay) + 'đ/ngày · Lương tháng ' + _fmtVND(t.luongThang) + 'đ</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;margin-top:6px">'
+        + '<div>✔ Ngày làm: <b>' + t.soNgayLam + '</b></div>'
+        + '<div>✗ Ngày nghỉ: <b style="color:#dc2626">' + t.soNgayNghi + '</b></div>'
+        + '<div>💵 Ứng: <b style="color:#dc2626">-' + _fmtVND(t.soTienUng) + 'đ</b></div>'
+        + '<div>💵 Thưởng: <b style="color:#16a34a">+' + _fmtVND(t.soTienThuong) + 'đ</b></div>'
+      + '</div>'
+      + '<div style="margin-top:6px;border-top:1px solid var(--g200);padding-top:5px;display:flex;justify-content:space-between"><span>Thực lãnh</span><b style="color:var(--gd)">' + _fmtVND(t.thucLinh) + 'đ</b></div>'
+      + '</div>';
+  }).join('');
+}
+
 function renderSbDataView() {
   if (!_sbViewData) return;
   var mua = _sbFilterRows(_sbViewData.mua||[], 'mua');
@@ -4033,6 +4297,24 @@ function renderSbDataView() {
     + '<summary style="font-weight:700;font-size:13px;color:var(--g800);padding:6px 0;cursor:pointer">💵 Ứng tiền — ' + su.length + ' bản ghi · ' + _fmtVND(tongSu) + 'đ</summary>'
     + _rowsToTableHtml(su, colsSU, optsSU) + '</details>';
 
+  // ── CHẤM CÔNG ──
+  var colsCC = [
+    {label:'Ngày',fmt:function(r){return _fmtDateSmart(r.date);}},
+    {key:'ten',label:'Công nhân'},
+    {label:'Loại',fmt:function(r){return {nghi:'✗ Nghỉ',ung:'💵 Ứng tiền',thuong:'💵 Thưởng',khac:'❗ Khác'}[r.loai]||r.loai;}},
+    {label:'Số tiền',fmt:function(r){return r.soTien?(_fmtVND(r.soTien)+'đ'):'-';},isSum:true},
+    {key:'lyDo',label:'Lý do'}
+  ];
+  var ccWorkers = _sbCcWorkerList();
+  var ccGhiChep = _sbFilterRows(_sbCcGhiChepFlat(), 'cc');
+  var ccTongTien = ccGhiChep.reduce(function(s,x){return s+(x.soTien||0);},0);
+  html += '<details style="margin-bottom:6px;border-top:1px solid var(--g100);padding-top:6px">'
+    + '<summary style="font-weight:700;font-size:13px;color:var(--g800);padding:6px 0;cursor:pointer">⏱️ Chấm Công — ' + (_sbViewData.cc||[]).length + ' công nhân</summary>'
+    + (ccWorkers.length ? ('<div style="margin:6px 0 10px">' + _sbCcSummaryHtml(ccWorkers) + '</div>') : '')
+    + '<div style="font-size:11px;color:var(--g500);font-weight:700;margin:6px 0 4px">📋 Ghi chép (' + ccGhiChep.length + ' dòng · ' + _fmtVND(ccTongTien) + 'đ)</div>'
+    + _rowsToTableHtml(ccGhiChep, colsCC, {sumKey:'soTien', showTotal:showTotal, groupByDate:groupByDate})
+    + '</details>';
+
   document.getElementById('sbv-results').innerHTML = html;
 }
 
@@ -4042,7 +4324,8 @@ function exportSbPdfFiltered() {
     mua: _sbFilterRows(_sbViewData.mua||[], 'mua'),
     ban: _sbFilterRows(_sbViewData.ban||[], 'ban'),
     sg:  _sbFilterRows(_sbViewData.sg||[], 'sg'),
-    su:  _sbFilterRows(_sbViewData.su||[], 'su')
+    su:  _sbFilterRows(_sbViewData.su||[], 'su'),
+    cc:  _sbFilterRows(_sbCcGhiChepFlat(), 'cc')
   };
   buildAndSaveSbPdf(filtered, 'Supabase (' + (sbUser?sbUser.email:'') + ') · ' + _sbFilterLabel());
 }
@@ -4130,6 +4413,14 @@ function buildAndSaveSbPdf(data, sourceLabel) {
         ['Ngay','Nguoi ung','So tien','Noi dung'],
         function(r){ return [_fmtDateSmart(r.date), r.ten||'', _fmtVND(r.tien)+' d', r.noidung||'']; },
         'Tong tien da ung', _fmtVND(tongSu)+' d');
+
+      var cc = data.cc||[];
+      var tongCc = cc.reduce(function(s,x){return s+(x.soTien||0);},0);
+      var LOAI_CC_PDF = { nghi:'Nghi', ung:'Ung tien', thuong:'Thuong', khac:'Khac' };
+      section('5. Cham cong (ghi chep)', cc,
+        ['Ngay','Cong nhan','Loai','So tien','Ly do'],
+        function(r){ return [_fmtDateSmart(r.date), r.ten||'', LOAI_CC_PDF[r.loai]||r.loai, r.soTien?(_fmtVND(r.soTien)+' d'):'-', r.lyDo||'']; },
+        'Tong tien ung/thuong cham cong', _fmtVND(tongCc)+' d');
 
       var fname = 'BaoCao_MuCaoSu_' + today() + '.pdf';
       doc.save(fname);
@@ -5355,12 +5646,20 @@ function syncToDrive_silent() {
   function sgRows(){return [hdrGui].concat(getSG().map(function(r){return[fmtDateVN2(r.date),r.ten,LOAI_LBL[r.loai]||r.loai||'',fmtKg(r.kg),r.do||'',fmtNum(r.gia),fmtNum(r.tt)];}));}
   var hdrUng=['Ngày','Tên','Số tiền ứng','Nội dung'];
   function suRows(){return [hdrUng].concat(getSU().map(function(r){return[fmtDateVN2(r.date),r.ten,fmtNum(Math.round(r.tien||0)),r.noidung||''];}));}
+  var hdrCC=['Ngày bắt đầu','Tên công nhân','Tiền công tháng','Tiền công/ngày','Số ngày làm','Số ngày nghỉ','Tiền trừ nghỉ','Số tiền ứng','Số tiền thưởng','Thực lãnh','Trạng thái','Ngày chốt'];
+  function ccRows(){return [hdrCC].concat(getCC().map(function(r){
+    var t=ccCalcTotals(r);
+    return [fmtDateVN2(r.date), r.ten, fmtNum(t.luongThang), fmtNum(t.luongNgay), t.soNgayLam, t.soNgayNghi,
+      fmtNum(t.tienTruNghi), fmtNum(t.soTienUng), fmtNum(t.soTienThuong), fmtNum(t.thucLinh),
+      r.chotCong?'Đã chốt':'Đang mở', r.chotCong&&r.chotDate?fmtDateVN2(r.chotDate):''];
+  }));}
   var fname = 'backup_' + gdTodayStr();
   upsertSheet(fname, [
     { name: 'Thu_Mua',   rows: gdRows2('mua') },
     { name: 'Ban_Ra',    rows: gdRows2('ban') },
     { name: 'So_Gui',    rows: sgRows() },
     { name: 'So_Ung',    rows: suRows() },
+    { name: 'Cham_Cong', rows: ccRows() },
     { name: 'Tinh_Toan', rows: [['Dữ liệu tính toán được lưu khi nhấn Lưu Sổ Sách']] }
   ], function() {
     gdSyncing = false;
@@ -7019,6 +7318,408 @@ function setSgtDate(val){
   document.getElementById('sgt-date').value=val;
   var lbl=document.getElementById('sgt-date-val');
   if(lbl) lbl.textContent=fmtDate(val);
+}
+
+// ═══════════════════════════════════════════════════════
+// CHẤM CÔNG (sub-tab trong Sổ Gửi) — v11.12
+// Mỗi kỳ chấm công của 1 công nhân: {id, date (ngày bắt đầu tính công), ten, tenGoc,
+//   luongThang, chotCong, chotDate, ghiChep:{ 'yyyy-mm-dd': {loai,soTien,lyDo} }}
+// Ngày không có ghi chép = mặc định "có làm" (✔ xanh).
+// loai ∈ 'lam'|'nghi'|'ung'|'thuong'|'khac'. Chọn "Chấm công" cho 1 ngày = xoá ghi chép ngày đó (về mặc định).
+// Kỳ tính công: từ "date" đến ngày chốt (nếu đã chốt) hoặc đến hôm nay (nếu chưa chốt).
+// Thực lãnh = Tiền công tháng − (Số ngày nghỉ × Tiền công/ngày) − Số tiền ứng + Số tiền thưởng
+// ═══════════════════════════════════════════════════════
+function ccKey(){ return 'cc_data'; }
+function getCC(){ return lsGet(ccKey()); }
+function setCC(list){ lsSet(ccKey(), list); }
+function ccISO(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function ccEffectiveEnd(r){ return (r.chotCong && r.chotDate) ? r.chotDate : today(); }
+// Trạng thái 1 ngày: {status:'out'} nếu ngoài kỳ tính công, hoặc {status:'lam'|'nghi'|'ung'|'thuong'|'khac', data:{...}}
+function ccDayStatus(r, ds){
+  if (ds < r.date) return {status:'out'};
+  if (ds > ccEffectiveEnd(r)) return {status:'out'};
+  var g = (r.ghiChep||{})[ds];
+  if (g) return {status:g.loai, data:g};
+  return {status:'lam'};
+}
+function ccCalcTotals(r){
+  var start=new Date(r.date+'T00:00:00'), end=new Date(ccEffectiveEnd(r)+'T00:00:00');
+  var soNgayLam=0, soNgayNghi=0, soTienUng=0, soTienThuong=0;
+  for (var d=new Date(start); d<=end; d.setDate(d.getDate()+1)) {
+    var ds=ccISO(d);
+    var g=(r.ghiChep||{})[ds];
+    var loai=g?g.loai:'lam';
+    if (loai==='lam') soNgayLam++;
+    else if (loai==='nghi') soNgayNghi++;
+    else if (loai==='ung') soTienUng += (g.soTien||0);
+    else if (loai==='thuong') soTienThuong += (g.soTien||0);
+  }
+  var luongThang=parseNum(r.luongThang);
+  var luongNgay=Math.round(luongThang/30);
+  var tienTruNghi=soNgayNghi*luongNgay;
+  var thucLinh=luongThang - tienTruNghi - soTienUng + soTienThuong;
+  return {luongThang:luongThang, luongNgay:luongNgay, soNgayLam:soNgayLam, soNgayNghi:soNgayNghi,
+    tienTruNghi:tienTruNghi, soTienUng:soTienUng, soTienThuong:soTienThuong, thucLinh:thucLinh};
+}
+
+function switchSgSubtab(which){
+  var btnSg=document.getElementById('sg-subtab-btn-sg'), btnCc=document.getElementById('sg-subtab-btn-cc');
+  var boxSg=document.getElementById('sg-subtab-sg'), boxCc=document.getElementById('sg-subtab-cc');
+  if(btnSg) btnSg.classList.toggle('active', which==='sg');
+  if(btnCc) btnCc.classList.toggle('active', which==='cc');
+  if(boxSg) boxSg.style.display = which==='sg' ? '' : 'none';
+  if(boxCc) boxCc.style.display = which==='cc' ? '' : 'none';
+  if(which==='cc') renderCcList();
+}
+
+function renderCcList(){
+  var box=document.getElementById('cc-list');
+  if(!box) return;
+  var list=getCC().slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+  if(!list.length){ box.innerHTML='<div class="sg-empty-name">Chưa có chấm công nào — nhấn "➕ Tạo chấm công mới" để bắt đầu</div>'; return; }
+  box.innerHTML=list.map(function(r){
+    var t=ccCalcTotals(r);
+    var chotTag = r.chotCong
+      ? '<span style="background:var(--g100);color:var(--g600);font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;margin-left:6px">🔒 Đã chốt '+fmtDate(r.chotDate)+'</span>'
+      : '<span style="background:var(--gb);color:var(--gd);font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;margin-left:6px">🟢 Đang mở</span>';
+    return '<div class="cc-card" onclick="openCcDetail(&quot;'+r.id+'&quot;)">'
+      +'<div class="cc-card-name">👷 '+r.ten+chotTag+'</div>'
+      +'<div class="cc-card-sub">Bắt đầu '+fmtDate(r.date)+' đến '+fmtDate(ccEffectiveEnd(r))+' · '+fmtNum(t.luongNgay)+' đ/ngày</div>'
+      +'<div class="cc-stat-grid">'
+        +'<div class="cc-stat"><span class="cc-stat-lbl">✔ Ngày làm</span><span class="cc-stat-val" style="color:#16a34a">'+t.soNgayLam+' ngày</span></div>'
+        +'<div class="cc-stat"><span class="cc-stat-lbl">✗ Ngày nghỉ</span><span class="cc-stat-val" style="color:#dc2626">'+t.soNgayNghi+' ngày</span></div>'
+        +'<div class="cc-stat"><span class="cc-stat-lbl">💵 Tiền ứng</span><span class="cc-stat-val" style="color:#dc2626">-'+fmtNum(t.soTienUng)+'đ</span></div>'
+        +'<div class="cc-stat"><span class="cc-stat-lbl">💵 Tiền thưởng</span><span class="cc-stat-val" style="color:#16a34a">+'+fmtNum(t.soTienThuong)+'đ</span></div>'
+      +'</div>'
+      +'<div class="cc-card-row"><span>Tiền công tháng</span><b>'+fmtNum(t.luongThang)+' đ</b></div>'
+      +'<div class="cc-card-row"><span>Trừ ngày nghỉ</span><b style="color:#dc2626">-'+fmtNum(t.tienTruNghi)+' đ</b></div>'
+      +'<div class="cc-card-row" style="border-top:1px solid var(--g100);padding-top:7px;font-size:14px"><span>Thực lãnh</span><b style="color:var(--gd)">'+fmtNum(t.thucLinh)+' đ</b></div>'
+      +'</div>';
+  }).join('');
+}
+
+// ── TẠO CHẤM CÔNG MỚI ──
+function openCcNew(){
+  document.getElementById('cc-date').value=today();
+  document.getElementById('cc-date-val').textContent=fmtDate(today());
+  document.getElementById('cc-ten').value='';
+  document.getElementById('cc-luong-thang').value='';
+  document.getElementById('cc-luong-ngay').textContent='0 ₫';
+  var errEl=document.getElementById('cc-new-err'); if(errEl) errEl.style.display='none';
+  openM('modal-cc-new');
+}
+function onCcLuongThang(){
+  var el=document.getElementById('cc-luong-thang');
+  var d=el.value.replace(/[^0-9]/g,'');
+  el.value=d?parseInt(d).toLocaleString('vi-VN'):'';
+  var luongNgay=d?Math.round(parseInt(d)/30):0;
+  document.getElementById('cc-luong-ngay').textContent=fmtNum(luongNgay)+' ₫';
+}
+function luuCcNew(){
+  if(guardLicense()) return;
+  var date=document.getElementById('cc-date').value||today();
+  var ten=(document.getElementById('cc-ten').value||'').trim();
+  var luongThang=parseNum((document.getElementById('cc-luong-thang').value||'').replace(/[^0-9]/g,''));
+  var errEl=document.getElementById('cc-new-err');
+  if(!ten){ errEl.textContent='⚠️ Vui lòng nhập tên công nhân!'; errEl.style.display='block'; return; }
+  if(!luongThang||luongThang<=0){ errEl.textContent='⚠️ Vui lòng nhập tiền công tháng!'; errEl.style.display='block'; return; }
+  var all=getCC();
+  var tenLower=ten.toLowerCase();
+  // Không cho tạo kỳ mới nếu tên này đang có 1 kỳ chưa chốt
+  var dangMo=all.find(function(x){ return (x.tenGoc||x.ten).trim().toLowerCase()===tenLower && !x.chotCong; });
+  if (dangMo) {
+    errEl.textContent='⚠️ "'+ten+'" đang có 1 kỳ chấm công chưa chốt! Vui lòng chốt công kỳ cũ trước khi thêm kỳ mới.';
+    errEl.style.display='block';
+    return;
+  }
+  // Nếu đã từng có kỳ (đã chốt) với tên này -> tự thêm hậu tố "Tháng X/Y" theo ngày bắt đầu
+  var daTungCo=all.some(function(x){ return (x.tenGoc||x.ten).trim().toLowerCase()===tenLower; });
+  var d=new Date(date+'T00:00:00');
+  var tenHienThi = daTungCo ? (ten+' (Tháng '+(d.getMonth()+1)+'/'+d.getFullYear()+')') : ten;
+  all.push({ id: Date.now().toString(), date: date, ten: tenHienThi, tenGoc: ten, luongThang: luongThang, chotCong:false, chotDate:null, ghiChep:{} });
+  setCC(all);
+  closeM('modal-cc-new');
+  renderCcList();
+  toast('✅ Đã tạo chấm công cho '+tenHienThi+'!');
+  autoSync();
+}
+
+// ── LỊCH CHỌN NGÀY (khi tạo chấm công mới) ──
+var ccNewCalViewYear, ccNewCalViewMonth, ccNewCalSelected;
+function openCcNewDate(){
+  var cur=document.getElementById('cc-date').value||today();
+  var d=new Date(cur+'T00:00:00');
+  ccNewCalViewYear=d.getFullYear();
+  ccNewCalViewMonth=d.getMonth();
+  ccNewCalSelected=cur;
+  renderCcNewCalendar();
+  openM('modal-cc-new-date');
+}
+function ccNewCalNav(delta){
+  ccNewCalViewMonth+=delta;
+  if(ccNewCalViewMonth<0){ccNewCalViewMonth=11;ccNewCalViewYear--;}
+  if(ccNewCalViewMonth>11){ccNewCalViewMonth=0;ccNewCalViewYear++;}
+  renderCcNewCalendar();
+}
+function renderCcNewCalendar(){
+  var datesWithData={};
+  getCC().forEach(function(r){ if(r.date) datesWithData[r.date]=true; });
+  var todayD=today();
+  document.getElementById('cc-new-cal-month-label').textContent=MONTH_NAMES_VN[ccNewCalViewMonth]+' '+ccNewCalViewYear;
+  var firstDay=new Date(ccNewCalViewYear,ccNewCalViewMonth,1);
+  var startWD=(firstDay.getDay()+6)%7;
+  var daysInM=new Date(ccNewCalViewYear,ccNewCalViewMonth+1,0).getDate();
+  var html='';
+  ['T2','T3','T4','T5','T6','T7','CN'].forEach(function(d){html+='<div class="cal-wd">'+d+'</div>';});
+  for(var i=0;i<startWD;i++) html+='<div class="cal-cell empty"></div>';
+  for(var day=1;day<=daysInM;day++){
+    var ds=ccNewCalViewYear+'-'+String(ccNewCalViewMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+    var cls='cal-cell';
+    if(ds===todayD) cls+=' today';
+    if(ds===ccNewCalSelected) cls+=' selected';
+    var dot=datesWithData[ds]?'<span class="cal-dot" style="background:var(--gd)"></span>':'';
+    html+='<div class="'+cls+'" onclick="selectCcNewCalDay(&quot;'+ds+'&quot;)">'+day+dot+'</div>';
+  }
+  document.getElementById('cc-new-cal-grid').innerHTML=html;
+}
+function selectCcNewCalDay(ds){ ccNewCalSelected=ds; renderCcNewCalendar(); }
+function applyCcNewDate(){
+  if(!ccNewCalSelected){ closeM('modal-cc-new-date'); return; }
+  document.getElementById('cc-date').value=ccNewCalSelected;
+  document.getElementById('cc-date-val').textContent=fmtDate(ccNewCalSelected);
+  closeM('modal-cc-new-date');
+}
+
+// ── CHI TIẾT CHẤM CÔNG: lịch nhiều trạng thái + khung ghi chép + tổng kết + chốt công ──
+var ccDetailCurId, ccDetailCalViewYear, ccDetailCalViewMonth;
+function openCcDetail(id){
+  ccDetailCurId=id;
+  var r=getCC().find(function(x){ return String(x.id)===String(id); });
+  if(!r){ toast('❌ Không tìm thấy bản ghi chấm công này!'); return; }
+  var d=new Date((r.chotCong&&r.chotDate?r.chotDate:today())+'T00:00:00');
+  ccDetailCalViewYear=d.getFullYear();
+  ccDetailCalViewMonth=d.getMonth();
+  document.getElementById('cc-detail-title').textContent='⏱️ Chấm công — '+r.ten;
+  resetCcGcForm();
+  renderCcDetailCalendar();
+  updCcChotUI(r);
+  openM('modal-cc-detail');
+}
+function updCcChotUI(r){
+  var chotBtn=document.getElementById('cc-detail-chot-btn');
+  var chotLbl=document.getElementById('cc-detail-chot-label');
+  var gcBox=document.getElementById('cc-gc-box');
+  if (r.chotCong) {
+    chotBtn.style.display='none';
+    chotLbl.style.display='block';
+    chotLbl.textContent='🔒 Đã chốt công ngày '+fmtDate(r.chotDate)+' — không thể chỉnh sửa thêm';
+    gcBox.style.opacity='.45';
+    gcBox.style.pointerEvents='none';
+  } else {
+    chotBtn.style.display='block';
+    chotLbl.style.display='none';
+    gcBox.style.opacity='1';
+    gcBox.style.pointerEvents='auto';
+  }
+}
+function ccDetailCalNav(delta){
+  ccDetailCalViewMonth+=delta;
+  if(ccDetailCalViewMonth<0){ccDetailCalViewMonth=11;ccDetailCalViewYear--;}
+  if(ccDetailCalViewMonth>11){ccDetailCalViewMonth=0;ccDetailCalViewYear++;}
+  renderCcDetailCalendar();
+}
+function renderCcDetailCalendar(){
+  var r=getCC().find(function(x){ return String(x.id)===String(ccDetailCurId); });
+  if(!r) return;
+  var todayD=today();
+  document.getElementById('cc-detail-cal-month-label').textContent=MONTH_NAMES_VN[ccDetailCalViewMonth]+' '+ccDetailCalViewYear;
+  var firstDay=new Date(ccDetailCalViewYear,ccDetailCalViewMonth,1);
+  var startWD=(firstDay.getDay()+6)%7;
+  var daysInM=new Date(ccDetailCalViewYear,ccDetailCalViewMonth+1,0).getDate();
+  var badgeIco={lam:'✔',nghi:'✗',ung:'💵',thuong:'💵',khac:'!'};
+  var html='';
+  ['T2','T3','T4','T5','T6','T7','CN'].forEach(function(d){html+='<div class="cal-wd">'+d+'</div>';});
+  for(var i=0;i<startWD;i++) html+='<div class="cal-cell empty"></div>';
+  for(var day=1;day<=daysInM;day++){
+    var ds=ccDetailCalViewYear+'-'+String(ccDetailCalViewMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+    var st=ccDayStatus(r, ds);
+    var cls='cal-cell';
+    if(ds===todayD) cls+=' today';
+    var badge='';
+    if (st.status==='out') { cls+=' cc-out'; }
+    else { badge='<span class="cc-badge '+st.status+'">'+badgeIco[st.status]+'</span>'; }
+    var clickAttr = st.status==='out' ? '' : ' onclick="selectCcDetailDay(&quot;'+ds+'&quot;)"';
+    html+='<div class="'+cls+'"'+clickAttr+'>'+day+badge+'</div>';
+  }
+  document.getElementById('cc-detail-cal-grid').innerHTML=html;
+  renderCcDetailSummary(r);
+}
+function renderCcDetailSummary(r){
+  var t=ccCalcTotals(r);
+  document.getElementById('cc-detail-summary').innerHTML=
+    '<div class="cc-card-row"><span>Tên công</span><b>'+r.ten+'</b></div>'
+    +'<div class="cc-card-row"><span>Tính công bắt đầu từ ngày</span><b>'+fmtDate(r.date)+'</b></div>'
+    +'<div class="cc-card-row"><span>Tiền công tháng</span><b>'+fmtNum(t.luongThang)+' đ</b></div>'
+    +'<div class="cc-card-row"><span>Tiền công quy ra ngày</span><b>'+fmtNum(t.luongNgay)+' đ</b></div>'
+    +'<div class="cc-card-row"><span>Số ngày làm</span><b>'+t.soNgayLam+' ngày</b></div>'
+    +'<div class="cc-card-row"><span>Số ngày nghỉ</span><b style="color:#dc2626">'+t.soNgayNghi+' ngày</b></div>'
+    +'<div class="cc-card-row"><span>Số tiền ngày nghỉ bị trừ</span><b style="color:#dc2626">-'+fmtNum(t.tienTruNghi)+' đ</b></div>'
+    +'<div class="cc-card-row"><span>Số tiền ứng</span><b style="color:#dc2626">-'+fmtNum(t.soTienUng)+' đ</b></div>'
+    +'<div class="cc-card-row"><span>Số tiền thưởng</span><b style="color:#16a34a">+'+fmtNum(t.soTienThuong)+' đ</b></div>'
+    +'<div class="cc-card-row" style="border-top:1px solid var(--g100);padding-top:6px;margin-top:4px;font-size:13.5px"><span>Số tiền thực lãnh</span><b style="color:var(--gd)">'+fmtNum(t.thucLinh)+' đ</b></div>';
+}
+
+// ── KHUNG NHẬP LIỆU GHI CHÉP (chọn ngày trong lịch sẽ đổ dữ liệu xuống đây) ──
+function selectCcDetailDay(ds){
+  var r=getCC().find(function(x){ return String(x.id)===String(ccDetailCurId); });
+  if(!r || r.chotCong) return;
+  var g=(r.ghiChep||{})[ds];
+  document.getElementById('cc-gc-date').value=ds;
+  document.getElementById('cc-gc-date-val').textContent=fmtDate(ds);
+  document.getElementById('cc-gc-loai').value=g?g.loai:'lam';
+  document.getElementById('cc-gc-tien').value=(g&&g.soTien)?fmtNum(g.soTien):'';
+  document.getElementById('cc-gc-lydo').value=(g&&g.lyDo)?g.lyDo:'';
+  var errEl=document.getElementById('cc-gc-err'); if(errEl) errEl.style.display='none';
+  onCcGcLoaiChange();
+}
+function resetCcGcForm(){
+  document.getElementById('cc-gc-date').value=today();
+  document.getElementById('cc-gc-date-val').textContent=fmtDate(today());
+  document.getElementById('cc-gc-loai').value='lam';
+  document.getElementById('cc-gc-tien').value='';
+  document.getElementById('cc-gc-lydo').value='';
+  var errEl=document.getElementById('cc-gc-err'); if(errEl) errEl.style.display='none';
+  onCcGcLoaiChange();
+}
+function huyCcGhiChep(){ resetCcGcForm(); }
+function onCcGcLoaiChange(){
+  var loai=document.getElementById('cc-gc-loai').value;
+  document.getElementById('cc-gc-tien-row').style.display=(loai==='ung'||loai==='thuong')?'':'none';
+  document.getElementById('cc-gc-lydo-row').style.display=(loai==='lam')?'none':'';
+}
+function onCcGcTien(){
+  var el=document.getElementById('cc-gc-tien');
+  var d=el.value.replace(/[^0-9]/g,'');
+  el.value=d?parseInt(d).toLocaleString('vi-VN'):'';
+}
+function luuCcGhiChep(){
+  if(guardLicense()) return;
+  var all=getCC();
+  var idx=all.findIndex(function(x){ return String(x.id)===String(ccDetailCurId); });
+  if(idx<0){ toast('❌ Không tìm thấy bản ghi chấm công này! Vui lòng đóng và mở lại.'); return; }
+  var r=all[idx];
+  if (r.chotCong) { toast('🔒 Kỳ này đã chốt công, không thể chỉnh sửa!'); return; }
+  var ds=document.getElementById('cc-gc-date').value;
+  var errEl=document.getElementById('cc-gc-err');
+  var st=ccDayStatus(r, ds);
+  if (st.status==='out') { errEl.textContent='⚠️ Ngày này nằm ngoài kỳ tính công (trước ngày bắt đầu hoặc sau hôm nay)!'; errEl.style.display='block'; return; }
+  var loai=document.getElementById('cc-gc-loai').value;
+  var tien=parseNum((document.getElementById('cc-gc-tien').value||'').replace(/[^0-9]/g,''));
+  var lyDo=(document.getElementById('cc-gc-lydo').value||'').trim();
+  if ((loai==='ung'||loai==='thuong') && (!tien||tien<=0)) {
+    errEl.textContent='⚠️ Vui lòng nhập số tiền!'; errEl.style.display='block'; return;
+  }
+  errEl.style.display='none';
+  r.ghiChep=r.ghiChep||{};
+  if (loai==='lam') { delete r.ghiChep[ds]; }
+  else { r.ghiChep[ds] = { loai:loai, soTien:(loai==='ung'||loai==='thuong')?tien:0, lyDo:lyDo }; }
+  all[idx]=r;
+  setCC(all);
+  renderCcDetailCalendar();
+  renderCcList();
+  var tenLoai={lam:'✔ Chấm công (bình thường)',nghi:'✗ Chấm nghỉ',ung:'💵 Ứng tiền',thuong:'💵 Thưởng tiền',khac:'❗ Khác'};
+  var rowsXn=[['Ngày', fmtDate(ds)],['Loại ghi chép', tenLoai[loai]]];
+  if (loai==='ung'||loai==='thuong') rowsXn.push(['Số tiền', fmtNum(tien)+' đ']);
+  if (lyDo) rowsXn.push(['Lý do', lyDo]);
+  showDetail('✅','Đã lưu ghi chép', rowsXn, null, null, null, null);
+  resetCcGcForm();
+  autoSync();
+}
+
+// ── LỊCH CHỌN NGÀY CHO KHUNG GHI CHÉP ──
+var ccGcCalViewYear, ccGcCalViewMonth;
+function openCcGcDate(){
+  var cur=document.getElementById('cc-gc-date').value||today();
+  var d=new Date(cur+'T00:00:00');
+  ccGcCalViewYear=d.getFullYear();
+  ccGcCalViewMonth=d.getMonth();
+  renderCcGcCalendar();
+  openM('modal-cc-gc-date');
+}
+function ccGcCalNav(delta){
+  ccGcCalViewMonth+=delta;
+  if(ccGcCalViewMonth<0){ccGcCalViewMonth=11;ccGcCalViewYear--;}
+  if(ccGcCalViewMonth>11){ccGcCalViewMonth=0;ccGcCalViewYear++;}
+  renderCcGcCalendar();
+}
+function renderCcGcCalendar(){
+  var r=getCC().find(function(x){ return String(x.id)===String(ccDetailCurId); });
+  var sel=document.getElementById('cc-gc-date').value;
+  var todayD=today();
+  document.getElementById('cc-gc-cal-month-label').textContent=MONTH_NAMES_VN[ccGcCalViewMonth]+' '+ccGcCalViewYear;
+  var firstDay=new Date(ccGcCalViewYear,ccGcCalViewMonth,1);
+  var startWD=(firstDay.getDay()+6)%7;
+  var daysInM=new Date(ccGcCalViewYear,ccGcCalViewMonth+1,0).getDate();
+  var html='';
+  ['T2','T3','T4','T5','T6','T7','CN'].forEach(function(d){html+='<div class="cal-wd">'+d+'</div>';});
+  for(var i=0;i<startWD;i++) html+='<div class="cal-cell empty"></div>';
+  for(var day=1;day<=daysInM;day++){
+    var ds=ccGcCalViewYear+'-'+String(ccGcCalViewMonth+1).padStart(2,'0')+'-'+String(day).padStart(2,'0');
+    var outOfPeriod = r && (ds<r.date || ds>ccEffectiveEnd(r));
+    var cls='cal-cell';
+    if(ds===todayD) cls+=' today';
+    if(ds===sel) cls+=' selected';
+    if(outOfPeriod) cls+=' cc-out';
+    var clickAttr = outOfPeriod ? '' : ' onclick="selectCcGcCalDay(&quot;'+ds+'&quot;)"';
+    html+='<div class="'+cls+'"'+clickAttr+'>'+day+'</div>';
+  }
+  document.getElementById('cc-gc-cal-grid').innerHTML=html;
+}
+function selectCcGcCalDay(ds){
+  document.getElementById('cc-gc-date').value=ds;
+  document.getElementById('cc-gc-date-val').textContent=fmtDate(ds);
+  renderCcGcCalendar();
+}
+function applyCcGcDate(){ closeM('modal-cc-gc-date'); }
+
+// ── CHỐT CÔNG ──
+function chotCcCong(){
+  if(guardLicense()) return;
+  var r=getCC().find(function(x){ return String(x.id)===String(ccDetailCurId); });
+  if(!r){ toast('❌ Không tìm thấy bản ghi chấm công này! Vui lòng đóng và mở lại.'); return; }
+  if(r.chotCong){ toast('🔒 Kỳ này đã được chốt công rồi!'); return; }
+  var t=ccCalcTotals(r);
+  showDetail('✅','Xác nhận chốt công?',
+    [['Công nhân', r.ten],['Từ ngày', fmtDate(r.date)],['Đến ngày', fmtDate(today())],
+     ['Thực lãnh', fmtNum(t.thucLinh)+' đ'],['Lưu ý','Sau khi chốt sẽ KHÔNG thể chỉnh sửa ghi chép của kỳ này']],
+    null,'✅ Chốt công',function(){
+      var all=getCC();
+      var idx=all.findIndex(function(x){ return String(x.id)===String(ccDetailCurId); });
+      if(idx<0) return;
+      all[idx].chotCong=true;
+      all[idx].chotDate=today();
+      setCC(all);
+      renderCcDetailCalendar();
+      updCcChotUI(all[idx]);
+      renderCcList();
+      toast('🔒 Đã chốt công cho '+all[idx].ten+'!');
+      autoSync();
+    });
+}
+
+function xoaCc(){
+  if(guardLicense()) return;
+  var r=getCC().find(function(x){ return String(x.id)===String(ccDetailCurId); });
+  if(!r){ toast('❌ Không tìm thấy bản ghi chấm công này! Vui lòng đóng và mở lại.'); return; }
+  showDetail('🗑️','Xoá chấm công?',
+    [['Công nhân', r.ten],['Lưu ý','Không thể hoàn tác']],
+    null,'Xoá',function(){
+      setCC(getCC().filter(function(x){ return String(x.id)!==String(ccDetailCurId); }));
+      closeM('modal-cc-detail');
+      renderCcList();
+      toast('🗑️ Đã xoá chấm công!');
+      autoSync();
+    });
 }
 
 function openSgGuiMoi(){
