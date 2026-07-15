@@ -2,10 +2,22 @@
 
 Phần mềm ghi chép **mua bán mủ cao su** — PWA cài được lên điện thoại như app thật, hoạt động offline.
 
+## 🔢 Quy tắc đánh số phiên bản (áp dụng từ v1.a1)
+
+Số phiên bản cũ (v11.x) tăng quá cao nên đổi sang cơ chế mới: **`1.<chữ><số>`**
+
+- Số hàng đơn vị chạy từ **1 → 9**, hết thì chữ cái tăng lên và số quay lại 1.
+- Ví dụ thứ tự: `1.a1` → `1.a2` → ... → `1.a9` → `1.b1` → `1.b2` → ... → `1.b9` → `1.c1` → ... → `1.d1` → `1.e1` ...
+- Mỗi lần cập nhật chỉ tăng 1 bước theo đúng thứ tự trên, tại đúng 3 vị trí như quy tắc cũ (title/logo-ver trong index.html, description trong manifest.json, CACHE trong sw.js).
+- Các ghi chú phiên bản cũ (v7.x–v11.x) còn sót lại trong code là mốc lịch sử, không đổi lại theo hệ mới.
+
 ## 📋 Lịch sử phiên bản
 
 | Phiên bản | Ngày | Thay đổi |
 |-----------|------|----------|
+| **v1.a2** | 2026-07 | Thêm `admin_pw` (mã quản trị) vào danh sách đồng bộ Supabase, kèm giá trị mặc định đúng khi chưa từng đổi mật khẩu — phục vụ tính năng "chế độ quản trị" sắp có ở app "Xem Sổ Khách Hàng" (nhập mã quản trị vào ô Mã khách hàng sẽ được xem toàn bộ khách hàng thay vì chỉ 1 người) |
+| **v1.a1** | 2026-07 | Đổi cơ chế đánh số phiên bản: chuyển từ v11.14 sang hệ mới `1.<chữ><số>` (xem quy tắc phía trên) do số phiên bản cũ đã quá cao. Không có thay đổi tính năng nào trong bản này |
+| **v11.14** | 2026-07 | Thêm hệ thống "Mã khách hàng" cố định (5 ký tự, không đụng cấu trúc kh3_all cũ nên không ảnh hưởng autocomplete hiện có) — mỗi khách hàng tự động có 1 mã khi tên được lưu. Thêm màn "📇 Mã khách hàng" trong Cài đặt để tra cứu/sao chép mã, chuẩn bị cho app đồng hành "Xem Sổ Khách Hàng" (máy khách) sắp triển khai — khách hàng nhập đúng mã này để xem sổ Thu Mua/Gửi/Ứng của riêng mình. Đồng bộ mã KH lên cả Supabase (`kh_ids`) và Google Drive (sheet `Ma_KH`) |
 | **v11.13** | 2026-07 | Thêm 3 tuỳ chọn lọc mới trong menu "Xem dữ liệu Supabase": "📒 Theo Gửi sổ (chọn khách hàng)", "💵 Theo Ứng tiền (chọn khách hàng)", "⏱️ Theo Chấm công (chọn công nhân)" — mỗi tuỳ chọn chỉ hiện đúng 1 loại dữ liệu và có ô chọn tên riêng để xem chính xác người/công cần xem. Tên công nhân (Chấm công) dùng ô chọn hoàn toàn tách biệt với tên khách hàng (Gửi sổ/Ứng tiền/Mua/Bán), không gộp chung danh sách nữa như v11.12 |
 | **v11.12** | 2026-07 | Xác nhận dữ liệu Chấm Công đã tự động đồng bộ Supabase (khoá `cc_data`) từ trước — mọi thao tác tạo/ghi chép/chốt/xoá đều gọi autoSync() ngay. Bổ sung phần "⏱️ Chấm Công" vào màn "Xem dữ liệu Supabase": thẻ tổng quan từng công nhân (ngày làm/nghỉ, ứng, thưởng, thực lãnh, trạng thái mở/chốt) và bảng ghi chép chi tiết (ngày, công nhân, loại, số tiền, lý do) có thể lọc theo ngày/tháng/tên công nhân giống các mục khác; đưa tên công nhân vào chung dropdown lọc theo khách hàng; thêm mục Chấm Công vào file PDF xuất từ Supabase |
 | **v11.11** | 2026-07 | Xác nhận lỗi "Chốt công/Xoá chấm công" ở v11.10 là do trình duyệt/PWA chưa cập nhật cache, không phải lỗi code (đã hoạt động đúng sau khi xoá lịch sử/cache trình duyệt). Thêm lưới an toàn try/catch quanh 2 nút này để nếu có lỗi bất ngờ trong tương lai sẽ luôn hiện thông báo rõ ràng thay vì im lặng |

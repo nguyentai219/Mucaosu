@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v11.13</title>
+<title>Mua Bán Mủ Cao Su v1.a2</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -401,7 +401,7 @@ input[type=date]:focus{border-color:var(--gl)}
 .sg-dd-select{width:100%;background:#fff;border:1.5px solid var(--gp);border-radius:var(--r);padding:11px 12px;font-size:13px;font-weight:700;color:var(--gd);cursor:pointer;-webkit-appearance:none};border-radius:var(--r);padding:11px 12px;font-size:13px;font-weight:700;color:var(--gd);display:flex;align-items:center;justify-content:space-between;cursor:pointer}
 .sg-overview-card{background:#fff;border-radius:var(--r);box-shadow:var(--s1);padding:14px;margin-bottom:10px}
 
-/* SUB-TAB SỔ GỬI & CHẤM CÔNG v11.13 */
+/* SUB-TAB SỔ GỬI & CHẤM CÔNG v11.14 */
 .sg-subtab-bar{display:flex;gap:6px;background:var(--g100);padding:3px;border-radius:10px;margin-bottom:14px}
 .sg-subtab-btn{flex:1;padding:8px 0;background:transparent;border:none;color:var(--g600);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;border-radius:8px;cursor:pointer;transition:all .2s}
 .sg-subtab-btn.active{background:#fff;color:var(--gd);box-shadow:var(--s1)}
@@ -417,7 +417,7 @@ input[type=date]:focus{border-color:var(--gl)}
 #modal-cc-detail .cal-cell.offday{background:#dc2626;color:#fff!important}
 #modal-cc-detail .cal-cell.offday .cal-dot{display:none}
 #modal-cc-detail .cal-legend .cal-dot{background:#dc2626}
-/* Lịch chi tiết chấm công v11.13: nhiều trạng thái/ngày */
+/* Lịch chi tiết chấm công v11.14: nhiều trạng thái/ngày */
 #cc-detail-cal-grid .cal-cell{padding-bottom:17px}
 #cc-detail-cal-grid .cal-cell.cc-out{color:var(--g200);cursor:default}
 #cc-detail-cal-grid .cc-badge{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:9px;line-height:1;min-width:14px;height:14px;padding:0 2px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800}
@@ -480,7 +480,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v11.13 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.a2 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -991,6 +991,7 @@ input[type=date]:focus{border-color:var(--gl)}
         <button onclick="openQuenMatKhau()" style="width:100%;padding:10px;background:#fff7ed;color:#c2410c;border:1.5px solid #fdba74;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">❓ Quên mật khẩu</button>
       </div>
     </div>
+    <button onclick="openKhachIdList()" style="width:100%;margin-top:10px;padding:11px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">📇 Mã khách hàng (cho app Xem Sổ Khách Hàng)</button>
     <button onclick="openHuongDan()" style="width:100%;margin-top:10px;padding:11px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">📖 Hướng dẫn sử dụng</button>
     <button class="btn-huy" style="width:100%;margin-top:8px" onclick="closeM('modal-settings')">Đóng</button>
   </div>
@@ -1479,7 +1480,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v11.13</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.a2</div>
       </div>
     </div>
 
@@ -1597,6 +1598,18 @@ input[type=date]:focus{border-color:var(--gl)}
   </div>
 </div>
 
+<!-- MODAL MÃ KHÁCH HÀNG -->
+<div class="modal" id="modal-khach-id">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📇 Mã khách hàng</div>
+    <div style="font-size:11.5px;color:var(--g600);margin-bottom:10px">Đưa Mã KH này cho khách hàng để họ nhập vào app <b>"Xem Sổ Khách Hàng"</b> và tự xem sổ sách thu mua/gửi/ứng của riêng mình.</div>
+    <input type="text" id="khid-search" class="fi" placeholder="🔍 Tìm tên khách hàng..." oninput="renderKhachIdList()" style="margin-bottom:10px" autocomplete="off">
+    <div id="khid-list"></div>
+    <button class="btn-huy" style="width:100%;margin-top:12px" onclick="closeM('modal-khach-id')">Đóng</button>
+  </div>
+</div>
+
 <script>
 // ============================================================
 // MỦ CAO SU PRO v1.3
@@ -1651,6 +1664,74 @@ function saveKHShared(ten){
   ['mua','ban'].forEach(function(t){
     var kh=getKH(t); if(!kh.includes(ten)){ kh.push(ten); setKH(t,kh); }
   });
+  getOrCreateKhachId(ten); // Đảm bảo khách hàng nào cũng có Mã KH cố định ngay khi được lưu
+}
+
+// ═══════════ MÃ KHÁCH HÀNG (mã cố định để tra cứu trên app "Xem Sổ Khách Hàng") ═══════════
+// Lưu riêng (không đổi cấu trúc kh3_all) để không ảnh hưởng autocomplete hiện có.
+// Cấu trúc: { "Tên khách hàng": "ABCDE" }
+const KH_IDS_KEY = 'kh_ids';
+function getKhIds(){ return lsGetO(KH_IDS_KEY); }
+function setKhIds(v){ lsSet(KH_IDS_KEY, v); }
+function genKhachId(){
+  var chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // bỏ ký tự dễ nhầm: 0,1,O,I
+  var s = '';
+  for (var i=0;i<5;i++) s += chars.charAt(Math.floor(Math.random()*chars.length));
+  return s;
+}
+function getOrCreateKhachId(ten){
+  if (!ten) return '';
+  ten = ten.trim();
+  var map = getKhIds();
+  if (map[ten]) return map[ten];
+  var used = {};
+  Object.keys(map).forEach(function(k){ used[map[k]] = true; });
+  var id;
+  do { id = genKhachId(); } while (used[id]);
+  map[ten] = id;
+  setKhIds(map);
+  return id;
+}
+function findTenByKhachId(id){
+  var map = getKhIds();
+  id = (id||'').trim().toUpperCase();
+  for (var ten in map) { if ((map[ten]||'').toUpperCase() === id) return ten; }
+  return null;
+}
+// Đảm bảo mọi tên trong kh3_all đều có Mã KH (chạy khi mở màn Mã khách hàng, phòng dữ liệu cũ trước khi có tính năng này)
+function backfillAllKhachIds(){
+  getKHAll().forEach(function(ten){ getOrCreateKhachId(ten); });
+}
+function openKhachIdList(){
+  backfillAllKhachIds();
+  swapM('modal-settings', 'modal-khach-id');
+  var s = document.getElementById('khid-search'); if (s) s.value = '';
+  renderKhachIdList();
+}
+function renderKhachIdList(){
+  var box = document.getElementById('khid-list');
+  if (!box) return;
+  var q = (document.getElementById('khid-search').value || '').trim().toLowerCase();
+  var map = getKhIds();
+  var names = Object.keys(map).sort(function(a,b){ return a.localeCompare(b,'vi'); });
+  if (q) names = names.filter(function(n){ return n.toLowerCase().includes(q); });
+  if (!names.length){ box.innerHTML = '<div class="sg-empty-name">Không có khách hàng nào</div>'; return; }
+  box.innerHTML = names.map(function(ten){
+    var id = map[ten];
+    var tenEsc = ten.replace(/"/g,'&quot;');
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--g50);border-radius:10px;padding:10px 12px;margin-bottom:6px">'
+      + '<div style="min-width:0"><div style="font-weight:700;font-size:13px;color:var(--g800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ten + '</div>'
+      + '<div style="font-size:16px;font-weight:800;color:var(--gd);letter-spacing:1.5px;margin-top:2px">' + id + '</div></div>'
+      + '<button onclick="copyKhachId(&quot;' + id + '&quot;,&quot;' + tenEsc + '&quot;)" style="flex:0 0 auto;background:var(--gd);color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer">📋 Sao chép</button>'
+      + '</div>';
+  }).join('');
+}
+function copyKhachId(id, ten){
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(id).then(function(){ toast('📋 Đã sao chép mã "' + id + '" của ' + ten); }).catch(function(){ toast('Mã KH của ' + ten + ': ' + id); });
+  } else {
+    toast('Mã KH của ' + ten + ': ' + id);
+  }
 }
 // Khi load: gộp kh3_mua + kh3_ban vào kh3_all nếu chưa có
 function migrateKHAll(){
@@ -3725,7 +3806,7 @@ var SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 var sbClient = null;
 var sbUser = null;
 var sbSyncing = false;
-var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','sg3','su_data','cc_data','thang_v1','setting_round','license_expiry'];
+var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','kh_ids','sg3','su_data','cc_data','thang_v1','setting_round','license_expiry','admin_pw'];
 
 function initSupabase() {
   if (typeof window.supabase === 'undefined') { setTimeout(initSupabase, 600); return; }
@@ -3881,7 +3962,7 @@ function _sbRowsPayload() {
     var raw = localStorage.getItem(k);
     var val;
     if (raw == null) {
-      val = (k === 'license_expiry') ? null : [];
+      val = (k === 'license_expiry') ? null : (k === 'kh_ids' ? {} : (k === 'admin_pw' ? '28082008' : []));
     } else {
       try { val = JSON.parse(raw); } catch(e) { val = raw; }
     }
@@ -5763,12 +5844,19 @@ function syncToDrive_silent() {
       r.chotCong?'Đã chốt':'Đang mở', r.chotCong&&r.chotDate?fmtDateVN2(r.chotDate):''];
   }));}
   var fname = 'backup_' + gdTodayStr();
+  var hdrKh=['Tên khách hàng','Mã KH'];
+  function khIdRows(){
+    backfillAllKhachIds();
+    var map=getKhIds();
+    return [hdrKh].concat(Object.keys(map).sort(function(a,b){return a.localeCompare(b,'vi');}).map(function(ten){return [ten, map[ten]];}));
+  }
   upsertSheet(fname, [
     { name: 'Thu_Mua',   rows: gdRows2('mua') },
     { name: 'Ban_Ra',    rows: gdRows2('ban') },
     { name: 'So_Gui',    rows: sgRows() },
     { name: 'So_Ung',    rows: suRows() },
     { name: 'Cham_Cong', rows: ccRows() },
+    { name: 'Ma_KH',     rows: khIdRows() },
     { name: 'Tinh_Toan', rows: [['Dữ liệu tính toán được lưu khi nhấn Lưu Sổ Sách']] }
   ], function() {
     gdSyncing = false;
@@ -7430,7 +7518,7 @@ function setSgtDate(val){
 }
 
 // ═══════════════════════════════════════════════════════
-// CHẤM CÔNG (sub-tab trong Sổ Gửi) — v11.13
+// CHẤM CÔNG (sub-tab trong Sổ Gửi) — v11.14
 // Mỗi kỳ chấm công của 1 công nhân: {id, date (ngày bắt đầu tính công), ten, tenGoc,
 //   luongThang, chotCong, chotDate, ghiChep:{ 'yyyy-mm-dd': {loai,soTien,lyDo} }}
 // Ngày không có ghi chép = mặc định "có làm" (✔ xanh).
