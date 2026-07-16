@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.a5</title>
+<title>Mua Bán Mủ Cao Su v1.a6</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -1626,7 +1626,16 @@ input[type=date]:focus{border-color:var(--gl)}
     <select id="mua-chot-select" class="fi" style="margin-bottom:8px" onchange="onMuaChotSelectChange()">
       <option value="">-- Chọn khách hàng --</option>
     </select>
-    <div id="mua-chot-select-status" style="font-size:12px;color:var(--g600);margin-bottom:12px;text-align:center;min-height:16px"></div>
+    <div id="mua-chot-select-status" style="font-size:12px;color:var(--g600);margin-bottom:10px;text-align:center;min-height:16px"></div>
+    <div id="mua-cal-wrap" style="display:none;margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <button type="button" onclick="muaCalPrev()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--gd);padding:2px 12px;line-height:1">‹</button>
+        <span id="mua-cal-label" style="font-size:13px;font-weight:700;color:var(--g800)"></span>
+        <button type="button" onclick="muaCalNext()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--gd);padding:2px 12px;line-height:1">›</button>
+      </div>
+      <div id="mua-cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center"></div>
+      <div id="mua-cal-selected" style="text-align:center;font-size:11px;color:var(--g600);margin-top:8px"></div>
+    </div>
     <div style="display:flex;gap:8px">
       <button id="mua-chot-select-chot-btn" onclick="openChotMua()" disabled style="flex:1;padding:10px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">🔒 Chốt</button>
       <button id="mua-chot-select-huy-btn" onclick="openHuyChotMua()" style="flex:1;padding:10px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:none">🔓 Huỷ chốt</button>
@@ -1734,6 +1743,17 @@ function findTenByKhachId(id){
 // Đảm bảo mọi tên trong kh3_all đều có Mã KH (chạy khi mở màn Mã khách hàng, phòng dữ liệu cũ trước khi có tính năng này)
 function backfillAllKhachIds(){
   getKHAll().forEach(function(ten){ getOrCreateKhachId(ten); });
+  getCcCongNhanNames().forEach(function(ten){ getOrCreateKhachId(ten); });
+}
+// Danh sách tên công nhân duy nhất đang có trong Chấm Công
+function getCcCongNhanNames(){
+  var seen={}, out=[];
+  getCC().forEach(function(r){
+    if (!r.ten) return;
+    var norm = normTen(r.ten);
+    if (!seen[norm]) { seen[norm]=true; out.push(r.ten); }
+  });
+  return out;
 }
 function openKhachIdList(){
   backfillAllKhachIds();
@@ -1743,24 +1763,70 @@ function openKhachIdList(){
 }
 
 // ═══════════ CHỐT DANH SÁCH THU MUA THEO TỪNG KHÁCH HÀNG (cho app "Xem Sổ Khách Hàng") ═══════════
-// Với mỗi khách hàng có thể đánh dấu 1 mốc thời gian riêng: app khách chỉ hiện các giao dịch
-// Thu Mua của người đó PHÁT SINH SAU mốc này. Toàn bộ dữ liệu cũ vẫn được giữ nguyên đầy đủ
-// trong app chính — chỉ ẩn khỏi app khách hàng. Lưu trữ: { "Tên KH": mốcThờiGian }.
+// Với mỗi khách hàng có thể chọn 1 NGÀY chốt riêng: app khách chỉ hiện các giao dịch Thu Mua
+// của người đó có NGÀY SAU ngày chốt. Toàn bộ dữ liệu cũ vẫn được giữ nguyên đầy đủ trong app
+// chính — chỉ ẩn khỏi app khách hàng. Lưu trữ: { "Tên KH": "yyyy-mm-dd" }.
 const MUA_CHOT_KEY = 'mua_chot_moc';
 function getMuaChotMap(){ return lsGetO(MUA_CHOT_KEY); }
 function setMuaChotMap(v){ lsSet(MUA_CHOT_KEY, v); }
-function getMuaChotMoc(ten){
+function getMuaChotMoc(ten){ // trả về chuỗi 'yyyy-mm-dd' đã chốt đến hết ngày này, hoặc '' nếu chưa chốt
   var map = getMuaChotMap();
   var norm = normTen(ten);
-  for (var k in map) { if (normTen(k) === norm) return map[k] || 0; }
-  return 0;
+  for (var k in map) { if (normTen(k) === norm) return map[k] || ''; }
+  return '';
 }
-function setMuaChotMocFor(ten, v){
+function setMuaChotMocFor(ten, dateStr){
   var map = getMuaChotMap();
   var norm = normTen(ten);
   Object.keys(map).forEach(function(k){ if (normTen(k) === norm) delete map[k]; });
-  if (v > 0) map[ten] = v;
+  if (dateStr) map[ten] = dateStr;
   setMuaChotMap(map);
+}
+function pad2(n){ return n<10 ? '0'+n : ''+n; }
+function dstr(y,m,d){ return y+'-'+pad2(m+1)+'-'+pad2(d); } // m: 0-based (kiểu JS Date)
+function getMuaDatesSet(ten){
+  var set={}; var norm=normTen(ten);
+  getGD('mua').forEach(function(r){ if (normTen(r.ten)===norm && r.date) set[r.date]=true; });
+  return set;
+}
+var _muaCalYear, _muaCalMonth, _muaCalSelDate, _muaCalTen;
+function initMuaCal(ten){
+  var today = new Date();
+  _muaCalYear = today.getFullYear(); _muaCalMonth = today.getMonth();
+  _muaCalSelDate = dstr(_muaCalYear, _muaCalMonth, today.getDate());
+  _muaCalTen = ten;
+  renderMuaCal();
+}
+function muaCalPrev(){ _muaCalMonth--; if(_muaCalMonth<0){ _muaCalMonth=11; _muaCalYear--; } renderMuaCal(); }
+function muaCalNext(){ _muaCalMonth++; if(_muaCalMonth>11){ _muaCalMonth=0; _muaCalYear++; } renderMuaCal(); }
+function muaCalSelectDay(ds){ _muaCalSelDate = ds; renderMuaCal(); }
+function renderMuaCal(){
+  var grid = document.getElementById('mua-cal-grid'); if (!grid) return;
+  document.getElementById('mua-cal-label').textContent = 'Tháng ' + (_muaCalMonth+1) + '/' + _muaCalYear;
+  var set = getMuaDatesSet(_muaCalTen);
+  var firstDay = new Date(_muaCalYear, _muaCalMonth, 1).getDay(); // 0 = Chủ nhật
+  var daysInMonth = new Date(_muaCalYear, _muaCalMonth+1, 0).getDate();
+  var today = new Date();
+  var todayStr = dstr(today.getFullYear(), today.getMonth(), today.getDate());
+  var html = ['CN','T2','T3','T4','T5','T6','T7'].map(function(d){
+    return '<div style="font-size:10px;font-weight:700;color:var(--g500);padding:2px 0">'+d+'</div>';
+  }).join('');
+  for (var i=0; i<firstDay; i++) html += '<div></div>';
+  for (var d=1; d<=daysInMonth; d++){
+    var ds = dstr(_muaCalYear, _muaCalMonth, d);
+    var has = set[ds];
+    var isSel = (ds === _muaCalSelDate);
+    var isToday = (ds === todayStr);
+    var style = 'padding:6px 0;border-radius:8px;font-size:12.5px;cursor:pointer;';
+    if (isSel) style += 'background:var(--gd);color:#fff;font-weight:700;';
+    else if (isToday) style += 'border:1.5px solid var(--gd);font-weight:700;color:var(--gd);';
+    else style += 'color:var(--g800);';
+    html += '<div onclick="muaCalSelectDay(\''+ds+'\')" style="'+style+'">'+d
+      + (has ? '<div style="width:4px;height:4px;border-radius:50%;background:'+(isSel?'#fff':'#dc2626')+';margin:2px auto 0"></div>' : '')
+      + '</div>';
+  }
+  grid.innerHTML = html;
+  document.getElementById('mua-cal-selected').innerHTML = 'Ngày chốt: <b>' + _muaCalSelDate.split('-').reverse().join('/') + '</b> <span style="color:#dc2626">●</span> = ngày có giao dịch';
 }
 function openMuaChotSelect(){
   var sel = document.getElementById('mua-chot-select');
@@ -1778,11 +1844,14 @@ function onMuaChotSelectChange(){
   var statusEl = document.getElementById('mua-chot-select-status');
   var chotBtn = document.getElementById('mua-chot-select-chot-btn');
   var huyBtn = document.getElementById('mua-chot-select-huy-btn');
-  if (!ten){ statusEl.innerHTML=''; chotBtn.disabled=true; huyBtn.style.display='none'; return; }
+  var calWrap = document.getElementById('mua-cal-wrap');
+  if (!ten){ statusEl.innerHTML=''; chotBtn.disabled=true; huyBtn.style.display='none'; calWrap.style.display='none'; return; }
   chotBtn.disabled = false;
+  calWrap.style.display = '';
+  initMuaCal(ten);
   var moc = getMuaChotMoc(ten);
-  if (moc > 0){
-    statusEl.innerHTML = '🔒 Đã chốt lúc <b>'+new Date(moc).toLocaleString('vi-VN')+'</b>';
+  if (moc){
+    statusEl.innerHTML = '🔒 Đã chốt đến hết ngày <b>'+moc.split('-').reverse().join('/')+'</b>';
     huyBtn.style.display = '';
   } else {
     statusEl.innerHTML = 'Chưa chốt — app khách hàng đang hiện toàn bộ Thu Mua của '+ten;
@@ -1795,8 +1864,9 @@ function openChotMua(){
   var ten = document.getElementById('mua-chot-select').value;
   if (!ten) return;
   _chotMode = 'mua'; _chotMuaTen = ten;
+  var ngayDD = _muaCalSelDate.split('-').reverse().join('/');
   document.getElementById('chot-so-title').textContent = '🔒 Chốt Thu Mua — ' + ten;
-  document.getElementById('chot-so-info').innerHTML = 'Toàn bộ Thu Mua của <b>'+ten+'</b> tính đến thời điểm này sẽ ẩn khỏi app "Xem Sổ Khách Hàng". Dữ liệu vẫn được giữ nguyên đầy đủ trong app này.<br><span style="color:#dc2626;font-size:11px">Có thể huỷ chốt bất cứ lúc nào.</span>';
+  document.getElementById('chot-so-info').innerHTML = 'Thu Mua của <b>'+ten+'</b> từ ngày <b>'+ngayDD+'</b> trở về trước sẽ ẩn khỏi app "Xem Sổ Khách Hàng". Dữ liệu vẫn được giữ nguyên đầy đủ trong app này.<br><span style="color:#dc2626;font-size:11px">Có thể huỷ chốt bất cứ lúc nào.</span>';
   document.getElementById('chot-so-pw').value = '';
   document.getElementById('chot-so-err').style.display = 'none';
   openM('modal-chot-so');
@@ -1815,16 +1885,27 @@ function renderKhachIdList(){
   var box = document.getElementById('khid-list');
   if (!box) return;
   var q = (document.getElementById('khid-search').value || '').trim().toLowerCase();
-  // Chỉ hiện khách hàng đang thực sự tồn tại (kh3_all) — khách đã xoá sẽ không hiện dù mã cũ
-  // vẫn được giữ lại trong kh_ids để tự động khôi phục đúng mã nếu thêm lại cùng tên.
-  var names = getKHAll().slice().sort(function(a,b){ return a.localeCompare(b,'vi'); });
-  if (q) names = names.filter(function(n){ return n.toLowerCase().includes(q); });
-  if (!names.length){ box.innerHTML = '<div class="sg-empty-name">Không có khách hàng nào</div>'; return; }
-  box.innerHTML = names.map(function(ten){
+  // Gồm khách hàng (kh3_all) và công nhân (Chấm Công) đang thực sự tồn tại — người đã xoá sẽ không hiện
+  // dù mã cũ vẫn được giữ lại trong kh_ids để tự động khôi phục đúng mã nếu thêm lại cùng tên.
+  var khNames = getKHAll();
+  var ccNames = getCcCongNhanNames();
+  var seen = {}, all = [];
+  khNames.forEach(function(n){ var k=normTen(n); if(!seen[k]){ seen[k]=true; all.push({ten:n, isKh:true, isCc:false}); } });
+  ccNames.forEach(function(n){
+    var k=normTen(n);
+    var existed = all.find(function(x){ return normTen(x.ten)===k; });
+    if (existed) existed.isCc = true; else all.push({ten:n, isKh:false, isCc:true});
+  });
+  all.sort(function(a,b){ return a.ten.localeCompare(b.ten,'vi'); });
+  if (q) all = all.filter(function(x){ return x.ten.toLowerCase().includes(q); });
+  if (!all.length){ box.innerHTML = '<div class="sg-empty-name">Không có khách hàng nào</div>'; return; }
+  box.innerHTML = all.map(function(x){
+    var ten = x.ten;
     var id = getOrCreateKhachId(ten);
     var tenEsc = ten.replace(/"/g,'&quot;');
+    var tag = x.isCc ? '<span style="font-size:9px;padding:1px 5px;border-radius:6px;background:#fffbeb;color:#92400e;font-weight:700;margin-left:5px;vertical-align:middle">👷 CÔNG NHÂN</span>' : '';
     return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--g50);border-radius:10px;padding:10px 12px;margin-bottom:6px">'
-      + '<div style="min-width:0"><div style="font-weight:700;font-size:13px;color:var(--g800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ten + '</div>'
+      + '<div style="min-width:0"><div style="font-weight:700;font-size:13px;color:var(--g800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ten + tag + '</div>'
       + '<div style="font-size:16px;font-weight:800;color:var(--gd);letter-spacing:1.5px;margin-top:2px">' + id + '</div></div>'
       + '<button onclick="copyKhachId(&quot;' + id + '&quot;,&quot;' + tenEsc + '&quot;)" style="flex:0 0 auto;background:var(--gd);color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer">📋 Sao chép</button>'
       + '</div>';
@@ -3276,9 +3357,12 @@ function renderKH(){
     if(muaSet[k]) tags+='<span style="font-size:9px;padding:1px 5px;border-radius:6px;background:var(--gb);color:var(--gd);font-weight:700;margin-left:3px">MUA</span>';
     if(guiSet[k]) tags+='<span style="font-size:9px;padding:1px 5px;border-radius:6px;background:#f0fdf4;color:#16a34a;font-weight:700;margin-left:3px">GỬI</span>';
     if(ungSet[k]) tags+='<span style="font-size:9px;padding:1px 5px;border-radius:6px;background:#fffbeb;color:#92400e;font-weight:700;margin-left:3px">ỨNG</span>';
+    var maKH = getOrCreateKhachId(k);
+    var kEsc = k.replace(/'/g,"\\'").replace(/"/g,'&quot;');
     return '<div class="kh-item">'
-      +'<div class="kh-name">👤 '+k+tags+'</div>'
+      +'<div class="kh-name">👤 '+k+tags+'<div style="font-size:11px;color:var(--g500);font-weight:700;margin-top:2px;letter-spacing:.5px">Mã KH: <span style="color:var(--gd)">'+maKH+'</span></div></div>'
       +'<div class="kh-acts">'
+      +'<button class="kh-btn" onclick="copyKhachId(\''+maKH+'\',\''+kEsc+'\')" title="Sao chép mã KH">📋</button>'
       +'<button class="kh-btn e" onclick="editKH('+i+')">✏️</button>'
       +'<button class="kh-btn d" onclick="delKH('+i+')">🗑️</button>'
       +'</div></div>';
@@ -7507,14 +7591,14 @@ function doChot(){
   }
   closeM('modal-chot-so');
   if(_chotMode==='mua'){
-    setMuaChotMocFor(_chotMuaTen, Date.now());
+    setMuaChotMocFor(_chotMuaTen, _muaCalSelDate);
     onMuaChotSelectChange();
-    toast('🔒 Đã chốt Thu Mua của '+_chotMuaTen+'!');
+    toast('🔒 Đã chốt Thu Mua của '+_chotMuaTen+' đến hết ngày '+_muaCalSelDate.split('-').reverse().join('/')+'!');
     autoSync();
     return;
   }
   if(_chotMode==='huyMua'){
-    setMuaChotMocFor(_chotMuaTen, 0);
+    setMuaChotMocFor(_chotMuaTen, '');
     onMuaChotSelectChange();
     toast('🔓 Đã huỷ chốt Thu Mua của '+_chotMuaTen+'!');
     autoSync();
