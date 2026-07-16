@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.a4</title>
+<title>Mua Bán Mủ Cao Su v1.a5</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -4078,7 +4078,7 @@ function _sbRowsPayload() {
     var raw = localStorage.getItem(k);
     var val;
     if (raw == null) {
-      val = (k === 'license_expiry') ? null : (k === 'kh_ids' ? {} : (k === 'admin_pw' ? '28082008' : (k === 'mua_chot_moc' ? {} : [])));
+      val = (k === 'license_expiry') ? null : (k === 'kh_ids' ? {} : (k === 'admin_pw' ? '28082008' : (k === 'mua_chot_moc' ? {} : (k === THANG_PW_SB_KEY ? RESET_PW_DEFAULT : []))));
     } else {
       try { val = JSON.parse(raw); } catch(e) { val = raw; }
     }
@@ -6105,6 +6105,8 @@ var RESET_PW_DEFAULT = _dc('X1BHR1tU');         // mật khẩu quản lý giao 
 var ADMIN_PW_DEFAULT = _dc('X1tDSl9TQ0o=');     // mật khẩu quản trị mặc định
 function getThangPW(){ var v=localStorage.getItem(_dc('GQsSHAo8AwU=')); return v||RESET_PW_DEFAULT; }
 function setThangPW(p){ localStorage.setItem(_dc('GQsSHAo8AwU='),p); }
+var THANG_PW_SB_KEY = _dc('GQsSHAo8AwU='); // = 'thang_pw' — đồng bộ để app "Xem Sổ Khách Hàng" xác thực trước khi mở Cài đặt
+if (SB_DATA_KEYS.indexOf(THANG_PW_SB_KEY) === -1) SB_DATA_KEYS.push(THANG_PW_SB_KEY);
 function getAdminPW(){ var v=localStorage.getItem(_dc('DAceGwM8AwU=')); return v||ADMIN_PW_DEFAULT; }
 function setAdminPW(p){ localStorage.setItem(_dc('DAceGwM8AwU='),p); }
 // Kiểm tra mật khẩu hợp lệ cho mọi thao tác quản lý giao dịch
