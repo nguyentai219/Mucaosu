@@ -13,8 +13,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" defer></script>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
-<link rel="apple-touch-startup-image" href="icon-512.png">
-<title>Mua Bán Mủ Cao Su v1.a2</title>
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-startup-image" href="splash.png">
+<title>Mua Bán Mủ Cao Su v1.a4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -1119,7 +1120,7 @@ input[type=date]:focus{border-color:var(--gl)}
 </div>
 
 <!-- MODAL XÁC NHẬN CHỐT SỔ -->
-<div class="modal center" id="modal-chot-so">
+<div class="modal center" id="modal-chot-so" style="z-index:1500">
   <div class="modal-box center-box" style="max-width:320px">
     <div style="font-size:32px;text-align:center;margin-bottom:8px">🔒</div>
     <div class="modal-title" id="chot-so-title">Chốt sổ</div>
@@ -1604,9 +1605,33 @@ input[type=date]:focus{border-color:var(--gl)}
     <div class="modal-handle"></div>
     <div class="modal-title">📇 Mã khách hàng</div>
     <div style="font-size:11.5px;color:var(--g600);margin-bottom:10px">Đưa Mã KH này cho khách hàng để họ nhập vào app <b>"Xem Sổ Khách Hàng"</b> và tự xem sổ sách thu mua/gửi/ứng của riêng mình.</div>
+
+    <div style="background:var(--g50);border-radius:10px;padding:10px 12px;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700;color:var(--g800);margin-bottom:2px">🔒 Chốt danh sách Thu Mua</div>
+      <div style="font-size:11.5px;color:var(--g600);margin-bottom:8px">Chốt riêng theo từng khách hàng — app khách hàng sẽ chỉ hiện Thu Mua phát sinh sau mốc chốt của người đó</div>
+      <button onclick="openMuaChotSelect()" style="width:100%;padding:9px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">🔒 Chốt theo khách hàng</button>
+    </div>
+
     <input type="text" id="khid-search" class="fi" placeholder="🔍 Tìm tên khách hàng..." oninput="renderKhachIdList()" style="margin-bottom:10px" autocomplete="off">
     <div id="khid-list"></div>
     <button class="btn-huy" style="width:100%;margin-top:12px" onclick="closeM('modal-khach-id')">Đóng</button>
+  </div>
+</div>
+
+<!-- MODAL CHỌN KHÁCH HÀNG ĐỂ CHỐT THU MUA RIÊNG LẺ -->
+<div class="modal center" id="modal-mua-chot-select" style="z-index:800">
+  <div class="modal-box center-box" style="max-width:340px">
+    <div class="modal-title">🔒 Chốt danh sách Thu Mua</div>
+    <div style="font-size:11.5px;color:var(--g600);margin-bottom:10px;text-align:center">Chọn khách hàng để chốt riêng sổ Thu Mua của người đó. Dữ liệu cũ vẫn giữ nguyên trong app này, chỉ ẩn khỏi app "Xem Sổ Khách Hàng".</div>
+    <select id="mua-chot-select" class="fi" style="margin-bottom:8px" onchange="onMuaChotSelectChange()">
+      <option value="">-- Chọn khách hàng --</option>
+    </select>
+    <div id="mua-chot-select-status" style="font-size:12px;color:var(--g600);margin-bottom:12px;text-align:center;min-height:16px"></div>
+    <div style="display:flex;gap:8px">
+      <button id="mua-chot-select-chot-btn" onclick="openChotMua()" disabled style="flex:1;padding:10px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">🔒 Chốt</button>
+      <button id="mua-chot-select-huy-btn" onclick="openHuyChotMua()" style="flex:1;padding:10px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:none">🔓 Huỷ chốt</button>
+    </div>
+    <button class="btn-huy" style="width:100%;margin-top:10px" onclick="closeM('modal-mua-chot-select')">Đóng</button>
   </div>
 </div>
 
@@ -1655,16 +1680,22 @@ function setKH(t,v){ lsSet(khKey(t),v) }
 const KH_ALL_KEY = 'kh3_all';
 function getKHAll(){ return lsGet(KH_ALL_KEY); }
 function setKHAll(v){ lsSet(KH_ALL_KEY, v); }
+// So khớp tên khách hàng không phân biệt hoa/thường và khoảng trắng thừa,
+// để "anh 2" và "Anh 2" (gõ khác nhau, cùng 1 người) được coi là cùng một khách hàng.
+function normTen(s){ return (s||'').trim().replace(/\s+/g,' ').toLowerCase(); }
 function saveKHShared(ten){
   if(!ten || !ten.trim()) return;
   ten = ten.trim();
   var all = getKHAll();
-  if(!all.includes(ten)){ all.push(ten); setKHAll(all); }
+  var norm = normTen(ten);
+  var existed = all.find(function(n){ return normTen(n)===norm; });
+  if(!existed){ all.push(ten); setKHAll(all); existed = ten; }
   // Đồng bộ ngược vào kh3_mua và kh3_ban để autocomplete cũ vẫn hoạt động
   ['mua','ban'].forEach(function(t){
-    var kh=getKH(t); if(!kh.includes(ten)){ kh.push(ten); setKH(t,kh); }
+    var kh=getKH(t);
+    if(!kh.some(function(n){ return normTen(n)===norm; })){ kh.push(existed); setKH(t,kh); }
   });
-  getOrCreateKhachId(ten); // Đảm bảo khách hàng nào cũng có Mã KH cố định ngay khi được lưu
+  getOrCreateKhachId(existed); // Đảm bảo khách hàng nào cũng có Mã KH cố định ngay khi được lưu
 }
 
 // ═══════════ MÃ KHÁCH HÀNG (mã cố định để tra cứu trên app "Xem Sổ Khách Hàng") ═══════════
@@ -1684,6 +1715,8 @@ function getOrCreateKhachId(ten){
   ten = ten.trim();
   var map = getKhIds();
   if (map[ten]) return map[ten];
+  var norm = normTen(ten);
+  for (var k in map) { if (normTen(k) === norm) return map[k]; } // khớp không phân biệt hoa/thường (khôi phục mã cũ nếu xoá rồi thêm lại)
   var used = {};
   Object.keys(map).forEach(function(k){ used[map[k]] = true; });
   var id;
@@ -1708,16 +1741,87 @@ function openKhachIdList(){
   var s = document.getElementById('khid-search'); if (s) s.value = '';
   renderKhachIdList();
 }
+
+// ═══════════ CHỐT DANH SÁCH THU MUA THEO TỪNG KHÁCH HÀNG (cho app "Xem Sổ Khách Hàng") ═══════════
+// Với mỗi khách hàng có thể đánh dấu 1 mốc thời gian riêng: app khách chỉ hiện các giao dịch
+// Thu Mua của người đó PHÁT SINH SAU mốc này. Toàn bộ dữ liệu cũ vẫn được giữ nguyên đầy đủ
+// trong app chính — chỉ ẩn khỏi app khách hàng. Lưu trữ: { "Tên KH": mốcThờiGian }.
+const MUA_CHOT_KEY = 'mua_chot_moc';
+function getMuaChotMap(){ return lsGetO(MUA_CHOT_KEY); }
+function setMuaChotMap(v){ lsSet(MUA_CHOT_KEY, v); }
+function getMuaChotMoc(ten){
+  var map = getMuaChotMap();
+  var norm = normTen(ten);
+  for (var k in map) { if (normTen(k) === norm) return map[k] || 0; }
+  return 0;
+}
+function setMuaChotMocFor(ten, v){
+  var map = getMuaChotMap();
+  var norm = normTen(ten);
+  Object.keys(map).forEach(function(k){ if (normTen(k) === norm) delete map[k]; });
+  if (v > 0) map[ten] = v;
+  setMuaChotMap(map);
+}
+function openMuaChotSelect(){
+  var sel = document.getElementById('mua-chot-select');
+  var names = getKHAll().slice().sort(function(a,b){ return a.localeCompare(b,'vi'); });
+  sel.innerHTML = '<option value="">-- Chọn khách hàng --</option>' + names.map(function(n){
+    var esc = n.replace(/"/g,'&quot;');
+    return '<option value="'+esc+'">'+n+'</option>';
+  }).join('');
+  sel.value = '';
+  onMuaChotSelectChange();
+  openM('modal-mua-chot-select');
+}
+function onMuaChotSelectChange(){
+  var ten = document.getElementById('mua-chot-select').value;
+  var statusEl = document.getElementById('mua-chot-select-status');
+  var chotBtn = document.getElementById('mua-chot-select-chot-btn');
+  var huyBtn = document.getElementById('mua-chot-select-huy-btn');
+  if (!ten){ statusEl.innerHTML=''; chotBtn.disabled=true; huyBtn.style.display='none'; return; }
+  chotBtn.disabled = false;
+  var moc = getMuaChotMoc(ten);
+  if (moc > 0){
+    statusEl.innerHTML = '🔒 Đã chốt lúc <b>'+new Date(moc).toLocaleString('vi-VN')+'</b>';
+    huyBtn.style.display = '';
+  } else {
+    statusEl.innerHTML = 'Chưa chốt — app khách hàng đang hiện toàn bộ Thu Mua của '+ten;
+    huyBtn.style.display = 'none';
+  }
+}
+var _chotMode = 'kh'; // 'kh' = chốt sổ Gửi/Ứng 1 khách hàng | 'mua' = chốt Thu Mua | 'huyMua' = huỷ chốt Thu Mua
+var _chotMuaTen = null;
+function openChotMua(){
+  var ten = document.getElementById('mua-chot-select').value;
+  if (!ten) return;
+  _chotMode = 'mua'; _chotMuaTen = ten;
+  document.getElementById('chot-so-title').textContent = '🔒 Chốt Thu Mua — ' + ten;
+  document.getElementById('chot-so-info').innerHTML = 'Toàn bộ Thu Mua của <b>'+ten+'</b> tính đến thời điểm này sẽ ẩn khỏi app "Xem Sổ Khách Hàng". Dữ liệu vẫn được giữ nguyên đầy đủ trong app này.<br><span style="color:#dc2626;font-size:11px">Có thể huỷ chốt bất cứ lúc nào.</span>';
+  document.getElementById('chot-so-pw').value = '';
+  document.getElementById('chot-so-err').style.display = 'none';
+  openM('modal-chot-so');
+}
+function openHuyChotMua(){
+  var ten = document.getElementById('mua-chot-select').value;
+  if (!ten) return;
+  _chotMode = 'huyMua'; _chotMuaTen = ten;
+  document.getElementById('chot-so-title').textContent = '🔓 Huỷ chốt Thu Mua — ' + ten;
+  document.getElementById('chot-so-info').innerHTML = 'App "Xem Sổ Khách Hàng" sẽ hiện lại toàn bộ lịch sử Thu Mua của <b>'+ten+'</b> như trước khi chốt.';
+  document.getElementById('chot-so-pw').value = '';
+  document.getElementById('chot-so-err').style.display = 'none';
+  openM('modal-chot-so');
+}
 function renderKhachIdList(){
   var box = document.getElementById('khid-list');
   if (!box) return;
   var q = (document.getElementById('khid-search').value || '').trim().toLowerCase();
-  var map = getKhIds();
-  var names = Object.keys(map).sort(function(a,b){ return a.localeCompare(b,'vi'); });
+  // Chỉ hiện khách hàng đang thực sự tồn tại (kh3_all) — khách đã xoá sẽ không hiện dù mã cũ
+  // vẫn được giữ lại trong kh_ids để tự động khôi phục đúng mã nếu thêm lại cùng tên.
+  var names = getKHAll().slice().sort(function(a,b){ return a.localeCompare(b,'vi'); });
   if (q) names = names.filter(function(n){ return n.toLowerCase().includes(q); });
   if (!names.length){ box.innerHTML = '<div class="sg-empty-name">Không có khách hàng nào</div>'; return; }
   box.innerHTML = names.map(function(ten){
-    var id = map[ten];
+    var id = getOrCreateKhachId(ten);
     var tenEsc = ten.replace(/"/g,'&quot;');
     return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--g50);border-radius:10px;padding:10px 12px;margin-bottom:6px">'
       + '<div style="min-width:0"><div style="font-weight:700;font-size:13px;color:var(--g800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ten + '</div>'
@@ -3183,7 +3287,7 @@ function renderKH(){
 function themKH(){
   var name=document.getElementById('kh-inp').value.trim();
   if(!name) return;
-  if(getKHAll().includes(name)){ toast('⚠️ Tên đã có!'); return; }
+  if(getKHAll().some(function(n){ return normTen(n)===normTen(name); })){ toast('⚠️ Tên đã có!'); return; }
   saveKHShared(name);
   document.getElementById('kh-inp').value='';
   renderKH(); toast('✅ Đã thêm!');
@@ -3193,11 +3297,23 @@ function editKH(i){
   var n=prompt('Sửa tên:',kh[i]);
   if(!n||!n.trim()) return;
   var oldName=kh[i]; var newName=n.trim();
+  if (normTen(newName)!==normTen(oldName) && kh.some(function(x,idx){ return idx!==i && normTen(x)===normTen(newName); })){
+    toast('⚠️ Tên đã tồn tại!'); return;
+  }
   kh[i]=newName; setKHAll(kh);
   ['mua','ban'].forEach(function(t){
     var arr=getKH(t); var idx=arr.indexOf(oldName);
     if(idx>=0){ arr[idx]=newName; setKH(t,arr); }
   });
+  // Di chuyển Mã KH cũ sang tên mới (giữ nguyên mã, không sinh mã mới, không để mồ côi trong kh_ids)
+  var map=getKhIds();
+  var oldKey=null;
+  for (var k in map) { if (normTen(k)===normTen(oldName)) { oldKey=k; break; } }
+  if (oldKey && oldKey!==newName){
+    if (!map[newName]) map[newName]=map[oldKey];
+    delete map[oldKey];
+    setKhIds(map);
+  }
   renderKH(); toast('✅ Đã cập nhật!');
 }
 function delKH(i){
@@ -3806,7 +3922,7 @@ var SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 var sbClient = null;
 var sbUser = null;
 var sbSyncing = false;
-var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','kh_ids','sg3','su_data','cc_data','thang_v1','setting_round','license_expiry','admin_pw'];
+var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','kh_ids','sg3','su_data','cc_data','thang_v1','setting_round','license_expiry','admin_pw','mua_chot_moc'];
 
 function initSupabase() {
   if (typeof window.supabase === 'undefined') { setTimeout(initSupabase, 600); return; }
@@ -3962,7 +4078,7 @@ function _sbRowsPayload() {
     var raw = localStorage.getItem(k);
     var val;
     if (raw == null) {
-      val = (k === 'license_expiry') ? null : (k === 'kh_ids' ? {} : (k === 'admin_pw' ? '28082008' : []));
+      val = (k === 'license_expiry') ? null : (k === 'kh_ids' ? {} : (k === 'admin_pw' ? '28082008' : (k === 'mua_chot_moc' ? {} : [])));
     } else {
       try { val = JSON.parse(raw); } catch(e) { val = raw; }
     }
@@ -7366,6 +7482,7 @@ function luuSgEntry(){
 
 var _chotTen = null;
 function chotSoGuiKH(ten){
+  _chotMode = 'kh';
   _chotTen = ten;
   var sgList=getSG().filter(function(r){return r.ten===ten;});
   var suList=getSU().filter(function(r){return r.ten===ten;});
@@ -7387,6 +7504,20 @@ function doChot(){
     return;
   }
   closeM('modal-chot-so');
+  if(_chotMode==='mua'){
+    setMuaChotMocFor(_chotMuaTen, Date.now());
+    onMuaChotSelectChange();
+    toast('🔒 Đã chốt Thu Mua của '+_chotMuaTen+'!');
+    autoSync();
+    return;
+  }
+  if(_chotMode==='huyMua'){
+    setMuaChotMocFor(_chotMuaTen, 0);
+    onMuaChotSelectChange();
+    toast('🔓 Đã huỷ chốt Thu Mua của '+_chotMuaTen+'!');
+    autoSync();
+    return;
+  }
   // Giữ lại ghi chép, chỉ đánh dấu chot:true + ghi chú
   var sg=getSG();
   sg.forEach(function(r){ if(r.ten===_chotTen&&!r.chot){ r.chot=true; r.ghiChuKhac='Đã chốt sổ'; } });
