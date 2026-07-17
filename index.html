@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.a6</title>
+<title>Mua Bán Mủ Cao Su v1.a7</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -8450,7 +8450,36 @@ function initSsDateSelect() {
 }
 
 // ─── SERVICE WORKER ───
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(function(reg){
+    // Chủ động kiểm tra bản mới mỗi khi mở lại app (kể cả từ nền, không cần chờ trình duyệt tự kiểm tra)
+    document.addEventListener('visibilitychange', function(){
+      if (document.visibilityState === 'visible') reg.update().catch(function(){});
+    });
+    reg.update().catch(function(){});
+    reg.addEventListener('updatefound', function(){
+      var nw = reg.installing;
+      if (!nw) return;
+      nw.addEventListener('statechange', function(){
+        if (nw.state === 'activated' && navigator.serviceWorker.controller) showUpdateBanner();
+      });
+    });
+  }).catch(function(){});
+  var _updShown = false;
+  navigator.serviceWorker.addEventListener('controllerchange', function(){
+    if (_updShown) return; _updShown = true;
+    showUpdateBanner();
+  });
+}
+function showUpdateBanner(){
+  if (document.getElementById('update-banner')) return;
+  var b = document.createElement('div');
+  b.id = 'update-banner';
+  b.textContent = '🔄 Đã có bản cập nhật mới — Nhấn để tải lại';
+  b.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#1a472a;color:#fff;text-align:center;padding:11px 10px;font-weight:700;font-size:13px;cursor:pointer;font-family:"Be Vietnam Pro",sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.25)';
+  b.onclick = function(){ location.reload(); };
+  document.body.appendChild(b);
+}
 </script>
 </body>
 </html>
