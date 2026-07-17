@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.a7</title>
+<title>Mua Bán Mủ Cao Su v1.a8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -481,7 +481,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.a7 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.a8 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -731,7 +731,12 @@ input[type=date]:focus{border-color:var(--gl)}
   <!-- SUB-TAB 2: CHẤM CÔNG -->
   <div id="sg-subtab-cc" style="display:none">
     <div class="sec-title">⏱️ Chấm công</div>
-    <button class="btn-luu" style="width:100%;margin-bottom:12px;background:linear-gradient(135deg,var(--gd),var(--gm))" onclick="openCcNew()">➕ Tạo chấm công mới</button>
+    <div class="license-lock-banner" id="lock-banner-cc" onclick="onLockBannerClick()">
+      <span>🔒 Phần mềm đã hết hạn — Nhấn để gia hạn</span>
+    </div>
+    <div id="cc-form-wrap">
+      <button class="btn-luu" style="width:100%;margin-bottom:12px;background:linear-gradient(135deg,var(--gd),var(--gm))" onclick="openCcNew()">➕ Tạo chấm công mới</button>
+    </div>
     <div id="cc-list"></div>
   </div>
 
@@ -856,6 +861,10 @@ input[type=date]:focus{border-color:var(--gl)}
 
   <!-- NHẬP MỤC TIÊU -->
   <div class="fc" style="border-left:3px solid #7c3aed">
+    <div class="license-lock-banner" id="lock-banner-ss" onclick="onLockBannerClick()">
+      <span>🔒 Phần mềm đã hết hạn — Nhấn để gia hạn</span>
+    </div>
+    <div id="ss-form-wrap">
     <div style="font-size:12px;font-weight:700;color:#7c3aed;margin-bottom:10px">🎯 Nhập mục tiêu cần đạt</div>
 
     <div class="ss-input-group">
@@ -882,6 +891,7 @@ input[type=date]:focus{border-color:var(--gl)}
 
     <div class="ss-warn" id="ss-warn" style="display:none"></div>
     <button class="btn-ss" onclick="tinhToanSS()">⚡ Tính toán & Phân bổ</button>
+    </div>
   </div>
 
   <!-- KẾT QUẢ PHÂN BỔ -->
@@ -930,7 +940,7 @@ input[type=date]:focus{border-color:var(--gl)}
 
     <!-- 4. 3 NÚT HÀNH ĐỘNG (ngay dưới chi tiết) -->
     <div class="ss-action-btns">
-      <button class="btn-ss-luu" onclick="luuSoSach()">💾 Lưu Sổ Sách</button>
+      <button class="btn-ss-luu" id="tt-luu-btn" onclick="luuSoSach()">💾 Lưu Sổ Sách</button>
       <button class="btn-ss-tinh" onclick="tinhLaiSS()">🔄 Tính Lại</button>
       <button class="btn-ss-xem" onclick="xemChiTietSS()">👁 Xem Chi Tiết</button>
     </div>
@@ -1481,7 +1491,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.a7</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.a8</div>
       </div>
     </div>
 
@@ -1889,6 +1899,7 @@ function renderKhachIdList(){
   // dù mã cũ vẫn được giữ lại trong kh_ids để tự động khôi phục đúng mã nếu thêm lại cùng tên.
   var khNames = getKHAll();
   var ccNames = getCcCongNhanNames();
+  var muaNames = getKH('mua'), banNames = getKH('ban');
   var seen = {}, all = [];
   khNames.forEach(function(n){ var k=normTen(n); if(!seen[k]){ seen[k]=true; all.push({ten:n, isKh:true, isCc:false}); } });
   ccNames.forEach(function(n){
@@ -1903,7 +1914,12 @@ function renderKhachIdList(){
     var ten = x.ten;
     var id = getOrCreateKhachId(ten);
     var tenEsc = ten.replace(/"/g,'&quot;');
-    var tag = x.isCc ? '<span style="font-size:9px;padding:1px 5px;border-radius:6px;background:#fffbeb;color:#92400e;font-weight:700;margin-left:5px;vertical-align:middle">👷 CÔNG NHÂN</span>' : '';
+    var laKhachBan = muaNames.some(function(n){ return normTen(n)===normTen(ten); }); // có trong kh3_mua = bán mủ CHO vựa
+    var laKhachMua = banNames.some(function(n){ return normTen(n)===normTen(ten); }); // có trong kh3_ban = mua mủ TỪ vựa
+    var tag = '';
+    if (x.isCc) tag += '<span style="font-size:9px;padding:1px 5px;border-radius:6px;background:#fffbeb;color:#92400e;font-weight:700;margin-left:5px;vertical-align:middle">👷 CÔNG NHÂN</span>';
+    if (laKhachBan) tag += '<span style="font-size:9px;padding:1px 5px;border-radius:6px;background:#eff6ff;color:#1e40af;font-weight:700;margin-left:5px;vertical-align:middle">🌾 KHÁCH BÁN</span>';
+    if (laKhachMua) tag += '<span style="font-size:9px;padding:1px 5px;border-radius:6px;background:#f0fdf4;color:#15803d;font-weight:700;margin-left:5px;vertical-align:middle">🚛 KHÁCH MUA</span>';
     return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--g50);border-radius:10px;padding:10px 12px;margin-bottom:6px">'
       + '<div style="min-width:0"><div style="font-weight:700;font-size:13px;color:var(--g800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ten + tag + '</div>'
       + '<div style="font-size:16px;font-weight:800;color:var(--gd);letter-spacing:1.5px;margin-top:2px">' + id + '</div></div>'
@@ -6529,13 +6545,13 @@ function checkLicenseOnLoad() {
 // Chỉ để lại: date-bar (chọn ngày), bảng dữ liệu cũ (xem lại)
 function applyLicenseLock() {
   updLicenseBanner();
-  // Khoá form wrap của tab mua và bán
-  ['mua-form-wrap','ban-form-wrap'].forEach(function(id){
+  // Khoá form wrap của tab mua, bán, tính toán, chấm công
+  ['mua-form-wrap','ban-form-wrap','ss-form-wrap','cc-form-wrap'].forEach(function(id){
     var el = document.getElementById(id);
     if (el) el.classList.add('license-locked');
   });
   // Hiện banner hết hạn
-  ['lock-banner-mua','lock-banner-ban'].forEach(function(id){
+  ['lock-banner-mua','lock-banner-ban','lock-banner-ss','lock-banner-cc'].forEach(function(id){
     var el = document.getElementById(id);
     if (el) el.classList.add('show');
   });
@@ -6549,11 +6565,11 @@ function applyLicenseLock() {
 
 // Mở khoá lại toàn bộ form sau khi gia hạn/kích hoạt thành công
 function applyLicenseUnlock() {
-  ['mua-form-wrap','ban-form-wrap'].forEach(function(id){
+  ['mua-form-wrap','ban-form-wrap','ss-form-wrap','cc-form-wrap'].forEach(function(id){
     var el = document.getElementById(id);
     if (el) el.classList.remove('license-locked');
   });
-  ['lock-banner-mua','lock-banner-ban'].forEach(function(id){
+  ['lock-banner-mua','lock-banner-ban','lock-banner-ss','lock-banner-cc'].forEach(function(id){
     var el = document.getElementById(id);
     if (el) el.classList.remove('show');
   });
@@ -7771,9 +7787,11 @@ function ccCalcTotals(r){
   var luongThang=parseNum(r.luongThang);
   var luongNgay=Math.round(luongThang/30);
   var tienTruNghi=soNgayNghi*luongNgay;
-  var thucLinh=luongThang - tienTruNghi - soTienUng + soTienThuong;
+  // Tiền công thực tế tính đến hiện tại = số ngày ĐÃ làm thực tế × tiền công 1 ngày (không phải cả tháng lương)
+  var tienCongThucTe=soNgayLam*luongNgay;
+  var thucLinh=tienCongThucTe - soTienUng + soTienThuong;
   return {luongThang:luongThang, luongNgay:luongNgay, soNgayLam:soNgayLam, soNgayNghi:soNgayNghi,
-    tienTruNghi:tienTruNghi, soTienUng:soTienUng, soTienThuong:soTienThuong, thucLinh:thucLinh};
+    tienTruNghi:tienTruNghi, tienCongThucTe:tienCongThucTe, soTienUng:soTienUng, soTienThuong:soTienThuong, thucLinh:thucLinh};
 }
 
 function switchSgSubtab(which){
@@ -7806,7 +7824,7 @@ function renderCcList(){
         +'<div class="cc-stat"><span class="cc-stat-lbl">💵 Tiền thưởng</span><span class="cc-stat-val" style="color:#16a34a">+'+fmtNum(t.soTienThuong)+'đ</span></div>'
       +'</div>'
       +'<div class="cc-card-row"><span>Tiền công tháng</span><b>'+fmtNum(t.luongThang)+' đ</b></div>'
-      +'<div class="cc-card-row"><span>Trừ ngày nghỉ</span><b style="color:#dc2626">-'+fmtNum(t.tienTruNghi)+' đ</b></div>'
+      +'<div class="cc-card-row"><span>Tiền công thực tế (đến nay)</span><b>'+fmtNum(t.tienCongThucTe)+' đ</b></div>'
       +'<div class="cc-card-row" style="border-top:1px solid var(--g100);padding-top:7px;font-size:14px"><span>Thực lãnh</span><b style="color:var(--gd)">'+fmtNum(t.thucLinh)+' đ</b></div>'
       +'</div>';
   }).join('');
@@ -7977,7 +7995,8 @@ function renderCcDetailSummary(r){
     +'<div class="cc-card-row"><span>Tiền công quy ra ngày</span><b>'+fmtNum(t.luongNgay)+' đ</b></div>'
     +'<div class="cc-card-row"><span>Số ngày làm</span><b>'+t.soNgayLam+' ngày</b></div>'
     +'<div class="cc-card-row"><span>Số ngày nghỉ</span><b style="color:#dc2626">'+t.soNgayNghi+' ngày</b></div>'
-    +'<div class="cc-card-row"><span>Số tiền ngày nghỉ bị trừ</span><b style="color:#dc2626">-'+fmtNum(t.tienTruNghi)+' đ</b></div>'
+    +'<div class="cc-card-row"><span>Số tiền ngày nghỉ bị trừ (so với lương đầy đủ)</span><b style="color:#dc2626">-'+fmtNum(t.tienTruNghi)+' đ</b></div>'
+    +'<div class="cc-card-row"><span>Tiền công thực tế (đến nay)</span><b>'+fmtNum(t.tienCongThucTe)+' đ</b></div>'
     +'<div class="cc-card-row"><span>Số tiền ứng</span><b style="color:#dc2626">-'+fmtNum(t.soTienUng)+' đ</b></div>'
     +'<div class="cc-card-row"><span>Số tiền thưởng</span><b style="color:#16a34a">+'+fmtNum(t.soTienThuong)+' đ</b></div>'
     +'<div class="cc-card-row" style="border-top:1px solid var(--g100);padding-top:6px;margin-top:4px;font-size:13.5px"><span>Số tiền thực lãnh</span><b style="color:var(--gd)">'+fmtNum(t.thucLinh)+' đ</b></div>';
