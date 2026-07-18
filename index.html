@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.a9</title>
+<title>Mua Bán Mủ Cao Su v1.b1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -481,7 +481,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.a9 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.b1 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1491,7 +1491,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.a9</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.b1</div>
       </div>
     </div>
 
@@ -2227,6 +2227,12 @@ function tinhTien(loai, kg, gia, doVal, bi){
 
 // ─── INIT ───
 document.addEventListener('DOMContentLoaded',()=>{
+  // Dọn dữ liệu cũ bị lẫn vai trò Khách bán/Khách mua + gộp danh sách chung — PHẢI chạy ngay khi
+  // mở app (không phụ thuộc tab đang mở), vì autocomplete Mua/Bán và màn Mã khách hàng cần dữ liệu
+  // này đúng ngay từ đầu.
+  migrateFixKhachHangRoles();
+  migrateKHAll();
+
   // Khôi phục tab đang dùng
   // Lần đầu mở app → tab mua; reload → giữ tab hiện tại
   var _savedTab = sessionStorage.getItem('cur_tab') || 'mua';
@@ -2533,7 +2539,6 @@ function setLoaiUI(tab, loai, updateGia){
   }
   if(tab==='ban') {
     setTimeout(updBanHints, 30);
-    setTimeout(function(){ restoreLastBuyer(loai); }, 30);
   }
 }
 function restoreLastBuyer(loai){
