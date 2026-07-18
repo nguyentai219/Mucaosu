@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.b4</title>
+<title>Mua Bán Mủ Cao Su v1.1.0</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -480,7 +480,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.b4 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.1.0 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1489,7 +1489,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.b4</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.1.0</div>
       </div>
     </div>
 
@@ -1528,7 +1528,24 @@ input[type=date]:focus{border-color:var(--gl)}
         • <b>Nhấp đúp</b> vào ghi chép → popup sửa/xoá/đánh dấu đã trả nợ<br>
         • Khi <b>Đánh dấu đã trả nợ</b>: ghi chép bị gạch ngang, không tính vào tổng nhưng vẫn lưu để xem<br>
         • <b>Chốt sổ</b>: toàn bộ ghi chép bị gạch ngang, KH chuyển vào mục "Đã chốt sổ" phía dưới<br>
-        • Mở rộng accordion <b>Đã chốt sổ</b> → nhấn 🗑️ để xoá hẳn ghi chép cũ
+        • Mở rộng accordion <b>Đã chốt sổ</b> → nhấn 🗑️ để xoá hẳn ghi chép cũ<br>
+        • Nhấn subtab <b>⏱️ Chấm Công</b> ở đầu trang để chuyển sang chấm công nhân viên (xem mục riêng bên dưới)
+      </div>
+    </div>
+
+    <!-- CHẤM CÔNG -->
+    <div style="background:#faf5ff;border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid #9333ea">
+      <div style="font-size:13px;font-weight:800;color:#7e22ce;margin-bottom:8px">⏱️ CHẤM CÔNG (subtab trong Sổ Gửi)</div>
+      <div style="font-size:12px;color:var(--g800);line-height:1.7">
+        • Nhấn <b>+ Thêm công nhân</b>: nhập tên + lương tháng → app tự tính <b>lương ngày = lương tháng ÷ 30</b><br>
+        • Nhấn vào tên công nhân → mở lịch tháng, nhấn vào từng ngày để ghi:<br>
+        &nbsp;&nbsp;– <b>✔ Chấm công</b>: ngày đi làm bình thường<br>
+        &nbsp;&nbsp;– Các lựa chọn khác: nghỉ, ứng lương, thưởng, khác (có ô nhập số tiền cho ứng/thưởng + ô lý do)<br>
+        • Xem tổng quan phía dưới lịch: số ngày đã làm, tổng ứng, tổng thưởng, và <b>Số tiền thực lãnh</b><br>
+        • Công thức: <i>Thực lãnh = (Số ngày đã làm × Lương ngày) − Tổng đã ứng + Tổng thưởng</i> — tính theo đúng số ngày đã làm thực tế trong kỳ, không tính trọn tháng<br>
+        • Nhấn <b>✅ Chốt công</b> để khoá kỳ chấm công hiện tại (không sửa được nữa, dùng khi đã thanh toán lương xong)<br>
+        • Nhấn <b>🗑️ Xoá chấm công này</b> để xoá 1 ngày ghi chép cụ thể (không xoá cả công nhân)<br>
+        • Tên công nhân trong Chấm Công là danh sách <b>tách biệt hoàn toàn</b> với tên khách hàng mua/bán mủ — không lẫn gợi ý tên qua lại
       </div>
     </div>
 
@@ -1536,8 +1553,26 @@ input[type=date]:focus{border-color:var(--gl)}
     <div style="background:#fffbeb;border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid #d97706">
       <div style="font-size:13px;font-weight:800;color:#d97706;margin-bottom:8px">🧮 Tab TÍNH TOÁN</div>
       <div style="font-size:12px;color:var(--g800);line-height:1.7">
-        • Tính nhanh thành tiền theo loại mủ và đơn giá<br>
-        • Không lưu dữ liệu — dùng để kiểm tra nhanh
+        • Dùng khi cần <b>khớp lại số liệu thu mua trong ngày</b> theo 1 mục tiêu cuối cùng (VD: cân lại ở kho tổng ra số kg/độ khác so với lúc cân ở điểm thu mua)<br>
+        • Chọn <b>loại mủ</b> và <b>ngày</b> cần tính lại — app hiện sẵn tổng số liệu thực tế đã ghi trong ngày đó<br>
+        • Nhập 1 hoặc nhiều <b>mục tiêu cần đạt</b>: đơn giá, tổng kg, độ TB, tổng tiền (để trống ô nào thì giữ nguyên theo số liệu hiện có)<br>
+        • Nhấn <b>⚡ Tính toán &amp; Phân bổ</b>: app tự chia lại kg/độ/tiền cho từng người theo đúng tỷ lệ cũ, sao cho tổng khớp đúng mục tiêu — xem trước kết quả, so sánh và bảng kiểm tra đạt yêu cầu chưa<br>
+        • Có thể nhấn <b>🔄 Tính toán &amp; Phân bổ lại</b> nhiều lần nếu muốn đổi mục tiêu<br>
+        • Nhấn <b>💾 Lưu Sổ Sách</b> để GHI ĐÈ số liệu mới vào đúng các giao dịch Thu Mua ngày đó (không thể hoàn tác) — nếu chỉ xem thử thì không cần nhấn nút này
+      </div>
+    </div>
+
+    <!-- QUẢN LÝ KHÁCH HÀNG -->
+    <div style="background:#ecfdf5;border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid #059669">
+      <div style="font-size:13px;font-weight:800;color:#047857;margin-bottom:8px">👥 QUẢN LÝ KHÁCH HÀNG &amp; MÃ KHÁCH HÀNG</div>
+      <div style="font-size:12px;color:var(--g800);line-height:1.7">
+        • Nhấn icon <b>👥</b> ở đầu trang để mở danh sách khách hàng<br>
+        • Mỗi khách hàng có 1 <b>Mã khách hàng</b> cố định gồm <b>5 chữ số</b> (VD: 04821) — đưa mã này cho khách để họ tự tra cứu sổ sách trong app <b>"Xem Sổ Khách Hàng"</b><br>
+        • Nhãn vai trò tự động theo đúng giao dịch thật, không cần tự gán: <b>🌾 Khách bán</b> (có giao dịch ở tab Thu Mua), <b>🚛 Khách mua</b> (có giao dịch ở tab Bán Ra), <b>👷 Công nhân</b> (có trong Chấm Công) — khách có cả 2 loại giao dịch sẽ lên đủ cả 2 nhãn<br>
+        • Nhấn <b>📋 Sao chép</b> để copy nhanh mã, gửi cho khách qua Zalo/tin nhắn<br>
+        • Nhấn <b>➕ Thêm khách hàng mới</b> để đăng ký trước 1 khách chưa có giao dịch nào (tick sẵn vai trò nếu biết)<br>
+        • Nhấn nút <b>✏️</b> cạnh mỗi khách để đổi tên hoặc xoá — công nhân đang có trong Chấm Công sẽ khoá ô đổi tên (đổi tên công nhân phải làm trong mục Chấm Công để không lệch dữ liệu)<br>
+        • Nhấn <b>🔒 Chốt theo khách hàng</b> để chọn mốc ngày chốt riêng cho từng khách — app "Xem Sổ Khách Hàng" chỉ hiện Thu Mua phát sinh SAU mốc chốt đó (dùng khi đã thanh toán xong, không muốn khách thấy lẫn giao dịch cũ)
       </div>
     </div>
 
@@ -1548,7 +1583,11 @@ input[type=date]:focus{border-color:var(--gl)}
         • Nhấn vào thanh trạng thái phía trên (dưới tên app) để chọn phương án đồng bộ<br>
         • Có <b>2 phương án</b>, chọn 1 để dùng: <b>☁️ Google Drive</b> hoặc <b>⚡ Supabase</b><br>
         • Có thể đổi qua lại giữa 2 phương án bất cứ lúc nào trong menu đồng bộ, không mất dữ liệu<br>
-        • Khi đang đồng bộ: thanh trạng thái hiện <b>"Đang đồng bộ..."</b>; nếu lỗi sẽ hiện <b>"Lỗi đồng bộ (n)"</b> kèm số ghi chép chưa lưu, và tự thử lại ở lần ghi chép/cài đặt tiếp theo
+        • Ngoài việc tự đồng bộ ngay sau mỗi giao dịch, app còn <b>tự đồng bộ ngầm mỗi 15 giây</b> nếu không có thao tác nào (chạm/gõ) — quét toàn bộ dữ liệu, chạy im lặng không chớp màn hình, phòng trường hợp có chỗ nào lỡ chưa kịp đồng bộ ngay<br>
+        • Đọc thanh trạng thái để biết tình trạng đồng bộ hiện tại:<br>
+        &nbsp;&nbsp;– <b style="color:#16a34a">✅ Đã kết nối - cập nhật lúc: HH:MM:SS ngày dd/mm</b>: mọi thứ đã lưu lên máy chủ, kèm giờ đồng bộ gần nhất<br>
+        &nbsp;&nbsp;– <b style="color:#dc2626">⚠️ Mất kết nối</b>: chưa đăng nhập hoặc đang mất mạng — kèm số mục chưa sao lưu nếu có, app sẽ tự đồng bộ lại ngay khi có mạng<br>
+        &nbsp;&nbsp;– <b style="color:#dc2626">❌ Lỗi đồng bộ</b>: có lỗi khi lưu lên máy chủ — kèm số ghi chép chưa lưu, tự thử lại ở lần ghi chép/cài đặt tiếp theo
       </div>
     </div>
 
@@ -1588,7 +1627,7 @@ input[type=date]:focus{border-color:var(--gl)}
         • Cài app: mở trình duyệt → nhấn <b>"Thêm vào màn hình chính"</b> để dùng như app thật<br>
         • Dữ liệu lưu trên thiết bị (localStorage) — không mất khi tắt app<br>
         • Nhấp đúp nhanh 2 lần (trong 600ms) để sửa/xoá giao dịch<br>
-        • Nhấn biểu tượng 🌿 bất kỳ lúc nào để xem lại hướng dẫn này
+        • Vào <b>⚙️ Cài đặt → 📖 Hướng dẫn sử dụng</b> bất kỳ lúc nào để xem lại hướng dẫn này
       </div>
     </div>
 
