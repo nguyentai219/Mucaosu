@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.a8</title>
+<title>Mua Bán Mủ Cao Su v1.a9</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -481,12 +481,12 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.a8 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.a9 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
       <button class="ico-btn" id="settings-btn" onclick="openSettings()" title="Cài đặt">⚙️</button>
-      <button class="ico-btn" id="kh-btn" onclick="openKH()" title="Khách hàng">👥</button>
+      <button class="ico-btn" id="kh-btn" onclick="openKhachIdList()" title="Khách hàng">👥</button>
     </div>
   </div>
   <div class="gd-bar" id="gd-bar" onclick="openSyncModal()">
@@ -1491,7 +1491,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.a8</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.a9</div>
       </div>
     </div>
 
@@ -1617,6 +1617,16 @@ input[type=date]:focus{border-color:var(--gl)}
     <div style="font-size:11.5px;color:var(--g600);margin-bottom:10px">Đưa Mã KH này cho khách hàng để họ nhập vào app <b>"Xem Sổ Khách Hàng"</b> và tự xem sổ sách thu mua/gửi/ứng của riêng mình.</div>
 
     <div style="background:var(--g50);border-radius:10px;padding:10px 12px;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700;color:var(--g800);margin-bottom:6px">➕ Thêm khách hàng mới</div>
+      <input type="text" id="khid-add-ten" class="fi" placeholder="Nhập tên khách hàng..." style="margin-bottom:8px" autocomplete="off">
+      <div style="display:flex;gap:16px;margin-bottom:9px;font-size:12.5px;color:var(--g800)">
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="khid-add-ban" style="width:16px;height:16px;accent-color:var(--gd)"> 🌾 Khách bán</label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="khid-add-mua" style="width:16px;height:16px;accent-color:var(--gd)"> 🚛 Khách mua</label>
+      </div>
+      <button onclick="themKhachId()" style="width:100%;padding:9px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">+ Thêm khách hàng</button>
+    </div>
+
+    <div style="background:var(--g50);border-radius:10px;padding:10px 12px;margin-bottom:12px">
       <div style="font-size:13px;font-weight:700;color:var(--g800);margin-bottom:2px">🔒 Chốt danh sách Thu Mua</div>
       <div style="font-size:11.5px;color:var(--g600);margin-bottom:8px">Chốt riêng theo từng khách hàng — app khách hàng sẽ chỉ hiện Thu Mua phát sinh sau mốc chốt của người đó</div>
       <button onclick="openMuaChotSelect()" style="width:100%;padding:9px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">🔒 Chốt theo khách hàng</button>
@@ -1625,6 +1635,24 @@ input[type=date]:focus{border-color:var(--gl)}
     <input type="text" id="khid-search" class="fi" placeholder="🔍 Tìm tên khách hàng..." oninput="renderKhachIdList()" style="margin-bottom:10px" autocomplete="off">
     <div id="khid-list"></div>
     <button class="btn-huy" style="width:100%;margin-top:12px" onclick="closeM('modal-khach-id')">Đóng</button>
+  </div>
+</div>
+
+<!-- MODAL SỬA KHÁCH HÀNG -->
+<div class="modal center" id="modal-khid-edit" style="z-index:900">
+  <div class="modal-box center-box" style="max-width:340px">
+    <div class="modal-title">✏️ Sửa khách hàng</div>
+    <div id="khide-cc-note" style="display:none;font-size:11.5px;color:#92400e;background:#fffbeb;border-radius:8px;padding:8px 10px;margin-bottom:10px">👷 Đang là công nhân trong Chấm Công — đổi tên hoặc xoá công nhân trong mục Chấm Công, ở đây chỉ chỉnh được vai trò khách bán/khách mua.</div>
+    <input type="text" id="khide-ten" class="fi" placeholder="Tên khách hàng" style="margin-bottom:9px" autocomplete="off">
+    <div style="display:flex;gap:16px;margin-bottom:14px;font-size:12.5px;color:var(--g800)">
+      <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="khide-ban" style="width:16px;height:16px;accent-color:var(--gd)"> 🌾 Khách bán</label>
+      <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="khide-mua" style="width:16px;height:16px;accent-color:var(--gd)"> 🚛 Khách mua</label>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <button onclick="luuEditKhachId()" style="flex:1;padding:10px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">💾 Lưu</button>
+      <button onclick="xoaKhachId()" style="flex:1;padding:10px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">🗑️ Xoá</button>
+    </div>
+    <button class="btn-huy" style="width:100%" onclick="closeM('modal-khid-edit')">Huỷ</button>
   </div>
 </div>
 
@@ -1702,18 +1730,21 @@ function setKHAll(v){ lsSet(KH_ALL_KEY, v); }
 // So khớp tên khách hàng không phân biệt hoa/thường và khoảng trắng thừa,
 // để "anh 2" và "Anh 2" (gõ khác nhau, cùng 1 người) được coi là cùng một khách hàng.
 function normTen(s){ return (s||'').trim().replace(/\s+/g,' ').toLowerCase(); }
-function saveKHShared(ten){
+function saveKHShared(ten, tab){
   if(!ten || !ten.trim()) return;
   ten = ten.trim();
   var all = getKHAll();
   var norm = normTen(ten);
   var existed = all.find(function(n){ return normTen(n)===norm; });
   if(!existed){ all.push(ten); setKHAll(all); existed = ten; }
-  // Đồng bộ ngược vào kh3_mua và kh3_ban để autocomplete cũ vẫn hoạt động
-  ['mua','ban'].forEach(function(t){
-    var kh=getKH(t);
-    if(!kh.some(function(n){ return normTen(n)===norm; })){ kh.push(existed); setKH(t,kh); }
-  });
+  // CHỈ thêm vào đúng danh sách của tab đang lưu (mua HOẶC bán), KHÔNG tự động thêm sang tab còn lại.
+  // Nhờ đó "Khách bán" (kh3_mua = bán mủ CHO vựa, gõ tên ở tab Thu Mua) và "Khách mua"
+  // (kh3_ban = mua mủ TỪ vựa, gõ tên ở tab Bán Ra) tách biệt hoàn toàn, không lẫn gợi ý qua nhau.
+  // Lưu từ Sổ Gửi/Ứng tiền (không truyền tab) chỉ vào danh sách chung, không gán vai trò mua/bán.
+  if (tab==='mua' || tab==='ban'){
+    var kh=getKH(tab);
+    if(!kh.some(function(n){ return normTen(n)===norm; })){ kh.push(existed); setKH(tab,kh); }
+  }
   getOrCreateKhachId(existed); // Đảm bảo khách hàng nào cũng có Mã KH cố định ngay khi được lưu
 }
 
@@ -1923,9 +1954,27 @@ function renderKhachIdList(){
     return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--g50);border-radius:10px;padding:10px 12px;margin-bottom:6px">'
       + '<div style="min-width:0"><div style="font-weight:700;font-size:13px;color:var(--g800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ten + tag + '</div>'
       + '<div style="font-size:16px;font-weight:800;color:var(--gd);letter-spacing:1.5px;margin-top:2px">' + id + '</div></div>'
-      + '<button onclick="copyKhachId(&quot;' + id + '&quot;,&quot;' + tenEsc + '&quot;)" style="flex:0 0 auto;background:var(--gd);color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer">📋 Sao chép</button>'
-      + '</div>';
+      + '<div style="flex:0 0 auto;display:flex;gap:6px">'
+      + '<button onclick="copyKhachId(&quot;' + id + '&quot;,&quot;' + tenEsc + '&quot;)" style="background:var(--gd);color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer">📋 Sao chép</button>'
+      + '<button onclick="openEditKhachId(&quot;' + tenEsc + '&quot;)" title="Sửa" style="background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:8px;padding:8px 10px;font-size:13px;cursor:pointer">✏️</button>'
+      + '</div></div>';
   }).join('');
+}
+function themKhachId(){
+  var inp = document.getElementById('khid-add-ten');
+  var name = (inp.value || '').trim();
+  if (!name){ toast('⚠️ Nhập tên khách hàng!'); return; }
+  if (getKHAll().some(function(n){ return normTen(n)===normTen(name); })){ toast('⚠️ Tên đã có!'); return; }
+  var laBan = document.getElementById('khid-add-ban').checked; // vào kh3_mua = bán mủ CHO vựa
+  var laMua = document.getElementById('khid-add-mua').checked; // vào kh3_ban = mua mủ TỪ vựa
+  saveKHShared(name); // thêm vào danh sách chung + cấp Mã KH, không tự gán vai trò
+  if (laBan){ var k1=getKH('mua'); if(!k1.some(function(n){return normTen(n)===normTen(name);})){ k1.push(name); setKH('mua',k1); } }
+  if (laMua){ var k2=getKH('ban'); if(!k2.some(function(n){return normTen(n)===normTen(name);})){ k2.push(name); setKH('ban',k2); } }
+  inp.value = '';
+  document.getElementById('khid-add-ban').checked = false;
+  document.getElementById('khid-add-mua').checked = false;
+  renderKhachIdList();
+  toast('✅ Đã thêm khách hàng!');
 }
 function copyKhachId(id, ten){
   if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1933,6 +1982,91 @@ function copyKhachId(id, ten){
   } else {
     toast('Mã KH của ' + ten + ': ' + id);
   }
+}
+// Dọn dữ liệu cũ bị lỗi: trước đây saveKHShared() từng tự động thêm MỌI tên vào CẢ HAI kh3_mua
+// và kh3_ban (dù chỉ gõ ở 1 tab, hoặc thậm chí gõ ở Sổ Gửi/Ứng tiền), khiến khách hàng nào cũng
+// bị gắn cả nhãn "Khách bán" lẫn "Khách mua". Hàm này chỉ chạy 1 lần: xây lại kh3_mua/kh3_ban
+// dựa trên GIAO DỊCH THỰC TẾ (đúng định nghĩa: khách bán = có giao dịch ở tab Thu Mua, khách mua =
+// có giao dịch ở tab Bán Ra), đồng thời vẫn giữ khách được gán thủ công trước đó nếu tên đó CHỈ
+// nằm ở đúng 1 trong 2 danh sách cũ (không bị lỗi trùng) để không mất người mới thêm nhưng chưa giao dịch.
+function migrateFixKhachHangRoles(){
+  if (localStorage.getItem('kh_role_fix_v1')) return;
+  var muaTx = {}; getGD('mua').forEach(function(g){ if (g.ten) muaTx[normTen(g.ten)] = g.ten; });
+  var banTx = {}; getGD('ban').forEach(function(g){ if (g.ten) banTx[normTen(g.ten)] = g.ten; });
+  var oldMuaSet = {}; getKH('mua').forEach(function(n){ oldMuaSet[normTen(n)] = n; });
+  var oldBanSet = {}; getKH('ban').forEach(function(n){ oldBanSet[normTen(n)] = n; });
+  var newMua = [], newBan = [], seenMua = {}, seenBan = {};
+  Object.keys(muaTx).forEach(function(k){ if(!seenMua[k]){ seenMua[k]=true; newMua.push(muaTx[k]); } });
+  Object.keys(banTx).forEach(function(k){ if(!seenBan[k]){ seenBan[k]=true; newBan.push(banTx[k]); } });
+  Object.keys(oldMuaSet).forEach(function(k){ if(!oldBanSet[k] && !seenMua[k]){ seenMua[k]=true; newMua.push(oldMuaSet[k]); } });
+  Object.keys(oldBanSet).forEach(function(k){ if(!oldMuaSet[k] && !seenBan[k]){ seenBan[k]=true; newBan.push(oldBanSet[k]); } });
+  setKH('mua', newMua);
+  setKH('ban', newBan);
+  localStorage.setItem('kh_role_fix_v1','1');
+}
+var _khidEditOrigTen = '';
+function openEditKhachId(ten){
+  _khidEditOrigTen = ten;
+  document.getElementById('khide-ten').value = ten;
+  var muaNames = getKH('mua'), banNames = getKH('ban');
+  document.getElementById('khide-ban').checked = muaNames.some(function(n){ return normTen(n)===normTen(ten); });
+  document.getElementById('khide-mua').checked = banNames.some(function(n){ return normTen(n)===normTen(ten); });
+  var isCc = getCcCongNhanNames().some(function(n){ return normTen(n)===normTen(ten); });
+  document.getElementById('khide-cc-note').style.display = isCc ? 'block' : 'none';
+  document.getElementById('khide-ten').readOnly = isCc; // không đổi tên công nhân ở đây, tránh lệch dữ liệu Chấm Công
+  openM('modal-khid-edit');
+}
+function luuEditKhachId(){
+  var oldName = _khidEditOrigTen;
+  var isCc = getCcCongNhanNames().some(function(n){ return normTen(n)===normTen(oldName); });
+  var newName = isCc ? oldName : (document.getElementById('khide-ten').value || '').trim();
+  if (!newName){ toast('⚠️ Nhập tên khách hàng!'); return; }
+  if (normTen(newName)!==normTen(oldName) && getKHAll().some(function(n){ return normTen(n)===normTen(newName); })){
+    toast('⚠️ Tên đã tồn tại!'); return;
+  }
+  var laBan = document.getElementById('khide-ban').checked;
+  var laMua = document.getElementById('khide-mua').checked;
+  // Cập nhật/khôi phục tên trong danh sách chung kh3_all
+  var all = getKHAll();
+  var idx = all.findIndex(function(n){ return normTen(n)===normTen(oldName); });
+  if (idx>=0) { all[idx]=newName; setKHAll(all); }
+  else if (laBan || laMua) { all.push(newName); setKHAll(all); }
+  // Cập nhật kh3_mua/kh3_ban theo đúng 2 ô chọn vai trò
+  ['mua','ban'].forEach(function(t){
+    var want = (t==='mua') ? laBan : laMua;
+    var arr = getKH(t);
+    var i2 = arr.findIndex(function(n){ return normTen(n)===normTen(oldName); });
+    if (want) { if (i2>=0) arr[i2]=newName; else arr.push(newName); }
+    else if (i2>=0) { arr.splice(i2,1); }
+    setKH(t,arr);
+  });
+  // Đổi tên: di chuyển Mã KH và mốc chốt Thu Mua sang tên mới, giữ nguyên giá trị cũ
+  if (normTen(newName)!==normTen(oldName)){
+    var map=getKhIds(), oldKey=null;
+    for (var k in map) { if (normTen(k)===normTen(oldName)) { oldKey=k; break; } }
+    if (oldKey) { if (!map[newName]) map[newName]=map[oldKey]; delete map[oldKey]; setKhIds(map); }
+    var chotMap=getMuaChotMap(), oldChotKey=null;
+    for (var k2 in chotMap) { if (normTen(k2)===normTen(oldName)) { oldChotKey=k2; break; } }
+    if (oldChotKey) { chotMap[newName]=chotMap[oldChotKey]; delete chotMap[oldChotKey]; setMuaChotMap(chotMap); }
+  }
+  getOrCreateKhachId(newName);
+  closeM('modal-khid-edit');
+  renderKhachIdList();
+  toast('✅ Đã cập nhật!');
+}
+function xoaKhachId(){
+  var ten = _khidEditOrigTen;
+  showDetail('🗑️','Xoá khách hàng "'+ten+'"?',[],null,'Xoá',function(){
+    var all = getKHAll().filter(function(n){ return normTen(n)!==normTen(ten); });
+    setKHAll(all);
+    ['mua','ban'].forEach(function(t){
+      var arr = getKH(t).filter(function(n){ return normTen(n)!==normTen(ten); });
+      setKH(t,arr);
+    });
+    closeM('modal-khid-edit');
+    renderKhachIdList();
+    toast('🗑️ Đã xoá!');
+  });
 }
 // Khi load: gộp kh3_mua + kh3_ban vào kh3_all nếu chưa có
 function migrateKHAll(){
@@ -2179,6 +2313,7 @@ function switchTab(tab){
     if(ssLoai !== _targetLoai) setSsLoai(_targetLoai);
     else { var _sel2=document.getElementById('ss-loai-select'); if(_sel2&&_sel2.tagName==='SELECT') _sel2.value=ssLoai; }
     initSsDateSelect();
+    migrateFixKhachHangRoles(); // Dọn lỗi cũ: tách lại đúng Khách bán/Khách mua theo giao dịch thực tế (chạy 1 lần)
     migrateKHAll(); // Gộp KH mua+ban vào danh sách chung
     updSSSummary();
     restoreSsState(curDate['mua']);
@@ -2432,7 +2567,7 @@ function onTen(tab){
   const v=document.getElementById(tab+'-ten').value.trim();
   const ac=document.getElementById(tab+'-ac');
   if(!v){ ac.style.display='none'; return; }
-  const kh=getKHAll().filter(k=>k.toLowerCase().includes(v.toLowerCase()));
+  const kh=getKH(tab).filter(k=>k.toLowerCase().includes(v.toLowerCase()));
   if(!kh.length){ ac.style.display='none'; return; }
   // Ẩn ngay nếu nhập khớp chính xác với 1 tên (không phân biệt hoa/thường)
   if(kh.length===1 && kh[0].toLowerCase()===v.toLowerCase()){
@@ -2575,7 +2710,7 @@ function luuGD(tab){
   if(!ghArr.includes(gia)) ghArr.push(gia);
   ghArr=ghArr.slice(-6); // giữ tối đa 6 mức giá gần nhất
   localStorage.setItem(ghKey, JSON.stringify(ghArr));
-  saveKHShared(ten); // Lưu vào danh sách KH chung
+  saveKHShared(ten, tab); // Lưu vào danh sách KH chung, gán đúng vai trò theo tab (mua/bán)
 
   // Xây rows chi tiết
   const rows=buildRows(loai,ten,kg,gia,doV,bi);
