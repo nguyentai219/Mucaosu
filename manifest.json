@@ -1,7 +1,7 @@
 {
   "name": "Mua Bán Mủ Cao Su",
   "short_name": "Mủ Cao Su",
-  "description": "Phần mềm ghi chép mua bán mủ cao su - v1.1.3",
+  "description": "Phần mềm ghi chép mua bán mủ cao su - v1.1.4",
   "start_url": "/Mucaosu/index.html",
   "display": "standalone",
   "orientation": "portrait",
