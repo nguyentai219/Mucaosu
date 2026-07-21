@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.1.6</title>
+<title>Mua Bán Mủ Cao Su v1.1.9</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -480,7 +480,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.1.6 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.1.9 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -592,6 +592,7 @@ input[type=date]:focus{border-color:var(--gl)}
   <div class="sec-divider"></div>
   <div class="sec-title">📊 Thống kê trong ngày</div>
   <div class="tk-grid" id="mua-tk"></div>
+  <button onclick="openXemGDCu()" style="width:100%;margin-top:10px;padding:11px;background:#fff;border:1.5px solid var(--gd);border-radius:var(--r);color:var(--gd);font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🔍 Xem lại giao dịch cũ</button>
 </div>
 </div>
 
@@ -1218,6 +1219,25 @@ input[type=date]:focus{border-color:var(--gl)}
   </div>
 </div>
 
+<!-- MODAL XEM LẠI GIAO DỊCH CŨ (tab Thu Mua) -->
+<div class="modal" id="modal-xem-gd-cu">
+  <div class="modal-box" style="max-height:94vh;display:flex;flex-direction:column">
+    <div class="modal-handle"></div>
+    <div id="xgc-search-wrap">
+      <div class="modal-title" style="color:var(--gd);flex-shrink:0">🔍 Xem lại giao dịch cũ</div>
+      <div style="font-size:11.5px;color:var(--g600);text-align:center;margin-bottom:10px;flex-shrink:0">Tra cứu toàn bộ giao dịch Thu Mua đã lưu của 1 khách hàng, phân theo từng ngày</div>
+      <div class="fr" style="position:relative;flex-shrink:0">
+        <label class="fl">Tên khách hàng</label>
+        <input type="search" id="xgc-ten" class="fi" placeholder="Nhập tên khách hàng..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="q" oninput="onXgcTen()" onkeydown="xgcTenKey(event)">
+        <div class="ac-list" id="xgc-ac"></div>
+      </div>
+      <button class="btn-luu" style="width:100%;margin-top:10px;flex-shrink:0" onclick="xgcTraCuu()">🔍 Tra cứu</button>
+    </div>
+    <div id="xgc-result" style="flex:1;overflow-y:auto;margin-top:12px"></div>
+    <button class="btn-huy" style="width:100%;margin-top:8px;flex-shrink:0" onclick="closeM('modal-xem-gd-cu')">Đóng</button>
+  </div>
+</div>
+
 <!-- MODAL DATE SS (Tính Toán) -->
 <div class="modal" id="modal-ss-date">
   <div class="modal-box">
@@ -1504,7 +1524,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.1.6</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.1.9</div>
       </div>
     </div>
 
@@ -2694,6 +2714,96 @@ function pickKH(tab,name){
   } else {
     setTimeout(function(){ document.getElementById(tab+'-kg').focus(); }, 50);
   }
+}
+// ─── XEM LẠI GIAO DỊCH CŨ (tab Thu Mua) ───
+function openXemGDCu(){
+  document.getElementById('xgc-ten').value='';
+  document.getElementById('xgc-ac').style.display='none';
+  document.getElementById('xgc-ac').innerHTML='';
+  document.getElementById('xgc-result').innerHTML='';
+  document.getElementById('xgc-search-wrap').style.display='block';
+  openM('modal-xem-gd-cu');
+  setTimeout(function(){ var el=document.getElementById('xgc-ten'); if(el) el.focus(); }, 250);
+}
+function onXgcTen(){
+  rebuildKHRoleLists(); // luôn tính lại đúng danh sách khách Thu Mua trước khi gợi ý
+  var v=document.getElementById('xgc-ten').value.trim();
+  var ac=document.getElementById('xgc-ac');
+  if(!v){ ac.style.display='none'; return; }
+  var kh=getKH('mua').filter(function(k){ return k.toLowerCase().includes(v.toLowerCase()); });
+  if(!kh.length){ ac.style.display='none'; return; }
+  if(kh.length===1 && kh[0].toLowerCase()===v.toLowerCase()){ ac.style.display='none'; return; }
+  ac.innerHTML=kh.map(function(k){ return '<div class="ac-item" onmousedown="pickXgcKH(\''+k.replace(/'/g,"\\'")+'\')">👤 '+k+'</div>'; }).join('');
+  ac.style.display='block';
+}
+function pickXgcKH(name){
+  document.getElementById('xgc-ten').value=name;
+  document.getElementById('xgc-ac').style.display='none';
+  xgcTraCuu();
+}
+function xgcTenKey(e){
+  if(e.key==='Enter'){
+    document.getElementById('xgc-ac').style.display='none';
+    xgcTraCuu();
+  }
+}
+function xgcTraCuu(){
+  var ten=document.getElementById('xgc-ten').value.trim();
+  document.getElementById('xgc-ac').style.display='none';
+  var resEl=document.getElementById('xgc-result');
+  if(!ten){ toast('⚠️ Nhập tên khách hàng!'); return; }
+  var all=getGD('mua').filter(function(g){ return normTen(g.ten)===normTen(ten); });
+  if(!all.length){
+    resEl.innerHTML='<div class="no-data" style="display:block">Không tìm thấy giao dịch Thu Mua nào của "'+ten+'"</div>';
+    return;
+  }
+  // Đã có kết quả: ẩn khung nhập liệu + nút Tra cứu, chỉ hiện từ tên khách hàng trở xuống, chiếm toàn màn hình
+  document.getElementById('xgc-search-wrap').style.display='none';
+  var tenHienThi=all[all.length-1].ten; // giữ đúng cách viết hoa/thường của lần nhập gần nhất
+  // Nhóm theo ngày, ngày mới nhất lên đầu
+  var byDate={};
+  all.forEach(function(g){ (byDate[g.date]=byDate[g.date]||[]).push(g); });
+  var dates=Object.keys(byDate).sort().reverse();
+  var tongTien=0;
+  var html='';
+  dates.forEach(function(d){
+    var recs=byDate[d].slice().sort(function(a,b){ return parseFloat(a.id)-parseFloat(b.id); });
+    var tienNgay=0;
+    var rows=recs.map(function(gd){
+      var doTxt;
+      if(gd.loai==='nuoc') doTxt=gd.do||'--';
+      else if(gd.loai==='dong') doTxt=gd.do?fmtKg(gd.do):'--';
+      else doTxt='--';
+      var kgNet=kgThuc(gd.loai,gd.kg,gd.do,gd.bi||0);
+      tienNgay+=parseFloat(gd.tt)||0; tongTien+=parseFloat(gd.tt)||0;
+      var guiTxt=gd.guiSo?'<span style="color:#16a34a;font-weight:700">✅</span>':'<span style="color:var(--g400)">○</span>';
+      return '<tr>'
+        +'<td style="text-align:left;padding-left:7px">'+LOAI_ICO[gd.loai]+' '+LOAI_LBL_SHORT[gd.loai]+'</td>'
+        +'<td>'+fmtKg(kgNet)+((gd.bi&&parseFloat(gd.bi)>0)?'<span style="display:block;font-size:9.5px;color:#e57373;font-weight:700">(-'+fmtKg(gd.bi)+')</span>':'')+'</td>'
+        +'<td>'+doTxt+'</td>'
+        +'<td>'+fmtNum(gd.gia)+'</td>'
+        +'<td style="font-weight:700">'+fmtNum(gd.tt)+'</td>'
+        +'<td>'+guiTxt+'</td>'
+        +'</tr>';
+    }).join('');
+    html+='<div style="margin-bottom:14px;border:1.5px solid var(--gp);border-radius:var(--r);overflow:hidden">'
+      +'<div style="background:var(--gd);color:#fff;padding:7px 10px;font-size:12px;font-weight:700;display:flex;justify-content:space-between;align-items:center">'
+      +'<span>📅 '+fmtDate(d)+'</span><span style="font-size:11px;opacity:.9">'+recs.length+' lượt</span>'
+      +'</div>'
+      +'<table class="tbl"><thead><tr>'
+      +'<th style="text-align:left;padding-left:7px">Loại</th><th>Kg</th><th>Độ</th><th>Giá</th><th>Tiền</th><th>Gửi</th>'
+      +'</tr></thead><tbody>'+rows+'</tbody></table>'
+      +'<div style="display:flex;justify-content:flex-end;padding:6px 10px;background:var(--g50);font-size:11px;font-weight:700;color:var(--g600);border-top:1px solid var(--g100)">'
+      +'<span>Tổng tiền ngày: '+fmtNum(tienNgay)+' ₫</span>'
+      +'</div>'
+      +'</div>';
+  });
+  var headerHtml='<div style="background:var(--gb);border-radius:var(--r);padding:10px;margin-bottom:12px;text-align:center">'
+    +'<div style="font-size:13px;font-weight:800;color:var(--gd)">👤 '+tenHienThi+'</div>'
+    +'<div style="font-size:11px;color:var(--g600);margin-top:4px">'+all.length+' lượt giao dịch · '+dates.length+' ngày khác nhau</div>'
+    +'<div style="margin-top:6px;font-size:12px;font-weight:700;color:var(--g800)">Tổng tiền: '+fmtNum(tongTien)+' ₫</div>'
+    +'</div>';
+  resEl.innerHTML=headerHtml+html;
 }
 function nf(e,id){ if(e.key==='Enter'){e.preventDefault();document.getElementById(id).focus();} }
 function kgKey(e,tab){
