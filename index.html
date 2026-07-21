@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.1.9</title>
+<title>Mua Bán Mủ Cao Su v1.2.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -480,7 +480,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.1.9 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.2.1 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -999,6 +999,28 @@ input[type=date]:focus{border-color:var(--gl)}
         </div>
         <label class="toggle-sw">
           <input type="checkbox" id="setting-round" onchange="saveSetting('round',this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <!-- ĐỌC SỐ TIỀN TỰ ĐỘNG -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 4px;border-bottom:1px solid var(--g100)">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--g800)">🔊 Tự động đọc số tiền</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:2px">Tab Thu Mua: đọc to số tiền ngay sau khi lưu giao dịch</div>
+        </div>
+        <label class="toggle-sw">
+          <input type="checkbox" id="setting-docTien" onchange="saveSetting('docTien',this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <!-- ÂM BÁO LƯU THÀNH CÔNG -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 4px;border-bottom:1px solid var(--g100)">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--g800)">🔔 Âm báo lưu thành công</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:2px">Phát tiếng "ting" ở mọi nơi có nút Lưu, khi lưu thành công</div>
+        </div>
+        <label class="toggle-sw">
+          <input type="checkbox" id="setting-amBao" onchange="saveSetting('amBao',this.checked)">
           <span class="toggle-slider"></span>
         </label>
       </div>
@@ -1524,7 +1546,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.1.9</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.2.1</div>
       </div>
     </div>
 
@@ -2848,7 +2870,7 @@ function calc(tab){
   const t=tinhTien(loai,kg,gia,doV,bi);
   // Áp dụng làm tròn nếu bật
   var tDisplay=t;
-  if(getSetting&&getSetting('round',false)){
+  if(getSetting&&getSetting('round',true)){
     var rem=Math.round(t)%1000;
     tDisplay=rem>=500?Math.round(t)-rem+1000:Math.round(t)-rem;
   }
@@ -2903,7 +2925,7 @@ function luuGD(tab){
 
   var ttRaw=tinhTien(loai,kg,gia,doV,bi);
   var tt=ttRaw;
-  if(getSetting&&getSetting('round',false)){
+  if(getSetting&&getSetting('round',true)){
     var r3=Math.round(ttRaw)%1000;
     tt=r3>=500?Math.round(ttRaw)-r3+1000:Math.round(ttRaw)-r3;
   }
@@ -2919,10 +2941,13 @@ function luuGD(tab){
 
   // Xây rows chi tiết
   const rows=buildRows(loai,ten,kg,gia,doV,bi);
+  // Đọc to số tiền NGAY khi bấm nút "Lưu giao dịch" (không chờ xác nhận trong popup) — chỉ áp dụng tab Thu Mua
+  if(tab==='mua') docTienTuDongSauLuu(tt);
   showDetail('✅','Xác nhận lưu giao dịch',rows,tt,'Lưu',()=>{
     const gd={id:Date.now()+Math.random(), date:curDate[tab], ten, loai, kg, do:doV, bi, gia, tt, guiSo:false, edited:false};
     const all=getGD(tab); all.push(gd); setGD(tab,all);
     toast('✅ Đã lưu!'); resetF(tab); renderTbl(tab, gd.id); updTK(tab); updTK('ban'); if(typeof updSSSummary==='function') updSSSummary(); if(typeof updThangData==='function') updThangData(); autoSync();
+    playSaveSound();
   });
 }
 
@@ -2997,7 +3022,7 @@ function luuSua(tab){
   if(!ten||!kg||!gia||!loai){ toast('⚠️ Điền đầy đủ!'); return; }
   var ttRaw=tinhTien(loai,kg,gia,doV,bi);
   var tt=ttRaw;
-  if(getSetting&&getSetting('round',false)){
+  if(getSetting&&getSetting('round',true)){
     var r3=Math.round(ttRaw)%1000;
     tt=r3>=500?Math.round(ttRaw)-r3+1000:Math.round(ttRaw)-r3;
   }
@@ -3005,6 +3030,7 @@ function luuSua(tab){
   const idx=all.findIndex(g=>String(g.id)===String(id));
   if(idx>=0){ all[idx]={...all[idx],ten,loai,kg,do:doV,bi,gia,tt,edited:true}; setGD(tab,all); }
   huySua(tab); renderTbl(tab); updTK(tab); updTK('ban'); if(typeof updThangData==='function') updThangData(); toast('✅ Đã lưu thay đổi!'); autoSync();
+  playSaveSound();
 }
 function huySua(tab){
   editId[tab]=null;
@@ -3682,6 +3708,7 @@ function luuSgEdit(){
   closeM('modal-sg-edit');
   openSoGuiDetail(sgCurKH);
   toast('✅ Đã lưu!');
+  playSaveSound();
 }
 function xoaSgEdit(){
   showDetail('🗑️','Xoá ghi chép sổ gửi?',[['Bạn có chắc muốn xoá?','']],null,'Xoá',()=>{
@@ -6343,14 +6370,36 @@ function loadSSSaved(dateStr) {
 var _origSwitchTab = typeof switchTab === 'function' ? switchTab : null;
 
 // ─── ĐỌC THÀNH TIỀN BẰNG GIỌNG NÓI ───
-function docThanhTien() {
-  var soEl = document.getElementById('mua-tt-so');
-  var chuEl = document.getElementById('mua-tt-chu');
-  if (!soEl) return;
-  var so = soEl.textContent.trim();
-  var chu = chuEl ? chuEl.textContent.trim() : '';
-  if (!chu || chu === '--') { toast('⚠️ Chưa có thành tiền!'); return; }
-  if (!('speechSynthesis' in window)) { toast('⚠️ Trình duyệt không hỗ trợ đọc!'); return; }
+// Âm báo "ting" khi lưu dữ liệu thành công — dùng Web Audio API, không cần file âm thanh ngoài (hoạt động offline)
+// Có thể bật/tắt ở Cài đặt ⚙️ → "🔔 Âm báo lưu thành công" (mặc định BẬT khi cài mới / xoá lịch sử duyệt web)
+var _saveSoundCtx=null;
+function playSaveSound(){
+  if(!getSetting('amBao', true)) return;
+  try{
+    var AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC) return;
+    if(!_saveSoundCtx) _saveSoundCtx=new AC();
+    var ctx=_saveSoundCtx;
+    if(ctx.state==='suspended') ctx.resume();
+    var now=ctx.currentTime;
+    function tone(freq,start,dur,vol){
+      var osc=ctx.createOscillator();
+      var gain=ctx.createGain();
+      osc.type='sine';
+      osc.frequency.setValueAtTime(freq, now+start);
+      gain.gain.setValueAtTime(0, now+start);
+      gain.gain.linearRampToValueAtTime(vol, now+start+0.012);
+      gain.gain.exponentialRampToValueAtTime(0.001, now+start+dur);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(now+start); osc.stop(now+start+dur+0.03);
+    }
+    tone(880, 0, 0.11, 0.20);     // A5
+    tone(1318.5, 0.09, 0.18, 0.17); // E6
+  }catch(e){}
+}
+function speakVN(chu, so) {
+  if (!chu || chu === '--') return;
+  if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   var msg = new SpeechSynthesisUtterance(chu);
   msg.lang = 'vi-VN';
@@ -6361,7 +6410,26 @@ function docThanhTien() {
   var viVoice = voices.find(function(v){ return v.lang && v.lang.toLowerCase().startsWith('vi'); });
   if (viVoice) msg.voice = viVoice;
   window.speechSynthesis.speak(msg);
-  toast('🔊 ' + so);
+  if (so) toast('🔊 ' + so);
+}
+function docThanhTien() {
+  var soEl = document.getElementById('mua-tt-so');
+  var chuEl = document.getElementById('mua-tt-chu');
+  if (!soEl) return;
+  var so = soEl.textContent.trim();
+  var chu = chuEl ? chuEl.textContent.trim() : '';
+  if (!chu || chu === '--') { toast('⚠️ Chưa có thành tiền!'); return; }
+  if (!('speechSynthesis' in window)) { toast('⚠️ Trình duyệt không hỗ trợ đọc!'); return; }
+  speakVN(chu, so);
+}
+// Tự động đọc to số tiền ngay sau khi lưu giao dịch ở tab Thu Mua (không cần bấm nút loa)
+// Có thể bật/tắt ở Cài đặt ⚙️ → "🔊 Tự động đọc số tiền" (mặc định BẬT khi cài mới / xoá lịch sử duyệt web)
+// Lưu ý: tt truyền vào đã được làm tròn theo cài đặt "Làm tròn số tiền" ngay tại thời điểm lưu giao dịch (xem luuGD)
+function docTienTuDongSauLuu(tt) {
+  if (!getSetting('docTien', true)) return;
+  if (!('speechSynthesis' in window)) return;
+  var n = Math.round(tt || 0);
+  speakVN(docTien(n), n.toLocaleString('vi-VN') + ' ₫');
 }
 // Load voices khi sẵn sàng
 if ('speechSynthesis' in window) {
@@ -6384,7 +6452,9 @@ function saveSetting(key, val) {
   autoSync();
 }
 function openSettings() {
-  document.getElementById('setting-round').checked = getSetting('round', false);
+  document.getElementById('setting-round').checked = getSetting('round', true);
+  document.getElementById('setting-docTien').checked = getSetting('docTien', true);
+  document.getElementById('setting-amBao').checked = getSetting('amBao', true);
   var info = document.getElementById('settings-license-info');
   if (info) {
     var days = getRemainingDays();
@@ -6400,7 +6470,7 @@ function openSettings() {
 var _origFmtNum = fmtNum;
 function fmtNumRound(n) {
   n = Math.round(n||0);
-  if (getSetting('round', false)) {
+  if (getSetting('round', true)) {
     var rem = n % 1000;
     n = rem >= 500 ? n - rem + 1000 : n - rem;
   }
@@ -6621,7 +6691,7 @@ window.addEventListener('offline', function() {
 var _origTinhTien = tinhTien;
 function tinhTienDisplay(loai, kg, gia, doVal, bi) {
   var t = tinhTien(loai, kg, gia, doVal, bi);
-  if (getSetting('round', false)) {
+  if (getSetting('round', true)) {
     var rem = Math.round(t) % 1000;
     t = rem >= 500 ? Math.round(t) - rem + 1000 : Math.round(t) - rem;
   }
@@ -7989,6 +8059,7 @@ function luuSgEntry(){
     setSG(sg);
     saveKHShared(ten);
     toast('📒 Đã '+(sgTabEditId?'cập nhật':'lưu')+' sổ gửi!');
+    playSaveSound();
     if(sgCurrentKH!==ten){ sgCurrentKH=ten; }
   } else {
     var tenU=document.getElementById('sgu-ten').value.trim();
@@ -8007,6 +8078,7 @@ function luuSgEntry(){
     setSU(su);
     saveKHShared(tenU);
     toast('💵 Đã '+(sgTabEditId?'cập nhật':'lưu')+' ứng tiền!');
+    playSaveSound();
     if(sgCurrentKH!==tenU){ sgCurrentKH=tenU; }
   }
 
@@ -8326,6 +8398,7 @@ function luuCcNew(){
   closeM('modal-cc-new');
   renderCcList();
   toast('✅ Đã tạo chấm công cho '+tenHienThi+'!');
+  playSaveSound();
   autoSync();
 }
 
@@ -8513,6 +8586,7 @@ function luuCcGhiChep(){
   setCC(all);
   renderCcDetailCalendar();
   renderCcList();
+  playSaveSound();
   var tenLoai={lam:'✔ Chấm công (bình thường)',nghi:'✗ Chấm nghỉ',ung:'💵 Ứng tiền',thuong:'💵 Thưởng tiền',khac:'❗ Khác'};
   var rowsXn=[['Ngày', fmtDate(ds)],['Loại ghi chép', tenLoai[loai]]];
   if (loai==='ung'||loai==='thuong') rowsXn.push(['Số tiền', fmtNum(tien)+' đ']);
