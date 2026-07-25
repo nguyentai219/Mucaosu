@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.2.1</title>
+<title>Mua Bán Mủ Cao Su v1.2.8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -480,7 +480,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.2.1 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.2.8 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1040,6 +1040,7 @@ input[type=date]:focus{border-color:var(--gl)}
     </div>
 
     <button onclick="openHuongDan()" style="width:100%;margin-top:10px;padding:11px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">📖 Hướng dẫn sử dụng</button>
+    <button onclick="openGioiThieu()" style="width:100%;margin-top:8px;padding:11px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">ℹ️ Giới thiệu phần mềm</button>
     <button class="btn-huy" style="width:100%;margin-top:8px" onclick="closeM('modal-settings')">Đóng</button>
   </div>
 </div>
@@ -1095,13 +1096,35 @@ input[type=date]:focus{border-color:var(--gl)}
   </div>
 </div>
 
+<!-- MODAL XUNG ĐỘT MÃ KHÁCH HÀNG (máy vs đám mây) -->
+<div class="modal center" id="modal-khid-conflict" style="z-index:2000">
+  <div class="modal-box center-box" style="max-width:360px">
+    <div style="font-size:32px;text-align:center;margin-bottom:8px">☁️</div>
+    <div style="font-size:15px;font-weight:800;text-align:center;color:var(--g800);margin-bottom:10px">Phát hiện Mã khách hàng khác nhau</div>
+    <div id="khid-cf-msg" style="font-size:13px;color:var(--g700);line-height:1.6;margin-bottom:12px"></div>
+    <select id="khid-cf-strategy" class="fi" style="margin-bottom:10px">
+      <option value="merge" selected>🔀 Trộn dữ liệu trên máy và đám mây làm một</option>
+      <option value="cloud">☁️ Đồng bộ dữ liệu trên đám mây, xoá dữ liệu trên máy</option>
+      <option value="local">📱 Đồng bộ dữ liệu trên máy lên đám mây, xoá dữ liệu đã có trên đám mây</option>
+    </select>
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--g600);margin-bottom:12px;cursor:pointer">
+      <input type="checkbox" id="khid-cf-apply-all" style="width:16px;height:16px">
+      Áp dụng lựa chọn này cho tất cả các khách hàng khác đang bị trùng
+    </label>
+    <div class="cfm-btns">
+      <button class="cfm-btn y" style="width:100%" onclick="_khidConflictConfirm()">Xác nhận</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL GIA HẠN -->
+
 <div class="modal center" id="modal-gia-han">
   <div class="modal-box center-box" style="max-width:320px">
     <div style="font-size:32px;text-align:center;margin-bottom:8px">🔑</div>
     <div id="gh-title" style="font-size:15px;font-weight:800;text-align:center;color:var(--g800);margin-bottom:8px">Gia hạn thời gian sử dụng</div>
     <div style="background:var(--gb);border-radius:var(--rs);padding:8px 12px;text-align:center;margin-bottom:10px">
-      <div style="font-size:11px;color:var(--g600)">Mã máy của bạn (đọc cho người bán)</div>
+      <div style="font-size:11px;color:var(--g600)">Mã thiết bị của bạn (đọc cho người bán)</div>
       <div id="gh-device-code" style="font-size:22px;font-weight:800;color:var(--gd);letter-spacing:2px"></div>
       <div style="font-size:10px;color:var(--g400);margin-top:2px">Thuật toán mã: <b id="gh-algo-ver"></b></div>
     </div>
@@ -1523,7 +1546,7 @@ input[type=date]:focus{border-color:var(--gl)}
 </div>
 
 <!-- MODAL POPUP XAC NHAN / CHI TIET -->
-<div class="modal center" id="modal-cfm">
+<div class="modal center" id="modal-cfm" style="z-index:2500">
   <div class="modal-box center-box">
     <div class="cfm-ico" id="cfm-ico">✅</div>
     <div class="cfm-ttl" id="cfm-ttl">Xác nhận</div>
@@ -1546,7 +1569,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.2.1</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.2.8</div>
       </div>
     </div>
 
@@ -1694,13 +1717,100 @@ input[type=date]:focus{border-color:var(--gl)}
       <div style="font-size:13px;font-weight:800;color:#15803d;margin-bottom:8px">🔑 GIA HẠN THỜI GIAN SỬ DỤNG</div>
       <div style="font-size:12px;color:var(--g800);line-height:1.7">
         Vào <b>⚙️ Cài đặt → 🔑 Gia hạn thời gian sử dụng</b><br>
-        Đọc <b>Mã máy</b> và liên hệ để nhận mã kích hoạt:<br>
+        Đọc <b>Mã thiết bị</b> và liên hệ để nhận mã kích hoạt:<br>
         📧 <b>taidautieng@gmail.com</b><br>
         📞 <b>0987.656.701</b>
       </div>
     </div>
 
     <button onclick="closeM('modal-huong-dan')" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer">✅ Đã hiểu, bắt đầu sử dụng!</button>
+  </div>
+</div>
+
+<!-- MODAL GIỚI THIỆU PHẦN MỀM -->
+<div class="modal" id="modal-gioi-thieu" style="z-index:10000">
+  <div class="modal-box" style="max-height:88vh;overflow-y:auto;padding-bottom:24px">
+    <div class="modal-handle"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <span style="font-size:28px">🌿</span>
+      <div>
+        <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.2.8</div>
+      </div>
+    </div>
+
+    <!-- TỔNG QUAN -->
+    <div style="background:var(--gb);border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid var(--gd)">
+      <div style="font-size:13px;font-weight:800;color:var(--gd);margin-bottom:8px">📌 Phần mềm này dùng để làm gì?</div>
+      <div style="font-size:12px;color:var(--g800);line-height:1.7">
+        <b>Mua Bán Mủ Cao Su</b> là phần mềm quản lý dành riêng cho <b>vựa thu mua mủ cao su</b> — giúp ghi chép thu mua, bán ra, sổ gửi/ứng tiền khách hàng, chấm công nhân viên và tính toán số liệu, thay cho việc ghi sổ tay truyền thống.<br>
+        • Chạy ngay trên trình duyệt điện thoại, có thể <b>"Thêm vào màn hình chính"</b> để dùng như 1 app thật<br>
+        • Hoạt động <b>offline</b> — không cần mạng vẫn ghi chép được, dữ liệu tự đồng bộ lên đám mây khi có mạng trở lại<br>
+        • Không cần cài đặt qua kho ứng dụng, không tốn dung lượng máy
+      </div>
+    </div>
+
+    <!-- CÁC CHỨC NĂNG CHÍNH -->
+    <div style="background:#fff8f0;border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid var(--ad,#f97316)">
+      <div style="font-size:13px;font-weight:800;color:var(--ad,#f97316);margin-bottom:8px">🧩 Các chức năng chính</div>
+      <div style="font-size:12px;color:var(--g800);line-height:1.7">
+        • <b>🛒 Thu Mua</b> — ghi chép mua mủ theo ngày, tự tính tiền theo loại mủ nước/chén/dây/đông<br>
+        • <b>📤 Bán Ra</b> — ghi chép bán mủ, tự so sánh lợi nhuận mua vào/bán ra<br>
+        • <b>📒 Sổ Gửi / Ứng Tiền</b> — theo dõi tiền gửi và tiền ứng cho từng khách, có chốt sổ riêng<br>
+        • <b>⏱️ Chấm Công</b> — chấm công, tính lương, ứng/thưởng cho nhân viên<br>
+        • <b>🧮 Tính Toán</b> — đối chiếu, phân bổ lại số liệu khi cân đối ở kho tổng lệch so với lúc thu mua<br>
+        • <b>👥 Quản lý khách hàng</b> — mỗi khách có mã số riêng để tự tra cứu sổ sách
+      </div>
+    </div>
+
+    <!-- APP ĐỒNG HÀNH -->
+    <div style="background:#f0fdf4;border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid #16a34a">
+      <div style="font-size:13px;font-weight:800;color:#15803d;margin-bottom:8px">🔗 App đồng hành "Xem Sổ Khách Hàng"</div>
+      <div style="font-size:12px;color:var(--g800);line-height:1.7">
+        Mỗi khách hàng được cấp 1 <b>mã số gồm 5 chữ số</b> — khách chỉ cần nhập mã này vào app <b>"Xem Sổ Khách Hàng"</b> (không cần tài khoản, không cần chủ vựa thao tác gì thêm) là tự xem được lịch sử thu mua, tiền gửi sổ và tiền ứng của chính mình, minh bạch và tiện lợi cho cả hai bên.
+      </div>
+    </div>
+
+    <!-- LƯU TRỮ & ĐỒNG BỘ -->
+    <div style="background:#eff6ff;border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid #2563eb">
+      <div style="font-size:13px;font-weight:800;color:#1d4ed8;margin-bottom:8px">☁️ Lưu trữ &amp; đồng bộ dữ liệu</div>
+      <div style="font-size:12px;color:var(--g800);line-height:1.7">
+        • Dữ liệu luôn được lưu sẵn ngay trên điện thoại (không phụ thuộc mạng)<br>
+        • Đồng thời tự động sao lưu lên đám mây theo phương án đã chọn: <b>☁️ Google Drive</b> hoặc <b>⚡ Supabase</b><br>
+        • Đổi điện thoại hoặc cài lại app: chỉ cần đăng nhập lại là khôi phục được toàn bộ dữ liệu cũ, không lo mất sổ sách
+      </div>
+    </div>
+
+    <!-- BẢO MẬT -->
+    <div style="background:#faf5ff;border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid #9333ea">
+      <div style="font-size:13px;font-weight:800;color:#7e22ce;margin-bottom:8px">🔐 Bảo mật &amp; phân quyền</div>
+      <div style="font-size:12px;color:var(--g800);line-height:1.7">
+        • Có <b>mật khẩu quản lý giao dịch</b> riêng, chỉ dùng khi thực hiện các thao tác nhạy cảm: Chốt sổ, Huỷ chốt sổ, Chốt tháng, Huỷ chốt tháng<br>
+        • App được khoá theo <b>thời hạn sử dụng</b> và gắn với thiết bị, gia hạn qua mã kích hoạt liên hệ trực tiếp với người phát triển
+      </div>
+    </div>
+
+    <!-- KIẾN TRÚC / CÔNG NGHỆ -->
+    <div style="background:#fffbeb;border-radius:var(--r);padding:12px;margin-bottom:10px;border-left:3px solid #d97706">
+      <div style="font-size:13px;font-weight:800;color:#d97706;margin-bottom:8px">🛠️ Về mặt kỹ thuật</div>
+      <div style="font-size:12px;color:var(--g800);line-height:1.7">
+        • Là <b>PWA (Progressive Web App)</b> — gói gọn trong 1 trang web, không cần cửa hàng ứng dụng<br>
+        • Được phát triển và cập nhật liên tục theo nhu cầu thực tế sử dụng hằng ngày của vựa — mỗi bản cập nhật đều có ghi chú thay đổi cụ thể<br>
+        • Toàn bộ ứng dụng do chính chủ vựa tự đặt hàng phát triển riêng, không phải phần mềm bán đại trà
+      </div>
+    </div>
+
+    <!-- LIÊN HỆ -->
+    <div style="background:#f5f3ff;border-radius:var(--r);padding:12px;margin-bottom:14px;border-left:3px solid #7c3aed">
+      <div style="font-size:13px;font-weight:800;color:#5b21b6;margin-bottom:8px">📞 Thông tin liên hệ &amp; hỗ trợ</div>
+      <div style="font-size:12px;color:var(--g800);line-height:1.7">
+        Cần hỗ trợ, báo lỗi hoặc gia hạn sử dụng, liên hệ:<br>
+        📧 <b>taidautieng@gmail.com</b><br>
+        📞 <b>0987.656.701</b>
+      </div>
+    </div>
+
+    <button onclick="closeM('modal-gioi-thieu')" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer">Đã rõ</button>
   </div>
 </div>
 
@@ -1792,6 +1902,7 @@ const LOAI_LBL_SHORT = {nuoc:'Nước', chen:'Chén', day:'Dây', dong:'Đông'}
 const LOAI_ICO = {nuoc:'💧', chen:'🥣', day:'🪢', dong:'🧱'};
 
 function openHuongDan(){ swapM('modal-settings', 'modal-huong-dan'); }
+function openGioiThieu(){ swapM('modal-settings', 'modal-gioi-thieu'); }
 
 let curTab = 'mua';
 let curDate = {mua: today(), ban: today()}; // luôn lấy ngày hệ thống
@@ -1911,7 +2022,13 @@ function migrateKhachIdToNumeric(){
   if (localStorage.getItem('kh_id_numeric_v1')) return;
   var map = getKhIds();
   var hasOldStyle = Object.keys(map).some(function(k){ return /[A-Za-z]/.test(map[k]||''); });
-  if (!hasOldStyle && Object.keys(map).length===0) { localStorage.setItem('kh_id_numeric_v1','1'); return; }
+  // QUAN TRỌNG: chỉ tạo mã MỚI khi thực sự còn mã kiểu cũ (xen chữ). Nếu toàn bộ mã đã là số (dù
+  // danh sách rỗng hay đã có sẵn dữ liệu — VD vừa khôi phục từ Supabase trên máy/trình duyệt mới,
+  // nơi cờ 'kh_id_numeric_v1' chưa kịp lưu) thì chỉ đánh dấu đã chuyển đổi rồi dừng, TUYỆT ĐỐI không
+  // sinh lại mã mới đè lên mã cũ đang dùng — trước đây có lỗi: điều kiện dừng sớm chỉ áp dụng khi
+  // danh sách trống, khiến máy mới đăng nhập (đã có mã số hợp lệ do đồng bộ về) vẫn bị chạy nhánh sinh
+  // mã mới ngẫu nhiên đè hết toàn bộ Mã khách hàng đang dùng, làm khách không tra cứu được sổ sách nữa.
+  if (!hasOldStyle) { localStorage.setItem('kh_id_numeric_v1','1'); return; }
   var used = {}, newMap = {};
   Object.keys(map).forEach(function(ten){
     var id; do { id = genKhachId(); } while (used[id]);
@@ -3516,8 +3633,8 @@ function renderChiTietMua(){
     grp[gd.loai].push(gd);
   });
 
-  var totalAll=0,totalKgAll=0;
-  list.forEach(function(g){totalAll+=parseFloat(g.tt)||0; totalKgAll+=kgThuc(g.loai,g.kg,g.do,g.bi||0);});
+  var totalAll=0;
+  list.forEach(function(g){totalAll+=parseFloat(g.tt)||0;});
   var html='';
 
   LOAIS.forEach(function(loai){
@@ -3564,14 +3681,15 @@ function renderChiTietMua(){
     html+='</div>';
   });
 
-  // Card tổng cộng (chỉ hiện khi xem tất cả hoặc nhiều loại)
+  // Card tổng cộng — không hiện tổng kg vì tiền thu mua có thể gồm nhiều loại mủ khác nhau, cộng chung kg không có ý nghĩa
+  var isAllLoai = loaiFilter==='all';
   html+='<div style="margin-top:12px;background:linear-gradient(135deg,var(--gd),var(--gl));border-radius:8px;padding:12px 14px;color:#fff">'
     +'<div style="font-size:10px;opacity:.8;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">'
-    +(loaiFilter==='all'?'Tổng cộng tất cả loại':'Tổng '+LOAI_LBL[loaiFilter])
+    +(isAllLoai?'Tổng cộng tất cả loại':'Tổng '+LOAI_LBL[loaiFilter])
     +'</div>'
     +'<div style="display:flex;justify-content:space-between;align-items:flex-end">'
-    +'<div><span style="font-size:20px;font-weight:800">'+fmtKg(totalKgAll)+'</span><span style="font-size:12px;margin-left:4px;opacity:.9">kg</span></div>'
-    +'<div style="text-align:right"><div style="font-size:11px;opacity:.8">'+list.length+' giao dịch</div><div style="font-size:18px;font-weight:800">'+fmtNum(totalAll)+' ₫</div></div>'
+    +'<div style="font-size:11px;opacity:.85">'+list.length+' giao dịch</div>'
+    +'<div style="text-align:right"><div style="font-size:18px;font-weight:800">'+fmtNum(totalAll)+' ₫</div></div>'
     +'</div>'
     +'</div>';
 
@@ -4376,7 +4494,29 @@ var SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 var sbClient = null;
 var sbUser = null;
 var sbSyncing = false;
-var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','kh_ids','kh_role_manual','sg3','su_data','cc_data','thang_v1','setting_round','license_expiry','admin_pw','mua_chot_moc','ss_data'];
+var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','kh_ids','kh_role_manual','sg3','su_data','cc_data','thang_v1','setting_round','license_expiry','admin_pw','mua_chot_moc','ss_data','kh_id_numeric_v1'];
+// Các khoá localStorage CHỈ thuộc về riêng máy này (thiết bị/phiên đăng nhập/trạng thái giao diện tạm),
+// KHÔNG đồng bộ lên Supabase/Drive vì đồng bộ sẽ gây rối (VD: token Google Drive của máy A không dùng
+// được cho máy B). Bất kỳ khoá localStorage nào KHÁC ngoài danh sách này đều được coi là dữ liệu nghiệp
+// vụ cần đồng bộ và sẽ tự động được quét kèm theo, kể cả khi quên thêm vào SB_DATA_KEYS phía trên.
+var SB_NO_SYNC_KEYS = ['device_code','gd_token','gd_token_expiry','gd_folder_id','gd_user','gd_silent_failed',
+  'gd_last_sync','sb_last_sync','pending_sync_count','sync_provider','active_tab','used_ext_codes',
+  'license_is_new','gia_day','ban_last_buyer','ss_state'];
+// Danh sách khoá THỰC SỰ sẽ đồng bộ mỗi lần: hợp của SB_DATA_KEYS (đảm bảo có giá trị mặc định hợp lý
+// nếu máy chưa từng có khoá đó) VÀ toàn bộ khoá đang thực sự tồn tại trong localStorage của app (trừ
+// danh sách chỉ-riêng-máy-này ở trên) — để không bỏ sót dữ liệu của các tính năng thêm sau này mà lỡ
+// quên khai báo thủ công vào SB_DATA_KEYS.
+function getAllSyncableKeys(){
+  var set = {};
+  SB_DATA_KEYS.forEach(function(k){ set[k] = true; });
+  try {
+    for (var i=0;i<localStorage.length;i++){
+      var k = localStorage.key(i);
+      if (k && SB_NO_SYNC_KEYS.indexOf(k) === -1) set[k] = true;
+    }
+  } catch(e){}
+  return Object.keys(set);
+}
 
 function initSupabase() {
   if (typeof window.supabase === 'undefined') { setTimeout(initSupabase, 600); return; }
@@ -4527,16 +4667,193 @@ function sbSignOut() {
   });
 }
 
-// Khi vừa đăng nhập: máy trống dữ liệu → khôi phục; máy có dữ liệu → đẩy lên
+// ═══════════════════════════════════════════════════════════════════════════
+// TRỘN DỮ LIỆU KHI ĐĂNG NHẬP (thay cho cơ chế cũ "máy trống thì tải về đè, máy
+// có dữ liệu thì đẩy lên đè" — cách cũ có thể XOÁ MẤT dữ liệu ở 1 trong 2 bên).
+// Nguyên tắc bắt buộc:
+//  - Dữ liệu đã có trên đám mây KHÔNG BAO GIỜ bị xoá hay bị thay thế toàn bộ bởi dữ liệu máy.
+//  - Mỗi lần đăng nhập, dữ liệu đang có trên máy được BỔ SUNG THÊM vào dữ liệu đã có trên đám mây
+//    (hợp cả 2 chiều), rồi kết quả đã trộn được lưu lại cả trên máy lẫn đẩy lên đám mây.
+//  - Riêng "Mã khách hàng" (kh_ids): nếu cùng 1 tên khách hàng đã tồn tại ở CẢ máy lẫn đám mây
+//    nhưng mã khác nhau (VD tạo mới khi chưa đăng nhập, trùng tên với khách đã có mã trên đám
+//    mây từ trước) → KHÔNG tự ý chọn 1 bên, phải hỏi người dùng có muốn thay bằng mã trên đám mây
+//    hay không, để tránh vô tình làm sai mã đã phát cho khách hàng thật.
+// ═══════════════════════════════════════════════════════════════════════════
+function _isPlainObj(v){ return v && typeof v==='object' && !Array.isArray(v); }
+
+// Trộn 2 mảng bản ghi có trường 'id' duy nhất (Mua/Bán/Sổ Gửi/Ứng tiền/Chấm công) — hợp cả 2 chiều
+// theo id, bản ghi chỉ có ở 1 bên đều được giữ lại nguyên vẹn, không bao giờ mất. Dùng làm kết quả
+// MẶC ĐỊNH (chiến lược "Trộn") — với khách hàng chọn chiến lược khác, kết quả này sẽ được lọc lại
+// riêng cho tên khách đó bởi _applyPerCustomerDecision() bên dưới.
+function _mergeArrById(cloudArr, localArr){
+  var out = Array.isArray(cloudArr) ? cloudArr.slice() : [];
+  var seen = {};
+  out.forEach(function(r){ if(r && r.id!=null) seen[String(r.id)]=true; });
+  (Array.isArray(localArr)?localArr:[]).forEach(function(r){
+    if(!r) return;
+    var key = r.id!=null ? String(r.id) : JSON.stringify(r);
+    if(!seen[key]){ seen[key]=true; out.push(r); }
+  });
+  return out;
+}
+// Tập id chỉ xuất hiện ở mảng A mà KHÔNG có ở mảng B (dùng để biết bản ghi nào "chỉ có ở máy" hay
+// "chỉ có ở đám mây" của riêng 1 khách hàng, phục vụ 2 chiến lược ưu tiên 1 bên bên dưới).
+function _idsOnlyIn(arrA, arrB){
+  var setB = {};
+  (Array.isArray(arrB)?arrB:[]).forEach(function(r){ if (r && r.id!=null) setB[String(r.id)]=true; });
+  var out = {};
+  (Array.isArray(arrA)?arrA:[]).forEach(function(r){ if (r && r.id!=null && !setB[String(r.id)]) out[String(r.id)]=true; });
+  return out;
+}
+// Áp dụng chiến lược người dùng chọn CHO RIÊNG 1 khách hàng (theo tên r.ten) vào 1 mảng đã trộn mặc
+// định: 'merge' giữ nguyên (đã hợp cả 2 bên); 'cloud' bỏ các bản ghi CHỈ có ở máy của khách này (coi
+// như xoá phần dữ liệu máy chưa từng lên đám mây của riêng khách đó); 'local' bỏ các bản ghi CHỈ có ở
+// đám mây của khách này (coi như xoá phần dữ liệu đám mây của riêng khách đó, giữ lại đúng dữ liệu máy
+// để đẩy lên thay thế). Dữ liệu của các khách hàng KHÁC không bị ảnh hưởng.
+function _applyPerCustomerDecision(mergedArr, ten, decision, localOnlyIds, cloudOnlyIds){
+  if (decision === 'merge') return mergedArr;
+  return mergedArr.filter(function(r){
+    if (!r || r.ten !== ten) return true;
+    var idKey = r.id!=null ? String(r.id) : null;
+    if (decision === 'cloud') return !(idKey && localOnlyIds[idKey]);
+    if (decision === 'local') return !(idKey && cloudOnlyIds[idKey]);
+    return true;
+  });
+}
+// Trộn object key-value đơn giản: giữ TOÀN BỘ khoá đám mây, chỉ bổ sung thêm khoá chỉ có ở máy
+// (không đụng vào khoá đã có sẵn trên đám mây). Không dùng cho kh_ids (có xử lý xung đột riêng).
+function _mergeObjUnionCloudWins(cloudObj, localObj){
+  var out = {};
+  if (_isPlainObj(cloudObj)) for (var k in cloudObj) out[k] = cloudObj[k];
+  if (_isPlainObj(localObj)) for (var k2 in localObj) if (!(k2 in out)) out[k2] = localObj[k2];
+  return out;
+}
+// Trộn Mã khách hàng: trả về { merged, conflicts:[{ten, localCode, cloudCode}] }.
+// merged mặc định giữ nguyên mã trên đám mây cho các tên đã có ở cả 2 nơi (an toàn nhất khi chưa
+// hỏi ý kiến), và bổ sung thẳng các tên chỉ mới có ở máy (không xung đột gì với đám mây).
+function _mergeKhIdsDetectConflicts(cloudMap, localMap){
+  var merged = {}, conflicts = [];
+  if (_isPlainObj(cloudMap)) for (var k in cloudMap) merged[k] = cloudMap[k];
+  if (_isPlainObj(localMap)) {
+    for (var t in localMap) {
+      if (!(t in merged)) merged[t] = localMap[t];
+      else if (merged[t] !== localMap[t]) conflicts.push({ ten: t, localCode: localMap[t], cloudCode: merged[t] });
+    }
+  }
+  return { merged: merged, conflicts: conflicts };
+}
+// Hỏi lần lượt từng xung đột Mã khách hàng (nếu có nhiều tên trùng), gọi onDone(decisions) khi xong.
+// decisions[ten] = 'merge' (trộn, mặc định) | 'cloud' (ưu tiên đám mây, xoá dữ liệu riêng của khách
+// này trên máy) | 'local' (ưu tiên máy, xoá dữ liệu riêng của khách này trên đám mây). Nếu người dùng
+// tick "Áp dụng cho tất cả khách hàng khác", chiến lược vừa chọn được gán luôn cho mọi xung đột còn
+// lại trong hàng đợi mà không cần hỏi tiếp từng cái.
+var _khidConflictQueue = [];
+function _processKhidConflicts(conflicts, onDone){
+  _khidConflictQueue = conflicts.slice();
+  var decisions = {};
+  function next(){
+    if (!_khidConflictQueue.length) { onDone(decisions); return; }
+    var c = _khidConflictQueue.shift();
+    var msgEl = document.getElementById('khid-cf-msg');
+    if (msgEl) {
+      var tenEsc = (c.ten||'').replace(/</g,'&lt;');
+      msgEl.innerHTML = 'Đã phát hiện tên khách hàng <b>"' + tenEsc + '"</b> có dữ liệu và <b>Mã khách hàng</b> khác nhau giữa máy (<b>' + c.localCode + '</b>) và đám mây (<b style="color:var(--gd)">' + c.cloudCode + '</b>).';
+    }
+    var selEl = document.getElementById('khid-cf-strategy'); if (selEl) selEl.value = 'merge';
+    var allEl = document.getElementById('khid-cf-apply-all'); if (allEl) allEl.checked = false;
+    window._khidConflictConfirm = function(){
+      var strategy = (document.getElementById('khid-cf-strategy')||{}).value || 'merge';
+      var applyAll = !!(document.getElementById('khid-cf-apply-all')||{}).checked;
+      decisions[c.ten] = strategy;
+      if (applyAll) {
+        _khidConflictQueue.forEach(function(rest){ decisions[rest.ten] = strategy; });
+        _khidConflictQueue = [];
+      }
+      closeM('modal-khid-conflict');
+      setTimeout(next, 260);
+    };
+    openM('modal-khid-conflict');
+  }
+  next();
+}
+// Điểm vào chính: gọi ngay sau khi đăng nhập Supabase thành công.
 function restoreOrPushOnLogin() {
-  var hasLocal = (getGD('mua')||[]).length + (getGD('ban')||[]).length + (getSG()||[]).length + (getSU()||[]).length > 0;
-  if (!hasLocal) restoreFromSupabase(true);
-  else syncToSupabase();
+  if (!sbClient || !sbUser) return;
+  sbClient.from('mucaosu_data').select('data_key,data_value').eq('user_id', sbUser.id).then(function(res) {
+    if (res.error) { toast('❌ Lỗi kiểm tra dữ liệu đám mây: ' + res.error.message); return; }
+    var rows = res.data || [];
+    if (!rows.length) { syncToSupabase(); return; } // đám mây chưa có gì (đăng nhập lần đầu) → chỉ cần đẩy dữ liệu máy lên, không có gì để trộn
+    var cloud = {};
+    rows.forEach(function(r){ cloud[r.data_key] = r.data_value; });
+    _finishLoginMerge(cloud);
+  }).catch(function(e) { toast('❌ Lỗi kết nối: ' + e.message); });
+}
+function _finishLoginMerge(cloud){
+  var localMua = getGD('mua'), localBan = getGD('ban'), localSg = getSG(), localSu = getSU(), localCc = getCC();
+  var mua = _mergeArrById(cloud.gd3_mua, localMua);
+  var ban = _mergeArrById(cloud.gd3_ban, localBan);
+  var sg  = _mergeArrById(cloud.sg3, localSg);
+  var su  = _mergeArrById(cloud.su_data, localSu);
+  var cc  = _mergeArrById(cloud.cc_data, localCc);
+  var khMerge = _mergeKhIdsDetectConflicts(_isPlainObj(cloud.kh_ids)?cloud.kh_ids:{}, getKhIds());
+
+  function applyAndPush(khFinalMap, decisions){
+    var finalMua = mua, finalBan = ban, finalSg = sg, finalSu = su, finalCc = cc;
+    if (decisions) {
+      var loOnly = {
+        mua: _idsOnlyIn(localMua, cloud.gd3_mua), ban: _idsOnlyIn(localBan, cloud.gd3_ban),
+        sg: _idsOnlyIn(localSg, cloud.sg3), su: _idsOnlyIn(localSu, cloud.su_data), cc: _idsOnlyIn(localCc, cloud.cc_data)
+      };
+      var clOnly = {
+        mua: _idsOnlyIn(cloud.gd3_mua, localMua), ban: _idsOnlyIn(cloud.gd3_ban, localBan),
+        sg: _idsOnlyIn(cloud.sg3, localSg), su: _idsOnlyIn(cloud.su_data, localSu), cc: _idsOnlyIn(cloud.cc_data, localCc)
+      };
+      Object.keys(decisions).forEach(function(ten){
+        var strat = decisions[ten];
+        if (strat === 'merge') return;
+        finalMua = _applyPerCustomerDecision(finalMua, ten, strat, loOnly.mua, clOnly.mua);
+        finalBan = _applyPerCustomerDecision(finalBan, ten, strat, loOnly.ban, clOnly.ban);
+        finalSg  = _applyPerCustomerDecision(finalSg,  ten, strat, loOnly.sg,  clOnly.sg);
+        finalSu  = _applyPerCustomerDecision(finalSu,  ten, strat, loOnly.su,  clOnly.su);
+        finalCc  = _applyPerCustomerDecision(finalCc,  ten, strat, loOnly.cc,  clOnly.cc);
+      });
+    }
+    setGD('mua', finalMua); setGD('ban', finalBan); setSG(finalSg); setSU(finalSu); setCC(finalCc);
+    setKhIds(khFinalMap);
+    lsSet('kh_role_manual', _mergeObjUnionCloudWins(cloud.kh_role_manual, lsGetO('kh_role_manual')));
+    lsSet('mua_chot_moc', _mergeObjUnionCloudWins(cloud.mua_chot_moc, lsGetO('mua_chot_moc')));
+    lsSet('ss_data', _mergeObjUnionCloudWins(cloud.ss_data, JSON.parse(localStorage.getItem('ss_data')||'{}')));
+    // Các giá trị đơn (không phải danh sách/đối tượng gộp được): đám mây có sẵn thì ưu tiên giữ
+    // nguyên giá trị đám mây (không bị máy ghi đè khi đăng nhập); máy chỉ được dùng nếu đám mây
+    // chưa từng có giá trị này.
+    ['license_expiry','admin_pw','thang_v1','setting_round', THANG_PW_SB_KEY].forEach(function(k){
+      if (cloud[k] !== undefined && cloud[k] !== null) {
+        localStorage.setItem(k, typeof cloud[k]==='string' ? cloud[k] : JSON.stringify(cloud[k]));
+      }
+    });
+    if (cloud.kh_id_numeric_v1 || localStorage.getItem('kh_id_numeric_v1')) localStorage.setItem('kh_id_numeric_v1','1');
+    toast('✅ Đã trộn dữ liệu máy với đám mây!');
+    syncToSupabase();
+    setTimeout(function(){ location.reload(); }, 1200);
+  }
+
+  if (khMerge.conflicts.length) {
+    _processKhidConflicts(khMerge.conflicts, function(decisions){
+      var finalKh = {};
+      for (var t in khMerge.merged) finalKh[t] = khMerge.merged[t];
+      // Mã khách hàng cuối cùng theo chiến lược: 'merge' hoặc 'cloud' → dùng mã đã có trên đám mây
+      // (an toàn nhất vì đã phát cho khách thật); 'local' → dùng mã đang có trên máy.
+      khMerge.conflicts.forEach(function(c){ finalKh[c.ten] = (decisions[c.ten]==='local') ? c.localCode : c.cloudCode; });
+      applyAndPush(finalKh, decisions);
+    });
+  } else {
+    applyAndPush(khMerge.merged, null);
+  }
 }
 
 function _sbRowsPayload() {
   var now = new Date().toISOString();
-  return SB_DATA_KEYS.map(function(k) {
+  return getAllSyncableKeys().map(function(k) {
     var raw = localStorage.getItem(k);
     var val;
     if (raw == null) {
@@ -6461,7 +6778,7 @@ function openSettings() {
     var lic = days > 0
       ? '✅ Còn <b style="color:var(--gd)">' + days + ' ngày</b> sử dụng'
       : '❌ <b style="color:#dc2626">Đã hết hạn</b> — chỉ xem được dữ liệu cũ';
-    info.innerHTML = lic + '<br>📱 Mã máy: <b style="color:var(--gd);letter-spacing:1px">' + getDeviceCode() + '</b>'
+    info.innerHTML = lic + '<br>📱 Mã thiết bị: <b style="color:var(--gd);letter-spacing:1px">' + getDeviceCode() + '</b>'
       + ' &nbsp;·&nbsp; 🔢 Thuật toán mã: <b style="color:var(--gd)">' + EXT_ALGO_VERSION + '</b>';
   }
   openM('modal-settings');
@@ -6589,6 +6906,16 @@ function syncToDrive_silent() {
     var map=getKhIds();
     return [hdrKh].concat(Object.keys(map).sort(function(a,b){return a.localeCompare(b,'vi');}).map(function(ten){return [ten, map[ten]];}));
   }
+  // Lưới an toàn: dump TOÀN BỘ khoá dữ liệu nghiệp vụ (đúng danh sách quét getAllSyncableKeys(), y hệt
+  // bên Supabase) dạng key-value JSON thô vào 1 sheet riêng, để phòng trường hợp 1 loại dữ liệu nào đó
+  // (VD Mã KH, chốt mốc, vai trò thủ công...) chưa có sheet định dạng đẹp riêng vẫn không bị thất lạc.
+  function fullBackupRows(){
+    var hdr=['Khoá dữ liệu','Giá trị (JSON)'];
+    return [hdr].concat(getAllSyncableKeys().sort().map(function(k){
+      var raw = localStorage.getItem(k);
+      return [k, raw==null?'':raw];
+    }));
+  }
   upsertSheet(fname, [
     { name: 'Thu_Mua',   rows: gdRows2('mua') },
     { name: 'Ban_Ra',    rows: gdRows2('ban') },
@@ -6596,7 +6923,8 @@ function syncToDrive_silent() {
     { name: 'So_Ung',    rows: suRows() },
     { name: 'Cham_Cong', rows: ccRows() },
     { name: 'Ma_KH',     rows: khIdRows() },
-    { name: 'Tinh_Toan', rows: [['Dữ liệu tính toán được lưu khi nhấn Lưu Sổ Sách']] }
+    { name: 'Tinh_Toan', rows: [['Dữ liệu tính toán được lưu khi nhấn Lưu Sổ Sách']] },
+    { name: 'Sao_Luu_Day_Du', rows: fullBackupRows() }
   ], function() {
     gdSyncing = false;
     syncQueue = false;
@@ -7165,14 +7493,14 @@ function openGiaHan() {
 
 
 // ══════════════════════════════════════════
-// MÃ MÁY + MÃ GIA HẠN (hash-based, theo từng máy)
+// MÃ KHÁCH HÀNG + MÃ GIA HẠN (hash-based, theo từng máy)
 // ══════════════════════════════════════════
 // Phiên bản thuật toán mã gia hạn - chỉ đổi khi công thức tính mã thay đổi
 // (KHÔNG đổi theo version chung của app)
 var EXT_ALGO_VERSION = 'MG1';
 var EXT_SECRET = 'MuCaoSuTai0987656701-K7xQ2026Pro';
 
-// Mã máy: 4 số ngẫu nhiên, sinh 1 lần khi cài, không đổi
+// Mã thiết bị: 4 số ngẫu nhiên, sinh 1 lần khi cài, không đổi
 function getDeviceCode() {
   var dc = localStorage.getItem('device_code');
   if (!dc) {
@@ -7189,11 +7517,11 @@ function hashStr(s) {
   return Math.abs(h);
 }
 
-// Dòng khoá (keystream) 3 số - phụ thuộc Mã máy
+// Dòng khoá (keystream) 3 số - phụ thuộc Mã thiết bị
 function getKeystream(deviceCode) {
   return hashStr(deviceCode + '|' + EXT_SECRET) % 1000;
 }
-// Checksum 3 số - phụ thuộc Mã máy + số ngày
+// Checksum 3 số - phụ thuộc Mã thiết bị + số ngày
 function getChecksum(deviceCode, days) {
   return hashStr(deviceCode + '|' + String(days).padStart(3,'0') + '|' + EXT_SECRET + '|chk') % 1000;
 }

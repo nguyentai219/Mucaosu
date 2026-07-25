@@ -1,7 +1,7 @@
 {
   "name": "Mua Bán Mủ Cao Su",
   "short_name": "Mủ Cao Su",
-  "description": "Phần mềm ghi chép mua bán mủ cao su - v1.2.1",
+  "description": "Phần mềm ghi chép mua bán mủ cao su - v1.2.8",
   "start_url": "/Mucaosu/index.html",
   "display": "standalone",
   "orientation": "portrait",
@@ -10,7 +10,8 @@
   "icons": [
     { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
     { "name": "Thu Mua", "short_name": "Thu Mua", "url": "/Mucaosu/index.html#mua", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
