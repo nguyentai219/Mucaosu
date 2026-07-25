@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.2.8</title>
+<title>Mua Bán Mủ Cao Su v1.2.9</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -480,7 +480,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.2.8 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.2.9 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1569,7 +1569,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.2.8</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.2.9</div>
       </div>
     </div>
 
@@ -1735,7 +1735,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.2.8</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.2.9</div>
       </div>
     </div>
 
@@ -1962,12 +1962,32 @@ function rebuildKHRoleLists(){
 const KH_ALL_KEY = 'kh3_all';
 function getKHAll(){ return lsGet(KH_ALL_KEY); }
 function setKHAll(v){ lsSet(KH_ALL_KEY, v); }
+// ── Danh sách tên đã bị NGƯỜI DÙNG CHỦ ĐỘNG XOÁ khỏi màn quản lý 👥 ──
+// Trước đây: xoá xong, nếu khách vẫn còn giao dịch Mua/Bán thật thì rebuildKHRoleLists()/migrateKHAll()
+// (chạy lại mỗi lần tải trang) sẽ tự thêm tên đó trở lại kh3_all → khách "sống lại" sau khi tải lại
+// trang, dù đã xoá thành công. Nay lưu lại đúng những tên đã bị xoá thủ công vào đây; migrateKHAll()
+// và renderKhachIdList() sẽ bỏ qua các tên này khi tự động khôi phục theo giao dịch thật. Nếu sau đó
+// có hoạt động MỚI thật sự với đúng tên này (thêm lại thủ công, hoặc phát sinh giao dịch mới) thì tự
+// động gỡ khỏi danh sách ẩn (saveKHShared()) — vì rõ ràng người dùng đang chủ động dùng lại tên đó.
+const KH_HIDDEN_KEY = 'kh_hidden';
+function getKhHidden(){ return lsGet(KH_HIDDEN_KEY); }
+function setKhHidden(v){ lsSet(KH_HIDDEN_KEY, v); }
+function hideKhachTen(ten){
+  var hidden = getKhHidden(), norm = normTen(ten);
+  if (!hidden.some(function(h){ return h===norm; })) { hidden.push(norm); setKhHidden(hidden); }
+}
+function unhideKhachTen(ten){
+  var hidden = getKhHidden(), norm = normTen(ten);
+  var idx = hidden.indexOf(norm);
+  if (idx>=0) { hidden.splice(idx,1); setKhHidden(hidden); }
+}
 // So khớp tên khách hàng không phân biệt hoa/thường và khoảng trắng thừa,
 // để "anh 2" và "Anh 2" (gõ khác nhau, cùng 1 người) được coi là cùng một khách hàng.
 function normTen(s){ return (s||'').trim().replace(/\s+/g,' ').toLowerCase(); }
 function saveKHShared(ten, tab){
   if(!ten || !ten.trim()) return;
   ten = ten.trim();
+  unhideKhachTen(ten); // có hoạt động mới với tên này → chắc chắn không còn "đã xoá" nữa
   var all = getKHAll();
   var norm = normTen(ten);
   var existed = all.find(function(n){ return normTen(n)===norm; });
@@ -1975,6 +1995,17 @@ function saveKHShared(ten, tab){
   // Không cần tự ghi vào kh3_mua/kh3_ban ở đây nữa — rebuildKHRoleLists() sẽ tính lại đúng
   // vai trò dựa trên giao dịch thật (gd3_mua/gd3_ban) mỗi khi cần hiển thị/gợi ý tên.
   getOrCreateKhachId(existed); // Đảm bảo khách hàng nào cũng có Mã KH cố định ngay khi được lưu
+}
+// Thông báo xoá kèm đồng bộ NGAY lên đám mây (Supabase/Drive, tuỳ phương án đang chọn) và cho người
+// dùng biết rõ hành động xoá này cũng xoá cả bản sao trên đám mây — dùng chung cho MỌI luồng xoá dữ
+// liệu (giao dịch Mua/Bán, Sổ Gửi, Ứng tiền, Chấm công, Khách hàng...).
+function toastDeleted(baseMsg){
+  var provider = getSyncProvider();
+  var extra = '';
+  if (provider === 'supabase' && sbUser) extra = ' Đang đồng bộ xoá trên Supabase…';
+  else if (provider === 'gdrive' && gdToken) extra = ' Đang đồng bộ xoá trên Google Drive…';
+  toast(baseMsg + extra);
+  autoSync();
 }
 
 // ═══════════ MÃ KHÁCH HÀNG (mã cố định để tra cứu trên app "Xem Sổ Khách Hàng") ═══════════
@@ -2185,10 +2216,12 @@ function renderKhachIdList(){
   var khNames = getKHAll();
   var ccNames = getCcCongNhanNames();
   var muaNames = getKH('mua'), banNames = getKH('ban');
+  var hidden = getKhHidden();
   var seen = {}, all = [];
-  khNames.forEach(function(n){ var k=normTen(n); if(!seen[k]){ seen[k]=true; all.push({ten:n, isKh:true, isCc:false}); } });
+  khNames.forEach(function(n){ var k=normTen(n); if(!seen[k] && hidden.indexOf(k)<0){ seen[k]=true; all.push({ten:n, isKh:true, isCc:false}); } });
   ccNames.forEach(function(n){
     var k=normTen(n);
+    if (hidden.indexOf(k)>=0) return; // công nhân đã bị xoá thủ công khỏi danh sách này thì cũng không hiện lại
     var existed = all.find(function(x){ return normTen(x.ten)===k; });
     if (existed) existed.isCc = true; else all.push({ten:n, isKh:false, isCc:true});
   });
@@ -2305,19 +2338,22 @@ function xoaKhachId(){
     var manual = getKhRoleManual();
     delete manual[normTen(ten)];
     setKhRoleManual(manual);
+    hideKhachTen(ten); // ghi nhớ đã xoá thủ công, không cho tự khôi phục lại dù còn giao dịch thật
     rebuildKHRoleLists();
     closeM('modal-khid-edit');
     renderKhachIdList();
-    toast('🗑️ Đã xoá!' + (getGD('mua').concat(getGD('ban')).some(function(g){return normTen(g.ten)===normTen(ten);}) ? ' (khách vẫn còn giao dịch thật nên có thể hiện lại nếu còn dữ liệu)' : ''));
-    autoSync();
+    var conGiaoDichThat = getGD('mua').concat(getGD('ban')).some(function(g){return normTen(g.ten)===normTen(ten);});
+    toastDeleted('🗑️ Đã xoá khỏi danh sách!' + (conGiaoDichThat ? ' (lịch sử giao dịch thật vẫn được giữ nguyên, chỉ ẩn khỏi danh sách quản lý)' : ''));
   });
 }
 // Khi load: gộp kh3_mua + kh3_ban vào kh3_all nếu chưa có
 function migrateKHAll(){
   var all=getKHAll();
+  var hidden=getKhHidden();
   var changed=false;
   ['mua','ban'].forEach(function(t){
     getKH(t).forEach(function(n){
+      if(hidden.indexOf(normTen(n))>=0) return; // đã bị xoá thủ công → không tự khôi phục lại
       if(!all.includes(n)){ all.push(n); changed=true; }
     });
   });
@@ -3159,7 +3195,7 @@ function xoaGD(tab){
   if(guardLicense()) return;
   showDetail('🗑️','Xoá giao dịch?',[['Bạn có chắc muốn xoá?','']],null,'Xoá',()=>{
     const all=getGD(tab).filter(g=>String(g.id)!==String(editId[tab]));
-    setGD(tab,all); huySua(tab); renderTbl(tab); updTK(tab); updTK('ban'); if(typeof updThangData==='function') updThangData(); toast('🗑️ Đã xoá!'); autoSync();
+    setGD(tab,all); huySua(tab); renderTbl(tab); updTK(tab); updTK('ban'); if(typeof updThangData==='function') updThangData(); toastDeleted('🗑️ Đã xoá giao dịch!');
   });
 }
 
@@ -3834,7 +3870,7 @@ function xoaSgEdit(){
     setSG(sg);
     closeM('modal-sg-edit');
     openSoGuiDetail(sgCurKH);
-    toast('🗑️ Đã xoá!');
+    toastDeleted('🗑️ Đã xoá ghi chép!');
   });
 }
 
@@ -4494,7 +4530,7 @@ var SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 var sbClient = null;
 var sbUser = null;
 var sbSyncing = false;
-var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','kh_ids','kh_role_manual','sg3','su_data','cc_data','thang_v1','setting_round','license_expiry','admin_pw','mua_chot_moc','ss_data','kh_id_numeric_v1'];
+var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','kh_ids','kh_role_manual','sg3','su_data','cc_data','thang_v1','setting_round','license_expiry','admin_pw','mua_chot_moc','ss_data','kh_id_numeric_v1','kh_hidden'];
 // Các khoá localStorage CHỈ thuộc về riêng máy này (thiết bị/phiên đăng nhập/trạng thái giao diện tạm),
 // KHÔNG đồng bộ lên Supabase/Drive vì đồng bộ sẽ gây rối (VD: token Google Drive của máy A không dùng
 // được cho máy B). Bất kỳ khoá localStorage nào KHÁC ngoài danh sách này đều được coi là dữ liệu nghiệp
@@ -4728,6 +4764,15 @@ function _mergeObjUnionCloudWins(cloudObj, localObj){
   if (_isPlainObj(localObj)) for (var k2 in localObj) if (!(k2 in out)) out[k2] = localObj[k2];
   return out;
 }
+// Trộn mảng chuỗi đơn giản (hợp, loại trùng) — dùng cho kh_hidden: 1 tên đã bị ẩn ở BẤT KỲ máy nào
+// cũng phải tiếp tục bị ẩn sau khi trộn, không được để việc trộn vô tình làm khách "sống lại".
+function _mergeArrStrUnion(cloudArr, localArr){
+  var out=[], seen={};
+  (Array.isArray(cloudArr)?cloudArr:[]).concat(Array.isArray(localArr)?localArr:[]).forEach(function(s){
+    if (s==null) return; var k=String(s); if(!seen[k]){ seen[k]=true; out.push(s); }
+  });
+  return out;
+}
 // Trộn Mã khách hàng: trả về { merged, conflicts:[{ten, localCode, cloudCode}] }.
 // merged mặc định giữ nguyên mã trên đám mây cho các tên đã có ở cả 2 nơi (an toàn nhất khi chưa
 // hỏi ý kiến), và bổ sung thẳng các tên chỉ mới có ở máy (không xung đột gì với đám mây).
@@ -4822,6 +4867,7 @@ function _finishLoginMerge(cloud){
     setKhIds(khFinalMap);
     lsSet('kh_role_manual', _mergeObjUnionCloudWins(cloud.kh_role_manual, lsGetO('kh_role_manual')));
     lsSet('mua_chot_moc', _mergeObjUnionCloudWins(cloud.mua_chot_moc, lsGetO('mua_chot_moc')));
+    lsSet('kh_hidden', _mergeArrStrUnion(cloud.kh_hidden, getKhHidden()));
     lsSet('ss_data', _mergeObjUnionCloudWins(cloud.ss_data, JSON.parse(localStorage.getItem('ss_data')||'{}')));
     // Các giá trị đơn (không phải danh sách/đối tượng gộp được): đám mây có sẵn thì ưu tiên giữ
     // nguyên giá trị đám mây (không bị máy ghi đè khi đăng nhập); máy chỉ được dùng nếu đám mây
@@ -6585,9 +6631,8 @@ function xoaGhiChepSS() {
     ssData[dateStr] = arr.filter(function(e){ return e.loai !== ssLoai; });
     if (!ssData[dateStr].length) delete ssData[dateStr];
     localStorage.setItem('ss_data', JSON.stringify(ssData));
-    autoSync();
     renderSsHistoryBtn();
-    toast('🗑️ Đã xoá ghi chép!');
+    toastDeleted('🗑️ Đã xoá ghi chép!');
   });
 }
 
@@ -7967,8 +8012,7 @@ function xoaChotKH(ten){
       setSG(getSG().filter(function(r){return r.ten!==ten;}));
       setSU(getSU().filter(function(r){return r.ten!==ten;}));
       renderSgTabContent();
-      autoSync();
-      toast('🗑️ Đã xoá toàn bộ ghi chép của '+ten+'!');
+      toastDeleted('🗑️ Đã xoá toàn bộ ghi chép của '+ten+'!');
     });
 }
 
@@ -9005,8 +9049,7 @@ function xoaCc(){
       setCC(getCC().filter(function(x){ return String(x.id)!==String(ccDetailCurId); }));
       closeM('modal-cc-detail');
       renderCcList();
-      toast('🗑️ Đã xoá chấm công!');
-      autoSync();
+      toastDeleted('🗑️ Đã xoá chấm công!');
     });
 }
 
@@ -9223,8 +9266,7 @@ function xoaSgEntry(){
       }
       closeSgModal();
       renderSgTabContent();
-      autoSync();
-      toast('🗑️ Đã xoá ghi chép!');
+      toastDeleted('🗑️ Đã xoá ghi chép!');
     });
 }
 
