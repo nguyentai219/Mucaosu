@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.3.1</title>
+<title>Mua Bán Mủ Cao Su v1.4.4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -26,6 +26,11 @@
   --s1:0 1px 4px rgba(0,0,0,.1);--s2:0 4px 16px rgba(0,0,0,.12);--s3:0 8px 32px rgba(0,0,0,.18);
   --r:12px;--rs:8px;
 }
+.bk-card{border:1.5px solid var(--gp);border-radius:var(--r);overflow:hidden}
+.bk-card-hd{background:var(--gb);color:var(--gd);font-weight:700;font-size:13.5px;padding:10px 12px}
+.bk-card-body{padding:12px;background:#fff}
+.bk-card.tt{border-color:#c4b5fd}
+.bk-card.tt .bk-card-hd{background:#ede9fe;color:#5b21b6}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g800);min-height:100vh;max-width:480px;margin:0 auto;overflow-x:hidden;scroll-behavior:smooth}
 
@@ -154,6 +159,12 @@ input[type="search"]::-webkit-search-decoration{-webkit-appearance:none;appearan
 
 /* MODAL OVERLAY */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(2px)}
+#bangke-print-area{display:none}
+@media print{
+  body>*:not(#bangke-print-area){display:none!important}
+  #bangke-print-area{display:block!important;position:static!important}
+  @page{size:A4 landscape;margin:10mm}
+}
 .modal.show{display:flex}
 .modal.center{align-items:center;padding:20px}
 .modal-box{background:#fff;border-radius:20px 20px 0 0;padding:14px 16px 36px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;animation:slideUp .22s ease}
@@ -485,7 +496,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.3.1 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.4.4 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -598,6 +609,16 @@ input[type=date]:focus{border-color:var(--gl)}
   <div class="sec-title">📊 Thống kê trong ngày</div>
   <div class="tk-grid" id="mua-tk"></div>
   <button onclick="openXemGDCu()" style="width:100%;margin-top:10px;padding:11px;background:#fff;border:1.5px solid var(--gd);border-radius:var(--r);color:var(--gd);font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🔍 Xem lại giao dịch cũ</button>
+  <div class="bk-card" style="margin-top:14px">
+    <div class="bk-card-hd">📄 Bảng kê thu mua &amp; thanh toán</div>
+    <div class="bk-card-body">
+      <div style="font-size:11px;color:var(--g400);margin-bottom:8px">Xuất bảng kê theo đúng mẫu quy định, gồm khách hàng có giao dịch trong khoảng ngày chọn</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="openBangKeInfo()" style="flex:1;padding:10px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">🏢 Thông tin xuất</button>
+        <button onclick="openBangKeExport('thu_mua')" style="flex:1;padding:10px;background:var(--gd);color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">🖨️ Xuất bảng kê</button>
+      </div>
+    </div>
+  </div>
 </div>
 </div>
 
@@ -920,10 +941,12 @@ input[type=date]:focus{border-color:var(--gl)}
 
     <!-- 2. SO SÁNH + KIỂM TRA (render bởi renderSSDetail + renderSSCheck) -->
     <div id="ss-detail-tk" style="margin-bottom:8px"></div>
-    <div class="sec-divider" style="margin-top:12px"></div>
-    <div class="sec-title" style="color:#7c3aed">🔍 Kiểm tra đạt yêu cầu</div>
-    <div class="ss-check-card" id="ss-check-card"></div>
-    <button class="btn-ss-phanbo" id="ss-btn-phanbo-lai" onclick="tinhToanSS()" style="display:none">🔄 Tính toán & Phân bổ lại</button>
+    <div id="ss-check-section" style="display:none">
+      <div class="sec-divider" style="margin-top:12px"></div>
+      <div class="sec-title" style="color:#7c3aed">🔍 Kiểm tra đạt yêu cầu</div>
+      <div class="ss-check-card" id="ss-check-card"></div>
+      <button class="btn-ss-phanbo" id="ss-btn-phanbo-lai" onclick="tinhToanSS()" style="display:none">🔄 Tính toán &amp; Phân bổ lại</button>
+    </div>
 
     <!-- 3. CHI TIẾT THU MUA THEO SỐ LIỆU MỚI -->
     <div class="sec-divider" style="margin-top:14px"></div>
@@ -950,7 +973,19 @@ input[type=date]:focus{border-color:var(--gl)}
     <div class="ss-sync-info">💡 Dữ liệu tham khảo — không thay đổi giao dịch thực tế</div>
   </div>
 
-  <!-- 5. LỊCH SỬ TÍNH TOÁN ĐÃ LƯU -->
+  <!-- 5. XUẤT BẢNG KÊ (đầy đủ như tab Thu Mua, chỉ khác mặc định chọn nguồn Dữ liệu Tính Toán) -->
+  <div class="bk-card tt" style="margin-top:14px">
+    <div class="bk-card-hd">📄 Bảng kê thu mua &amp; thanh toán</div>
+    <div class="bk-card-body">
+      <div style="font-size:11px;color:var(--g400);margin-bottom:8px">Xuất bảng kê theo đúng mẫu quy định, gồm khách hàng có giao dịch trong khoảng ngày chọn</div>
+      <div style="display:flex;gap:8px">
+        <button onclick="openBangKeInfo()" style="flex:1;padding:10px;background:#ede9fe;color:#5b21b6;border:1.5px solid #c4b5fd;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">🏢 Thông tin xuất</button>
+        <button onclick="openBangKeExport('tinh_toan')" style="flex:1;padding:10px;background:linear-gradient(135deg,#5b21b6,#7c3aed);color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">🖨️ Xuất bảng kê</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. LỊCH SỬ TÍNH TOÁN ĐÃ LƯU -->
   <div class="sec-divider" style="margin-top:14px"></div>
   <button class="btn-ss-tinh" id="ss-history-btn" style="width:100%;background:#ede9fe;color:#5b21b6;border:1.5px solid #c4b5fd" onclick="openLichSuSS()">📜 Lịch sử tính toán đã lưu</button>
 
@@ -1156,7 +1191,47 @@ input[type=date]:focus{border-color:var(--gl)}
   </div>
 </div>
 
-<!-- MODAL ĐỔI MẬT KHẨU THỐNG KÊ THÁNG -->
+<!-- MODAL THÔNG TIN DOANH NGHIỆP XUẤT BẢNG KÊ -->
+<div class="modal center" id="modal-bangke-info" style="z-index:900">
+  <div class="modal-box center-box" style="max-width:360px;max-height:85vh;overflow-y:auto">
+    <div class="modal-title">🏢 Thông tin xuất bảng kê</div>
+    <div style="font-size:11.5px;color:var(--g600);margin-bottom:12px">Điền 1 lần, dùng lại cho mọi lần xuất "Bảng kê thu mua và thanh toán mủ cao su". Để trống ô nào thì ô đó để trống trên bảng kê.</div>
+    <input type="text" id="bk-tenDN" class="fi" placeholder="Tên Doanh nghiệp" style="margin-bottom:8px" autocomplete="off">
+    <input type="text" id="bk-mst" class="fi" placeholder="Mã số thuế" style="margin-bottom:8px" inputmode="numeric" autocomplete="off">
+    <input type="text" id="bk-diaChi" class="fi" placeholder="Địa chỉ (trụ sở/hộ kinh doanh)" style="margin-bottom:8px" autocomplete="off">
+    <input type="text" id="bk-diaDiemThuMua" class="fi" placeholder="Địa điểm thu mua" style="margin-bottom:8px" autocomplete="off">
+    <input type="text" id="bk-diaChiToChuc" class="fi" placeholder="Địa chỉ nơi tổ chức thu mua" style="margin-bottom:8px" autocomplete="off">
+    <input type="text" id="bk-nguoiPhuTrach" class="fi" placeholder="Người phụ trách thu mua" style="margin-bottom:8px" autocomplete="off">
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <input type="text" id="bk-giaMuNuoc" class="fi" placeholder="Đơn giá mủ nước (đ/độ)" inputmode="numeric" autocomplete="off">
+      <input type="text" id="bk-giaMuTap" class="fi" placeholder="Đơn giá mủ tạp (đ/kg)" inputmode="numeric" autocomplete="off">
+    </div>
+    <button onclick="luuBangKeInfo()" style="width:100%;padding:10px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">💾 Lưu</button>
+    <button class="btn-huy" style="width:100%" onclick="closeM('modal-bangke-info')">Đóng</button>
+  </div>
+</div>
+
+<!-- MODAL CHỌN KHOẢNG NGÀY XUẤT BẢNG KÊ -->
+<div class="modal center" id="modal-bangke-export" style="z-index:900">
+  <div class="modal-box center-box" style="max-width:340px">
+    <div class="modal-title">🖨️ Xuất Bảng kê thu mua</div>
+    <div style="font-size:11.5px;color:var(--g600);margin-bottom:12px">Gồm khách hàng có giao dịch trong khoảng ngày chọn, mỗi khách 1 dòng theo loại mủ (mủ nước tính độ riêng, mủ tạp tính theo kg).</div>
+    <div style="font-size:12px;font-weight:700;color:var(--g700);margin-bottom:4px">Nguồn dữ liệu</div>
+    <select id="bk-nguon" class="fi" style="margin-bottom:10px">
+      <option value="thu_mua">📥 Dữ liệu Thu Mua (giao dịch thật)</option>
+      <option value="tinh_toan">⚡ Dữ liệu Tính Toán (đã lưu ở tab Tính Toán)</option>
+    </select>
+    <div style="font-size:12px;font-weight:700;color:var(--g700);margin-bottom:4px">Từ ngày</div>
+    <input type="date" id="bk-tuNgay" class="fi" style="margin-bottom:10px">
+    <div style="font-size:12px;font-weight:700;color:var(--g700);margin-bottom:4px">Đến ngày</div>
+    <input type="date" id="bk-denNgay" class="fi" style="margin-bottom:10px">
+    <div style="font-size:12px;font-weight:700;color:var(--g700);margin-bottom:4px">Số bảng kê (không bắt buộc)</div>
+    <input type="text" id="bk-soBangKe" class="fi" placeholder="VD: 07/2026" style="margin-bottom:14px" autocomplete="off">
+    <button onclick="xuatBangKe()" style="width:100%;padding:10px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">📄 Xuất bảng kê</button>
+    <button class="btn-huy" style="width:100%" onclick="closeM('modal-bangke-export')">Huỷ</button>
+  </div>
+</div>
+
 <div class="modal center" id="modal-doi-pw-thang">
   <div class="modal-box center-box" style="max-width:320px">
     <div style="font-size:32px;text-align:center;margin-bottom:8px">🔐</div>
@@ -1585,7 +1660,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.3.1</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.4.4</div>
       </div>
     </div>
 
@@ -1751,7 +1826,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.3.1</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.4.4</div>
       </div>
     </div>
 
@@ -1844,6 +1919,14 @@ input[type=date]:focus{border-color:var(--gl)}
         <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="khid-add-ban" style="width:16px;height:16px;accent-color:var(--gd)"> 🌾 Khách bán</label>
         <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="khid-add-mua" style="width:16px;height:16px;accent-color:var(--gd)"> 🚛 Khách mua</label>
       </div>
+      <details style="margin-bottom:9px">
+        <summary style="font-size:11.5px;color:var(--g600);cursor:pointer;user-select:none">📋 Thêm thông tin liên hệ (không bắt buộc, dùng khi xuất bảng kê)</summary>
+        <div style="margin-top:8px">
+          <input type="text" id="khid-add-sdt" class="fi" placeholder="Số điện thoại" style="margin-bottom:6px" inputmode="tel" autocomplete="off">
+          <input type="text" id="khid-add-cccd" class="fi" placeholder="Số CCCD/CMND" style="margin-bottom:6px" inputmode="numeric" autocomplete="off">
+          <input type="text" id="khid-add-diachi" class="fi" placeholder="Địa chỉ" autocomplete="off">
+        </div>
+      </details>
       <button onclick="themKhachId()" style="width:100%;padding:9px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">+ Thêm khách hàng</button>
     </div>
 
@@ -1870,6 +1953,10 @@ input[type=date]:focus{border-color:var(--gl)}
       <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="khide-ban" style="width:16px;height:16px;accent-color:var(--gd)"> 🌾 Khách bán</label>
       <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="khide-mua" style="width:16px;height:16px;accent-color:var(--gd)"> 🚛 Khách mua</label>
     </div>
+    <div style="font-size:11.5px;font-weight:700;color:var(--g600);margin-bottom:6px">📋 Thông tin liên hệ (không bắt buộc — dùng khi xuất bảng kê)</div>
+    <input type="text" id="khide-sdt" class="fi" placeholder="Số điện thoại" style="margin-bottom:8px" inputmode="tel" autocomplete="off">
+    <input type="text" id="khide-cccd" class="fi" placeholder="Số CCCD/CMND" style="margin-bottom:8px" inputmode="numeric" autocomplete="off">
+    <input type="text" id="khide-diachi" class="fi" placeholder="Địa chỉ" style="margin-bottom:14px" autocomplete="off">
     <div style="display:flex;gap:8px;margin-bottom:8px">
       <button onclick="luuEditKhachId()" style="flex:1;padding:10px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">💾 Lưu</button>
       <button onclick="xoaKhachId()" style="flex:1;padding:10px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">🗑️ Xoá</button>
@@ -1952,6 +2039,13 @@ function setKH(t,v){ lsSet(khKey(t),v) }
 const KH_ROLE_MANUAL_KEY = 'kh_role_manual';
 function getKhRoleManual(){ return lsGetO(KH_ROLE_MANUAL_KEY); }
 function setKhRoleManual(v){ lsSet(KH_ROLE_MANUAL_KEY, v); }
+// ── Thông tin liên hệ tuỳ chọn theo khách hàng (Số điện thoại, Số CCCD/CMND, Địa chỉ) ──
+// { "tên chuẩn hoá": { sdt, cccd, diaChi } } — dùng khi xuất "Bảng kê thu mua và thanh toán mủ cao su"
+// theo đúng mẫu quy định (cần đủ 4 cột: Tên người bán / Địa chỉ / Số CCCD / Số điện thoại).
+const KH_INFO_KEY = 'kh_info';
+function getKhInfo(){ return lsGetO(KH_INFO_KEY); }
+function setKhInfo(v){ lsSet(KH_INFO_KEY, v); }
+function getKhInfoOf(ten){ return getKhInfo()[normTen(ten)] || {sdt:'',cccd:'',diaChi:''}; }
 // Tính lại HOÀN TOÀN kh3_mua/kh3_ban từ giao dịch THẬT (gd3_mua/gd3_ban) + vai trò gán thủ công.
 // Gọi hàm này ngay trước khi đọc badge/gợi ý tên để LUÔN đúng tuyệt đối, không phụ thuộc lịch sử
 // dữ liệu cũ hay thời điểm chạy — tự sửa lại mọi lúc, không cần "dọn 1 lần" dễ sai như trước.
@@ -2277,9 +2371,20 @@ function themKhachId(){
     manual[normTen(name)] = {ten:name, ban:laBan, mua:laMua};
     setKhRoleManual(manual);
   }
+  var sdt = (document.getElementById('khid-add-sdt').value||'').trim();
+  var cccd = (document.getElementById('khid-add-cccd').value||'').trim();
+  var diaChi = (document.getElementById('khid-add-diachi').value||'').trim();
+  if (sdt || cccd || diaChi){
+    var info = getKhInfo();
+    info[normTen(name)] = {sdt:sdt, cccd:cccd, diaChi:diaChi};
+    setKhInfo(info);
+  }
   inp.value = '';
   document.getElementById('khid-add-ban').checked = false;
   document.getElementById('khid-add-mua').checked = false;
+  document.getElementById('khid-add-sdt').value = '';
+  document.getElementById('khid-add-cccd').value = '';
+  document.getElementById('khid-add-diachi').value = '';
   renderKhachIdList();
   toast('✅ Đã thêm khách hàng!');
   autoSync();
@@ -2307,6 +2412,10 @@ function openEditKhachId(ten){
   document.getElementById('khide-ban').disabled = hasMuaTx; // đã có giao dịch thật thì không tắt được nhãn
   document.getElementById('khide-mua').disabled = hasBanTx;
   document.getElementById('khide-tx-note').style.display = (hasMuaTx || hasBanTx) ? 'block' : 'none';
+  var info = getKhInfoOf(ten);
+  document.getElementById('khide-sdt').value = info.sdt || '';
+  document.getElementById('khide-cccd').value = info.cccd || '';
+  document.getElementById('khide-diachi').value = info.diaChi || '';
   openM('modal-khid-edit');
 }
 function luuEditKhachId(){
@@ -2339,6 +2448,14 @@ function luuEditKhachId(){
     for (var k2 in chotMap) { if (normTen(k2)===normTen(oldName)) { oldChotKey=k2; break; } }
     if (oldChotKey) { chotMap[newName]=chotMap[oldChotKey]; delete chotMap[oldChotKey]; setMuaChotMap(chotMap); }
   }
+  // Lưu thông tin liên hệ (SĐT/CCCD/Địa chỉ) — di chuyển sang khoá tên mới nếu vừa đổi tên
+  var sdt = (document.getElementById('khide-sdt').value||'').trim();
+  var cccd = (document.getElementById('khide-cccd').value||'').trim();
+  var diaChi = (document.getElementById('khide-diachi').value||'').trim();
+  var khInfo = getKhInfo();
+  delete khInfo[normTen(oldName)];
+  if (sdt || cccd || diaChi) khInfo[normTen(newName)] = {sdt:sdt, cccd:cccd, diaChi:diaChi};
+  setKhInfo(khInfo);
   getOrCreateKhachId(newName);
   rebuildKHRoleLists();
   closeM('modal-khid-edit');
@@ -4547,7 +4664,7 @@ var SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 var sbClient = null;
 var sbUser = null;
 var sbSyncing = false;
-var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','kh_ids','kh_role_manual','sg3','su_data','cc_data','thang_v1','setting_round','license_expiry','admin_pw','mua_chot_moc','ss_data','kh_id_numeric_v1','kh_hidden'];
+var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','kh_ids','kh_role_manual','sg3','su_data','cc_data','thang_v1','setting_round','license_expiry','admin_pw','mua_chot_moc','ss_data','kh_id_numeric_v1','kh_hidden','kh_info','bang_ke_info'];
 // Các khoá localStorage CHỈ thuộc về riêng máy này (thiết bị/phiên đăng nhập/trạng thái giao diện tạm),
 // KHÔNG đồng bộ lên Supabase/Drive vì đồng bộ sẽ gây rối (VD: token Google Drive của máy A không dùng
 // được cho máy B). Bất kỳ khoá localStorage nào KHÁC ngoài danh sách này đều được coi là dữ liệu nghiệp
@@ -4885,11 +5002,12 @@ function _finishLoginMerge(cloud){
     lsSet('kh_role_manual', _mergeObjUnionCloudWins(cloud.kh_role_manual, lsGetO('kh_role_manual')));
     lsSet('mua_chot_moc', _mergeObjUnionCloudWins(cloud.mua_chot_moc, lsGetO('mua_chot_moc')));
     lsSet('kh_hidden', _mergeArrStrUnion(cloud.kh_hidden, getKhHidden()));
+    lsSet('kh_info', _mergeObjUnionCloudWins(cloud.kh_info, getKhInfo()));
     lsSet('ss_data', _mergeObjUnionCloudWins(cloud.ss_data, JSON.parse(localStorage.getItem('ss_data')||'{}')));
     // Các giá trị đơn (không phải danh sách/đối tượng gộp được): đám mây có sẵn thì ưu tiên giữ
     // nguyên giá trị đám mây (không bị máy ghi đè khi đăng nhập); máy chỉ được dùng nếu đám mây
     // chưa từng có giá trị này.
-    ['license_expiry','admin_pw','thang_v1','setting_round', THANG_PW_SB_KEY].forEach(function(k){
+    ['license_expiry','admin_pw','thang_v1','setting_round','bang_ke_info', THANG_PW_SB_KEY].forEach(function(k){
       if (cloud[k] !== undefined && cloud[k] !== null) {
         localStorage.setItem(k, typeof cloud[k]==='string' ? cloud[k] : JSON.stringify(cloud[k]));
       }
@@ -6412,6 +6530,7 @@ function renderSSCheck(totalKg, avgDo, totalTien, isNuoc) {
   var doTarget  = parseFloat(document.getElementById('ss-do-target').value)||0;
   var tienTarget= getSsTien();
   var card = document.getElementById('ss-check-card');
+  var section = document.getElementById('ss-check-section');
   var btnPL= document.getElementById('ss-btn-phanbo-lai');
   var anyBad = false;
 
@@ -6441,9 +6560,12 @@ function renderSSCheck(totalKg, avgDo, totalTien, isNuoc) {
   if(doTarget&&isNuoc) html += row('💧 Độ TB', doTarget, avgDo, '', doTarget.toFixed(1), avgDo.toFixed(1));
   if(tienTarget) html += row('💰 Tổng tiền', tienTarget, totalTien, '₫', fmtNum(tienTarget), fmtNum(Math.round(totalTien)));
 
-  if(!html) html = '<div class="ss-check-row"><span class="ss-check-lbl">Chưa có mục tiêu cần kiểm tra</span></div>';
+  // Đã đạt yêu cầu 100% (mọi chỉ số có đặt mục tiêu đều >=99%) hoặc không có mục tiêu nào để kiểm tra
+  // → ẩn hẳn cả khối này để tối ưu không gian hiển thị. Chỉ hiện khi có ít nhất 1 chỉ số CHƯA đạt.
+  if (!html || !anyBad) { section.style.display = 'none'; return; }
 
   card.innerHTML = html;
+  section.style.display = 'block';
   btnPL.style.display = anyBad ? 'block' : 'none';
 }
 
@@ -6868,6 +6990,183 @@ function openSettings() {
       + ' &nbsp;·&nbsp; 🔢 Thuật toán mã: <b style="color:var(--gd)">' + EXT_ALGO_VERSION + '</b>';
   }
   openM('modal-settings');
+}
+// ══════════════════════════════════════════
+// BẢNG KÊ THU MUA VÀ THANH TOÁN MỦ CAO SU
+// ══════════════════════════════════════════
+function getBangKeInfo(){ return lsGetO('bang_ke_info'); }
+function setBangKeInfo(v){ lsSet('bang_ke_info', v); }
+function openBangKeInfo(){
+  var info = getBangKeInfo();
+  document.getElementById('bk-tenDN').value = info.tenDN || '';
+  document.getElementById('bk-mst').value = info.mst || '';
+  document.getElementById('bk-diaChi').value = info.diaChi || '';
+  document.getElementById('bk-diaDiemThuMua').value = info.diaDiemThuMua || '';
+  document.getElementById('bk-diaChiToChuc').value = info.diaChiToChuc || '';
+  document.getElementById('bk-nguoiPhuTrach').value = info.nguoiPhuTrach || '';
+  document.getElementById('bk-giaMuNuoc').value = info.giaMuNuoc || '';
+  document.getElementById('bk-giaMuTap').value = info.giaMuTap || '';
+  openM('modal-bangke-info');
+}
+function luuBangKeInfo(){
+  var info = {
+    tenDN: (document.getElementById('bk-tenDN').value||'').trim(),
+    mst: (document.getElementById('bk-mst').value||'').trim(),
+    diaChi: (document.getElementById('bk-diaChi').value||'').trim(),
+    diaDiemThuMua: (document.getElementById('bk-diaDiemThuMua').value||'').trim(),
+    diaChiToChuc: (document.getElementById('bk-diaChiToChuc').value||'').trim(),
+    nguoiPhuTrach: (document.getElementById('bk-nguoiPhuTrach').value||'').trim(),
+    giaMuNuoc: (document.getElementById('bk-giaMuNuoc').value||'').trim(),
+    giaMuTap: (document.getElementById('bk-giaMuTap').value||'').trim()
+  };
+  setBangKeInfo(info);
+  toast('✅ Đã lưu thông tin xuất bảng kê!');
+  autoSync();
+  closeM('modal-bangke-info');
+}
+function openBangKeExport(defaultNguon){
+  var t = today(); // yyyy-mm-dd, giờ địa phương
+  document.getElementById('bk-tuNgay').value = t; // mặc định từ hôm nay
+  document.getElementById('bk-denNgay').value = t; // đến hôm nay (đổi được)
+  document.getElementById('bk-soBangKe').value = '';
+  document.getElementById('bk-nguon').value = defaultNguon || 'thu_mua';
+  openM('modal-bangke-export');
+}
+function _bkDDMMYYYY(s){ var p=(s||'').split('-'); return p.length===3 ? (p[2]+'/'+p[1]+'/'+p[0]) : s; }
+function _bkEsc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function _bkInfoRow(label, val){
+  return '<tr><td style="width:230px;padding:2px 6px;border:none"><b>- '+label+':</b></td><td style="padding:2px 6px;border:none">'+_bkEsc(val)+'</td></tr>';
+}
+// Xuất bảng kê: gộp giao dịch Thu Mua trong khoảng ngày theo (Tên khách hàng + Loại mủ) — mủ nước
+// tính Số độ trung bình theo trọng số kg, mủ tạp (chén/dây/đông) chỉ tính theo kg. Thành tiền của mỗi
+// dòng luôn lấy TỔNG ĐÚNG từ các giao dịch thật đã lưu (Σ tt), Đơn giá hiển thị được suy ngược lại từ
+// tổng đó để cột 9=(6x7x8) luôn khớp đúng như mẫu, không tự bịa công thức tính giá khác với app.
+function xuatBangKe(){
+  var tuNgay = document.getElementById('bk-tuNgay').value;
+  var denNgay = document.getElementById('bk-denNgay').value;
+  if (!tuNgay || !denNgay){ toast('⚠️ Chọn đủ khoảng ngày!'); return; }
+  if (tuNgay > denNgay){ toast('⚠️ "Từ ngày" phải trước "Đến ngày"!'); return; }
+  var soBangKe = (document.getElementById('bk-soBangKe').value||'').trim();
+  var nguon = (document.getElementById('bk-nguon')||{}).value || 'thu_mua';
+
+  var groups = {};
+  function addToGroup(ten, loai, kg, doV, tt){
+    var key = normTen(ten) + '|' + loai;
+    if (!groups[key]) groups[key] = { ten:ten, loai:loai, kg:0, tt:0, kgDoSum:0 };
+    groups[key].kg += kg;
+    groups[key].tt += tt;
+    if (loai === 'nuoc') groups[key].kgDoSum += kg*doV;
+  }
+
+  if (nguon === 'tinh_toan') {
+    // Nguồn: dữ liệu đã LƯU ở tab Tính Toán (khoá ss_data) — gộp theo từng ngày trong khoảng chọn
+    var ssData = JSON.parse(localStorage.getItem('ss_data') || '{}');
+    Object.keys(ssData).forEach(function(dateStr){
+      if (dateStr < tuNgay || dateStr > denNgay) return;
+      (ssData[dateStr]||[]).forEach(function(entry){
+        var loai = entry.loai || 'nuoc';
+        (entry.list||[]).forEach(function(r){
+          addToGroup(r.ten, loai, parseFloat(r.kg)||0, parseFloat(r.do)||0, parseFloat(r.tien)||0);
+        });
+      });
+    });
+    if (!Object.keys(groups).length){ toast('⚠️ Không có dữ liệu Tính Toán nào đã lưu trong khoảng ngày đã chọn!'); return; }
+  } else {
+    // Nguồn: giao dịch Thu Mua thật (mặc định)
+    var mua = getGD('mua').filter(function(r){ return r.date >= tuNgay && r.date <= denNgay; });
+    if (!mua.length){ toast('⚠️ Không có giao dịch Thu Mua nào trong khoảng ngày đã chọn!'); return; }
+    mua.forEach(function(r){
+      addToGroup(r.ten, r.loai || 'nuoc', parseFloat(r.kg)||0, parseFloat(r.do)||0, parseFloat(r.tt)||0);
+    });
+  }
+
+  var list = Object.keys(groups).map(function(k){ return groups[k]; });
+  list.sort(function(a,b){
+    var c = a.ten.localeCompare(b.ten,'vi');
+    return c!==0 ? c : ((a.loai==='nuoc'?0:1) - (b.loai==='nuoc'?0:1));
+  });
+
+  var DO_LOAI_LABEL = { chen:'Mủ chén', day:'Mủ dây', dong:'Mủ đông' };
+  var tongCong = 0;
+  var rows = list.map(function(g, i){
+    var khInfo = getKhInfoOf(g.ten);
+    var doHT, giaHT;
+    if (g.loai === 'nuoc') {
+      var doTB = g.kg>0 ? (g.kgDoSum/g.kg) : 0;
+      doHT = doTB ? doTB.toFixed(1) : '';
+      giaHT = (g.kg>0 && doTB>0) ? Math.round(g.tt/(g.kg*doTB/100)) : '';
+    } else {
+      doHT = DO_LOAI_LABEL[g.loai] || g.loai;
+      giaHT = g.kg>0 ? Math.round(g.tt/g.kg) : '';
+    }
+    tongCong += g.tt;
+    return { stt:i+1, ten:g.ten, diaChi:khInfo.diaChi, cccd:khInfo.cccd, sdt:khInfo.sdt, kg:g.kg, do:doHT, gia:giaHT, tt:g.tt };
+  });
+
+  renderBangKePrint(getBangKeInfo(), tuNgay, denNgay, soBangKe, rows, tongCong);
+  closeM('modal-bangke-export');
+}
+function renderBangKePrint(info, tuNgay, denNgay, soBangKe, rows, tongCong){
+  var area = document.getElementById('bangke-print-area');
+  if (!area) return;
+  var denP = denNgay.split('-');
+  var rowsHtml = rows.map(function(r){
+    return '<tr>'
+      + '<td style="text-align:center;border:1px solid #000;padding:3px">'+r.stt+'</td>'
+      + '<td style="border:1px solid #000;padding:3px">'+_bkEsc(r.ten)+'</td>'
+      + '<td style="border:1px solid #000;padding:3px">'+_bkEsc(r.diaChi)+'</td>'
+      + '<td style="text-align:center;border:1px solid #000;padding:3px">'+_bkEsc(r.cccd)+'</td>'
+      + '<td style="text-align:center;border:1px solid #000;padding:3px">'+_bkEsc(r.sdt)+'</td>'
+      + '<td style="text-align:right;border:1px solid #000;padding:3px">'+fmtNum(r.kg)+'</td>'
+      + '<td style="text-align:center;border:1px solid #000;padding:3px">'+_bkEsc(r.do)+'</td>'
+      + '<td style="text-align:right;border:1px solid #000;padding:3px">'+(r.gia!==''?fmtNum(r.gia):'')+'</td>'
+      + '<td style="text-align:right;border:1px solid #000;padding:3px">'+fmtNum(r.tt)+'</td>'
+      + '<td style="border:1px solid #000;padding:3px"></td>'
+      + '<td style="border:1px solid #000;padding:3px"></td>'
+      + '</tr>';
+  }).join('');
+  area.innerHTML =
+    '<div style="font-family:\'Times New Roman\',Times,serif;font-size:12px;color:#000;padding:10px">'
+    + '<div style="text-align:center;font-weight:bold;font-size:16px;margin-bottom:4px">BẢNG KÊ THU MUA VÀ THANH TOÁN MỦ CAO SU</div>'
+    + '<div style="text-align:center;margin-bottom:2px">Số ' + _bkEsc(soBangKe || '……………………') + '</div>'
+    + '<div style="text-align:center;font-style:italic;margin-bottom:10px">Tháng ' + denP[1] + ' Năm ' + denP[0] + ' &nbsp;(từ ' + _bkDDMMYYYY(tuNgay) + ' đến ' + _bkDDMMYYYY(denNgay) + ')</div>'
+    + '<table style="width:100%;border-collapse:collapse;margin-bottom:8px">'
+      + _bkInfoRow('Tên Doanh nghiệp', info.tenDN)
+      + _bkInfoRow('Mã số thuế', info.mst)
+      + _bkInfoRow('Địa chỉ', info.diaChi)
+      + _bkInfoRow('Địa điểm thu mua', info.diaDiemThuMua)
+      + _bkInfoRow('Địa chỉ nơi tổ chức thu mua', info.diaChiToChuc)
+      + _bkInfoRow('Người phụ trách thu mua', info.nguoiPhuTrach)
+    + '</table>'
+    + '<div style="margin-bottom:10px">- Đơn giá: Mủ nước……………' + _bkEsc(info.giaMuNuoc || '……') + 'đ/Độ, Mủ tạp……………' + _bkEsc(info.giaMuTap || '……') + 'đ/Kg <i>(Giá có thể thay đổi theo chất lượng mủ)</i></div>'
+    + '<table style="width:100%;border-collapse:collapse;font-size:10.5px">'
+    + '<thead><tr>'
+      + '<th rowspan="2" style="border:1px solid #000;padding:3px">STT</th>'
+      + '<th rowspan="2" style="border:1px solid #000;padding:3px">Tên người bán</th>'
+      + '<th rowspan="2" style="border:1px solid #000;padding:3px">Địa chỉ</th>'
+      + '<th rowspan="2" style="border:1px solid #000;padding:3px">Số CCCD</th>'
+      + '<th rowspan="2" style="border:1px solid #000;padding:3px">Số điện thoại</th>'
+      + '<th colspan="4" style="border:1px solid #000;padding:3px">Hàng hoá, dịch vụ mua vào</th>'
+      + '<th colspan="2" style="border:1px solid #000;padding:3px">Xác nhận</th>'
+      + '</tr><tr>'
+      + '<th style="border:1px solid #000;padding:3px">Số lượng (kg)</th>'
+      + '<th style="border:1px solid #000;padding:3px">Số độ (%)</th>'
+      + '<th style="border:1px solid #000;padding:3px">Đơn giá (đ)</th>'
+      + '<th style="border:1px solid #000;padding:3px">Thành tiền (đ)</th>'
+      + '<th style="border:1px solid #000;padding:3px">Ký đã nhận tiền mặt</th>'
+      + '<th style="border:1px solid #000;padding:3px">Ký xác nhận CK</th>'
+      + '</tr></thead><tbody>'
+      + rowsHtml
+      + '<tr style="font-weight:bold"><td colspan="8" style="text-align:right;border:1px solid #000;padding:3px">Tổng giá trị hàng hoá mua vào:</td>'
+      + '<td style="text-align:right;border:1px solid #000;padding:3px">' + fmtNum(tongCong) + '</td>'
+      + '<td style="border:1px solid #000;padding:3px"></td><td style="border:1px solid #000;padding:3px"></td></tr>'
+      + '</tbody></table>'
+    + '<div style="margin-top:20px;display:flex;justify-content:space-between">'
+      + '<div style="text-align:center;width:45%"><b>Người lập bảng kê</b><br>(Ký, ghi rõ họ tên)</div>'
+      + '<div style="text-align:center;width:45%">……………, ngày ' + parseInt(denP[2],10) + ' tháng ' + parseInt(denP[1],10) + ' năm ' + denP[0] + '<br><b>Đại diện doanh nghiệp</b><br>(Ký tên, đóng dấu)</div>'
+    + '</div>'
+    + '</div>';
+  setTimeout(function(){ window.print(); }, 250);
 }
 // Override fmtNum để làm tròn nếu bật setting
 var _origFmtNum = fmtNum;
@@ -9431,5 +9730,9 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('controllerchange', _swAutoReload);
 }
 </script>
+
+<!-- Vùng in Bảng kê thu mua — bình thường ẩn, chỉ hiện khi bấm In (window.print), nội dung được JS
+     đổ vào lúc xuất bảng kê (xem hàm renderBangKePrint) -->
+<div id="bangke-print-area"></div>
 </body>
 </html>
