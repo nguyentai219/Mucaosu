@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.3.0</title>
+<title>Mua Bán Mủ Cao Su v1.3.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -485,7 +485,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.3.0 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.3.1 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1026,6 +1026,17 @@ input[type=date]:focus{border-color:var(--gl)}
         </div>
         <label class="toggle-sw">
           <input type="checkbox" id="setting-amBao" onchange="saveSetting('amBao',this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <!-- MÀN HÌNH LUÔN BẬT -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 4px;border-bottom:1px solid var(--g100)">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--g800)">🔆 Màn hình luôn bật</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:2px">Không tự tắt màn hình khi đang mở app (mặc định bật)</div>
+        </div>
+        <label class="toggle-sw">
+          <input type="checkbox" id="setting-wakelock" onchange="saveSetting('wakelock',this.checked)">
           <span class="toggle-slider"></span>
         </label>
       </div>
@@ -1574,7 +1585,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.3.0</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.3.1</div>
       </div>
     </div>
 
@@ -1740,7 +1751,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.3.0</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.3.1</div>
       </div>
     </div>
 
@@ -2518,6 +2529,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   rebuildKHRoleLists();
   migrateKHAll();
   migrateKhachIdToNumeric(); // Thay Mã KH cũ (chữ+số) bằng mã thuần số mới, chạy 1 lần rồi tự đồng bộ lên Supabase
+  applyWakeLock(getSetting('wakelock', true)); // Màn hình luôn bật — mặc định BẬT nếu chưa từng đổi
   if (typeof renderSsHistoryBtn === 'function') renderSsHistoryBtn();
   scheduleIdleSync(); // Bắt đầu vòng lặp đồng bộ ngầm mỗi 15s khi không có thao tác
 
@@ -4542,7 +4554,7 @@ var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','kh_ids','
 // vụ cần đồng bộ và sẽ tự động được quét kèm theo, kể cả khi quên thêm vào SB_DATA_KEYS phía trên.
 var SB_NO_SYNC_KEYS = ['device_code','gd_token','gd_token_expiry','gd_folder_id','gd_user','gd_silent_failed',
   'gd_last_sync','sb_last_sync','pending_sync_count','sync_provider','active_tab','used_ext_codes',
-  'license_is_new','gia_day','ban_last_buyer','ss_state'];
+  'license_is_new','gia_day','ban_last_buyer','ss_state','setting_wakelock'];
 // Danh sách khoá THỰC SỰ sẽ đồng bộ mỗi lần: hợp của SB_DATA_KEYS (đảm bảo có giá trị mặc định hợp lý
 // nếu máy chưa từng có khoá đó) VÀ toàn bộ khoá đang thực sự tồn tại trong localStorage của app (trừ
 // danh sách chỉ-riêng-máy-này ở trên) — để không bỏ sót dữ liệu của các tính năng thêm sau này mà lỡ
@@ -6816,12 +6828,36 @@ function saveSetting(key, val) {
     // Tính lại thành tiền hiện tại
     ['mua','ban'].forEach(function(t){ calc(t); });
   }
+  if (key === 'wakelock') applyWakeLock(val); // Giữ/tắt màn hình luôn bật ngay khi người dùng đổi tuỳ chọn
   autoSync();
 }
+// ── MÀN HÌNH LUÔN BẬT (Wake Lock) ──────────────────────────────────────────
+// Mặc định BẬT (nếu chưa từng cài đặt gì thì getSetting('wakelock', true) trả về true) — chỉ tắt khi
+// người dùng tự tay tắt trong ⚙️ Cài đặt. Trình duyệt sẽ tự NHẢ wake lock mỗi khi tab bị ẩn đi (chuyển
+// app khác, khoá màn hình...), nên phải tự xin cấp lại ngay khi quay về app (visibilitychange) nếu
+// tuỳ chọn vẫn đang bật, để màn hình tiếp tục không tự tắt.
+var _wakeLock = null;
+async function applyWakeLock(enabled){
+  if (!('wakeLock' in navigator)) return; // trình duyệt/thiết bị không hỗ trợ → bỏ qua, không báo lỗi
+  try {
+    if (enabled) {
+      if (_wakeLock) return; // đã đang giữ rồi, khỏi xin lại
+      _wakeLock = await navigator.wakeLock.request('screen');
+      _wakeLock.addEventListener('release', function(){ _wakeLock = null; });
+    } else if (_wakeLock) {
+      await _wakeLock.release();
+      _wakeLock = null;
+    }
+  } catch(e) { /* im lặng bỏ qua (VD tab đang ẩn lúc xin cấp thì trình duyệt sẽ từ chối, sẽ tự xin lại khi quay về) */ }
+}
+document.addEventListener('visibilitychange', function(){
+  if (document.visibilityState === 'visible' && getSetting('wakelock', true)) applyWakeLock(true);
+});
 function openSettings() {
   document.getElementById('setting-round').checked = getSetting('round', true);
   document.getElementById('setting-docTien').checked = getSetting('docTien', true);
   document.getElementById('setting-amBao').checked = getSetting('amBao', true);
+  document.getElementById('setting-wakelock').checked = getSetting('wakelock', true);
   var info = document.getElementById('settings-license-info');
   if (info) {
     var days = getRemainingDays();
