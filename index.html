@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.4.7</title>
+<title>Mua Bán Mủ Cao Su v1.4.8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -165,11 +165,8 @@ input[type="search"]::-webkit-search-decoration{-webkit-appearance:none;appearan
   #bangke-print-area{display:block!important;position:static!important}
   @page{size:A4 landscape;margin:10mm}
 }
-#bangke-preview-overlay{position:fixed;inset:0;z-index:5000;background:#525659;overflow:hidden}
-#bk-preview-rotate{position:absolute;top:0;left:0;width:100vh;height:100vw;transform:rotate(90deg) translateY(-100%);transform-origin:top left;display:flex;flex-direction:column}
-@media (orientation:landscape){
-  #bk-preview-rotate{width:100vw;height:100vh;transform:none}
-}
+#bangke-preview-overlay{display:none;position:fixed;inset:0;z-index:5000;background:#525659;flex-direction:column}
+#bangke-preview-content{transform-origin:top left}
 .modal.show{display:flex}
 .modal.center{align-items:center;padding:20px}
 .modal-box{background:#fff;border-radius:20px 20px 0 0;padding:14px 16px 36px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;animation:slideUp .22s ease}
@@ -501,7 +498,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.4.7 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.4.8 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1695,7 +1692,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.4.7</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.4.8</div>
       </div>
     </div>
 
@@ -1861,7 +1858,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.4.7</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.4.8</div>
       </div>
     </div>
 
@@ -7268,17 +7265,61 @@ function renderBangKePrint(info, ngay, soBangKe, rows, tongCong, dienNgay){
     + '</div>';
   area.innerHTML = contentHtml;
   var previewEl = document.getElementById('bangke-preview-content');
-  if (previewEl) { previewEl.style.width = '1050px'; previewEl.innerHTML = contentHtml; }
+  if (previewEl) { previewEl.style.width = '1050px'; previewEl.style.transform = 'scale(1)'; previewEl.innerHTML = contentHtml; }
   openBangKePreview();
+  setTimeout(_bkFitToScreen, 30); // đợi layout dựng xong rồi mới đo kích thước để co giãn cho khớp
 }
 function openBangKePreview(){
   var ov = document.getElementById('bangke-preview-overlay');
-  if (ov) ov.style.display = 'block';
+  if (ov) ov.style.display = 'flex';
+  _bkInitPinch();
 }
 function closeBangKePreview(){
   var ov = document.getElementById('bangke-preview-overlay');
   if (ov) ov.style.display = 'none';
   closeBangKeCapture(); // luôn thoát chế độ chụp ảnh khi đóng hẳn màn xem trước, tránh lần mở sau bị kẹt trạng thái ẩn nút
+}
+// ── Tự co giãn nội dung (khổ A4 ngang, rộng cố định 1050px) vừa khít bề ngang màn hình đang xem, và
+// cho phép chụm 2 ngón tay để phóng to/thu nhỏ thêm nếu cần xem chi tiết hơn mức vừa khít mặc định. ──
+var _bkScale = 1, _bkPinchStartDist = 0, _bkPinchStartScale = 1, _bkPinchBound = false;
+function _bkApplyScale(scale){
+  var content = document.getElementById('bangke-preview-content');
+  if (!content) return;
+  _bkScale = Math.max(0.15, Math.min(scale, 4));
+  content.style.transform = 'scale(' + _bkScale + ')';
+  // content luôn giữ kích thước gốc (offsetWidth/Height KHÔNG bị ảnh hưởng bởi transform), phải tự đặt
+  // lại kích thước hiển thị của khung cha bọc ngoài để vùng cuộn khớp đúng với kích thước sau co giãn,
+  // tránh vùng cuộn trống thừa hoặc bị cắt mất phần nội dung.
+  content.parentElement.style.width = (content.offsetWidth * _bkScale) + 'px';
+  content.parentElement.style.height = (content.offsetHeight * _bkScale) + 'px';
+}
+function _bkFitToScreen(){
+  var scrollEl = document.getElementById('bangke-preview-scroll');
+  var content = document.getElementById('bangke-preview-content');
+  if (!scrollEl || !content) return;
+  content.style.transform = 'scale(1)'; // reset tạm để đo đúng kích thước gốc trước khi tính tỉ lệ
+  content.parentElement.style.width = '';
+  content.parentElement.style.height = '';
+  var avail = scrollEl.clientWidth - 4;
+  _bkApplyScale(avail > 0 ? avail / content.offsetWidth : 1);
+}
+function _bkDist(t1, t2){ return Math.hypot(t2.clientX-t1.clientX, t2.clientY-t1.clientY); }
+function _bkInitPinch(){
+  if (_bkPinchBound) return;
+  _bkPinchBound = true;
+  var scrollEl = document.getElementById('bangke-preview-scroll');
+  if (!scrollEl) return;
+  scrollEl.addEventListener('touchstart', function(e){
+    if (e.touches.length === 2) { _bkPinchStartDist = _bkDist(e.touches[0], e.touches[1]); _bkPinchStartScale = _bkScale; }
+  }, {passive:true});
+  scrollEl.addEventListener('touchmove', function(e){
+    if (e.touches.length === 2 && _bkPinchStartDist > 0) {
+      e.preventDefault();
+      var d = _bkDist(e.touches[0], e.touches[1]);
+      _bkApplyScale(_bkPinchStartScale * d / _bkPinchStartDist);
+    }
+  }, {passive:false});
+  scrollEl.addEventListener('touchend', function(e){ if (e.touches.length < 2) _bkPinchStartDist = 0; }, {passive:true});
 }
 var _bkCaptureHideTimer = null;
 // Chế độ chụp ảnh: ẩn hết tiêu đề/nút bấm/viền, chỉ còn đúng nội dung bảng kê phủ toàn màn hình để
@@ -9925,26 +9966,26 @@ if ('serviceWorker' in navigator) {
      đổ vào lúc xuất bảng kê (xem hàm renderBangKePrint) -->
 <div id="bangke-print-area"></div>
 
-<!-- OVERLAY XEM TRƯỚC BẢNG KÊ — hiện đúng nội dung sẽ in/xuất PDF/chụp ảnh, có thể cuộn xem trước khi
-     quyết định In, Tải PDF, hay Chụp ảnh. Vì trang là A4 NGANG, trên điện thoại đang cầm dọc nội dung
-     sẽ tự động XOAY 90° để hiển thị đúng chiều ngang, đỡ phải xoay ngang điện thoại mới xem được rõ
-     (nếu máy/tablet đang thật sự ở chế độ ngang thì không xoay nữa, hiển thị bình thường). -->
-<div id="bangke-preview-overlay" style="display:none">
-  <div id="bk-preview-rotate">
-    <div id="bk-preview-header" style="background:#323639;color:#fff;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-      <div style="font-weight:700;font-size:14px">👁️ Xem trước Bảng kê</div>
-      <button onclick="closeBangKePreview()" style="background:none;border:none;color:#fff;font-size:22px;line-height:1;cursor:pointer;padding:4px 8px">✕</button>
-    </div>
-    <div id="bangke-preview-scroll" style="flex:1;overflow:auto;padding:16px" onclick="_bkCaptureScreenTap()">
-      <div id="bangke-preview-content" style="background:#fff;margin:0 auto;width:fit-content;box-shadow:0 2px 16px rgba(0,0,0,.35)"></div>
-    </div>
-    <div id="bk-preview-footer" style="background:#fff;padding:10px 14px;display:flex;gap:6px;flex-shrink:0;border-top:1px solid #ddd">
-      <button onclick="openBangKeCapture()" style="flex:1;padding:12px 4px;background:#f1f5f9;color:#334155;border:1.5px solid #cbd5e1;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:700;cursor:pointer">📷 Chụp ảnh</button>
-      <button onclick="inBangKe()" style="flex:1;padding:12px 4px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:700;cursor:pointer">🖨️ In</button>
-      <button onclick="taiPdfBangKe()" id="bk-tai-pdf-btn" style="flex:1;padding:12px 4px;background:var(--gd);color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:700;cursor:pointer">⬇️ PDF</button>
-    </div>
-    <button id="bk-capture-close" onclick="closeBangKeCapture()" style="display:none;position:absolute;top:14px;right:14px;z-index:10;width:42px;height:42px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;font-size:20px;cursor:pointer;transition:opacity .3s;align-items:center;justify-content:center">✕</button>
+<!-- OVERLAY XEM TRƯỚC BẢNG KÊ — hiện đúng nội dung sẽ in/xuất PDF/chụp ảnh. Trang là A4 NGANG nên nội
+     dung tự co giãn (scale) vừa khít bề ngang màn hình điện thoại ngay khi mở, xem được toàn bộ mà
+     không cần xoay máy; có thể chụm 2 ngón tay để phóng to/thu nhỏ xem chi tiết hơn nếu cần. Thanh nút
+     Chụp ảnh / In / Tải PDF luôn cố định ở DƯỚI CÙNG màn hình (không xoay theo nội dung). -->
+<div id="bangke-preview-overlay">
+  <div id="bk-preview-header" style="background:#323639;color:#fff;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <div style="font-weight:700;font-size:14px">👁️ Xem trước Bảng kê <span style="font-weight:400;font-size:11px;opacity:.75">(chụm 2 ngón để phóng to)</span></div>
+    <button onclick="closeBangKePreview()" style="background:none;border:none;color:#fff;font-size:22px;line-height:1;cursor:pointer;padding:4px 8px">✕</button>
   </div>
+  <div id="bangke-preview-scroll" style="flex:1;overflow:auto;padding:16px" onclick="_bkCaptureScreenTap()">
+    <div id="bangke-preview-content-wrap">
+      <div id="bangke-preview-content" style="background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.35)"></div>
+    </div>
+  </div>
+  <div id="bk-preview-footer" style="background:#fff;padding:10px 14px;display:flex;gap:6px;flex-shrink:0;border-top:1px solid #ddd">
+    <button onclick="openBangKeCapture()" style="flex:1;padding:12px 4px;background:#f1f5f9;color:#334155;border:1.5px solid #cbd5e1;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:700;cursor:pointer">📷 Chụp ảnh</button>
+    <button onclick="inBangKe()" style="flex:1;padding:12px 4px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:700;cursor:pointer">🖨️ In</button>
+    <button onclick="taiPdfBangKe()" id="bk-tai-pdf-btn" style="flex:1;padding:12px 4px;background:var(--gd);color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:700;cursor:pointer">⬇️ PDF</button>
+  </div>
+  <button id="bk-capture-close" onclick="closeBangKeCapture()" style="display:none;position:fixed;top:14px;right:14px;z-index:5010;width:42px;height:42px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;font-size:20px;cursor:pointer;transition:opacity .3s;align-items:center;justify-content:center">✕</button>
 </div>
 </body>
 </html>
