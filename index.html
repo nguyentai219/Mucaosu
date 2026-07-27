@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.4.6</title>
+<title>Mua Bán Mủ Cao Su v1.4.7</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -164,6 +164,11 @@ input[type="search"]::-webkit-search-decoration{-webkit-appearance:none;appearan
   body>*:not(#bangke-print-area){display:none!important}
   #bangke-print-area{display:block!important;position:static!important}
   @page{size:A4 landscape;margin:10mm}
+}
+#bangke-preview-overlay{position:fixed;inset:0;z-index:5000;background:#525659;overflow:hidden}
+#bk-preview-rotate{position:absolute;top:0;left:0;width:100vh;height:100vw;transform:rotate(90deg) translateY(-100%);transform-origin:top left;display:flex;flex-direction:column}
+@media (orientation:landscape){
+  #bk-preview-rotate{width:100vw;height:100vh;transform:none}
 }
 .modal.show{display:flex}
 .modal.center{align-items:center;padding:20px}
@@ -496,7 +501,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.4.6 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.4.7 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1215,20 +1220,50 @@ input[type=date]:focus{border-color:var(--gl)}
 <div class="modal center" id="modal-bangke-export" style="z-index:900">
   <div class="modal-box center-box" style="max-width:340px">
     <div class="modal-title">🖨️ Xuất Bảng kê thu mua</div>
-    <div style="font-size:11.5px;color:var(--g600);margin-bottom:12px">Gồm khách hàng có giao dịch trong khoảng ngày chọn, mỗi khách 1 dòng theo loại mủ (mủ nước tính độ riêng, mủ tạp tính theo kg).</div>
+    <div style="font-size:11.5px;color:var(--g600);margin-bottom:12px">Gồm khách hàng có giao dịch trong ngày chọn, mỗi khách 1 dòng theo loại mủ (mủ nước tính độ riêng, mủ tạp tính theo kg).</div>
     <div style="font-size:12px;font-weight:700;color:var(--g700);margin-bottom:4px">Nguồn dữ liệu</div>
     <select id="bk-nguon" class="fi" style="margin-bottom:10px">
       <option value="thu_mua">📥 Dữ liệu Thu Mua (giao dịch thật)</option>
       <option value="tinh_toan">⚡ Dữ liệu Tính Toán (đã lưu ở tab Tính Toán)</option>
     </select>
-    <div style="font-size:12px;font-weight:700;color:var(--g700);margin-bottom:4px">Từ ngày</div>
-    <input type="date" id="bk-tuNgay" class="fi" style="margin-bottom:10px">
-    <div style="font-size:12px;font-weight:700;color:var(--g700);margin-bottom:4px">Đến ngày</div>
-    <input type="date" id="bk-denNgay" class="fi" style="margin-bottom:10px">
+    <div style="font-size:12px;font-weight:700;color:var(--g700);margin-bottom:4px">Chọn loại mủ</div>
+    <select id="bk-loaiMu" class="fi" style="margin-bottom:10px">
+      <option value="all">Tất cả loại mủ</option>
+      <option value="nuoc">Mủ nước</option>
+      <option value="chen">Mủ chén</option>
+      <option value="day">Mủ dây</option>
+      <option value="dong">Mủ đông</option>
+    </select>
+    <div style="font-size:12px;font-weight:700;color:var(--g700);margin-bottom:4px">Ngày xuất</div>
+    <div class="fi" id="bk-ngayXuat-bar" style="margin-bottom:10px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;text-align:center" onclick="openBkCalDate()">
+      <span id="bk-ngayXuat-val" style="flex:1"></span>
+      <span>📅</span>
+    </div>
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--g600);margin-bottom:14px;cursor:pointer">
+      <input type="checkbox" id="bk-dienNgay" style="width:16px;height:16px;flex-shrink:0">
+      Điền ngày xuất, điền ngày ký vào dữ liệu xuất ra
+    </label>
     <div style="font-size:12px;font-weight:700;color:var(--g700);margin-bottom:4px">Số bảng kê (không bắt buộc)</div>
     <input type="text" id="bk-soBangKe" class="fi" placeholder="VD: 07/2026" style="margin-bottom:14px" autocomplete="off">
     <button onclick="xuatBangKe()" style="width:100%;padding:10px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">📄 Xuất bảng kê</button>
     <button class="btn-huy" style="width:100%" onclick="closeM('modal-bangke-export')">Huỷ</button>
+  </div>
+</div>
+
+<!-- MODAL LỊCH CHỌN NGÀY XUẤT BẢNG KÊ -->
+<div class="modal" id="modal-bk-caldate" style="z-index:950">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📅 Chọn ngày xuất bảng kê</div>
+    <div class="cal-header">
+      <button onclick="bkCalNav(-1)">‹</button>
+      <span id="bk-cal-month-label"></span>
+      <button onclick="bkCalNav(1)">›</button>
+    </div>
+    <div class="cal-grid" id="bk-cal-grid"></div>
+    <div class="cal-legend"><span class="cal-dot"></span> Ngày có dữ liệu</div>
+    <button class="btn-luu" style="width:100%;margin-top:10px" onclick="applyBkDate()">Xác nhận</button>
+    <button class="btn-huy" style="width:100%;margin-top:6px" onclick="closeM('modal-bk-caldate')">Đóng</button>
   </div>
 </div>
 
@@ -1660,7 +1695,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.4.6</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.4.7</div>
       </div>
     </div>
 
@@ -1826,7 +1861,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.4.6</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.4.7</div>
       </div>
     </div>
 
@@ -7026,31 +7061,89 @@ function luuBangKeInfo(){
 }
 function openBangKeExport(defaultNguon){
   var t = today(); // yyyy-mm-dd, giờ địa phương
-  document.getElementById('bk-tuNgay').value = t; // mặc định từ hôm nay
-  document.getElementById('bk-denNgay').value = t; // đến hôm nay (đổi được)
+  var el = document.getElementById('bk-ngayXuat-val');
+  el.textContent = fmtDate(t);
+  el.dataset.val = t;
+  document.getElementById('bk-loaiMu').value = 'all';
+  document.getElementById('bk-dienNgay').checked = false;
   document.getElementById('bk-soBangKe').value = '';
   document.getElementById('bk-nguon').value = defaultNguon || 'thu_mua';
   openM('modal-bangke-export');
+}
+// ── Lịch chọn ngày xuất bảng kê (đánh dấu ngày có dữ liệu theo đúng nguồn đang chọn) ──
+var bkCalViewYear, bkCalViewMonth, bkCalSelectedDate;
+function _bkDatesWithData(){
+  var nguon = (document.getElementById('bk-nguon')||{}).value || 'thu_mua';
+  var set = {};
+  if (nguon === 'tinh_toan') {
+    var ssData = JSON.parse(localStorage.getItem('ss_data') || '{}');
+    Object.keys(ssData).forEach(function(d){ if ((ssData[d]||[]).length) set[d]=true; });
+  } else {
+    getGD('mua').forEach(function(r){ if (r.date) set[r.date]=true; });
+  }
+  return set;
+}
+function openBkCalDate(){
+  var bar = document.getElementById('bk-ngayXuat-val');
+  var cur = (bar && bar.dataset.val) ? bar.dataset.val : today();
+  var d = new Date(cur+'T00:00:00');
+  bkCalViewYear = d.getFullYear(); bkCalViewMonth = d.getMonth(); bkCalSelectedDate = cur;
+  renderBkCalendar();
+  openM('modal-bk-caldate');
+}
+function bkCalNav(delta){
+  bkCalViewMonth += delta;
+  if (bkCalViewMonth<0){ bkCalViewMonth=11; bkCalViewYear--; }
+  if (bkCalViewMonth>11){ bkCalViewMonth=0; bkCalViewYear++; }
+  renderBkCalendar();
+}
+function renderBkCalendar(){
+  var datesWithData = _bkDatesWithData();
+  var todayD = today();
+  document.getElementById('bk-cal-month-label').textContent = MONTH_NAMES_VN[bkCalViewMonth] + ' ' + bkCalViewYear;
+  var firstDay = new Date(bkCalViewYear, bkCalViewMonth, 1);
+  var startWeekday = (firstDay.getDay()+6)%7;
+  var daysInMonth = new Date(bkCalViewYear, bkCalViewMonth+1, 0).getDate();
+  var html = '';
+  ['T2','T3','T4','T5','T6','T7','CN'].forEach(function(d){ html += '<div class="cal-wd">'+d+'</div>'; });
+  for (var i=0;i<startWeekday;i++) html += '<div class="cal-cell empty"></div>';
+  for (var day=1; day<=daysInMonth; day++) {
+    var dateStr = bkCalViewYear + '-' + String(bkCalViewMonth+1).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+    var cls = 'cal-cell';
+    if (dateStr === todayD) cls += ' today';
+    if (dateStr === bkCalSelectedDate) cls += ' selected';
+    var dot = datesWithData[dateStr] ? '<span class="cal-dot"></span>' : '';
+    html += '<div class="'+cls+'" onclick="selectBkCalDay(\''+dateStr+'\')">'+day+dot+'</div>';
+  }
+  document.getElementById('bk-cal-grid').innerHTML = html;
+}
+function selectBkCalDay(dateStr){ bkCalSelectedDate = dateStr; renderBkCalendar(); }
+function applyBkDate(){
+  var v = bkCalSelectedDate;
+  var el = document.getElementById('bk-ngayXuat-val');
+  if (el) { el.textContent = fmtDate(v); el.dataset.val = v; }
+  closeM('modal-bk-caldate');
 }
 function _bkDDMMYYYY(s){ var p=(s||'').split('-'); return p.length===3 ? (p[2]+'/'+p[1]+'/'+p[0]) : s; }
 function _bkEsc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function _bkInfoRow(label, val){
   return '<tr><td style="width:230px;padding:2px 6px;border:none"><b>- '+label+':</b></td><td style="padding:2px 6px;border:none">'+_bkEsc(val)+'</td></tr>';
 }
-// Xuất bảng kê: gộp giao dịch Thu Mua trong khoảng ngày theo (Tên khách hàng + Loại mủ) — mủ nước
-// tính Số độ trung bình theo trọng số kg, mủ tạp (chén/dây/đông) chỉ tính theo kg. Thành tiền của mỗi
-// dòng luôn lấy TỔNG ĐÚNG từ các giao dịch thật đã lưu (Σ tt), Đơn giá hiển thị được suy ngược lại từ
-// tổng đó để cột 9=(6x7x8) luôn khớp đúng như mẫu, không tự bịa công thức tính giá khác với app.
+// Xuất bảng kê: gộp giao dịch/tính toán trong ĐÚNG 1 NGÀY đã chọn theo (Tên khách hàng + Loại mủ) —
+// mủ nước tính Số độ trung bình theo trọng số kg, mủ tạp (chén/dây/đông) chỉ tính theo kg. Thành tiền
+// của mỗi dòng luôn lấy TỔNG ĐÚNG từ dữ liệu thật đã lưu (Σ tt), Đơn giá hiển thị được suy ngược lại
+// đúng theo công thức tinhTien() thật của app (kg×giá×độ, không chia 100) để cột 9=(6x7x8) luôn khớp.
 function xuatBangKe(){
-  var tuNgay = document.getElementById('bk-tuNgay').value;
-  var denNgay = document.getElementById('bk-denNgay').value;
-  if (!tuNgay || !denNgay){ toast('⚠️ Chọn đủ khoảng ngày!'); return; }
-  if (tuNgay > denNgay){ toast('⚠️ "Từ ngày" phải trước "Đến ngày"!'); return; }
+  var ngay = (document.getElementById('bk-ngayXuat-val')||{}).dataset.val;
+  if (!ngay){ toast('⚠️ Chọn ngày xuất!'); return; }
   var soBangKe = (document.getElementById('bk-soBangKe').value||'').trim();
   var nguon = (document.getElementById('bk-nguon')||{}).value || 'thu_mua';
+  var loaiMuLoc = (document.getElementById('bk-loaiMu')||{}).value || 'all';
+  var dienNgay = !!(document.getElementById('bk-dienNgay')||{}).checked;
 
   var groups = {};
   function addToGroup(ten, loai, kg, doV, tt){
+    if (loaiMuLoc !== 'all' && loai !== loaiMuLoc) return; // lọc đúng loại mủ đã chọn
     var key = normTen(ten) + '|' + loai;
     if (!groups[key]) groups[key] = { ten:ten, loai:loai, kg:0, tt:0, kgDoSum:0 };
     groups[key].kg += kg;
@@ -7059,25 +7152,22 @@ function xuatBangKe(){
   }
 
   if (nguon === 'tinh_toan') {
-    // Nguồn: dữ liệu đã LƯU ở tab Tính Toán (khoá ss_data) — gộp theo từng ngày trong khoảng chọn
+    // Nguồn: dữ liệu đã LƯU ở tab Tính Toán (khoá ss_data) của đúng ngày đã chọn
     var ssData = JSON.parse(localStorage.getItem('ss_data') || '{}');
-    Object.keys(ssData).forEach(function(dateStr){
-      if (dateStr < tuNgay || dateStr > denNgay) return;
-      (ssData[dateStr]||[]).forEach(function(entry){
-        var loai = entry.loai || 'nuoc';
-        (entry.list||[]).forEach(function(r){
-          addToGroup(r.ten, loai, parseFloat(r.kg)||0, parseFloat(r.do)||0, parseFloat(r.tien)||0);
-        });
+    (ssData[ngay]||[]).forEach(function(entry){
+      var loai = entry.loai || 'nuoc';
+      (entry.list||[]).forEach(function(r){
+        addToGroup(r.ten, loai, parseFloat(r.kg)||0, parseFloat(r.do)||0, parseFloat(r.tien)||0);
       });
     });
-    if (!Object.keys(groups).length){ toast('⚠️ Không có dữ liệu Tính Toán nào đã lưu trong khoảng ngày đã chọn!'); return; }
+    if (!Object.keys(groups).length){ toast('⚠️ Không có dữ liệu Tính Toán nào đã lưu trong ngày đã chọn (đúng loại mủ đã lọc)!'); return; }
   } else {
-    // Nguồn: giao dịch Thu Mua thật (mặc định)
-    var mua = getGD('mua').filter(function(r){ return r.date >= tuNgay && r.date <= denNgay; });
-    if (!mua.length){ toast('⚠️ Không có giao dịch Thu Mua nào trong khoảng ngày đã chọn!'); return; }
+    // Nguồn: giao dịch Thu Mua thật (mặc định) của đúng ngày đã chọn
+    var mua = getGD('mua').filter(function(r){ return r.date === ngay; });
     mua.forEach(function(r){
       addToGroup(r.ten, r.loai || 'nuoc', parseFloat(r.kg)||0, parseFloat(r.do)||0, parseFloat(r.tt)||0);
     });
+    if (!Object.keys(groups).length){ toast('⚠️ Không có giao dịch Thu Mua nào trong ngày đã chọn (đúng loại mủ đã lọc)!'); return; }
   }
 
   var list = Object.keys(groups).map(function(k){ return groups[k]; });
@@ -7094,7 +7184,10 @@ function xuatBangKe(){
     if (g.loai === 'nuoc') {
       var doTB = g.kg>0 ? (g.kgDoSum/g.kg) : 0;
       doHT = doTB ? doTB.toFixed(1) : '';
-      giaHT = (g.kg>0 && doTB>0) ? Math.round(g.tt/(g.kg*doTB/100)) : '';
+      // Công thức tính tiền THẬT của app (xem tinhTien()): tiền = kg × giá × độ — KHÔNG chia 100
+      // (độ dùng nguyên giá trị %, không quy đổi phân số) — suy ngược lại đơn giá phải theo đúng công
+      // thức này để cột 6x7x8 khớp đúng thành tiền thật, tránh đơn giá hiển thị sai lệch hàng trăm lần.
+      giaHT = (g.kg>0 && doTB>0) ? Math.round(g.tt/(g.kg*doTB)) : '';
     } else {
       doHT = DO_LOAI_LABEL[g.loai] || g.loai;
       giaHT = g.kg>0 ? Math.round(g.tt/g.kg) : '';
@@ -7103,31 +7196,35 @@ function xuatBangKe(){
     return { stt:i+1, ten:g.ten, diaChi:khInfo.diaChi, cccd:khInfo.cccd, sdt:khInfo.sdt, kg:g.kg, do:doHT, gia:giaHT, tt:g.tt };
   });
 
-  renderBangKePrint(getBangKeInfo(), tuNgay, denNgay, soBangKe, rows, tongCong);
+  renderBangKePrint(getBangKeInfo(), ngay, soBangKe, rows, tongCong, dienNgay);
   closeM('modal-bangke-export');
 }
-function renderBangKePrint(info, tuNgay, denNgay, soBangKe, rows, tongCong){
+function renderBangKePrint(info, ngay, soBangKe, rows, tongCong, dienNgay){
   var area = document.getElementById('bangke-print-area');
   if (!area) return;
-  var denP = denNgay.split('-');
+  var ngayP = ngay.split('-');
   var rowsHtml = rows.map(function(r){
     return '<tr>'
       + '<td style="text-align:center;border:1px solid #000;padding:3px">'+r.stt+'</td>'
-      + '<td style="border:1px solid #000;padding:3px">'+_bkEsc(r.ten)+'</td>'
-      + '<td style="border:1px solid #000;padding:3px">'+_bkEsc(r.diaChi)+'</td>'
+      + '<td style="text-align:center;border:1px solid #000;padding:3px">'+_bkEsc(r.ten)+'</td>'
+      + '<td style="text-align:center;border:1px solid #000;padding:3px">'+_bkEsc(r.diaChi)+'</td>'
       + '<td style="text-align:center;border:1px solid #000;padding:3px">'+_bkEsc(r.cccd)+'</td>'
       + '<td style="text-align:center;border:1px solid #000;padding:3px">'+_bkEsc(r.sdt)+'</td>'
-      + '<td style="text-align:right;border:1px solid #000;padding:3px">'+fmtNum(r.kg)+'</td>'
+      + '<td style="text-align:center;border:1px solid #000;padding:3px">'+fmtKg(r.kg)+'</td>'
       + '<td style="text-align:center;border:1px solid #000;padding:3px">'+_bkEsc(r.do)+'</td>'
-      + '<td style="text-align:right;border:1px solid #000;padding:3px">'+(r.gia!==''?fmtNum(r.gia):'')+'</td>'
-      + '<td style="text-align:right;border:1px solid #000;padding:3px">'+fmtNum(r.tt)+'</td>'
+      + '<td style="text-align:center;border:1px solid #000;padding:3px">'+(r.gia!==''?fmtNum(r.gia):'')+'</td>'
+      + '<td style="text-align:center;border:1px solid #000;padding:3px">'+fmtNum(r.tt)+'</td>'
       + '<td style="border:1px solid #000;padding:3px"></td>'
       + '<td style="border:1px solid #000;padding:3px"></td>'
       + '</tr>';
   }).join('');
-  var dongNgayThang = (tuNgay === denNgay)
-    ? ('Ngày ' + _bkDDMMYYYY(denNgay))
-    : ('Tháng ' + denP[1] + ' Năm ' + denP[0] + ' &nbsp;(từ ' + _bkDDMMYYYY(tuNgay) + ' đến ' + _bkDDMMYYYY(denNgay) + ')');
+  // Tuỳ chọn "Điền ngày xuất, điền ngày ký": tick thì điền đúng ngày/tháng/năm thật vào cả 2 chỗ
+  // (dòng Tháng/Năm đầu trang + dòng ngày ký cuối trang); bỏ tick thì để trống dạng chấm chấm cho
+  // người dùng tự viết tay sau khi in ra.
+  var dongNgayThang = dienNgay ? ('Tháng ' + ngayP[1] + ' Năm ' + ngayP[0]) : 'Tháng: ……… Năm: ………';
+  var dongKy = dienNgay
+    ? ('……………, ngày ' + parseInt(ngayP[2],10) + ' tháng ' + parseInt(ngayP[1],10) + ' năm ' + ngayP[0])
+    : '……………, Ngày: ……… Tháng: ……… Năm: ………';
   var contentHtml =
     '<div style="font-family:\'Times New Roman\',Times,serif;font-size:12px;color:#000;padding:10px">'
     + '<div style="text-align:center;font-weight:bold;font-size:16px;margin-bottom:4px">BẢNG KÊ THU MUA VÀ THANH TOÁN MỦ CAO SU</div>'
@@ -7166,7 +7263,7 @@ function renderBangKePrint(info, tuNgay, denNgay, soBangKe, rows, tongCong){
       + '</tbody></table>'
     + '<div style="margin-top:20px;display:flex;justify-content:space-between">'
       + '<div style="text-align:center;width:45%"><b>Người lập bảng kê</b><br>(Ký, ghi rõ họ tên)</div>'
-      + '<div style="text-align:center;width:45%">……………, ngày ' + parseInt(denP[2],10) + ' tháng ' + parseInt(denP[1],10) + ' năm ' + denP[0] + '<br><b>Đại diện doanh nghiệp</b><br>(Ký tên, đóng dấu)</div>'
+      + '<div style="text-align:center;width:45%">' + dongKy + '<br><b>Đại diện doanh nghiệp</b><br>(Ký tên, đóng dấu)</div>'
     + '</div>'
     + '</div>';
   area.innerHTML = contentHtml;
@@ -7176,12 +7273,39 @@ function renderBangKePrint(info, tuNgay, denNgay, soBangKe, rows, tongCong){
 }
 function openBangKePreview(){
   var ov = document.getElementById('bangke-preview-overlay');
-  if (ov) ov.style.display = 'flex';
+  if (ov) ov.style.display = 'block';
 }
 function closeBangKePreview(){
   var ov = document.getElementById('bangke-preview-overlay');
   if (ov) ov.style.display = 'none';
+  closeBangKeCapture(); // luôn thoát chế độ chụp ảnh khi đóng hẳn màn xem trước, tránh lần mở sau bị kẹt trạng thái ẩn nút
 }
+var _bkCaptureHideTimer = null;
+// Chế độ chụp ảnh: ẩn hết tiêu đề/nút bấm/viền, chỉ còn đúng nội dung bảng kê phủ toàn màn hình để
+// chụp ảnh trực tiếp không dính giao diện thừa. Chạm vào màn hình sẽ hiện nút ✕ để thoát, tự ẩn nút
+// đó sau 5 giây nếu không chạm vào (nội dung vẫn hiển thị, chỉ có nút ✕ tự ẩn) để không che ảnh chụp.
+function openBangKeCapture(){
+  document.getElementById('bk-preview-header').style.display = 'none';
+  document.getElementById('bk-preview-footer').style.display = 'none';
+  document.getElementById('bk-capture-close').style.display = 'flex';
+  _bkCaptureShowClose();
+}
+function closeBangKeCapture(){
+  var closeBtn = document.getElementById('bk-capture-close');
+  if (!closeBtn || closeBtn.style.display === 'none') return; // không đang ở chế độ chụp ảnh thì bỏ qua
+  document.getElementById('bk-preview-header').style.display = 'flex';
+  document.getElementById('bk-preview-footer').style.display = 'flex';
+  closeBtn.style.display = 'none';
+  clearTimeout(_bkCaptureHideTimer);
+}
+function _bkCaptureShowClose(){
+  var btn = document.getElementById('bk-capture-close');
+  if (!btn || btn.style.display === 'none') return; // chỉ áp dụng khi đang ở chế độ chụp ảnh
+  btn.style.opacity = '1';
+  clearTimeout(_bkCaptureHideTimer);
+  _bkCaptureHideTimer = setTimeout(function(){ btn.style.opacity = '0'; }, 5000);
+}
+function _bkCaptureScreenTap(){ _bkCaptureShowClose(); }
 function inBangKe(){ setTimeout(function(){ window.print(); }, 100); }
 function ensureHtml2Canvas(cb){
   if (window.html2canvas) { cb(); return; }
@@ -7193,18 +7317,23 @@ function ensureHtml2Canvas(cb){
 }
 // Xuất file PDF tải thẳng về máy — KHÔNG cần chọn máy in nào, không phụ thuộc máy in đang kết nối hay
 // không (khắc phục lỗi "Máy in này hiện không khả dụng" khi hộp thoại in hệ thống mặc định chọn nhầm
-// máy in không có sẵn). Chụp ảnh đúng nội dung đang xem trước rồi ghép vào PDF, tự chia nhiều trang
-// nếu bảng kê dài hơn 1 trang A4 ngang.
+// máy in không có sẵn). Chụp ảnh từ 1 BẢN SAO TẠM đặt ngoài màn hình (không dùng trực tiếp khung xem
+// trước vì khung đó có thể đang bị xoay 90° trên điện thoại cầm dọc — chụp thẳng từ đó sẽ ra ảnh bị
+// nghiêng sai hướng) rồi ghép vào PDF A4 NGANG, tự chia nhiều trang nếu bảng kê dài hơn 1 trang.
 function taiPdfBangKe(){
-  var el = document.getElementById('bangke-preview-content');
-  if (!el) return;
+  var srcHtml = document.getElementById('bangke-print-area').innerHTML;
+  if (!srcHtml) return;
   var btn = document.getElementById('bk-tai-pdf-btn');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Đang tạo PDF...'; }
+  var tmp = document.createElement('div');
+  tmp.style.cssText = 'position:fixed;left:-99999px;top:0;width:1050px;background:#fff;z-index:-1';
+  tmp.innerHTML = srcHtml;
+  document.body.appendChild(tmp);
   ensureHtml2Canvas(function(){
     ensureJsPDF(function(){
-      html2canvas(el, { scale:2, useCORS:true, backgroundColor:'#ffffff' }).then(function(canvas){
+      html2canvas(tmp, { scale:2, useCORS:true, backgroundColor:'#ffffff' }).then(function(canvas){
         var jsPDF = window.jspdf.jsPDF;
-        var pageW = 297, pageH = 210; // A4 ngang, đơn vị mm
+        var pageW = 297, pageH = 210; // A4 NGANG, đơn vị mm — luôn cố định landscape bất kể khung xem trước đang xoay hay không
         var imgW = pageW;
         var imgH = canvas.height * imgW / canvas.width;
         var pdf = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
@@ -7223,6 +7352,7 @@ function taiPdfBangKe(){
       }).catch(function(e){
         toast('❌ Lỗi tạo PDF: ' + (e&&e.message?e.message:'không rõ nguyên nhân'));
       }).finally(function(){
+        document.body.removeChild(tmp);
         if (btn) { btn.disabled = false; btn.textContent = '⬇️ Tải PDF'; }
       });
     });
@@ -9795,20 +9925,25 @@ if ('serviceWorker' in navigator) {
      đổ vào lúc xuất bảng kê (xem hàm renderBangKePrint) -->
 <div id="bangke-print-area"></div>
 
-<!-- OVERLAY XEM TRƯỚC BẢNG KÊ — hiện đúng nội dung sẽ in/xuất PDF, có thể cuộn xem trước khi quyết
-     định In (mở hộp thoại in hệ thống) hoặc Tải PDF (xuất file .pdf tải thẳng về máy, không cần máy
-     in nào, không phụ thuộc máy in nào đang kết nối hay không) -->
-<div id="bangke-preview-overlay" style="display:none;position:fixed;inset:0;z-index:5000;background:#525659;flex-direction:column">
-  <div style="background:#323639;color:#fff;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-    <div style="font-weight:700;font-size:14px">👁️ Xem trước Bảng kê</div>
-    <button onclick="closeBangKePreview()" style="background:none;border:none;color:#fff;font-size:22px;line-height:1;cursor:pointer;padding:4px 8px">✕</button>
-  </div>
-  <div id="bangke-preview-scroll" style="flex:1;overflow:auto;padding:16px">
-    <div id="bangke-preview-content" style="background:#fff;margin:0 auto;width:fit-content;box-shadow:0 2px 16px rgba(0,0,0,.35)"></div>
-  </div>
-  <div style="background:#fff;padding:10px 14px;display:flex;gap:8px;flex-shrink:0;border-top:1px solid #ddd">
-    <button onclick="inBangKe()" style="flex:1;padding:12px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">🖨️ In</button>
-    <button onclick="taiPdfBangKe()" id="bk-tai-pdf-btn" style="flex:1;padding:12px;background:var(--gd);color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">⬇️ Tải PDF</button>
+<!-- OVERLAY XEM TRƯỚC BẢNG KÊ — hiện đúng nội dung sẽ in/xuất PDF/chụp ảnh, có thể cuộn xem trước khi
+     quyết định In, Tải PDF, hay Chụp ảnh. Vì trang là A4 NGANG, trên điện thoại đang cầm dọc nội dung
+     sẽ tự động XOAY 90° để hiển thị đúng chiều ngang, đỡ phải xoay ngang điện thoại mới xem được rõ
+     (nếu máy/tablet đang thật sự ở chế độ ngang thì không xoay nữa, hiển thị bình thường). -->
+<div id="bangke-preview-overlay" style="display:none">
+  <div id="bk-preview-rotate">
+    <div id="bk-preview-header" style="background:#323639;color:#fff;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div style="font-weight:700;font-size:14px">👁️ Xem trước Bảng kê</div>
+      <button onclick="closeBangKePreview()" style="background:none;border:none;color:#fff;font-size:22px;line-height:1;cursor:pointer;padding:4px 8px">✕</button>
+    </div>
+    <div id="bangke-preview-scroll" style="flex:1;overflow:auto;padding:16px" onclick="_bkCaptureScreenTap()">
+      <div id="bangke-preview-content" style="background:#fff;margin:0 auto;width:fit-content;box-shadow:0 2px 16px rgba(0,0,0,.35)"></div>
+    </div>
+    <div id="bk-preview-footer" style="background:#fff;padding:10px 14px;display:flex;gap:6px;flex-shrink:0;border-top:1px solid #ddd">
+      <button onclick="openBangKeCapture()" style="flex:1;padding:12px 4px;background:#f1f5f9;color:#334155;border:1.5px solid #cbd5e1;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:700;cursor:pointer">📷 Chụp ảnh</button>
+      <button onclick="inBangKe()" style="flex:1;padding:12px 4px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:700;cursor:pointer">🖨️ In</button>
+      <button onclick="taiPdfBangKe()" id="bk-tai-pdf-btn" style="flex:1;padding:12px 4px;background:var(--gd);color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:700;cursor:pointer">⬇️ PDF</button>
+    </div>
+    <button id="bk-capture-close" onclick="closeBangKeCapture()" style="display:none;position:absolute;top:14px;right:14px;z-index:10;width:42px;height:42px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;font-size:20px;cursor:pointer;transition:opacity .3s;align-items:center;justify-content:center">✕</button>
   </div>
 </div>
 </body>
