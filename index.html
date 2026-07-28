@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.5.1</title>
+<title>Mua Bán Mủ Cao Su v1.5.4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -95,6 +95,10 @@ input[type="search"]::-webkit-search-decoration{-webkit-appearance:none;appearan
 
 /* AUTOCOMPLETE */
 .ac-list{position:absolute;top:100%;left:0;right:0;background:#fff;border-radius:var(--rs);box-shadow:var(--s3);z-index:200;max-height:180px;overflow-y:auto;border:1.5px solid var(--gp);display:none}
+.kh-info-ticker{display:none;align-items:center;gap:5px;font-size:11.5px;color:var(--g600);margin-top:5px;height:15px;overflow:hidden}
+.kh-info-ticker .kh-ic{flex-shrink:0;font-size:11px}
+.kh-info-ticker .kh-val{display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@keyframes khTickerIn{ from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
 .ac-item{padding:9px 12px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--g100)}
 .ac-item:last-child{border-bottom:none}
 .ac-item:active{background:var(--gb)}
@@ -166,8 +170,9 @@ input[type="search"]::-webkit-search-decoration{-webkit-appearance:none;appearan
   @page{size:A4 landscape;margin:10mm}
 }
 #bangke-preview-overlay{display:none;position:fixed;inset:0;z-index:5000;background:#525659;flex-direction:column}
+#bk-panzoom-wrap{position:absolute;inset:0;overflow:hidden;touch-action:none;transform-origin:center center}
 #bk-rotate-box{position:absolute;top:0;left:0;transform-origin:top left;display:flex;align-items:center;justify-content:center;overflow:hidden}
-#bangke-preview-img{max-width:100%;max-height:100%;object-fit:contain;display:block;box-shadow:0 2px 16px rgba(0,0,0,.35);transform-origin:center center}
+#bangke-preview-img{max-width:100%;max-height:100%;object-fit:contain;display:block;box-shadow:0 2px 16px rgba(0,0,0,.35)}
 .modal.show{display:flex}
 .modal.center{align-items:center;padding:20px}
 .modal-box{background:#fff;border-radius:20px 20px 0 0;padding:14px 16px 36px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;animation:slideUp .22s ease}
@@ -499,7 +504,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.5.1 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.5.4 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -559,6 +564,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <label class="fl">Tên người bán</label>
       <input type="search" id="mua-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('mua')" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="q" onkeydown="tenKey(event,'mua')" onfocus="scrollInputUp(this)">
       <div class="ac-list" id="mua-ac"></div>
+      <div class="kh-info-ticker" id="mua-info-ticker"></div>
     </div>
     <div class="g2" id="mua-kg-row">
       <div class="fr">
@@ -663,6 +669,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <label class="fl">Tên người mua</label>
       <input type="search" id="ban-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('ban')" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="q" onkeydown="tenKey(event,'ban')" onfocus="scrollInputUp(this)" onblur="var l=getLoai('ban');var t=this.value.trim();if(l&&t)saveLastBuyer(l,t);">
       <div class="ac-list" id="ban-ac"></div>
+      <div class="kh-info-ticker" id="ban-info-ticker"></div>
     </div>
     <div class="g2" id="ban-kg-row">
       <div class="fr">
@@ -1693,7 +1700,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.5.1</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.5.4</div>
       </div>
     </div>
 
@@ -1859,7 +1866,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.5.1</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.5.4</div>
       </div>
     </div>
 
@@ -1946,21 +1953,7 @@ input[type=date]:focus{border-color:var(--gl)}
     <div style="font-size:11.5px;color:var(--g600);margin-bottom:10px">Đưa Mã KH này cho khách hàng để họ nhập vào app <b>"Xem Sổ Khách Hàng"</b> và tự xem sổ sách thu mua/gửi/ứng của riêng mình.</div>
 
     <div style="background:var(--g50);border-radius:10px;padding:10px 12px;margin-bottom:12px">
-      <div style="font-size:13px;font-weight:700;color:var(--g800);margin-bottom:6px">➕ Thêm khách hàng mới</div>
-      <input type="text" id="khid-add-ten" class="fi" placeholder="Nhập tên khách hàng..." style="margin-bottom:8px" autocomplete="off">
-      <div style="display:flex;gap:16px;margin-bottom:9px;font-size:12.5px;color:var(--g800)">
-        <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="khid-add-ban" style="width:16px;height:16px;accent-color:var(--gd)"> 🌾 Khách bán</label>
-        <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="khid-add-mua" style="width:16px;height:16px;accent-color:var(--gd)"> 🚛 Khách mua</label>
-      </div>
-      <details style="margin-bottom:9px">
-        <summary style="font-size:11.5px;color:var(--g600);cursor:pointer;user-select:none">📋 Thêm thông tin liên hệ (không bắt buộc, dùng khi xuất bảng kê)</summary>
-        <div style="margin-top:8px">
-          <input type="text" id="khid-add-sdt" class="fi" placeholder="Số điện thoại" style="margin-bottom:6px" inputmode="tel" autocomplete="off">
-          <input type="text" id="khid-add-cccd" class="fi" placeholder="Số CCCD/CMND" style="margin-bottom:6px" inputmode="numeric" autocomplete="off">
-          <input type="text" id="khid-add-diachi" class="fi" placeholder="Địa chỉ" autocomplete="off">
-        </div>
-      </details>
-      <button onclick="themKhachId()" style="width:100%;padding:9px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">+ Thêm khách hàng</button>
+      <button onclick="openThemKhachHang()" style="width:100%;padding:10px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">➕ Thêm khách hàng mới</button>
     </div>
 
     <div style="background:var(--g50);border-radius:10px;padding:10px 12px;margin-bottom:12px">
@@ -1995,6 +1988,49 @@ input[type=date]:focus{border-color:var(--gl)}
       <button onclick="xoaKhachId()" style="flex:1;padding:10px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">🗑️ Xoá</button>
     </div>
     <button class="btn-huy" style="width:100%" onclick="closeM('modal-khid-edit')">Huỷ</button>
+  </div>
+</div>
+
+<!-- MODAL THÊM KHÁCH HÀNG MỚI -->
+<div class="modal center" id="modal-khid-add" style="z-index:950">
+  <div class="modal-box center-box" style="max-width:340px">
+    <div class="modal-title">➕ Thêm khách hàng mới</div>
+    <input type="text" id="khid-add-ten" class="fi" placeholder="Tên khách hàng *" style="margin-bottom:8px" autocomplete="off">
+    <input type="text" id="khid-add-sdt" class="fi" placeholder="Số điện thoại (có thể bỏ trống)" style="margin-bottom:8px" inputmode="tel" autocomplete="off">
+    <input type="text" id="khid-add-cccd" class="fi" placeholder="Số CCCD/CMND (có thể bỏ trống)" style="margin-bottom:8px" inputmode="numeric" autocomplete="off">
+    <input type="text" id="khid-add-diachi" class="fi" placeholder="Địa chỉ (có thể bỏ trống)" style="margin-bottom:14px" autocomplete="off">
+    <div style="display:flex;gap:16px;margin-bottom:16px;font-size:12.5px;color:var(--g800)">
+      <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="khid-add-ban" style="width:16px;height:16px;accent-color:var(--gd)"> 🌾 Khách bán</label>
+      <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="khid-add-mua" style="width:16px;height:16px;accent-color:var(--gd)"> 🚛 Khách mua</label>
+    </div>
+    <button onclick="themKhachId()" style="width:100%;padding:10px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">+ Thêm khách hàng</button>
+    <button class="btn-huy" style="width:100%" onclick="closeM('modal-khid-add')">Huỷ</button>
+  </div>
+</div>
+
+<!-- MODAL THÔNG BÁO: KHÁCH HÀNG TỰ ĐIỀN (MỚI) CHƯA ĐỦ THÔNG TIN, SAU KHI LƯU GIAO DỊCH THÀNH CÔNG -->
+<div class="modal center" id="modal-kh-need-info" style="z-index:960">
+  <div class="modal-box center-box" style="max-width:340px;text-align:center">
+    <div style="font-size:38px;margin-bottom:6px">👤</div>
+    <div class="modal-title" style="margin-bottom:8px">Khách hàng mới</div>
+    <div id="kh-need-info-msg" style="font-size:12.5px;color:var(--g600);margin-bottom:18px;line-height:1.5"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn-huy" style="flex:1" onclick="closeM('modal-kh-need-info')">Huỷ</button>
+      <button onclick="openKhUpdateInfoFromNotice()" style="flex:1;padding:10px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">✏️ Cập nhật</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CẬP NHẬT THÔNG TIN KHÁCH HÀNG (mở ra từ thông báo trên, tên đã điền sẵn từ giao dịch vừa lưu) -->
+<div class="modal center" id="modal-kh-update-info" style="z-index:960">
+  <div class="modal-box center-box" style="max-width:340px">
+    <div class="modal-title">📋 Cập nhật thông tin khách hàng</div>
+    <input type="text" id="khupd-ten" class="fi" style="margin-bottom:8px;background:var(--gb);color:var(--g600)" readonly>
+    <input type="text" id="khupd-sdt" class="fi" placeholder="Số điện thoại (có thể bỏ trống)" style="margin-bottom:8px" inputmode="tel" autocomplete="off">
+    <input type="text" id="khupd-cccd" class="fi" placeholder="Số CCCD/CMND (có thể bỏ trống)" style="margin-bottom:8px" inputmode="numeric" autocomplete="off">
+    <input type="text" id="khupd-diachi" class="fi" placeholder="Địa chỉ (có thể bỏ trống)" style="margin-bottom:14px" autocomplete="off">
+    <button onclick="luuKhUpdateInfo()" style="width:100%;padding:10px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">💾 Lưu</button>
+    <button class="btn-huy" style="width:100%" onclick="closeM('modal-kh-update-info')">Huỷ</button>
   </div>
 </div>
 
@@ -2381,15 +2417,30 @@ function renderKhachIdList(){
     if (x.isCc) tag += '<span style="font-size:9px;padding:1px 5px;border-radius:6px;background:#fffbeb;color:#92400e;font-weight:700;margin-left:5px;vertical-align:middle">👷 CÔNG NHÂN</span>';
     if (laKhachBan) tag += '<span style="font-size:9px;padding:1px 5px;border-radius:6px;background:#eff6ff;color:#1e40af;font-weight:700;margin-left:5px;vertical-align:middle">🌾 KHÁCH BÁN</span>';
     if (laKhachMua) tag += '<span style="font-size:9px;padding:1px 5px;border-radius:6px;background:#f0fdf4;color:#15803d;font-weight:700;margin-left:5px;vertical-align:middle">🚛 KHÁCH MUA</span>';
-    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--g50);border-radius:10px;padding:10px 12px;margin-bottom:6px">'
+    var info = getKhInfoOf(ten);
+    var infoLines = '';
+    if (info.sdt) infoLines += '<div style="font-size:10.5px;color:var(--g600);margin-top:2px">📞 ' + info.sdt + '</div>';
+    if (info.cccd) infoLines += '<div style="font-size:10.5px;color:var(--g600);margin-top:2px">🪪 ' + info.cccd + '</div>';
+    if (info.diaChi) infoLines += '<div style="font-size:10.5px;color:var(--g600);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📍 ' + info.diaChi + '</div>';
+    return '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;background:var(--g50);border-radius:10px;padding:10px 12px;margin-bottom:6px">'
       + '<div style="min-width:0"><div style="font-weight:700;font-size:13px;color:var(--g800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ten + tag + '</div>'
       + '<div style="font-size:10.5px;color:var(--g500);font-weight:700;margin-top:3px;letter-spacing:.3px">Mã khách hàng</div>'
-      + '<div style="font-size:16px;font-weight:800;color:var(--gd);letter-spacing:1.5px;margin-top:1px">' + id + '</div></div>'
+      + '<div style="font-size:16px;font-weight:800;color:var(--gd);letter-spacing:1.5px;margin-top:1px">' + id + '</div>'
+      + infoLines + '</div>'
       + '<div style="flex:0 0 auto;display:flex;gap:6px">'
       + '<button onclick="copyKhachId(&quot;' + id + '&quot;,&quot;' + tenEsc + '&quot;)" style="background:var(--gd);color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer">📋 Sao chép</button>'
       + '<button onclick="openEditKhachId(&quot;' + tenEsc + '&quot;)" title="Sửa" style="background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:8px;padding:8px 10px;font-size:13px;cursor:pointer">✏️</button>'
       + '</div></div>';
   }).join('');
+}
+function openThemKhachHang(){
+  document.getElementById('khid-add-ten').value = '';
+  document.getElementById('khid-add-sdt').value = '';
+  document.getElementById('khid-add-cccd').value = '';
+  document.getElementById('khid-add-diachi').value = '';
+  document.getElementById('khid-add-ban').checked = false;
+  document.getElementById('khid-add-mua').checked = false;
+  openM('modal-khid-add');
 }
 function themKhachId(){
   var inp = document.getElementById('khid-add-ten');
@@ -2412,12 +2463,7 @@ function themKhachId(){
     info[normTen(name)] = {sdt:sdt, cccd:cccd, diaChi:diaChi};
     setKhInfo(info);
   }
-  inp.value = '';
-  document.getElementById('khid-add-ban').checked = false;
-  document.getElementById('khid-add-mua').checked = false;
-  document.getElementById('khid-add-sdt').value = '';
-  document.getElementById('khid-add-cccd').value = '';
-  document.getElementById('khid-add-diachi').value = '';
+  closeM('modal-khid-add');
   renderKhachIdList();
   toast('✅ Đã thêm khách hàng!');
   autoSync();
@@ -2428,6 +2474,40 @@ function copyKhachId(id, ten){
   } else {
     toast('Mã KH của ' + ten + ': ' + id);
   }
+}
+// ── Thông báo sau khi lưu THÀNH CÔNG 1 giao dịch (Mua/Bán/Sổ Gửi/Ứng tiền) với tên khách hàng TỰ
+// ĐIỀN mà TRƯỚC ĐÓ chưa có trong danh sách khách hàng chung (kh3_all) — nhắc bổ sung SĐT/CCCD/Địa chỉ
+// ngay lúc còn nhớ, tránh phải vào lại màn 👥 tìm đúng người sau này. Gọi hàm này ngay sau khi lưu dữ
+// liệu thật thành công, với điều kiện đã xác định `ten` là MỚI (kiểm tra TRƯỚC khi gọi saveKHShared).
+var _khNeedInfoTen = '';
+function showKhNeedInfoNotice(ten){
+  if (!ten) return;
+  _khNeedInfoTen = ten;
+  document.getElementById('kh-need-info-msg').innerHTML = 'Khách hàng <b>' + _bkEsc(ten) + '</b> vừa được lưu nhưng chưa có Số điện thoại/Số CCCD/Địa chỉ.<br>Cập nhật ngay để dùng cho lần xuất Bảng kê sau này?';
+  openM('modal-kh-need-info');
+}
+function openKhUpdateInfoFromNotice(){
+  closeM('modal-kh-need-info');
+  var ten = _khNeedInfoTen;
+  var info = getKhInfoOf(ten);
+  document.getElementById('khupd-ten').value = ten;
+  document.getElementById('khupd-sdt').value = info.sdt || '';
+  document.getElementById('khupd-cccd').value = info.cccd || '';
+  document.getElementById('khupd-diachi').value = info.diaChi || '';
+  openM('modal-kh-update-info');
+}
+function luuKhUpdateInfo(){
+  var ten = _khNeedInfoTen;
+  if (!ten){ closeM('modal-kh-update-info'); return; }
+  var sdt = (document.getElementById('khupd-sdt').value||'').trim();
+  var cccd = (document.getElementById('khupd-cccd').value||'').trim();
+  var diaChi = (document.getElementById('khupd-diachi').value||'').trim();
+  var info = getKhInfo();
+  info[normTen(ten)] = {sdt:sdt, cccd:cccd, diaChi:diaChi};
+  setKhInfo(info);
+  closeM('modal-kh-update-info');
+  toast('✅ Đã cập nhật thông tin khách hàng!');
+  autoSync();
 }
 var _khidEditOrigTen = '';
 function openEditKhachId(ten){
@@ -3023,6 +3103,7 @@ function onTen(tab){
   rebuildKHRoleLists(); // luôn tính lại đúng danh sách theo giao dịch thật trước khi gợi ý
   const v=document.getElementById(tab+'-ten').value.trim();
   const ac=document.getElementById(tab+'-ac');
+  updateKhInfoTicker(tab);
   if(!v){ ac.style.display='none'; return; }
   const kh=getKH(tab).filter(k=>k.toLowerCase().includes(v.toLowerCase()));
   if(!kh.length){ ac.style.display='none'; return; }
@@ -3032,6 +3113,38 @@ function onTen(tab){
   }
   ac.innerHTML=kh.map(k=>'<div class="ac-item" onmousedown="pickKH(\''+tab+'\',\''+k.replace(/'/g,"\'")+'\')">👤 '+k+'</div>').join('');
   ac.style.display='block';
+}
+// ── Khung cuốn chiếu thông tin khách hàng (SĐT/CCCD/Địa chỉ, nếu có) hiện ngay dưới ô nhập tên,
+// ngăn cách bằng icon 🏠, tự động đổi qua từng thông tin mỗi 3 giây theo kiểu cuốn từ dưới lên. ──
+var _khTicker = {}; // { mua: {items, idx, timer}, ban: {...} }
+function updateKhInfoTicker(tab){
+  var ten = (document.getElementById(tab+'-ten').value||'').trim();
+  var wrap = document.getElementById(tab+'-info-ticker');
+  if (!wrap) return;
+  if (_khTicker[tab] && _khTicker[tab].timer) { clearInterval(_khTicker[tab].timer); }
+  if (!ten) { wrap.style.display='none'; wrap.innerHTML=''; return; }
+  var info = getKhInfoOf(ten);
+  var items = [];
+  if (info.sdt) items.push('📞 ' + info.sdt);
+  if (info.cccd) items.push('🪪 ' + info.cccd);
+  if (info.diaChi) items.push('📍 ' + info.diaChi);
+  if (!items.length) { wrap.style.display='none'; wrap.innerHTML=''; return; }
+  wrap.style.display = 'flex';
+  wrap.innerHTML = '<span class="kh-ic">🏠</span><span class="kh-val" id="' + tab + '-info-val">' + items[0] + '</span>';
+  var idx = 0;
+  var state = { items: items, idx: 0, timer: null };
+  _khTicker[tab] = state;
+  if (items.length > 1) {
+    state.timer = setInterval(function(){
+      idx = (idx+1) % items.length;
+      var valEl = document.getElementById(tab+'-info-val');
+      if (!valEl) { clearInterval(state.timer); return; }
+      valEl.style.animation = 'none';
+      void valEl.offsetWidth; // reflow để animation chạy lại từ đầu mỗi lần đổi thông tin
+      valEl.textContent = items[idx];
+      valEl.style.animation = 'khTickerIn .35s ease';
+    }, 3000);
+  }
 }
 function tenKey(e,tab){
   if(e.key==='Enter'){
@@ -3049,6 +3162,7 @@ function tenKey(e,tab){
 function pickKH(tab,name){
   document.getElementById(tab+'-ten').value=name;
   document.getElementById(tab+'-ac').style.display='none';
+  updateKhInfoTicker(tab);
   if(tab==='ban'){
     var loai=getLoai('ban');
     if(loai) saveLastBuyer(loai, name);
@@ -3249,6 +3363,10 @@ function luuGD(tab){
     var r3=Math.round(ttRaw)%1000;
     tt=r3>=500?Math.round(ttRaw)-r3+1000:Math.round(ttRaw)-r3;
   }
+  // Kiểm tra NGAY TRƯỚC khi saveKHShared (dòng dưới) xem tên này đã có trong danh sách khách hàng
+  // chung chưa — nếu CHƯA có (khách hoàn toàn mới, tự gõ tay) thì sau khi giao dịch được lưu thật sẽ
+  // nhắc bổ sung Số điện thoại/CCCD/Địa chỉ ngay lúc còn nhớ.
+  var _tenLaKhachMoi = !getKHAll().some(function(n){ return normTen(n)===normTen(ten); });
   // Lưu giá vào giaObj (giá gần nhất)
   const giaObj=getGia(tab); giaObj[loai]=gia; setGia(tab,giaObj);
   // Lưu lịch sử giá theo loại mủ (để đề xuất đúng loại)
@@ -3268,6 +3386,7 @@ function luuGD(tab){
     const all=getGD(tab); all.push(gd); setGD(tab,all);
     toast('✅ Đã lưu!'); resetF(tab); renderTbl(tab, gd.id); updTK(tab); updTK('ban'); if(typeof updSSSummary==='function') updSSSummary(); if(typeof updThangData==='function') updThangData(); autoSync();
     playSaveSound();
+    if(_tenLaKhachMoi) showKhNeedInfoNotice(ten); // nhắc bổ sung thông tin nếu là khách hoàn toàn mới
   });
 }
 
@@ -3307,6 +3426,7 @@ function resetF(tab){
   document.getElementById(tab+'-tt-so').textContent='0 ₫';
   document.getElementById(tab+'-tt-chu').textContent='--';
   document.getElementById(tab+'-ac').style.display='none';
+  updateKhInfoTicker(tab);
   // Ẩn bàn phím
   if(document.activeElement) document.activeElement.blur();
   hideKeyboard();
@@ -3321,6 +3441,7 @@ function editGD(tab,id){
   setLoaiUI(tab,gd.loai,false);
   document.getElementById(tab+'-gia').value=gd.gia?parseInt(gd.gia).toLocaleString('vi-VN'):'';
   document.getElementById(tab+'-ten').value=gd.ten;
+  updateKhInfoTicker(tab);
   document.getElementById(tab+'-kg').value=gd.kg;
   document.getElementById(tab+'-do').value=gd.do||'';
   // restore bi vào bi-inline-inp (tất cả loại đều dùng chung 1 input)
@@ -6437,14 +6558,22 @@ function tinhToanSS() {
   }
 
   // ── TÍNH TIỀN từ kg và độ đã phân bổ (gia là đ/độ) ──
-  // Công thức mủ nước: tiền = kg x gia x độ (gia đ/độ)
+  // Công thức mủ nước: tiền = kg x gia x độ (gia đ/độ). Áp dụng ĐÚNG cùng quy tắc "làm tròn số tiền"
+  // (làm tròn nghìn gần nhất) như mọi tab Mua/Bán/Sổ Gửi/Ứng tiền khi cài đặt round đang BẬT — trước
+  // đây Tab Tính Toán bỏ sót bước này nên thành tiền lệch nghìn lẻ so với các tab khác.
+  var _ssRoundOn = getSetting && getSetting('round', true);
+  function _ssRoundTien(t){
+    if (!_ssRoundOn) return Math.round(t);
+    var r = Math.round(t) % 1000;
+    return r >= 500 ? Math.round(t) - r + 1000 : Math.round(t) - r;
+  }
   var newTiens = list.map(function(g, i) {
     var bi = parseFloat(g.bi)||0;
     var kgNet = newKgs[i]; // đã là kg thực
     if (isNuoc) {
-      return Math.round(kgNet * gia * newDos[i]);
+      return _ssRoundTien(kgNet * gia * newDos[i]);
     } else {
-      return Math.round(kgNet * gia);
+      return _ssRoundTien(kgNet * gia);
     }
   });
 
@@ -7127,10 +7256,12 @@ function _bkEsc(s){ return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(
 function _bkInfoRow(label, val){
   return '<tr><td style="width:230px;padding:2px 6px;border:none"><b>- '+label+':</b></td><td style="padding:2px 6px;border:none">'+_bkEsc(val)+'</td></tr>';
 }
-// Xuất bảng kê: gộp giao dịch/tính toán trong ĐÚNG 1 NGÀY đã chọn theo (Tên khách hàng + Loại mủ) —
-// mủ nước tính Số độ trung bình theo trọng số kg, mủ tạp (chén/dây/đông) chỉ tính theo kg. Thành tiền
-// của mỗi dòng luôn lấy TỔNG ĐÚNG từ dữ liệu thật đã lưu (Σ tt), Đơn giá hiển thị được suy ngược lại
-// đúng theo công thức tinhTien() thật của app (kg×giá×độ, không chia 100) để cột 9=(6x7x8) luôn khớp.
+// Xuất bảng kê: liệt kê ĐÚNG NGUYÊN TỪNG GIAO DỊCH/DÒNG TÍNH TOÁN trong ĐÚNG 1 NGÀY đã chọn —
+// TUYỆT ĐỐI KHÔNG gộp nhiều giao dịch của cùng 1 khách hàng thành 1 dòng, KHÔNG tính lại số độ trung
+// bình hay suy ngược đơn giá theo tổng (cách làm cũ từng gây sai số liệu so với bản chi tiết thu mua
+// thật). Có bao nhiêu giao dịch/dòng thì kê ra bấy nhiêu dòng, mỗi dòng lấy NGUYÊN VẸN kg/độ/giá/thành
+// tiền trực tiếp từ dữ liệu gốc đã lưu (r.kg, r.do, r.gia, r.tt) — khớp 100% với "Chi tiết thu mua" (nguồn
+// thu_mua) hoặc "Chi tiết thu mua theo số liệu mới" (nguồn tinh_toan) tuỳ theo nguồn đã chọn khi xuất.
 function xuatBangKe(){
   var ngay = (document.getElementById('bk-ngayXuat-val')||{}).dataset.val;
   if (!ngay){ toast('⚠️ Chọn ngày xuất!'); return; }
@@ -7139,59 +7270,56 @@ function xuatBangKe(){
   var loaiMuLoc = (document.getElementById('bk-loaiMu')||{}).value || 'all';
   var dienNgay = !!(document.getElementById('bk-dienNgay')||{}).checked;
 
-  var groups = {};
-  function addToGroup(ten, loai, kg, doV, tt){
-    if (loaiMuLoc !== 'all' && loai !== loaiMuLoc) return; // lọc đúng loại mủ đã chọn
-    var key = normTen(ten) + '|' + loai;
-    if (!groups[key]) groups[key] = { ten:ten, loai:loai, kg:0, tt:0, kgDoSum:0 };
-    groups[key].kg += kg;
-    groups[key].tt += tt;
-    if (loai === 'nuoc') groups[key].kgDoSum += kg*doV;
-  }
+  var DO_LOAI_LABEL = { chen:'Mủ chén', day:'Mủ dây', dong:'Mủ đông' };
+  var list = []; // mỗi phần tử = ĐÚNG 1 giao dịch/dòng thật, không gộp
 
   if (nguon === 'tinh_toan') {
-    // Nguồn: dữ liệu đã LƯU ở tab Tính Toán (khoá ss_data) của đúng ngày đã chọn
+    // Nguồn: dữ liệu đã LƯU ở tab Tính Toán (khoá ss_data) của đúng ngày đã chọn — mỗi người trong
+    // mỗi lần lưu là 1 dòng riêng, lấy nguyên kg/do/tien đã phân bổ, không cộng dồn nhiều lần lưu.
     var ssData = JSON.parse(localStorage.getItem('ss_data') || '{}');
     (ssData[ngay]||[]).forEach(function(entry){
       var loai = entry.loai || 'nuoc';
+      if (loaiMuLoc !== 'all' && loai !== loaiMuLoc) return;
+      // Đơn giá của cả entry là 1 giá trị DÙNG CHUNG để phân bổ (entry.gia, giống hệt cột "Đơn giá" ở
+      // "Chi tiết thu mua theo số liệu mới") — lấy thẳng entry.gia, TUYỆT ĐỐI không suy ngược lại từ
+      // tien/(kg×độ) vì làm vậy sẽ ra số khác đơn giá thật đã dùng để phân bổ (sai lệch do làm tròn kg/độ).
       (entry.list||[]).forEach(function(r){
-        addToGroup(r.ten, loai, parseFloat(r.kg)||0, parseFloat(r.do)||0, parseFloat(r.tien)||0);
+        var kg = parseFloat(r.kg)||0, doV = parseFloat(r.do)||0, tien = parseFloat(r.tien)||0;
+        var doHT = (loai==='nuoc') ? doV : (DO_LOAI_LABEL[loai] || loai);
+        list.push({ ten:r.ten, loai:loai, kg:kg, do:doHT, gia:parseFloat(entry.gia)||0, tt:tien });
       });
     });
-    if (!Object.keys(groups).length){ toast('⚠️ Không có dữ liệu Tính Toán nào đã lưu trong ngày đã chọn (đúng loại mủ đã lọc)!'); return; }
+    if (!list.length){ toast('⚠️ Không có dữ liệu Tính Toán nào đã lưu trong ngày đã chọn (đúng loại mủ đã lọc)!'); return; }
   } else {
-    // Nguồn: giao dịch Thu Mua thật (mặc định) của đúng ngày đã chọn
+    // Nguồn: giao dịch Thu Mua thật (mặc định) của đúng ngày đã chọn — mỗi giao dịch là 1 dòng riêng,
+    // lấy NGUYÊN VẸN đơn giá (r.gia) đã nhập lúc lưu giao dịch, không tính suy ngược từ tổng. Cột Kg lấy
+    // ĐÚNG kgThuc() (kg đã trừ bì/khấu hao) — CÙNG công thức mà "Chi tiết thu mua" đang hiển thị — để 2
+    // bên khớp tuyệt đối, tránh trường hợp giao dịch có bì làm kg gộp/xuất lệch với kg thực hiển thị.
     var mua = getGD('mua').filter(function(r){ return r.date === ngay; });
     mua.forEach(function(r){
-      addToGroup(r.ten, r.loai || 'nuoc', parseFloat(r.kg)||0, parseFloat(r.do)||0, parseFloat(r.tt)||0);
+      var loai = r.loai || 'nuoc';
+      if (loaiMuLoc !== 'all' && loai !== loaiMuLoc) return;
+      var doHT = (loai==='nuoc') ? (parseFloat(r.do)||0) : (DO_LOAI_LABEL[loai] || loai);
+      var kgNet = kgThuc(loai, r.kg, r.do, r.bi||0);
+      list.push({ ten:r.ten, loai:loai, kg:kgNet, do:doHT, gia:parseFloat(r.gia)||0, tt:parseFloat(r.tt)||0 });
     });
-    if (!Object.keys(groups).length){ toast('⚠️ Không có giao dịch Thu Mua nào trong ngày đã chọn (đúng loại mủ đã lọc)!'); return; }
+    if (!list.length){ toast('⚠️ Không có giao dịch Thu Mua nào trong ngày đã chọn (đúng loại mủ đã lọc)!'); return; }
   }
 
-  var list = Object.keys(groups).map(function(k){ return groups[k]; });
+  // Sắp xếp theo tên (không gộp) để tiện đối chiếu, giữ nguyên từng dòng riêng biệt
   list.sort(function(a,b){
     var c = a.ten.localeCompare(b.ten,'vi');
     return c!==0 ? c : ((a.loai==='nuoc'?0:1) - (b.loai==='nuoc'?0:1));
   });
 
-  var DO_LOAI_LABEL = { chen:'Mủ chén', day:'Mủ dây', dong:'Mủ đông' };
   var tongCong = 0;
   var rows = list.map(function(g, i){
     var khInfo = getKhInfoOf(g.ten);
-    var doHT, giaHT;
-    if (g.loai === 'nuoc') {
-      var doTB = g.kg>0 ? (g.kgDoSum/g.kg) : 0;
-      doHT = doTB ? doTB.toFixed(1) : '';
-      // Công thức tính tiền THẬT của app (xem tinhTien()): tiền = kg × giá × độ — KHÔNG chia 100
-      // (độ dùng nguyên giá trị %, không quy đổi phân số) — suy ngược lại đơn giá phải theo đúng công
-      // thức này để cột 6x7x8 khớp đúng thành tiền thật, tránh đơn giá hiển thị sai lệch hàng trăm lần.
-      giaHT = (g.kg>0 && doTB>0) ? Math.round(g.tt/(g.kg*doTB)) : '';
-    } else {
-      doHT = DO_LOAI_LABEL[g.loai] || g.loai;
-      giaHT = g.kg>0 ? Math.round(g.tt/g.kg) : '';
-    }
     tongCong += g.tt;
-    return { stt:i+1, ten:g.ten, diaChi:khInfo.diaChi, cccd:khInfo.cccd, sdt:khInfo.sdt, kg:g.kg, do:doHT, gia:giaHT, tt:g.tt };
+    // Định dạng Số độ giống HỆT cách "Chi tiết thu mua" hiển thị (fmtDo, không làm tròn — chỉ bỏ số 0
+    // thừa phía sau dấu phẩy), để khớp 100% với bản chi tiết. Mủ tạp giữ nguyên nhãn (Mủ chén/dây/đông).
+    var doDisp = (typeof g.do === 'number') ? fmtDo(g.do) : g.do;
+    return { stt:i+1, ten:g.ten, diaChi:khInfo.diaChi, cccd:khInfo.cccd, sdt:khInfo.sdt, kg:g.kg, do:doDisp, gia:g.gia, tt:g.tt };
   });
 
   renderBangKePrint(getBangKeInfo(), ngay, soBangKe, rows, tongCong, dienNgay);
@@ -7299,9 +7427,10 @@ function _bkGeneratePreviewImage(){
     html2canvas(tmp, { scale:2, useCORS:true, backgroundColor:'#ffffff' }).then(function(canvas){
       document.body.removeChild(tmp);
       _bkLastCanvas = canvas;
-      scrollEl.innerHTML = '<div id="bk-rotate-box"><img id="bangke-preview-img" src="' + canvas.toDataURL('image/png') + '"></div>';
-      _bkScale = 1;
+      scrollEl.innerHTML = '<div id="bk-panzoom-wrap"><div id="bk-rotate-box"><img id="bangke-preview-img" src="' + canvas.toDataURL('image/png') + '"></div></div>';
+      _bkScale = 1; _bkPanX = 0; _bkPanY = 0;
       _bkLayoutRotateImg();
+      _bkApplyTransform();
     }).catch(function(e){
       document.body.removeChild(tmp);
       scrollEl.innerHTML = '<div style="color:#fff;text-align:center;padding:60px 16px;font-size:13px">❌ Lỗi dựng xem trước: ' + (e&&e.message?e.message:'không rõ nguyên nhân') + '</div>';
@@ -7311,23 +7440,34 @@ function _bkGeneratePreviewImage(){
 // Đo đúng kích thước khung cuộn rồi đặt khung xoay có kích thước HOÁN ĐỔI (rộng↔cao) trước khi xoay
 // 90°, để sau khi xoay, khung vừa đúng khít bề ngang/cao màn hình thật — ảnh bên trong tự canh giữa
 // vừa khít nhờ object-fit:contain, không bao giờ bị tràn hay thiếu hụt như cách xoay cả khối HTML.
+// Khung xoay (#bk-rotate-box) nằm TRONG #bk-panzoom-wrap — wrap này không xoay, chỉ nhận phóng
+// to/kéo của người dùng theo ĐÚNG toạ độ màn hình, nên kéo lên/xuống/trái/phải đều tự nhiên bất kể
+// phép xoay 90° áp dụng riêng cho khung bên trong.
 function _bkLayoutRotateImg(){
-  var scrollEl = document.getElementById('bangke-preview-scroll');
+  var wrap = document.getElementById('bk-panzoom-wrap');
   var box = document.getElementById('bk-rotate-box');
-  if (!scrollEl || !box) return;
-  var w = scrollEl.clientWidth, h = scrollEl.clientHeight;
+  if (!wrap || !box) return;
+  var w = wrap.clientWidth, h = wrap.clientHeight;
   box.style.width = h + 'px';
   box.style.height = w + 'px';
   box.style.transform = 'rotate(90deg) translateY(-100%)';
 }
-// ── Chụm 2 ngón tay để phóng to/thu nhỏ thêm ảnh xem trước (ảnh đã tự vừa khít màn hình sẵn từ đầu,
-// đây chỉ là phóng to thêm khi cần xem chi tiết hơn). ──
-var _bkScale = 1, _bkPinchStartDist = 0, _bkPinchStartScale = 1, _bkPinchBound = false;
+// ── Chụm 2 ngón tay để phóng to/thu nhỏ (0.5x–4x) + kéo tự do bằng 1 ngón/chuột theo CẢ 4 CHIỀU
+// (lên/xuống/trái/phải, không giới hạn) để xem chi tiết bảng kê. Cả 2 áp dụng lên #bk-panzoom-wrap
+// (translate + scale theo toạ độ màn hình thật), tách biệt hoàn toàn khỏi phép xoay 90° nội bộ của
+// #bk-rotate-box nên không bị lệch hướng kéo. ──
+var _bkScale = 1, _bkPanX = 0, _bkPanY = 0;
+var _bkPinchStartDist = 0, _bkPinchStartScale = 1;
+var _bkDragStartX = 0, _bkDragStartY = 0, _bkPanStartX = 0, _bkPanStartY = 0, _bkDragging = false;
+var _bkPinchBound = false;
+function _bkApplyTransform(){
+  var wrap = document.getElementById('bk-panzoom-wrap');
+  if (!wrap) return;
+  wrap.style.transform = 'translate(' + _bkPanX + 'px,' + _bkPanY + 'px) scale(' + _bkScale + ')';
+}
 function _bkApplyScale(scale){
-  var img = document.getElementById('bangke-preview-img');
-  if (!img) return;
   _bkScale = Math.max(0.5, Math.min(scale, 4));
-  img.style.transform = 'scale(' + _bkScale + ')';
+  _bkApplyTransform();
 }
 function _bkDist(t1, t2){ return Math.hypot(t2.clientX-t1.clientX, t2.clientY-t1.clientY); }
 function _bkInitPinch(){
@@ -7336,16 +7476,45 @@ function _bkInitPinch(){
   var scrollEl = document.getElementById('bangke-preview-scroll');
   if (!scrollEl) return;
   scrollEl.addEventListener('touchstart', function(e){
-    if (e.touches.length === 2) { _bkPinchStartDist = _bkDist(e.touches[0], e.touches[1]); _bkPinchStartScale = _bkScale; }
+    if (e.touches.length === 2) {
+      _bkDragging = false;
+      _bkPinchStartDist = _bkDist(e.touches[0], e.touches[1]);
+      _bkPinchStartScale = _bkScale;
+    } else if (e.touches.length === 1) {
+      _bkDragging = true;
+      _bkDragStartX = e.touches[0].clientX; _bkDragStartY = e.touches[0].clientY;
+      _bkPanStartX = _bkPanX; _bkPanStartY = _bkPanY;
+    }
   }, {passive:true});
   scrollEl.addEventListener('touchmove', function(e){
     if (e.touches.length === 2 && _bkPinchStartDist > 0) {
       e.preventDefault();
       var d = _bkDist(e.touches[0], e.touches[1]);
       _bkApplyScale(_bkPinchStartScale * d / _bkPinchStartDist);
+    } else if (e.touches.length === 1 && _bkDragging) {
+      e.preventDefault();
+      _bkPanX = _bkPanStartX + (e.touches[0].clientX - _bkDragStartX);
+      _bkPanY = _bkPanStartY + (e.touches[0].clientY - _bkDragStartY);
+      _bkApplyTransform();
     }
   }, {passive:false});
-  scrollEl.addEventListener('touchend', function(e){ if (e.touches.length < 2) _bkPinchStartDist = 0; }, {passive:true});
+  scrollEl.addEventListener('touchend', function(e){
+    if (e.touches.length < 2) _bkPinchStartDist = 0;
+    if (e.touches.length === 0) _bkDragging = false;
+  }, {passive:true});
+  // Kéo bằng chuột (hữu ích khi xem/test trên máy tính)
+  scrollEl.addEventListener('mousedown', function(e){
+    _bkDragging = true;
+    _bkDragStartX = e.clientX; _bkDragStartY = e.clientY;
+    _bkPanStartX = _bkPanX; _bkPanStartY = _bkPanY;
+  });
+  window.addEventListener('mousemove', function(e){
+    if (!_bkDragging) return;
+    _bkPanX = _bkPanStartX + (e.clientX - _bkDragStartX);
+    _bkPanY = _bkPanStartY + (e.clientY - _bkDragStartY);
+    _bkApplyTransform();
+  });
+  window.addEventListener('mouseup', function(){ _bkDragging = false; });
 }
 function ensureHtml2Canvas(cb){
   if (window.html2canvas) { cb(); return; }
@@ -8991,6 +9160,7 @@ function luuSgEntry(){
     if(!kg){ toast('⚠️ Nhập số kg!'); return; }
     if(!gia){ toast('⚠️ Nhập đơn giá!'); return; }
     var tt=tinhTien(loai,kg,gia,doV,0);
+    var _tenLaKhachMoiSg = !getKHAll().some(function(n){ return normTen(n)===normTen(ten); });
     var sg=getSG();
     if(sgTabEditId && sgTabEditType==='gui'){
       var idx=sg.findIndex(function(x){return String(x.id)===String(sgTabEditId);});
@@ -9002,6 +9172,7 @@ function luuSgEntry(){
     saveKHShared(ten);
     toast('📒 Đã '+(sgTabEditId?'cập nhật':'lưu')+' sổ gửi!');
     playSaveSound();
+    if(!sgTabEditId && _tenLaKhachMoiSg) showKhNeedInfoNotice(ten); // chỉ nhắc khi TẠO MỚI với tên chưa từng có, không nhắc khi sửa
     if(sgCurrentKH!==ten){ sgCurrentKH=ten; }
   } else {
     var tenU=document.getElementById('sgu-ten').value.trim();
@@ -9010,6 +9181,7 @@ function luuSgEntry(){
     var noidung=document.getElementById('sgu-noidung').value.trim();
     if(!tenU){ toast('⚠️ Nhập tên người ứng!'); return; }
     if(!tien){ toast('⚠️ Nhập số tiền ứng!'); return; }
+    var _tenLaKhachMoiSu = !getKHAll().some(function(n){ return normTen(n)===normTen(tenU); });
     var su=getSU();
     if(sgTabEditId && sgTabEditType==='ung'){
       var idx2=su.findIndex(function(x){return String(x.id)===String(sgTabEditId);});
@@ -9021,6 +9193,7 @@ function luuSgEntry(){
     saveKHShared(tenU);
     toast('💵 Đã '+(sgTabEditId?'cập nhật':'lưu')+' ứng tiền!');
     playSaveSound();
+    if(!sgTabEditId && _tenLaKhachMoiSu) showKhNeedInfoNotice(tenU); // chỉ nhắc khi TẠO MỚI với tên chưa từng có, không nhắc khi sửa
     if(sgCurrentKH!==tenU){ sgCurrentKH=tenU; }
   }
 
