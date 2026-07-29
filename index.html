@@ -1245,11 +1245,11 @@ input[type=date]:focus{border-color:var(--gl)}
       <span>📅</span>
     </div>
     <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--g600);margin-bottom:6px;cursor:pointer">
-      <input type="checkbox" id="bk-dienThangNam" style="width:16px;height:16px;flex-shrink:0">
+      <input type="checkbox" id="bk-dienThangNam" onchange="_bkSaveDienOpts()" style="width:16px;height:16px;flex-shrink:0">
       Điền tháng, năm xuất vào bản kê
     </label>
     <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--g600);margin-bottom:14px;cursor:pointer">
-      <input type="checkbox" id="bk-dienNgayKy" style="width:16px;height:16px;flex-shrink:0">
+      <input type="checkbox" id="bk-dienNgayKy" onchange="_bkSaveDienOpts()" style="width:16px;height:16px;flex-shrink:0">
       Điền ngày, tháng, năm ký vào bản kê
     </label>
     <div style="font-size:12px;font-weight:700;color:var(--g700);margin-bottom:4px">Số bảng kê (không bắt buộc)</div>
@@ -7240,14 +7240,23 @@ function luuBangKeInfo(){
   autoSync();
   closeM('modal-bangke-info');
 }
+// Nhớ lựa chọn 2 tick "Điền tháng/năm xuất" và "Điền ngày/tháng/năm ký" cho lần xuất bảng kê sau, khỏi
+// phải tick lại mỗi lần nếu Tài luôn dùng cùng 1 lựa chọn.
+function _bkSaveDienOpts(){
+  lsSet('bk_dien_opts', {
+    thangNam: !!(document.getElementById('bk-dienThangNam')||{}).checked,
+    ngayKy: !!(document.getElementById('bk-dienNgayKy')||{}).checked
+  });
+}
 function openBangKeExport(defaultNguon){
   var t = today(); // yyyy-mm-dd, giờ địa phương
   var el = document.getElementById('bk-ngayXuat-val');
   el.textContent = fmtDate(t);
   el.dataset.val = t;
   document.getElementById('bk-loaiMu').value = 'all';
-  document.getElementById('bk-dienThangNam').checked = false;
-  document.getElementById('bk-dienNgayKy').checked = false;
+  var _bkDienOpts = lsGetO('bk_dien_opts');
+  document.getElementById('bk-dienThangNam').checked = !!_bkDienOpts.thangNam;
+  document.getElementById('bk-dienNgayKy').checked = !!_bkDienOpts.ngayKy;
   document.getElementById('bk-soBangKe').value = '';
   document.getElementById('bk-nguon').value = defaultNguon || 'thu_mua';
   openM('modal-bangke-export');
