@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.5.4</title>
+<title>Mua Bán Mủ Cao Su v1.5.6</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -504,7 +504,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.5.4 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.5.6 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1700,7 +1700,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.5.4</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.5.6</div>
       </div>
     </div>
 
@@ -1866,7 +1866,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.5.4</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.5.6</div>
       </div>
     </div>
 
@@ -3129,6 +3129,7 @@ function updateKhInfoTicker(tab){
   if (info.cccd) items.push('🪪 ' + info.cccd);
   if (info.diaChi) items.push('📍 ' + info.diaChi);
   if (!items.length) { wrap.style.display='none'; wrap.innerHTML=''; return; }
+  if (tab === 'mua') items.unshift('Thông tin chi tiết của khách hàng'); // riêng tab Thu Mua: hiện dòng tiêu đề đầu tiên, sau đó mới cuốn qua từng thông tin thật
   wrap.style.display = 'flex';
   wrap.innerHTML = '<span class="kh-ic">🏠</span><span class="kh-val" id="' + tab + '-info-val">' + items[0] + '</span>';
   var idx = 0;
@@ -7567,6 +7568,31 @@ function inBangKe(){
     window.open(blobUrl, '_blank');
   });
 }
+// Chia sẻ file PDF bảng kê thẳng qua Zalo/Messenger/Gmail/... bằng Web Share API của điện thoại — mở
+// ĐÚNG bảng "Chia sẻ" gốc của hệ điều hành (giống mọi app khác), Zalo sẽ tự xuất hiện trong danh sách
+// nếu máy đã cài. Zalo không có API web riêng để nhận file trực tiếp nên đây là cách khả thi và ổn định
+// nhất; nếu máy/trình duyệt cũ không hỗ trợ chia sẻ kèm file thì báo rõ để Tài bấm "Tải PDF" rồi tự gửi.
+function chiaSeBangKe(){
+  if (!_bkLastCanvas) { toast('⏳ Bản xem trước chưa dựng xong, thử lại sau giây lát!'); return; }
+  var btn = document.getElementById('bk-chiase-btn');
+  var resetBtn = function(){ if (btn){ btn.disabled=false; btn.textContent='📤 Chia sẻ (Zalo, Messenger...)'; } };
+  if (btn){ btn.disabled = true; btn.textContent = '⏳ Đang chuẩn bị...'; }
+  _bkBuildPdfFromCanvas(_bkLastCanvas, function(pdf){
+    var fileName = 'BangKeThuMua_' + today() + '.pdf';
+    var file;
+    try { file = new File([pdf.output('blob')], fileName, { type:'application/pdf' }); } catch(e){ file = null; }
+    if (file && navigator.canShare && navigator.canShare({ files:[file] })) {
+      navigator.share({ files:[file], title:'Bảng kê thu mua mủ cao su', text:'Bảng kê thu mua và thanh toán mủ cao su' })
+        .then(resetBtn)
+        .catch(function(e){ resetBtn(); if (e && e.name !== 'AbortError') toast('❌ Không chia sẻ được, hãy thử "Tải PDF" rồi gửi thủ công'); });
+    } else {
+      // Máy/trình duyệt không hỗ trợ chia sẻ kèm file (thường gặp trên máy tính hoặc trình duyệt cũ) —
+      // báo rõ hướng xử lý thay vì im lặng thất bại.
+      resetBtn();
+      toast('ℹ️ Thiết bị này chưa hỗ trợ chia sẻ trực tiếp — hãy bấm "⬇️ Tải PDF" rồi tự gửi file qua Zalo');
+    }
+  });
+}
 // Override fmtNum để làm tròn nếu bật setting
 var _origFmtNum = fmtNum;
 function fmtNumRound(n) {
@@ -10148,9 +10174,12 @@ if ('serviceWorker' in navigator) {
     <button onclick="closeBangKePreview()" style="background:none;border:none;color:#fff;font-size:22px;line-height:1;cursor:pointer;padding:4px 8px">✕</button>
   </div>
   <div id="bangke-preview-scroll" style="flex:1;overflow:hidden;position:relative"></div>
-  <div id="bk-preview-footer" style="background:#fff;padding:10px 14px;display:flex;gap:8px;flex-shrink:0;border-top:1px solid #ddd">
-    <button onclick="inBangKe()" style="flex:1;padding:12px 4px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">🖨️ In</button>
-    <button onclick="taiPdfBangKe()" id="bk-tai-pdf-btn" style="flex:1;padding:12px 4px;background:var(--gd);color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">⬇️ Tải PDF</button>
+  <div id="bk-preview-footer" style="background:#fff;padding:10px 14px 4px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;border-top:1px solid #ddd">
+    <div style="display:flex;gap:8px">
+      <button onclick="inBangKe()" style="flex:1;padding:12px 4px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">🖨️ In</button>
+      <button onclick="taiPdfBangKe()" id="bk-tai-pdf-btn" style="flex:1;padding:12px 4px;background:var(--gd);color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">⬇️ Tải PDF</button>
+    </div>
+    <button onclick="chiaSeBangKe()" id="bk-chiase-btn" style="width:100%;padding:11px 4px;margin-bottom:6px;background:#0068FF;color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">📤 Chia sẻ (Zalo, Messenger...)</button>
   </div>
 </div>
 </body>
