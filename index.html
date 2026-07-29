@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.5.6</title>
+<title>Mua Bán Mủ Cao Su v1.5.7</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -504,7 +504,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.5.6 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.5.7 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1244,9 +1244,13 @@ input[type=date]:focus{border-color:var(--gl)}
       <span id="bk-ngayXuat-val" style="flex:1"></span>
       <span>📅</span>
     </div>
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--g600);margin-bottom:6px;cursor:pointer">
+      <input type="checkbox" id="bk-dienThangNam" style="width:16px;height:16px;flex-shrink:0">
+      Điền tháng, năm xuất vào bản kê
+    </label>
     <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--g600);margin-bottom:14px;cursor:pointer">
-      <input type="checkbox" id="bk-dienNgay" style="width:16px;height:16px;flex-shrink:0">
-      Điền ngày xuất, điền ngày ký vào dữ liệu xuất ra
+      <input type="checkbox" id="bk-dienNgayKy" style="width:16px;height:16px;flex-shrink:0">
+      Điền ngày, tháng, năm ký vào bản kê
     </label>
     <div style="font-size:12px;font-weight:700;color:var(--g700);margin-bottom:4px">Số bảng kê (không bắt buộc)</div>
     <input type="text" id="bk-soBangKe" class="fi" placeholder="VD: 07/2026" style="margin-bottom:14px" autocomplete="off">
@@ -1700,7 +1704,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.5.6</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.5.7</div>
       </div>
     </div>
 
@@ -1866,7 +1870,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.5.6</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.5.7</div>
       </div>
     </div>
 
@@ -4858,8 +4862,8 @@ function initSupabase() {
       // hạn dùng thật đang lưu đúng trên tài khoản. Đợi vài giây cho verifyLicenseAntiCheat() khôi phục
       // đúng hạn dùng (lấy max giữa máy và máy chủ) rồi mới cho phép tự đồng bộ lên.
       if (typeof verifyLicenseAntiCheat === 'function') verifyLicenseAntiCheat();
-      if (getSyncProvider() === 'supabase' && navigator.onLine && getPendingCount() > 0) {
-        setTimeout(function(){ syncToSupabase_silent(); }, 3000);
+      if (getSyncProvider() === 'supabase' && navigator.onLine) {
+        setTimeout(function(){ restoreOrPushOnLogin({ silent:true }); }, 3000);
       }
     }
   }).catch(function(){});
@@ -5110,26 +5114,45 @@ function _processKhidConflicts(conflicts, onDone){
   }
   next();
 }
-// Điểm vào chính: gọi ngay sau khi đăng nhập Supabase thành công.
-function restoreOrPushOnLogin() {
+// So sánh 2 object phẳng (không quan tâm thứ tự khoá) — dùng để phát hiện CÓ THỰC SỰ thay đổi hay
+// không sau khi trộn, tránh việc chỉ đổi thứ tự phần tử/khoá (do cách trộn luôn xếp đám mây trước) bị
+// hiểu nhầm thành "có dữ liệu mới" rồi tải lại trang không cần thiết.
+function _objDiffers(a, b){
+  a = a || {}; b = b || {};
+  var ak = Object.keys(a), bk = Object.keys(b);
+  if (ak.length !== bk.length) return true;
+  for (var i=0;i<ak.length;i++){ var k=ak[i]; if (!(k in b) || JSON.stringify(a[k])!==JSON.stringify(b[k])) return true; }
+  return false;
+}
+// Điểm vào chính — gọi ngay sau khi đăng nhập Supabase thành công (opts.silent=false, mặc định), HOẶC
+// gọi NGẦM mỗi lần mở app với phiên đăng nhập Supabase đã có sẵn từ trước (opts.silent=true) — trước
+// đây trường hợp thứ 2 chỉ ĐẨY (push) dữ liệu máy lên nếu có pending, KHÔNG BAO GIỜ tự kéo (pull) dữ
+// liệu mới từ đám mây về, nên nếu 1 giao dịch được tạo ở thiết bị/phiên khác rồi đồng bộ lên, mở app ở
+// thiết bị này (đã đăng nhập sẵn từ trước, không phải vừa bấm nút Đăng nhập) sẽ KHÔNG thấy giao dịch đó
+// cho tới khi đăng xuất/đăng nhập lại thủ công. Nay luôn kiểm tra + trộn dữ liệu mới mỗi lần mở app.
+function restoreOrPushOnLogin(opts) {
+  opts = opts || {};
   if (!sbClient || !sbUser) return;
   sbClient.from('mucaosu_data').select('data_key,data_value').eq('user_id', sbUser.id).then(function(res) {
-    if (res.error) { toast('❌ Lỗi kiểm tra dữ liệu đám mây: ' + res.error.message); return; }
+    if (res.error) { if(!opts.silent) toast('❌ Lỗi kiểm tra dữ liệu đám mây: ' + res.error.message); return; }
     var rows = res.data || [];
-    if (!rows.length) { syncToSupabase(); return; } // đám mây chưa có gì (đăng nhập lần đầu) → chỉ cần đẩy dữ liệu máy lên, không có gì để trộn
+    if (!rows.length) { if(opts.silent) syncToSupabase_silent(); else syncToSupabase(); return; } // đám mây chưa có gì → chỉ cần đẩy dữ liệu máy lên, không có gì để trộn
     var cloud = {};
     rows.forEach(function(r){ cloud[r.data_key] = r.data_value; });
-    _finishLoginMerge(cloud);
-  }).catch(function(e) { toast('❌ Lỗi kết nối: ' + e.message); });
+    _finishLoginMerge(cloud, opts);
+  }).catch(function(e) { if(!opts.silent) toast('❌ Lỗi kết nối: ' + e.message); });
 }
-function _finishLoginMerge(cloud){
+function _finishLoginMerge(cloud, opts){
+  opts = opts || {};
   var localMua = getGD('mua'), localBan = getGD('ban'), localSg = getSG(), localSu = getSU(), localCc = getCC();
+  var localKhIds = getKhIds(), localKhRole = lsGetO('kh_role_manual'), localMuaChot = lsGetO('mua_chot_moc'),
+      localKhHidden = getKhHidden(), localKhInfo = getKhInfo(), localSsData = JSON.parse(localStorage.getItem('ss_data')||'{}');
   var mua = _mergeArrById(cloud.gd3_mua, localMua);
   var ban = _mergeArrById(cloud.gd3_ban, localBan);
   var sg  = _mergeArrById(cloud.sg3, localSg);
   var su  = _mergeArrById(cloud.su_data, localSu);
   var cc  = _mergeArrById(cloud.cc_data, localCc);
-  var khMerge = _mergeKhIdsDetectConflicts(_isPlainObj(cloud.kh_ids)?cloud.kh_ids:{}, getKhIds());
+  var khMerge = _mergeKhIdsDetectConflicts(_isPlainObj(cloud.kh_ids)?cloud.kh_ids:{}, localKhIds);
 
   function applyAndPush(khFinalMap, decisions){
     var finalMua = mua, finalBan = ban, finalSg = sg, finalSu = su, finalCc = cc;
@@ -5152,13 +5175,29 @@ function _finishLoginMerge(cloud){
         finalCc  = _applyPerCustomerDecision(finalCc,  ten, strat, loOnly.cc,  clOnly.cc);
       });
     }
+    var finalKhRole = _mergeObjUnionCloudWins(cloud.kh_role_manual, localKhRole);
+    var finalMuaChot = _mergeObjUnionCloudWins(cloud.mua_chot_moc, localMuaChot);
+    var finalKhHidden = _mergeArrStrUnion(cloud.kh_hidden, localKhHidden);
+    var finalKhInfo = _mergeObjUnionCloudWins(cloud.kh_info, localKhInfo);
+    var finalSsData = _mergeObjUnionCloudWins(cloud.ss_data, localSsData);
+
+    // Kiểm tra THỰC SỰ có gì mới sau khi trộn hay không (so với đúng trạng thái máy TRƯỚC khi trộn) —
+    // chỉ khi có gì mới mới toast + tải lại trang; nếu không, chỉ lặng lẽ đẩy phần máy đang có (nếu còn
+    // pending) lên đám mây, tránh làm phiền/tải lại trang mỗi lần mở app dù chẳng có gì thay đổi.
+    var changed = finalMua.length!==localMua.length || finalBan.length!==localBan.length
+      || finalSg.length!==localSg.length || finalSu.length!==localSu.length || finalCc.length!==localCc.length
+      || finalKhHidden.length!==localKhHidden.length
+      || _objDiffers(khFinalMap, localKhIds) || _objDiffers(finalKhRole, localKhRole)
+      || _objDiffers(finalMuaChot, localMuaChot) || _objDiffers(finalKhInfo, localKhInfo)
+      || _objDiffers(finalSsData, localSsData);
+
     setGD('mua', finalMua); setGD('ban', finalBan); setSG(finalSg); setSU(finalSu); setCC(finalCc);
     setKhIds(khFinalMap);
-    lsSet('kh_role_manual', _mergeObjUnionCloudWins(cloud.kh_role_manual, lsGetO('kh_role_manual')));
-    lsSet('mua_chot_moc', _mergeObjUnionCloudWins(cloud.mua_chot_moc, lsGetO('mua_chot_moc')));
-    lsSet('kh_hidden', _mergeArrStrUnion(cloud.kh_hidden, getKhHidden()));
-    lsSet('kh_info', _mergeObjUnionCloudWins(cloud.kh_info, getKhInfo()));
-    lsSet('ss_data', _mergeObjUnionCloudWins(cloud.ss_data, JSON.parse(localStorage.getItem('ss_data')||'{}')));
+    lsSet('kh_role_manual', finalKhRole);
+    lsSet('mua_chot_moc', finalMuaChot);
+    lsSet('kh_hidden', finalKhHidden);
+    lsSet('kh_info', finalKhInfo);
+    lsSet('ss_data', finalSsData);
     // Các giá trị đơn (không phải danh sách/đối tượng gộp được): đám mây có sẵn thì ưu tiên giữ
     // nguyên giá trị đám mây (không bị máy ghi đè khi đăng nhập); máy chỉ được dùng nếu đám mây
     // chưa từng có giá trị này.
@@ -5168,12 +5207,22 @@ function _finishLoginMerge(cloud){
       }
     });
     if (cloud.kh_id_numeric_v1 || localStorage.getItem('kh_id_numeric_v1')) localStorage.setItem('kh_id_numeric_v1','1');
-    toast('✅ Đã trộn dữ liệu máy với đám mây!');
+
+    if (!changed) {
+      // Không có gì mới từ đám mây — chỉ cần đẩy lặng lẽ (nếu máy có gì chưa đồng bộ), không toast/reload
+      syncToSupabase_silent();
+      return;
+    }
+    if (opts.silent) {
+      toast('🔄 Đã tự động cập nhật dữ liệu mới đồng bộ từ thiết bị/phiên khác!');
+    } else {
+      toast('✅ Đã trộn dữ liệu máy với đám mây!');
+    }
     syncToSupabase();
     setTimeout(function(){ location.reload(); }, 1200);
   }
 
-  if (khMerge.conflicts.length) {
+  if (khMerge.conflicts.length && !opts.silent) {
     _processKhidConflicts(khMerge.conflicts, function(decisions){
       var finalKh = {};
       for (var t in khMerge.merged) finalKh[t] = khMerge.merged[t];
@@ -5183,6 +5232,10 @@ function _finishLoginMerge(cloud){
       applyAndPush(finalKh, decisions);
     });
   } else {
+    // Khi chạy NGẦM (mở app với phiên có sẵn): nếu có xung đột Mã khách hàng thì tự áp dụng chiến lược
+    // 'merge' mặc định (ưu tiên giữ mã đã có trên đám mây, an toàn nhất) thay vì bật popup hỏi — tránh
+    // làm phiền người dùng mỗi lần mở app; xung đột thật sự hiếm gặp và người dùng vẫn có thể tự sửa
+    // mã khách hàng thủ công ở màn 👥 nếu cần.
     applyAndPush(khMerge.merged, null);
   }
 }
@@ -7193,7 +7246,8 @@ function openBangKeExport(defaultNguon){
   el.textContent = fmtDate(t);
   el.dataset.val = t;
   document.getElementById('bk-loaiMu').value = 'all';
-  document.getElementById('bk-dienNgay').checked = false;
+  document.getElementById('bk-dienThangNam').checked = false;
+  document.getElementById('bk-dienNgayKy').checked = false;
   document.getElementById('bk-soBangKe').value = '';
   document.getElementById('bk-nguon').value = defaultNguon || 'thu_mua';
   openM('modal-bangke-export');
@@ -7269,7 +7323,8 @@ function xuatBangKe(){
   var soBangKe = (document.getElementById('bk-soBangKe').value||'').trim();
   var nguon = (document.getElementById('bk-nguon')||{}).value || 'thu_mua';
   var loaiMuLoc = (document.getElementById('bk-loaiMu')||{}).value || 'all';
-  var dienNgay = !!(document.getElementById('bk-dienNgay')||{}).checked;
+  var dienThangNam = !!(document.getElementById('bk-dienThangNam')||{}).checked;
+  var dienNgayKy = !!(document.getElementById('bk-dienNgayKy')||{}).checked;
 
   var DO_LOAI_LABEL = { chen:'Mủ chén', day:'Mủ dây', dong:'Mủ đông' };
   var list = []; // mỗi phần tử = ĐÚNG 1 giao dịch/dòng thật, không gộp
@@ -7323,10 +7378,10 @@ function xuatBangKe(){
     return { stt:i+1, ten:g.ten, diaChi:khInfo.diaChi, cccd:khInfo.cccd, sdt:khInfo.sdt, kg:g.kg, do:doDisp, gia:g.gia, tt:g.tt };
   });
 
-  renderBangKePrint(getBangKeInfo(), ngay, soBangKe, rows, tongCong, dienNgay);
+  renderBangKePrint(getBangKeInfo(), ngay, soBangKe, rows, tongCong, dienThangNam, dienNgayKy);
   closeM('modal-bangke-export');
 }
-function renderBangKePrint(info, ngay, soBangKe, rows, tongCong, dienNgay){
+function renderBangKePrint(info, ngay, soBangKe, rows, tongCong, dienThangNam, dienNgayKy){
   var area = document.getElementById('bangke-print-area');
   if (!area) return;
   var ngayP = ngay.split('-');
@@ -7345,11 +7400,11 @@ function renderBangKePrint(info, ngay, soBangKe, rows, tongCong, dienNgay){
       + '<td style="border:1px solid #000;padding:3px"></td>'
       + '</tr>';
   }).join('');
-  // Tuỳ chọn "Điền ngày xuất, điền ngày ký": tick thì điền đúng ngày/tháng/năm thật vào cả 2 chỗ
-  // (dòng Tháng/Năm đầu trang + dòng ngày ký cuối trang); bỏ tick thì để trống dạng chấm chấm cho
-  // người dùng tự viết tay sau khi in ra.
-  var dongNgayThang = dienNgay ? ('Tháng ' + ngayP[1] + ' Năm ' + ngayP[0]) : 'Tháng: ……… Năm: ………';
-  var dongKy = dienNgay
+  // 2 tuỳ chọn ĐỘC LẬP với nhau: "Điền tháng, năm xuất" chỉ ảnh hưởng dòng Tháng/Năm đầu trang; "Điền
+  // ngày, tháng, năm ký" chỉ ảnh hưởng dòng ngày ký cuối trang — bỏ tick bên nào thì để trống dạng
+  // chấm chấm bên đó cho người dùng tự viết tay sau khi in ra, không còn gộp chung 1 tick như trước.
+  var dongNgayThang = dienThangNam ? ('Tháng ' + ngayP[1] + ' Năm ' + ngayP[0]) : 'Tháng: ……… Năm: ………';
+  var dongKy = dienNgayKy
     ? ('……………, ngày ' + parseInt(ngayP[2],10) + ' tháng ' + parseInt(ngayP[1],10) + ' năm ' + ngayP[0])
     : '……………, Ngày: ……… Tháng: ……… Năm: ………';
   var contentHtml =
