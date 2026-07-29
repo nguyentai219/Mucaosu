@@ -7575,7 +7575,7 @@ function inBangKe(){
 function chiaSeBangKe(){
   if (!_bkLastCanvas) { toast('⏳ Bản xem trước chưa dựng xong, thử lại sau giây lát!'); return; }
   var btn = document.getElementById('bk-chiase-btn');
-  var resetBtn = function(){ if (btn){ btn.disabled=false; btn.textContent='📤 Chia sẻ (Zalo, Messenger...)'; } };
+  var resetBtn = function(){ if (btn){ btn.disabled=false; btn.textContent='📤 Chia sẻ'; } };
   if (btn){ btn.disabled = true; btn.textContent = '⏳ Đang chuẩn bị...'; }
   _bkBuildPdfFromCanvas(_bkLastCanvas, function(pdf){
     var fileName = 'BangKeThuMua_' + today() + '.pdf';
@@ -10174,12 +10174,10 @@ if ('serviceWorker' in navigator) {
     <button onclick="closeBangKePreview()" style="background:none;border:none;color:#fff;font-size:22px;line-height:1;cursor:pointer;padding:4px 8px">✕</button>
   </div>
   <div id="bangke-preview-scroll" style="flex:1;overflow:hidden;position:relative"></div>
-  <div id="bk-preview-footer" style="background:#fff;padding:10px 14px 4px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;border-top:1px solid #ddd">
-    <div style="display:flex;gap:8px">
-      <button onclick="inBangKe()" style="flex:1;padding:12px 4px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">🖨️ In</button>
-      <button onclick="taiPdfBangKe()" id="bk-tai-pdf-btn" style="flex:1;padding:12px 4px;background:var(--gd);color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">⬇️ Tải PDF</button>
-    </div>
-    <button onclick="chiaSeBangKe()" id="bk-chiase-btn" style="width:100%;padding:11px 4px;margin-bottom:6px;background:#0068FF;color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">📤 Chia sẻ (Zalo, Messenger...)</button>
+  <div id="bk-preview-footer" style="background:#fff;padding:10px 14px;display:flex;gap:6px;flex-shrink:0;border-top:1px solid #ddd">
+    <button onclick="chiaSeBangKe()" id="bk-chiase-btn" style="flex:1.1;padding:12px 2px;background:#0068FF;color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">📤 Chia sẻ</button>
+    <button onclick="inBangKe()" style="flex:0.75;padding:12px 2px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:11.5px;font-weight:700;cursor:pointer">🖨️ In</button>
+    <button onclick="taiPdfBangKe()" id="bk-tai-pdf-btn" style="flex:1.3;padding:12px 2px;background:var(--gd);color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap">⬇️ Tải PDF</button>
   </div>
 </div>
 </body>
