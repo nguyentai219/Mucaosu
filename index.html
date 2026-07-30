@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.6.0</title>
+<title>Mua Bán Mủ Cao Su v1.6.2</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -223,7 +223,7 @@ input[type="search"]::-webkit-search-decoration{-webkit-appearance:none;appearan
 .btn-add{padding:9px 14px;background:var(--gl);color:#fff;border:none;border-radius:var(--rs);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
 
 /* TOAST */
-.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%);background:var(--gd);color:#fff;padding:9px 18px;border-radius:20px;font-size:12px;font-weight:600;z-index:1000;opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none}
+.toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%);background:var(--gd);color:#fff;padding:10px 18px;border-radius:16px;font-size:12.5px;font-weight:600;z-index:1000;opacity:0;transition:opacity .3s;white-space:normal;max-width:88vw;width:max-content;text-align:center;line-height:1.4;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.25)}
 .toast.show{opacity:1}
 
 input[type=date]{width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:var(--rs);font-family:'Be Vietnam Pro',sans-serif;font-size:16px;color:var(--g800);background:var(--g50);outline:none;-webkit-appearance:none}
@@ -504,7 +504,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.6.0 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.6.2 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1762,7 +1762,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.6.0</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.6.2</div>
       </div>
     </div>
 
@@ -1928,7 +1928,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.6.0</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.6.2</div>
       </div>
     </div>
 
@@ -4548,7 +4548,8 @@ window.addEventListener('popstate', function(){
 function toast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2200);
+  clearTimeout(window._toastTimer);
+  window._toastTimer=setTimeout(()=>t.classList.remove('show'),2600);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -5233,7 +5234,13 @@ function openSbStorageModal() {
       + '<div style="font-size:40px;margin-bottom:8px">📁</div>'
       + '<div style="font-size:15px;font-weight:700;color:var(--g800);margin-bottom:4px">Dữ liệu đang lưu trên Supabase</div>'
       + '<div style="font-size:12px;color:var(--g400)">' + rows.length + ' mục · Tổng ' + sbFmtSize(totalSize) + (hiddenCount ? ' <span style="color:var(--g400)">(đã ẩn ' + hiddenCount + ' mục hệ thống)</span>' : '') + '</div>'
-      + '</div>';
+      + '</div>'
+      + '<div class="gd-opt" onclick="openSbAnhListModal()" style="margin-bottom:12px">'
+      + '<span class="gd-opt-ico">🖼️</span>'
+      + '<div class="gd-opt-txt"><div>Xem ảnh đã tải lên</div>'
+      + '<div class="gd-opt-sub">Xem/xoá từng ảnh đính kèm giao dịch trên Supabase Storage</div></div>'
+      + '</div>'
+      + '<div style="font-size:11px;color:var(--g400);font-weight:700;padding:4px 2px 6px">💾 DỮ LIỆU (mucaosu_data)</div>';
     if (!rows.length) {
       html += '<div style="text-align:center;padding:10px;color:var(--g400);font-size:13px">Chưa có dữ liệu nào trên Supabase</div>';
     } else {
@@ -5250,8 +5257,10 @@ function openSbStorageModal() {
   }).catch(function(e) { body.innerHTML = '<div style="text-align:center;padding:20px 10px;color:var(--red);font-size:13px">❌ Lỗi kết nối: ' + e.message + '</div>'; });
 }
 var _sbDelPendingKey = null;
+var _sbDelPendingType = 'data'; // 'data' = xoá 1 mục trong bảng mucaosu_data | 'anh' = xoá 1 file ảnh trong Storage
 function sbDeleteStorageItem(key) {
   if (!sbClient || !sbUser) return;
+  _sbDelPendingType = 'data';
   _sbDelPendingKey = key;
   var label = sbStorageLabel(key).replace(/^[^\s]+\s*/, '');
   document.getElementById('sbdel-msg').textContent = 'Xoá "' + label + '" khỏi Supabase VÀ khỏi máy này? Dữ liệu đã xoá KHÔNG THỂ khôi phục lại. Nhập mật khẩu giao dịch để xác nhận.';
@@ -5263,9 +5272,10 @@ function sbDeleteStorageItem(key) {
 function sbDeleteConfirmSubmit() {
   var pw = document.getElementById('sbdel-pw').value;
   if (!checkManagePW(pw)) { document.getElementById('sbdel-err').style.display = 'block'; return; }
-  var key = _sbDelPendingKey;
+  var type = _sbDelPendingType, key = _sbDelPendingKey;
   closeM('modal-sb-del-confirm');
   if (!key || !sbClient || !sbUser) return;
+  if (type === 'anh') { _sbDoDeleteAnhFile(key); return; }
   toast('⏳ Đang xoá...');
   sbClient.from('mucaosu_data').delete().eq('user_id', sbUser.id).eq('data_key', key).then(function(res) {
     if (res.error) { toast('❌ Lỗi xoá: ' + res.error.message); return; }
@@ -5276,6 +5286,90 @@ function sbDeleteConfirmSubmit() {
     toast('✅ Đã xoá khỏi Supabase và máy này!');
     setTimeout(function(){ location.reload(); }, 900);
   }).catch(function(e) { toast('❌ Lỗi kết nối: ' + e.message); });
+}
+
+// ── Màn "🖼️ Xem ảnh đã tải lên" — liệt kê từng file ảnh đang có trong bucket Storage
+// (giao-dich-anh) của đúng tài khoản đang dùng, cho xem phóng to + xoá từng ảnh. Xoá 1 ảnh ở đây sẽ
+// xoá cả trên Supabase Storage LẪN gỡ khỏi đúng giao dịch tương ứng trên máy (không chỉ xoá file mồ
+// côi), để tránh giao dịch còn trỏ tới 1 ảnh đã không còn tồn tại.
+function _sbAnhParseFilename(fname){
+  var base = String(fname).replace(/\.[a-zA-Z0-9]+$/, '');
+  var us = base.indexOf('_');
+  if (us < 0) return null;
+  return { tab: base.slice(0, us), id: base.slice(us + 1) };
+}
+function openSbAnhListModal(){
+  if (!sbClient || !sbUser) { toast('⚠️ Chưa đăng nhập Supabase'); return; }
+  var body = document.getElementById('gd-modal-body');
+  var title = document.getElementById('gd-modal-title');
+  title.textContent = '🖼️ Ảnh giao dịch đã tải lên';
+  body.innerHTML = '<div style="text-align:center;padding:24px 10px;color:var(--g400);font-size:13px">Đang tải danh sách ảnh...</div>';
+  openM('modal-gd');
+  sbClient.storage.from(SB_ANH_BUCKET).list(sbUser.id, { limit:1000, sortBy:{ column:'created_at', order:'desc' } }).then(function(res){
+    if (res.error) { body.innerHTML = '<div style="text-align:center;padding:20px 10px;color:var(--red);font-size:13px">❌ Lỗi tải danh sách ảnh: ' + res.error.message + '</div>'; return; }
+    var files = (res.data || []).filter(function(f){ return f && f.name && f.id; }); // bỏ qua placeholder thư mục rỗng
+    var totalSize = files.reduce(function(s,f){ return s + ((f.metadata && f.metadata.size) || 0); }, 0);
+    var html = '<div style="text-align:center;padding:6px 10px 16px">'
+      + '<div style="font-size:40px;margin-bottom:8px">🖼️</div>'
+      + '<div style="font-size:15px;font-weight:700;color:var(--g800);margin-bottom:4px">Ảnh đính kèm giao dịch trên Supabase</div>'
+      + '<div style="font-size:12px;color:var(--g400)">' + files.length + ' ảnh · Tổng ' + sbFmtSize(totalSize) + '</div>'
+      + '</div>';
+    if (!files.length) {
+      html += '<div style="text-align:center;padding:10px;color:var(--g400);font-size:13px">Chưa có ảnh nào được tải lên</div>';
+    } else {
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 2px">';
+      files.forEach(function(f){
+        var pub = sbClient.storage.from(SB_ANH_BUCKET).getPublicUrl(sbUser.id + '/' + f.name);
+        var url = (pub && pub.data) ? pub.data.publicUrl : '';
+        var info = _sbAnhParseFilename(f.name);
+        var lbl = info ? (info.tab === 'mua' ? '📥 Thu Mua' : (info.tab === 'ban' ? '📤 Bán Ra' : f.name)) : f.name;
+        html += '<div style="border:1px solid var(--g200);border-radius:10px;overflow:hidden;background:#fff">'
+          + '<img src="' + url + '" style="width:100%;height:90px;object-fit:cover;display:block;cursor:pointer" onclick="_sbViewAnhFull(\'' + url.replace(/'/g, "\\'") + '\')">'
+          + '<div style="padding:6px 8px">'
+          + '<div style="font-size:11px;color:var(--g600);font-weight:700">' + lbl + '</div>'
+          + '<div style="font-size:10px;color:var(--g400);margin-bottom:6px">' + sbFmtSize((f.metadata && f.metadata.size) || 0) + '</div>'
+          + '<button onclick="sbDeleteAnhFile(\'' + String(f.name).replace(/'/g, "\\'") + '\')" style="width:100%;border:none;background:#fee2e2;color:var(--red);border-radius:6px;padding:5px;font-size:11px;font-weight:700;cursor:pointer">🗑️ Xoá</button>'
+          + '</div></div>';
+      });
+      html += '</div>';
+    }
+    html += '<div class="gd-opt" onclick="openSbStorageModal()" style="margin-top:14px"><span class="gd-opt-ico">◀️</span><div class="gd-opt-txt"><div>Quay lại</div></div></div>';
+    body.innerHTML = html;
+  }).catch(function(e){ body.innerHTML = '<div style="text-align:center;padding:20px 10px;color:var(--red);font-size:13px">❌ Lỗi kết nối: ' + e.message + '</div>'; });
+}
+function _sbViewAnhFull(url){
+  document.getElementById('anh-viewer-img').src = url;
+  openM('modal-anh-viewer');
+}
+function sbDeleteAnhFile(fname){
+  if (!sbClient || !sbUser) return;
+  _sbDelPendingType = 'anh';
+  _sbDelPendingKey = fname;
+  document.getElementById('sbdel-msg').textContent = 'Xoá ảnh này khỏi Supabase VÀ khỏi giao dịch tương ứng trên máy? Ảnh đã xoá KHÔNG THỂ khôi phục lại. Nhập mật khẩu giao dịch để xác nhận.';
+  document.getElementById('sbdel-pw').value = '';
+  document.getElementById('sbdel-err').style.display = 'none';
+  openM('modal-sb-del-confirm');
+  setTimeout(function(){ document.getElementById('sbdel-pw').focus(); }, 200);
+}
+function _sbDoDeleteAnhFile(fname){
+  toast('⏳ Đang xoá ảnh...');
+  var path = sbUser.id + '/' + fname;
+  sbClient.storage.from(SB_ANH_BUCKET).remove([path]).then(function(res){
+    if (res.error) { toast('❌ Lỗi xoá ảnh: ' + res.error.message); return; }
+    var info = _sbAnhParseFilename(fname);
+    if (info && (info.tab === 'mua' || info.tab === 'ban')) {
+      var all = getGD(info.tab);
+      var idx = all.findIndex(function(g){ return String(g.id) === String(info.id); });
+      if (idx >= 0) {
+        delete all[idx].anh; delete all[idx].anhPath; delete all[idx].anhHetHan; delete all[idx].anhSoNgay;
+        setGD(info.tab, all);
+        renderTbl(info.tab);
+      }
+      autoSync();
+    }
+    toast('✅ Đã xoá ảnh!');
+    openSbAnhListModal(); // tải lại danh sách để cập nhật ngay
+  }).catch(function(e){ toast('❌ Lỗi kết nối: ' + e.message); });
 }
 
 function toggleSbPassVisibility() {
