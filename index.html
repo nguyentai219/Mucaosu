@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.5.9</title>
+<title>Mua Bán Mủ Cao Su v1.6.0</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -504,7 +504,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.5.9 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.6.0 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -579,6 +579,19 @@ input[type=date]:focus{border-color:var(--gl)}
         <label class="fl" id="mua-bi-lbl-inline">Trừ bì</label>
         <input type="text" inputmode="decimal" id="mua-bi-inline-inp" class="fi fi-bi-hint" placeholder="có thể bỏ trống" step="0.01" oninput="calcBi('mua')" onkeydown="biKey(event,'mua')">
       </div>
+    </div>
+    <div class="fr">
+      <label class="fl">📷 Ảnh đính kèm <span style="font-weight:400;color:var(--g400);font-size:11px">(không bắt buộc, tự xoá sau vài ngày)</span></label>
+      <div id="mua-anh-preview-wrap" style="display:none;position:relative;margin-bottom:8px;width:110px">
+        <img id="mua-anh-preview" style="width:100%;border-radius:10px;display:block;border:1px solid var(--g200)">
+        <button type="button" onclick="xoaAnhPending('mua')" style="position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:#dc2626;color:#fff;border:none;font-size:13px;line-height:1;cursor:pointer">✕</button>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button type="button" onclick="chonAnh('mua','camera')" style="flex:1;padding:9px;background:var(--g50);border:1px solid var(--g200);border-radius:8px;font-size:12.5px;font-weight:600;color:var(--g800);cursor:pointer">📷 Chụp ảnh</button>
+        <button type="button" onclick="chonAnh('mua','gallery')" style="flex:1;padding:9px;background:var(--g50);border:1px solid var(--g200);border-radius:8px;font-size:12.5px;font-weight:600;color:var(--g800);cursor:pointer">🖼️ Chọn ảnh có sẵn</button>
+      </div>
+      <input type="file" accept="image/*" capture="environment" id="mua-anh-file-camera" style="display:none" onchange="onAnhFileChange('mua', this)">
+      <input type="file" accept="image/*" id="mua-anh-file-gallery" style="display:none" onchange="onAnhFileChange('mua', this)">
     </div>
     <div class="tt-box" style="position:relative">
       <div class="tt-lbl">Thành tiền</div>
@@ -684,6 +697,19 @@ input[type=date]:focus{border-color:var(--gl)}
         <label class="fl" id="ban-bi-lbl-inline">Trừ bì</label>
         <input type="text" inputmode="decimal" id="ban-bi-inline-inp" class="fi fi-bi-hint ban-hint" placeholder="có thể bỏ trống" step="0.01" oninput="calcBi('ban')" onkeydown="biKey(event,'ban')">
       </div>
+    </div>
+    <div class="fr">
+      <label class="fl">📷 Ảnh đính kèm <span style="font-weight:400;color:var(--g400);font-size:11px">(không bắt buộc, tự xoá sau vài ngày)</span></label>
+      <div id="ban-anh-preview-wrap" style="display:none;position:relative;margin-bottom:8px;width:110px">
+        <img id="ban-anh-preview" style="width:100%;border-radius:10px;display:block;border:1px solid var(--g200)">
+        <button type="button" onclick="xoaAnhPending('ban')" style="position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:#dc2626;color:#fff;border:none;font-size:13px;line-height:1;cursor:pointer">✕</button>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button type="button" onclick="chonAnh('ban','camera')" style="flex:1;padding:9px;background:var(--g50);border:1px solid var(--g200);border-radius:8px;font-size:12.5px;font-weight:600;color:var(--g800);cursor:pointer">📷 Chụp ảnh</button>
+        <button type="button" onclick="chonAnh('ban','gallery')" style="flex:1;padding:9px;background:var(--g50);border:1px solid var(--g200);border-radius:8px;font-size:12.5px;font-weight:600;color:var(--g800);cursor:pointer">🖼️ Chọn ảnh có sẵn</button>
+      </div>
+      <input type="file" accept="image/*" capture="environment" id="ban-anh-file-camera" style="display:none" onchange="onAnhFileChange('ban', this)">
+      <input type="file" accept="image/*" id="ban-anh-file-gallery" style="display:none" onchange="onAnhFileChange('ban', this)">
     </div>
     <div class="tt-box ban-tt">
       <div class="tt-lbl">Thành tiền</div>
@@ -1084,6 +1110,15 @@ input[type=date]:focus{border-color:var(--gl)}
           <input type="checkbox" id="setting-wakelock" onchange="saveSetting('wakelock',this.checked)">
           <span class="toggle-slider"></span>
         </label>
+      </div>
+      <!-- SỐ NGÀY LƯU ẢNH ĐÍNH KÈM -->
+      <div style="padding:14px 4px;border-bottom:1px solid var(--g100)">
+        <div style="font-size:14px;font-weight:700;color:var(--g800)">📷 Ảnh đính kèm giao dịch</div>
+        <div style="font-size:11px;color:var(--g400);margin:2px 0 10px">Số ngày lưu ảnh trên Supabase trước khi tự xoá (giải phóng dung lượng). Đổi số ngày ở đây chỉ áp dụng cho ảnh tải lên SAU này, không ảnh hưởng ảnh đã có từ trước</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="text" inputmode="numeric" id="setting-anh-ngay" class="fi" placeholder="30" style="flex:1" maxlength="3">
+          <button onclick="onSaveAnhLuuNgay()" style="padding:10px 16px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">💾 Lưu</button>
+        </div>
       </div>
       <!-- GIA HẠN -->
       <div style="padding:14px 4px;border-top:1px solid var(--g100)">
@@ -1711,6 +1746,14 @@ input[type=date]:focus{border-color:var(--gl)}
   </div>
 </div>
 
+<!-- MODAL XEM ẢNH ĐÍNH KÈM GIAO DỊCH — PHÓNG TO TOÀN MÀN HÌNH -->
+<div class="modal center" id="modal-anh-viewer" style="z-index:3000;background:rgba(0,0,0,.92)">
+  <div class="modal-box center-box" style="background:transparent;box-shadow:none;padding:0;max-width:96vw;width:auto;text-align:center;animation:none">
+    <img id="anh-viewer-img" style="max-width:94vw;max-height:78vh;border-radius:10px;display:block;margin:0 auto" onclick="event.stopPropagation()">
+    <button onclick="closeM('modal-anh-viewer')" style="margin-top:16px;padding:10px 26px;background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">✕ Đóng</button>
+  </div>
+</div>
+
 <!-- MODAL HƯỚNG DẪN SỬ DỤNG -->
 <div class="modal" id="modal-huong-dan" style="z-index:10000">
   <div class="modal-box" style="max-height:88vh;overflow-y:auto;padding-bottom:24px">
@@ -1719,7 +1762,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.5.9</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.6.0</div>
       </div>
     </div>
 
@@ -1885,7 +1928,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.5.9</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.6.0</div>
       </div>
     </div>
 
@@ -2805,6 +2848,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   initGoogleAuth();
   initSupabase();
   checkLicenseOnLoad();
+  setTimeout(cleanupExpiredAnh, 6000); // đợi đăng nhập Supabase xong rồi mới quét ảnh hết hạn
+  setInterval(cleanupExpiredAnh, 30*60*1000); // quét lại mỗi 30 phút trong lúc app vẫn đang mở
 
   ['mua','ban'].forEach(t=>{
     updDate(t);
@@ -3408,9 +3453,11 @@ function luuGD(tab){
   showDetail('✅','Xác nhận lưu giao dịch',rows,tt,'Lưu',()=>{
     const gd={id:Date.now()+Math.random(), date:curDate[tab], ten, loai, kg, do:doV, bi, gia, tt, guiSo:false, edited:false};
     const all=getGD(tab); all.push(gd); setGD(tab,all);
+    var _anhBlob = _pendingAnh[tab]; // lấy trước khi resetF (bên dưới) xoá mất biến tạm
     toast('✅ Đã lưu!'); resetF(tab); renderTbl(tab, gd.id); updTK(tab); updTK('ban'); if(typeof updSSSummary==='function') updSSSummary(); if(typeof updThangData==='function') updThangData(); autoSync();
     playSaveSound();
     if(_tenLaKhachMoi) showKhNeedInfoNotice(ten); // nhắc bổ sung thông tin nếu là khách hoàn toàn mới
+    if(_anhBlob) uploadAnhGD(tab, gd.id, _anhBlob);
   });
 }
 
@@ -3451,6 +3498,7 @@ function resetF(tab){
   document.getElementById(tab+'-tt-chu').textContent='--';
   document.getElementById(tab+'-ac').style.display='none';
   updateKhInfoTicker(tab);
+  resetAnhPicker(tab);
   // Ẩn bàn phím
   if(document.activeElement) document.activeElement.blur();
   hideKeyboard();
@@ -3471,6 +3519,11 @@ function editGD(tab,id){
   // restore bi vào bi-inline-inp (tất cả loại đều dùng chung 1 input)
   document.getElementById(tab+'-bi-inline-inp').value=gd.bi||'';
   calc(tab);
+  resetAnhPicker(tab);
+  if(gd.anh){
+    document.getElementById(tab+'-anh-preview').src=gd.anh;
+    document.getElementById(tab+'-anh-preview-wrap').style.display='block';
+  }
   document.getElementById(tab+'-btns').style.display='none';
   document.getElementById(tab+'-edit-btns').style.display='flex';
   document.getElementById(tab+'-fc').scrollIntoView({behavior:'smooth'});
@@ -3494,8 +3547,11 @@ function luuSua(tab){
   const all=getGD(tab);
   const idx=all.findIndex(g=>String(g.id)===String(id));
   if(idx>=0){ all[idx]={...all[idx],ten,loai,kg,do:doV,bi,gia,tt,edited:true}; setGD(tab,all); }
+  var _anhBlob = _pendingAnh[tab], _anhRemoved = _pendingAnhRemoved[tab]; // lấy trước khi huySua (bên dưới) reset mất
   huySua(tab); renderTbl(tab); updTK(tab); updTK('ban'); if(typeof updThangData==='function') updThangData(); toast('✅ Đã lưu thay đổi!'); autoSync();
   playSaveSound();
+  if(_anhBlob) uploadAnhGD(tab, id, _anhBlob);
+  else if(_anhRemoved) xoaAnhOfGD(tab, id);
 }
 function huySua(tab){
   editId[tab]=null;
@@ -3506,9 +3562,156 @@ function huySua(tab){
 function xoaGD(tab){
   if(guardLicense()) return;
   showDetail('🗑️','Xoá giao dịch?',[['Bạn có chắc muốn xoá?','']],null,'Xoá',()=>{
+    var _gdOld = getGD(tab).find(function(g){ return String(g.id)===String(editId[tab]); });
     const all=getGD(tab).filter(g=>String(g.id)!==String(editId[tab]));
     setGD(tab,all); huySua(tab); renderTbl(tab); updTK(tab); updTK('ban'); if(typeof updThangData==='function') updThangData(); toastDeleted('🗑️ Đã xoá giao dịch!');
+    if(_gdOld && _gdOld.anhPath && sbClient && sbUser) sbClient.storage.from(SB_ANH_BUCKET).remove([_gdOld.anhPath]).catch(function(){});
   });
+}
+
+// ═══════════════════════════════════════════════════════
+// ẢNH ĐÍNH KÈM GIAO DỊCH (Thu Mua/Bán Ra) — chụp ảnh hoặc chọn ảnh có sẵn trong máy, tự nén nhỏ rồi
+// tải lên Supabase Storage (bucket riêng, KHÔNG dùng bảng mucaosu_data vì đó chỉ dành cho dữ liệu
+// dạng chữ/số nhỏ gọn). Ảnh tự xoá sau đúng "N ngày" theo cài đặt — quan trọng: N được CHỐT NGAY tại
+// thời điểm tải ảnh lên (lưu vào field anhHetHan của chính giao dịch đó), nên sau này đổi cài đặt N
+// sang giá trị khác chỉ áp dụng cho ảnh tải lên SAU thời điểm đổi, không ảnh hưởng ảnh đã có từ trước.
+// ═══════════════════════════════════════════════════════
+var SB_ANH_BUCKET = 'giao-dich-anh'; // Cần tạo bucket này thủ công trên Supabase Dashboard (xem README)
+function getAnhLuuNgay(){ var v=parseInt(localStorage.getItem('anh_luu_ngay')); return (v>0) ? v : 30; }
+function setAnhLuuNgay(n){ n=parseInt(n)||30; if(n<1) n=1; if(n>365) n=365; localStorage.setItem('anh_luu_ngay', String(n)); }
+function onSaveAnhLuuNgay(){
+  var v = parseInt(document.getElementById('setting-anh-ngay').value);
+  if (!v || v < 1) { toast('⚠️ Nhập số ngày hợp lệ (tối thiểu 1)!'); return; }
+  setAnhLuuNgay(v);
+  document.getElementById('setting-anh-ngay').value = getAnhLuuNgay();
+  toast('✅ Đã lưu! Ảnh tải lên từ giờ sẽ tự xoá sau ' + getAnhLuuNgay() + ' ngày (ảnh cũ không đổi)');
+  autoSync();
+}
+
+var _pendingAnh = { mua:null, ban:null };         // Blob ảnh đã nén, đang chờ tải lên khi lưu/sửa giao dịch
+var _pendingAnhRemoved = { mua:false, ban:false }; // true = người dùng vừa bấm ✕ để bỏ ảnh (mới chọn hoặc ảnh cũ đang sửa)
+
+function chonAnh(tab, kieu){
+  var inp = document.getElementById(tab + '-anh-file-' + (kieu==='camera' ? 'camera' : 'gallery'));
+  if (inp) inp.click();
+}
+function onAnhFileChange(tab, inputEl){
+  var file = inputEl.files && inputEl.files[0];
+  inputEl.value = ''; // cho chọn lại đúng file đó ở lần sau nếu cần
+  if (!file) return;
+  if (!file.type || file.type.indexOf('image/') !== 0) { toast('⚠️ Chỉ chọn được file ảnh!'); return; }
+  toast('⏳ Đang xử lý ảnh...');
+  _nenAnh(file, function(blob){
+    _pendingAnh[tab] = blob;
+    _pendingAnhRemoved[tab] = false;
+    var url = URL.createObjectURL(blob);
+    document.getElementById(tab+'-anh-preview').src = url;
+    document.getElementById(tab+'-anh-preview-wrap').style.display = 'block';
+    toast('✅ Đã chọn ảnh — sẽ tải lên khi lưu giao dịch');
+  }, function(){
+    toast('❌ Lỗi xử lý ảnh, thử chọn ảnh khác!');
+  });
+}
+function xoaAnhPending(tab){
+  _pendingAnh[tab] = null;
+  _pendingAnhRemoved[tab] = true;
+  document.getElementById(tab+'-anh-preview-wrap').style.display = 'none';
+  document.getElementById(tab+'-anh-preview').src = '';
+}
+function resetAnhPicker(tab){
+  _pendingAnh[tab] = null;
+  _pendingAnhRemoved[tab] = false;
+  var wrap = document.getElementById(tab+'-anh-preview-wrap');
+  if (wrap) wrap.style.display = 'none';
+  var img = document.getElementById(tab+'-anh-preview');
+  if (img) img.src = '';
+}
+// Nén ảnh: co về tối đa 1024px chiều dài cạnh lớn nhất + nén JPEG chất lượng 72% — giảm dung lượng
+// đáng kể trước khi tải lên (đỡ tốn gói Storage miễn phí 1GB, tải nhanh hơn khi mạng yếu ở vườn/rẫy)
+function _nenAnh(file, cb, errCb){
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var img = new Image();
+    img.onload = function(){
+      var maxDim = 1024, w = img.width, h = img.height;
+      if (w > maxDim || h > maxDim) {
+        if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+        else { w = Math.round(w * maxDim / h); h = maxDim; }
+      }
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      canvas.toBlob(function(blob){ if (blob) cb(blob); else errCb && errCb(); }, 'image/jpeg', 0.72);
+    };
+    img.onerror = function(){ errCb && errCb(); };
+    img.src = e.target.result;
+  };
+  reader.onerror = function(){ errCb && errCb(); };
+  reader.readAsDataURL(file);
+}
+// Tải ảnh lên Supabase Storage (path = userId/tab_id.jpg — CỐ ĐỊNH theo đúng id giao dịch nên sửa ảnh
+// sau này chỉ ghi đè đúng file cũ, không tạo file mồ côi), gắn URL + hạn tự xoá vào bản ghi giao dịch.
+function uploadAnhGD(tab, gdId, blob){
+  if (!sbClient || !sbUser) { toast('⚠️ Cần đăng nhập Supabase để đính kèm ảnh!'); return; }
+  var path = sbUser.id + '/' + tab + '_' + gdId + '.jpg';
+  toast('⏳ Đang tải ảnh lên...');
+  sbClient.storage.from(SB_ANH_BUCKET).upload(path, blob, { contentType:'image/jpeg', upsert:true }).then(function(res){
+    if (res.error) { toast('⚠️ Lỗi tải ảnh lên (giao dịch vẫn đã lưu bình thường): ' + res.error.message); return; }
+    var pub = sbClient.storage.from(SB_ANH_BUCKET).getPublicUrl(path);
+    var url = pub && pub.data ? pub.data.publicUrl : null;
+    var soNgay = getAnhLuuNgay();
+    var hetHan = Date.now() + soNgay * 86400000;
+    var all = getGD(tab);
+    var idx = all.findIndex(function(g){ return String(g.id)===String(gdId); });
+    if (idx >= 0) {
+      all[idx].anh = url; all[idx].anhPath = path; all[idx].anhHetHan = hetHan; all[idx].anhSoNgay = soNgay;
+      setGD(tab, all);
+      renderTbl(tab);
+    }
+    autoSync();
+    toast('✅ Đã đính kèm ảnh! (tự xoá sau ' + soNgay + ' ngày)');
+  }).catch(function(e){ toast('⚠️ Lỗi kết nối khi tải ảnh lên: ' + e.message); });
+}
+// Xoá ảnh đang đính kèm của 1 giao dịch (do người dùng chủ động bấm ✕ khi đang sửa giao dịch đó)
+function xoaAnhOfGD(tab, gdId){
+  var all = getGD(tab);
+  var idx = all.findIndex(function(g){ return String(g.id)===String(gdId); });
+  if (idx < 0) return;
+  var path = all[idx].anhPath;
+  delete all[idx].anh; delete all[idx].anhPath; delete all[idx].anhHetHan; delete all[idx].anhSoNgay;
+  setGD(tab, all);
+  renderTbl(tab);
+  if (path && sbClient && sbUser) sbClient.storage.from(SB_ANH_BUCKET).remove([path]).catch(function(){});
+  autoSync();
+}
+// Xem ảnh phóng to toàn màn hình (chạm vào icon 📷 trong bảng giao dịch)
+function xemAnhGD(tab, gdId){
+  var gd = getGD(tab).find(function(g){ return String(g.id)===String(gdId); });
+  if (!gd || !gd.anh) return;
+  document.getElementById('anh-viewer-img').src = gd.anh;
+  openM('modal-anh-viewer');
+}
+// Tự động xoá ảnh đã hết hạn (đúng theo hạn đã chốt riêng cho từng ảnh) khỏi Supabase Storage LẪN
+// khỏi dữ liệu giao dịch — chạy khi mở app + định kỳ mỗi 30 phút trong lúc app vẫn đang mở.
+function cleanupExpiredAnh(){
+  if (!sbClient || !sbUser) return;
+  var now = Date.now();
+  var pathsToDelete = [];
+  var changed = false;
+  ['mua','ban'].forEach(function(tab){
+    var all = getGD(tab);
+    var touched = false;
+    all.forEach(function(g){
+      if (g.anh && g.anhHetHan && g.anhHetHan <= now) {
+        if (g.anhPath) pathsToDelete.push(g.anhPath);
+        delete g.anh; delete g.anhPath; delete g.anhHetHan; delete g.anhSoNgay;
+        touched = true; changed = true;
+      }
+    });
+    if (touched) setGD(tab, all);
+  });
+  if (pathsToDelete.length) sbClient.storage.from(SB_ANH_BUCKET).remove(pathsToDelete).catch(function(){});
+  if (changed) { autoSync(); renderTbl('mua'); renderTbl('ban'); }
 }
 
 // ─── DOUBLE TAP ───
@@ -3608,6 +3811,7 @@ function renderTbl(tab, newId){
     const rankIdx=top3Ids.indexOf(String(gd.id));
     const rankBadge=rankIdx>=0?'<span class="badge-rank">'+(rankIdx+1)+'</span>':'';
     const editIcon=gd.edited?'<span class="tr-edited-icon">✏️</span>':'';
+    const anhIcon=gd.anh?'<span onclick="event.stopPropagation();xemAnhGD(\''+tab+'\',\''+gd.id+'\')" style="cursor:pointer" title="Xem ảnh đính kèm">📷</span>':'';
 
     if(tab==='ban'){
       const ttCls='tc-gui'+(gd.thanhToan?' done':'');
@@ -3616,7 +3820,7 @@ function renderTbl(tab, newId){
         +'<td class="tc-ten" title="'+gd.ten+'">'
         +'<div class="tc-ten-wrap">'
         +'<span class="tc-ten-inner" id="tni-'+gd.id+'">'+gd.ten+'</span>'
-        +'<span class="tc-ten-badges">'+editIcon+'</span>'
+        +'<span class="tc-ten-badges">'+editIcon+anhIcon+'</span>'
         +'</div></td>'
         +'<td>'+fmtKg(kgThuc(gd.loai,gd.kg,gd.do,gd.bi||0))+((gd.bi&&parseFloat(gd.bi)>0)?'<span style="font-size:10px;color:#e57373;font-weight:700">('+fmtKg(gd.bi)+')</span>':'')+'</td>'
         +'<td>'+chat+'</td>'
@@ -3631,7 +3835,7 @@ function renderTbl(tab, newId){
       +'<td class="tc-ten" title="'+gd.ten+'">'
       +'<div class="tc-ten-wrap">'
       +'<span class="tc-ten-inner" id="tni-'+gd.id+'">'+gd.ten+'</span>'
-      +'<span class="tc-ten-badges">'+editIcon+rankBadge+'</span>'
+      +'<span class="tc-ten-badges">'+editIcon+rankBadge+anhIcon+'</span>'
       +'</div></td>'
       +'<td>'+fmtKg(kgThuc(gd.loai,gd.kg,gd.do,gd.bi||0))+((gd.bi&&parseFloat(gd.bi)>0)?'<span style="font-size:10px;color:#e57373;font-weight:700">('+fmtKg(gd.bi)+')</span>':'')+'</td>'
       +'<td>'+chat+'</td>'
@@ -7328,6 +7532,7 @@ function openSettings() {
   document.getElementById('setting-docTien').checked = getSetting('docTien', true);
   document.getElementById('setting-amBao').checked = getSetting('amBao', true);
   document.getElementById('setting-wakelock').checked = getSetting('wakelock', true);
+  document.getElementById('setting-anh-ngay').value = getAnhLuuNgay();
   var info = document.getElementById('settings-license-info');
   if (info) {
     var days = getRemainingDays();

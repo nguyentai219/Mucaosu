@@ -15,6 +15,7 @@ Số phiên bản cũ (v11.x) tăng quá cao nên đổi sang cơ chế mới: *
 
 | Phiên bản | Ngày | Thay đổi |
 |-----------|------|----------|
+| **v1.6.0** | 2026-07 | **📷 Tính năng mới: Ảnh đính kèm giao dịch (Thu Mua/Bán Ra)** — chụp ảnh trực tiếp hoặc chọn ảnh có sẵn trong máy khi lưu (hoặc sửa) giao dịch, ảnh tự nén nhỏ (tối đa cạnh 1024px, JPEG 72%) trước khi tải lên **Supabase Storage** (KHÔNG dùng chung bảng dữ liệu `mucaosu_data`, tránh làm nặng phần đồng bộ chính). Xem lại ảnh bằng cách chạm icon 📷 trong bảng giao dịch → phóng to toàn màn hình. **Tự động xoá ảnh sau N ngày** để giải phóng dung lượng — số ngày N cài đặt tại ⚙️ Cài đặt → "📷 Ảnh đính kèm giao dịch", **chốt cố định ngay tại thời điểm tải ảnh lên** theo đúng N đang cài lúc đó: sau này đổi N sang giá trị khác **chỉ áp dụng cho ảnh tải lên sau khi đổi**, hoàn toàn không ảnh hưởng tới hạn tự xoá của ảnh đã có từ trước. Xoá ảnh cũng dọn theo khi xoá hẳn giao dịch hoặc bấm ✕ bỏ ảnh lúc đang sửa. ⚠️ *Cần Tài tự tạo 1 bucket Storage tên `giao-dich-anh` trên Supabase Dashboard (xem hướng dẫn bên dưới) trước khi dùng được tính năng này — xem thêm mục "📷 Thiết lập Supabase Storage cho ảnh đính kèm" phía dưới trong file này.* |
 | **v1.5.9** | 2026-07 | Màn "📁 Thư mục lưu trữ Supabase": (1) **Ẩn hoàn toàn** các mục dữ liệu hệ thống (Hạn dùng license, Mật khẩu quản trị, Mật khẩu giao dịch, Mã khách hàng) khỏi danh sách hiển thị/xoá — không còn hiện ra để tránh xoá nhầm làm sai lệch license/mật khẩu/mã khách đang dùng, chỉ còn hiện đúng các mục dữ liệu thông thường (giao dịch, sổ gửi, ứng tiền, chấm công...) kèm dòng ghi chú "(đã ẩn N mục hệ thống)". (2) **Thay hộp thoại xác nhận xoá** (trước đây là popup xác nhận thường của trình duyệt) **bằng popup yêu cầu nhập mật khẩu giao dịch** — chỉ xoá được khi nhập đúng mật khẩu giao dịch (hoặc mật khẩu quản trị), tránh xoá nhầm dữ liệu do vô tình chạm phải nút Xoá |
 | **v1.5.8** | 2026-07 | (1) **Thêm "📁 Mở thư mục lưu trữ Supabase"** trong màn cài đặt đồng bộ (chạm vào thanh trạng thái kết nối mạng) — liệt kê từng mục dữ liệu đang lưu trên Supabase kèm dung lượng (KB/MB), nút "🗑️ Xoá" cho từng mục để giải phóng bớt dung lượng khi cần (đầy gói miễn phí...). Khi xoá 1 mục: xoá đồng thời cả trên Supabase LẪN trên máy này (localStorage) trong cùng thao tác, tránh vòng lặp "xoá trên Supabase xong lại bị máy tự đồng bộ đẩy dữ liệu cũ lên lại y như trước" — có cảnh báo rõ ràng hơn với các mục dữ liệu hệ thống (license, mật khẩu, mã khách hàng). (2) Màn **"📇 Danh Sách và Mã Khách Hàng"** (đổi tên từ "📇 Mã khách hàng"): đưa khối "🔒 Chốt danh sách Thu Mua" xuống **cuối cùng**, sau danh sách khách hàng (trước đây nằm ngay đầu, phía trên cả ô tìm kiếm). (3) **Âm báo lưu thành công** nay phát đầy đủ ở tất cả các chỗ lưu còn thiếu trong app: lưu thông tin liên hệ khách hàng (SĐT/CCCD/Địa chỉ), lưu sửa khách hàng, thêm khách hàng mới, lưu thông tin xuất bảng kê, và mỗi lần bấm **"⚡ Tính toán & Phân bổ"** (tab Tính Toán) — cùng dùng chung 1 âm thanh và cùng bật/tắt theo đúng 1 cài đặt "🔔 Âm báo lưu thành công" như các chỗ lưu giao dịch khác |
 | **v1.5.7** | 2026-07 | (1) **Modal "Xuất Bảng kê thu mua"**: tách tick "Điền ngày xuất, điền ngày ký" thành **2 hàng, 2 tick riêng biệt** — "Điền tháng, năm xuất vào bản kê" và "Điền ngày, tháng, năm ký vào bản kê" — bật/tắt độc lập với nhau thay vì gộp chung 1 tick như trước. (2) **Khắc phục lỗi không tự đồng bộ dữ liệu mới khi mở lại app đã đăng nhập Supabase sẵn**: trước đây việc TỰ ĐỘNG kéo (pull) + trộn dữ liệu mới từ đám mây chỉ chạy khi bấm nút "Đăng nhập" thủ công (`restoreOrPushOnLogin`) — nếu phiên đăng nhập Supabase đã có sẵn từ trước (mở app bằng icon trên điện thoại, không cần đăng nhập lại), app chỉ ĐẨY (push) dữ liệu máy lên nếu có pending, KHÔNG BAO GIỜ tự kéo dữ liệu mới tạo ở thiết bị/phiên khác về — khiến giao dịch tạo ở nơi khác "biến mất" cho tới khi đăng xuất/đăng nhập lại thủ công. Nay mỗi lần mở app (đã đăng nhập Supabase sẵn), sau 3 giây sẽ tự kiểm tra + trộn ngầm dữ liệu mới nhất từ đám mây; chỉ khi THỰC SỰ có dữ liệu mới mới báo "🔄 Đã tự động cập nhật dữ liệu mới…" và tải lại trang, nếu không có gì mới thì chỉ lặng lẽ đẩy phần máy đang có lên (nếu cần), không làm phiền hay tải lại trang vô ích |
@@ -160,3 +161,30 @@ mu-cao-su/
 └── README.md
 ```
 > 💾 Dữ liệu lưu trong **localStorage** — không cần server, hoạt động offline hoàn toàn.
+
+## 📷 Thiết lập Supabase Storage cho ảnh đính kèm (bắt buộc từ v1.6.0)
+
+Tính năng đính kèm ảnh giao dịch (chụp ảnh/chọn ảnh trong máy) cần 1 **bucket Storage riêng** trên Supabase — bucket này KHÔNG tự tạo được từ trong app (cần quyền quản trị dự án), Tài cần vào **Supabase Dashboard** tạo 1 lần duy nhất theo các bước sau:
+
+**Bước 1 — Tạo bucket:**
+1. Vào Supabase Dashboard → dự án đang dùng → **Storage** (thanh bên trái)
+2. **New bucket** → đặt tên chính xác: `giao-dich-anh`
+3. Bật **Public bucket** (để ảnh hiển thị được trực tiếp qua link, không cần đăng nhập) → **Create bucket**
+
+**Bước 2 — Cho phép tải lên/xoá ảnh (RLS Policy):** vào **SQL Editor** → dán đoạn sau → **Run**:
+```sql
+create policy "giao-dich-anh insert" on storage.objects for insert to authenticated
+with check (bucket_id = 'giao-dich-anh' and (storage.foldername(name))[1] = auth.uid()::text);
+
+create policy "giao-dich-anh update" on storage.objects for update to authenticated
+using (bucket_id = 'giao-dich-anh' and (storage.foldername(name))[1] = auth.uid()::text);
+
+create policy "giao-dich-anh delete" on storage.objects for delete to authenticated
+using (bucket_id = 'giao-dich-anh' and (storage.foldername(name))[1] = auth.uid()::text);
+```
+Đoạn này cho phép **đúng tài khoản Supabase đang đăng nhập trong app** (Tài) được tải lên/sửa/xoá ảnh trong đúng thư mục của mình (`{user_id}/...`), không ai khác tải/xoá được. Việc **xem ảnh** thì không cần policy riêng vì bucket đã bật Public ở Bước 1.
+
+Nếu bỏ qua 2 bước trên, khi bấm 📷 Chụp ảnh/🖼️ Chọn ảnh app vẫn lưu giao dịch bình thường, chỉ riêng bước tải ảnh lên sẽ báo lỗi (toast "⚠️ Lỗi tải ảnh lên") — không mất dữ liệu giao dịch.
+
+> ℹ️ Ảnh đính kèm hiện chỉ hiển thị được trong chính app **"Mua Bán Mủ Cao Su"** (chạm icon 📷 trong bảng giao dịch). App đồng hành **"Xem Sổ Khách Hàng"** cần được cập nhật riêng (thêm đoạn hiển thị `<img>` từ field `anh` trong dữ liệu) mới hiện được ảnh cho khách xem — gửi kèm file đó ở lần chỉnh sửa sau nếu muốn bổ sung.
+
