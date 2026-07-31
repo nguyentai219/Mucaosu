@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.6.2</title>
+<title>Mua Bán Mủ Cao Su v1.6.4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -504,7 +504,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.6.2 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.6.4 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1762,7 +1762,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.6.2</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.6.4</div>
       </div>
     </div>
 
@@ -1928,7 +1928,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.6.2</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.6.4</div>
       </div>
     </div>
 
@@ -3651,9 +3651,29 @@ function _nenAnh(file, cb, errCb){
 }
 // Tải ảnh lên Supabase Storage (path = userId/tab_id.jpg — CỐ ĐỊNH theo đúng id giao dịch nên sửa ảnh
 // sau này chỉ ghi đè đúng file cũ, không tạo file mồ côi), gắn URL + hạn tự xoá vào bản ghi giao dịch.
+// Chuẩn hoá tên khách hàng để dùng an toàn trong tên file (bỏ dấu tiếng Việt, khoảng trắng -> gạch dưới)
+function _sbSanitizeForFilename(s){
+  s = String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  s = s.replace(/đ/g, 'd').replace(/Đ/g, 'D');
+  s = s.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  return s || 'khach';
+}
+// Tên file dạng: tab_tenkhachhang_ngay_thang_id.jpg (VD: mua_chi_2_30_7_1735500000123.456.jpg) — dễ nhận
+// ra ngay là ảnh của giao dịch nào khi xem trực tiếp trong Supabase Dashboard, không chỉ trong app.
+function _sbAnhBuildFilename(tab, ten, dateStr, gdId){
+  var cleanTen = _sbSanitizeForFilename(ten);
+  var parts = String(dateStr || '').split('-'); // dateStr dạng YYYY-MM-DD
+  var ngayThang = (parts.length === 3) ? (parseInt(parts[2],10) + '_' + parseInt(parts[1],10)) : '0_0';
+  return tab + '_' + cleanTen + '_' + ngayThang + '_' + gdId + '.jpg';
+}
 function uploadAnhGD(tab, gdId, blob){
   if (!sbClient || !sbUser) { toast('⚠️ Cần đăng nhập Supabase để đính kèm ảnh!'); return; }
-  var path = sbUser.id + '/' + tab + '_' + gdId + '.jpg';
+  var all0 = getGD(tab);
+  var idx0 = all0.findIndex(function(g){ return String(g.id)===String(gdId); });
+  if (idx0 < 0) { toast('⚠️ Không tìm thấy giao dịch để đính kèm ảnh!'); return; }
+  var gd0 = all0[idx0];
+  var oldPath = gd0.anhPath || null; // ảnh cũ (nếu sửa giao dịch và đổi tên/ngày làm đổi tên file mới)
+  var path = sbUser.id + '/' + _sbAnhBuildFilename(tab, gd0.ten, gd0.date, gdId);
   toast('⏳ Đang tải ảnh lên...');
   sbClient.storage.from(SB_ANH_BUCKET).upload(path, blob, { contentType:'image/jpeg', upsert:true }).then(function(res){
     if (res.error) { toast('⚠️ Lỗi tải ảnh lên (giao dịch vẫn đã lưu bình thường): ' + res.error.message); return; }
@@ -3668,6 +3688,7 @@ function uploadAnhGD(tab, gdId, blob){
       setGD(tab, all);
       renderTbl(tab);
     }
+    if (oldPath && oldPath !== path) sbClient.storage.from(SB_ANH_BUCKET).remove([oldPath]).catch(function(){}); // dọn file ảnh cũ tránh mồ côi
     autoSync();
     toast('✅ Đã đính kèm ảnh! (tự xoá sau ' + soNgay + ' ngày)');
   }).catch(function(e){ toast('⚠️ Lỗi kết nối khi tải ảnh lên: ' + e.message); });
@@ -5213,15 +5234,43 @@ function _sbResetLocalAfterDelete(k) {
     lsSet(k, []);
   }
 }
-function openSbStorageModal() {
+// ── Màn "📁 Thư mục lưu trữ Supabase" — 2 tab: 💾 Dữ liệu (bảng mucaosu_data, quota Database 500MB)
+// và 🖼️ Ảnh (bucket Storage giao-dich-anh, quota Storage 1GB), mỗi tab có thanh dung lượng riêng.
+var _sbStorageTab = 'data';
+function openSbStorageModal(tab) {
   if (!sbClient || !sbUser) { toast('⚠️ Chưa đăng nhập Supabase'); return; }
+  _sbStorageTab = tab || _sbStorageTab || 'data';
   var body  = document.getElementById('gd-modal-body');
   var title = document.getElementById('gd-modal-title');
   title.textContent = '📁 Thư mục lưu trữ Supabase';
-  body.innerHTML = '<div style="text-align:center;padding:24px 10px;color:var(--g400);font-size:13px">Đang tải danh sách dữ liệu...</div>';
+  body.innerHTML = _sbStorageTabsHtml() + '<div id="sb-storage-content" style="text-align:center;padding:24px 10px;color:var(--g400);font-size:13px">Đang tải...</div>';
   openM('modal-gd');
+  if (_sbStorageTab === 'anh') _sbLoadAnhTab(); else _sbLoadDataTab();
+}
+function _sbStorageTabsHtml(){
+  var isData = _sbStorageTab === 'data';
+  return '<div style="display:flex;gap:8px;margin-bottom:14px">'
+    + '<button onclick="openSbStorageModal(\'data\')" style="flex:1;padding:10px 6px;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;background:' + (isData ? 'var(--gd)' : 'var(--g50)') + ';color:' + (isData ? '#fff' : 'var(--g600)') + '">💾 Dữ liệu</button>'
+    + '<button onclick="openSbStorageModal(\'anh\')" style="flex:1;padding:10px 6px;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;background:' + (!isData ? 'var(--gd)' : 'var(--g50)') + ';color:' + (!isData ? '#fff' : 'var(--g600)') + '">🖼️ Ảnh</button>'
+    + '</div>';
+}
+function _sbQuotaBarHtml(totalSize, quotaTotal, quotaLabel){
+  var pct = Math.min(100, (totalSize / quotaTotal) * 100);
+  return '<div style="padding:0 4px 16px">'
+    + '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--g500);margin-bottom:5px">'
+    + '<span>Đã dùng ' + sbFmtSize(totalSize) + '</span>'
+    + '<span>Còn lại ' + sbFmtSize(Math.max(0, quotaTotal - totalSize)) + ' / ' + quotaLabel + '</span>'
+    + '</div>'
+    + '<div style="width:100%;height:10px;background:var(--g100);border-radius:6px;overflow:hidden">'
+    + '<div style="width:' + pct.toFixed(1) + '%;height:100%;background:linear-gradient(90deg,#22c55e,#16a34a);border-radius:6px"></div>'
+    + '</div></div>';
+}
+function _sbLoadDataTab(){
+  var content = document.getElementById('sb-storage-content');
+  content.innerHTML = '<div style="text-align:center;padding:20px 10px;color:var(--g400);font-size:13px">Đang tải danh sách dữ liệu...</div>';
   sbClient.from('mucaosu_data').select('data_key,data_value').eq('user_id', sbUser.id).then(function(res) {
-    if (res.error) { body.innerHTML = '<div style="text-align:center;padding:20px 10px;color:var(--red);font-size:13px">❌ Lỗi tải dữ liệu: ' + res.error.message + '</div>'; return; }
+    if (_sbStorageTab !== 'data') return; // đã chuyển tab trong lúc chờ tải, bỏ qua kết quả trễ
+    if (res.error) { content.innerHTML = '<div style="text-align:center;padding:20px 10px;color:var(--red);font-size:13px">❌ Lỗi tải dữ liệu: ' + res.error.message + '</div>'; return; }
     var rows = res.data || [];
     rows.forEach(function(r) { r._size = JSON.stringify(r.data_value == null ? '' : r.data_value).length; });
     // Ẩn hẳn các mục dữ liệu hệ thống (license/mật khẩu/mã khách hàng) khỏi danh sách hiển thị —
@@ -5230,17 +5279,12 @@ function openSbStorageModal() {
     rows = rows.filter(function(r){ return !sbStorageCritical(r.data_key); });
     rows.sort(function(a,b) { return b._size - a._size; });
     var totalSize = rows.reduce(function(s,r) { return s + r._size; }, 0);
-    var html = '<div style="text-align:center;padding:6px 10px 16px">'
+    var html = '<div style="text-align:center;padding:6px 10px 14px">'
       + '<div style="font-size:40px;margin-bottom:8px">📁</div>'
       + '<div style="font-size:15px;font-weight:700;color:var(--g800);margin-bottom:4px">Dữ liệu đang lưu trên Supabase</div>'
-      + '<div style="font-size:12px;color:var(--g400)">' + rows.length + ' mục · Tổng ' + sbFmtSize(totalSize) + (hiddenCount ? ' <span style="color:var(--g400)">(đã ẩn ' + hiddenCount + ' mục hệ thống)</span>' : '') + '</div>'
+      + '<div style="font-size:12px;color:var(--g400)">' + rows.length + ' mục' + (hiddenCount ? ' <span style="color:var(--g400)">(đã ẩn ' + hiddenCount + ' mục hệ thống)</span>' : '') + '</div>'
       + '</div>'
-      + '<div class="gd-opt" onclick="openSbAnhListModal()" style="margin-bottom:12px">'
-      + '<span class="gd-opt-ico">🖼️</span>'
-      + '<div class="gd-opt-txt"><div>Xem ảnh đã tải lên</div>'
-      + '<div class="gd-opt-sub">Xem/xoá từng ảnh đính kèm giao dịch trên Supabase Storage</div></div>'
-      + '</div>'
-      + '<div style="font-size:11px;color:var(--g400);font-weight:700;padding:4px 2px 6px">💾 DỮ LIỆU (mucaosu_data)</div>';
+      + _sbQuotaBarHtml(totalSize, 500*1024*1024, '500 MB');
     if (!rows.length) {
       html += '<div style="text-align:center;padding:10px;color:var(--g400);font-size:13px">Chưa có dữ liệu nào trên Supabase</div>';
     } else {
@@ -5253,8 +5297,8 @@ function openSbStorageModal() {
       });
     }
     html += '<div class="gd-opt" onclick="openSbModal()" style="margin-top:14px"><span class="gd-opt-ico">◀️</span><div class="gd-opt-txt"><div>Quay lại</div></div></div>';
-    body.innerHTML = html;
-  }).catch(function(e) { body.innerHTML = '<div style="text-align:center;padding:20px 10px;color:var(--red);font-size:13px">❌ Lỗi kết nối: ' + e.message + '</div>'; });
+    content.innerHTML = html;
+  }).catch(function(e) { if (_sbStorageTab === 'data') content.innerHTML = '<div style="text-align:center;padding:20px 10px;color:var(--red);font-size:13px">❌ Lỗi kết nối: ' + e.message + '</div>'; });
 }
 var _sbDelPendingKey = null;
 var _sbDelPendingType = 'data'; // 'data' = xoá 1 mục trong bảng mucaosu_data | 'anh' = xoá 1 file ảnh trong Storage
@@ -5288,32 +5332,32 @@ function sbDeleteConfirmSubmit() {
   }).catch(function(e) { toast('❌ Lỗi kết nối: ' + e.message); });
 }
 
-// ── Màn "🖼️ Xem ảnh đã tải lên" — liệt kê từng file ảnh đang có trong bucket Storage
-// (giao-dich-anh) của đúng tài khoản đang dùng, cho xem phóng to + xoá từng ảnh. Xoá 1 ảnh ở đây sẽ
-// xoá cả trên Supabase Storage LẪN gỡ khỏi đúng giao dịch tương ứng trên máy (không chỉ xoá file mồ
-// côi), để tránh giao dịch còn trỏ tới 1 ảnh đã không còn tồn tại.
+// ── Tab "🖼️ Ảnh" — liệt kê từng file ảnh đang có trong bucket Storage (giao-dich-anh) của đúng tài
+// khoản đang dùng, cho xem phóng to + xoá từng ảnh. Xoá 1 ảnh ở đây sẽ xoá cả trên Supabase Storage
+// LẪN gỡ khỏi đúng giao dịch tương ứng trên máy (không chỉ xoá file mồ côi), tránh giao dịch còn trỏ
+// tới 1 ảnh đã không còn tồn tại. Tên file dạng tab_tenkhach_ngay_thang_id.jpg (từ v1.6.3 trở đi) —
+// ảnh tải lên TRƯỚC v1.6.3 vẫn giữ tên cũ (chỉ có id) nên sẽ hiện tên file gốc thay vì tên khách/ngày.
 function _sbAnhParseFilename(fname){
   var base = String(fname).replace(/\.[a-zA-Z0-9]+$/, '');
-  var us = base.indexOf('_');
-  if (us < 0) return null;
-  return { tab: base.slice(0, us), id: base.slice(us + 1) };
+  var usFirst = base.indexOf('_');
+  var usLast = base.lastIndexOf('_');
+  if (usFirst < 0 || usLast < 0 || usLast <= usFirst) return { tab: base.slice(0, usFirst > 0 ? usFirst : base.length), id: null, label: null };
+  return { tab: base.slice(0, usFirst), id: base.slice(usLast + 1), label: base.slice(usFirst + 1, usLast) };
 }
-function openSbAnhListModal(){
-  if (!sbClient || !sbUser) { toast('⚠️ Chưa đăng nhập Supabase'); return; }
-  var body = document.getElementById('gd-modal-body');
-  var title = document.getElementById('gd-modal-title');
-  title.textContent = '🖼️ Ảnh giao dịch đã tải lên';
-  body.innerHTML = '<div style="text-align:center;padding:24px 10px;color:var(--g400);font-size:13px">Đang tải danh sách ảnh...</div>';
-  openM('modal-gd');
+function _sbLoadAnhTab(){
+  var content = document.getElementById('sb-storage-content');
+  content.innerHTML = '<div style="text-align:center;padding:20px 10px;color:var(--g400);font-size:13px">Đang tải danh sách ảnh...</div>';
   sbClient.storage.from(SB_ANH_BUCKET).list(sbUser.id, { limit:1000, sortBy:{ column:'created_at', order:'desc' } }).then(function(res){
-    if (res.error) { body.innerHTML = '<div style="text-align:center;padding:20px 10px;color:var(--red);font-size:13px">❌ Lỗi tải danh sách ảnh: ' + res.error.message + '</div>'; return; }
+    if (_sbStorageTab !== 'anh') return; // đã chuyển tab trong lúc chờ tải, bỏ qua kết quả trễ
+    if (res.error) { content.innerHTML = '<div style="text-align:center;padding:20px 10px;color:var(--red);font-size:13px">❌ Lỗi tải danh sách ảnh: ' + res.error.message + '</div>'; return; }
     var files = (res.data || []).filter(function(f){ return f && f.name && f.id; }); // bỏ qua placeholder thư mục rỗng
     var totalSize = files.reduce(function(s,f){ return s + ((f.metadata && f.metadata.size) || 0); }, 0);
-    var html = '<div style="text-align:center;padding:6px 10px 16px">'
+    var html = '<div style="text-align:center;padding:6px 10px 14px">'
       + '<div style="font-size:40px;margin-bottom:8px">🖼️</div>'
       + '<div style="font-size:15px;font-weight:700;color:var(--g800);margin-bottom:4px">Ảnh đính kèm giao dịch trên Supabase</div>'
-      + '<div style="font-size:12px;color:var(--g400)">' + files.length + ' ảnh · Tổng ' + sbFmtSize(totalSize) + '</div>'
-      + '</div>';
+      + '<div style="font-size:12px;color:var(--g400)">' + files.length + ' ảnh</div>'
+      + '</div>'
+      + _sbQuotaBarHtml(totalSize, 1024*1024*1024, '1 GB');
     if (!files.length) {
       html += '<div style="text-align:center;padding:10px;color:var(--g400);font-size:13px">Chưa có ảnh nào được tải lên</div>';
     } else {
@@ -5322,20 +5366,21 @@ function openSbAnhListModal(){
         var pub = sbClient.storage.from(SB_ANH_BUCKET).getPublicUrl(sbUser.id + '/' + f.name);
         var url = (pub && pub.data) ? pub.data.publicUrl : '';
         var info = _sbAnhParseFilename(f.name);
-        var lbl = info ? (info.tab === 'mua' ? '📥 Thu Mua' : (info.tab === 'ban' ? '📤 Bán Ra' : f.name)) : f.name;
+        var icon = info && info.tab === 'mua' ? '📥' : (info && info.tab === 'ban' ? '📤' : '📄');
+        var lbl = info && info.label ? (icon + ' ' + info.label.replace(/_/g, ' ')) : (icon + ' ' + f.name);
         html += '<div style="border:1px solid var(--g200);border-radius:10px;overflow:hidden;background:#fff">'
           + '<img src="' + url + '" style="width:100%;height:90px;object-fit:cover;display:block;cursor:pointer" onclick="_sbViewAnhFull(\'' + url.replace(/'/g, "\\'") + '\')">'
           + '<div style="padding:6px 8px">'
-          + '<div style="font-size:11px;color:var(--g600);font-weight:700">' + lbl + '</div>'
+          + '<div style="font-size:11px;color:var(--g600);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + lbl.replace(/"/g,'') + '">' + lbl + '</div>'
           + '<div style="font-size:10px;color:var(--g400);margin-bottom:6px">' + sbFmtSize((f.metadata && f.metadata.size) || 0) + '</div>'
           + '<button onclick="sbDeleteAnhFile(\'' + String(f.name).replace(/'/g, "\\'") + '\')" style="width:100%;border:none;background:#fee2e2;color:var(--red);border-radius:6px;padding:5px;font-size:11px;font-weight:700;cursor:pointer">🗑️ Xoá</button>'
           + '</div></div>';
       });
       html += '</div>';
     }
-    html += '<div class="gd-opt" onclick="openSbStorageModal()" style="margin-top:14px"><span class="gd-opt-ico">◀️</span><div class="gd-opt-txt"><div>Quay lại</div></div></div>';
-    body.innerHTML = html;
-  }).catch(function(e){ body.innerHTML = '<div style="text-align:center;padding:20px 10px;color:var(--red);font-size:13px">❌ Lỗi kết nối: ' + e.message + '</div>'; });
+    html += '<div class="gd-opt" onclick="openSbModal()" style="margin-top:14px"><span class="gd-opt-ico">◀️</span><div class="gd-opt-txt"><div>Quay lại</div></div></div>';
+    content.innerHTML = html;
+  }).catch(function(e){ if (_sbStorageTab === 'anh') content.innerHTML = '<div style="text-align:center;padding:20px 10px;color:var(--red);font-size:13px">❌ Lỗi kết nối: ' + e.message + '</div>'; });
 }
 function _sbViewAnhFull(url){
   document.getElementById('anh-viewer-img').src = url;
@@ -5357,7 +5402,7 @@ function _sbDoDeleteAnhFile(fname){
   sbClient.storage.from(SB_ANH_BUCKET).remove([path]).then(function(res){
     if (res.error) { toast('❌ Lỗi xoá ảnh: ' + res.error.message); return; }
     var info = _sbAnhParseFilename(fname);
-    if (info && (info.tab === 'mua' || info.tab === 'ban')) {
+    if (info && info.id && (info.tab === 'mua' || info.tab === 'ban')) {
       var all = getGD(info.tab);
       var idx = all.findIndex(function(g){ return String(g.id) === String(info.id); });
       if (idx >= 0) {
@@ -5368,7 +5413,7 @@ function _sbDoDeleteAnhFile(fname){
       autoSync();
     }
     toast('✅ Đã xoá ảnh!');
-    openSbAnhListModal(); // tải lại danh sách để cập nhật ngay
+    _sbLoadAnhTab(); // tải lại danh sách để cập nhật ngay (giữ nguyên tab đang xem)
   }).catch(function(e){ toast('❌ Lỗi kết nối: ' + e.message); });
 }
 
