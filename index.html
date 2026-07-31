@@ -5774,9 +5774,9 @@ function syncToSupabase_silent() {
 // chưa đăng nhập Supabase lẫn Google Drive. Nếu máy có đăng nhập Supabase thì
 // kèm thêm email để dễ tra cứu. KHÔNG bao giờ gửi mật khẩu lên bảng này.
 // Được gọi lại mỗi khi kiểm tra bản quyền (mỗi lần mở app) và mỗi khi đồng bộ
-// dữ liệu thành công, nên luôn tự cập nhật. Bảng `client_registry` chỉ admin
-// (nguyentai219@gmail.com) mới đọc được toàn bộ — thực thi bằng Row Level
-// Security phía Supabase.
+// dữ liệu thành công, nên luôn tự cập nhật. Bảng `client_registry` chỉ tài
+// khoản quản trị mới đọc được toàn bộ — thực thi bằng Row Level Security
+// phía Supabase.
 // ══════════════════════════════════════════
 function syncClientRegistry() {
   if (!sbClient) return;
