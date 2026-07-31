@@ -5791,7 +5791,9 @@ function syncClientRegistry() {
       updated_at: new Date().toISOString()
     };
     if (sbUser) { row.user_id = sbUser.id; row.email = sbUser.email; }
-    sbClient.from('client_registry').upsert([row], { onConflict: 'fingerprint' }).catch(function(){});
+    sbClient.from('client_registry').upsert([row], { onConflict: 'fingerprint' }).then(function(res) {
+      if (res && res.error) console.error('[client_registry] lỗi đồng bộ:', res.error.message);
+    }).catch(function(e) { console.error('[client_registry] lỗi kết nối:', e && e.message); });
   } catch(e) {}
 }
 
