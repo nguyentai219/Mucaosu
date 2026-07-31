@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.6.5</title>
+<title>Mua Bán Mủ Cao Su v1.6.6</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -504,7 +504,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.6.5 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.6.6 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1125,6 +1125,11 @@ input[type=date]:focus{border-color:var(--gl)}
         <div style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:2px">Thời hạn sử dụng</div>
         <div id="settings-license-info" style="font-size:12px;color:var(--g600);margin-bottom:8px"></div>
         <button onclick="openGiaHan()" style="width:100%;padding:10px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">🔑 Gia hạn thời gian sử dụng</button>
+      </div>
+      <!-- TRẠNG THÁI ĐỒNG BỘ (chẩn đoán) -->
+      <div style="padding:14px 4px;border-top:1px solid var(--g100)">
+        <div style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:2px">🔧 Trạng thái đồng bộ máy này</div>
+        <div id="registry-debug-line" style="font-size:11.5px;color:var(--g600);word-break:break-word;line-height:1.5">Chưa có thông tin</div>
       </div>
       <!-- ĐỔI MẬT KHẨU QUẢN LÝ GIAO DỊCH -->
       <div style="padding:14px 4px;border-top:1px solid var(--g100)">
@@ -1762,7 +1767,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.6.5</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.6.6</div>
       </div>
     </div>
 
@@ -1928,7 +1933,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.6.5</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.6.6</div>
       </div>
     </div>
 
@@ -5779,7 +5784,8 @@ function syncToSupabase_silent() {
 // phía Supabase.
 // ══════════════════════════════════════════
 function syncClientRegistry() {
-  if (!sbClient) return;
+  localStorage.setItem('registry_sync_debug', 'Đang gọi lúc ' + new Date().toLocaleTimeString('vi-VN') + '...');
+  if (!sbClient) { localStorage.setItem('registry_sync_debug', 'Chưa khởi tạo sbClient lúc ' + new Date().toLocaleTimeString('vi-VN')); return; }
   try {
     var used = getUsedExtCodes();
     var lastCode = used.length ? used[used.length - 1] : null;
@@ -5792,9 +5798,21 @@ function syncClientRegistry() {
     };
     if (sbUser) { row.user_id = sbUser.id; row.email = sbUser.email; }
     sbClient.from('client_registry').upsert([row], { onConflict: 'fingerprint' }).then(function(res) {
-      if (res && res.error) console.error('[client_registry] lỗi đồng bộ:', res.error.message);
-    }).catch(function(e) { console.error('[client_registry] lỗi kết nối:', e && e.message); });
-  } catch(e) {}
+      if (res && res.error) {
+        console.error('[client_registry] lỗi đồng bộ:', res.error.message);
+        localStorage.setItem('registry_sync_debug', '❌ Lỗi lúc ' + new Date().toLocaleTimeString('vi-VN') + ': ' + res.error.message);
+      } else {
+        localStorage.setItem('registry_sync_debug', '✅ OK lúc ' + new Date().toLocaleTimeString('vi-VN') + ' (fp: ' + row.fingerprint + ')');
+      }
+      if (typeof updRegistryDebugLine === 'function') updRegistryDebugLine();
+    }).catch(function(e) {
+      console.error('[client_registry] lỗi kết nối:', e && e.message);
+      localStorage.setItem('registry_sync_debug', '❌ Lỗi kết nối lúc ' + new Date().toLocaleTimeString('vi-VN') + ': ' + (e && e.message));
+      if (typeof updRegistryDebugLine === 'function') updRegistryDebugLine();
+    });
+  } catch(e) {
+    localStorage.setItem('registry_sync_debug', '❌ Lỗi JS lúc ' + new Date().toLocaleTimeString('vi-VN') + ': ' + e.message);
+  }
 }
 
 function restoreFromSupabase(silent) {
@@ -7715,7 +7733,18 @@ function openSettings() {
     info.innerHTML = lic + '<br>📱 Mã thiết bị: <b style="color:var(--gd);letter-spacing:1px">' + getDeviceCode() + '</b>'
       + ' &nbsp;·&nbsp; 🔢 Thuật toán mã: <b style="color:var(--gd)">' + EXT_ALGO_VERSION + '</b>';
   }
+  updRegistryDebugLine();
   openM('modal-settings');
+}
+
+// Hiển thị trạng thái đồng bộ ngầm về bảng quản lý khách hàng (chẩn đoán, xem
+// được ngay trong app mà không cần DevTools). Chạm vào dòng chữ để thử đồng
+// bộ lại ngay lập tức.
+function updRegistryDebugLine() {
+  var el = document.getElementById('registry-debug-line');
+  if (!el) return;
+  var msg = localStorage.getItem('registry_sync_debug') || 'Chưa từng chạy — có thể máy chưa cập nhật bản mới nhất, hoặc chưa có mạng.';
+  el.innerHTML = msg + '<br><span style="color:var(--gd);text-decoration:underline;cursor:pointer" onclick="syncClientRegistry();setTimeout(updRegistryDebugLine,1200)">↻ Thử đồng bộ lại ngay</span>';
 }
 // ══════════════════════════════════════════
 // BẢNG KÊ THU MUA VÀ THANH TOÁN MỦ CAO SU
