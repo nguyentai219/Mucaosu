@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.6.4</title>
+<title>Mua Bán Mủ Cao Su v1.6.5</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -504,7 +504,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.6.4 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.6.5 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1762,7 +1762,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.6.4</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.6.5</div>
       </div>
     </div>
 
@@ -1928,7 +1928,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.6.4</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.6.5</div>
       </div>
     </div>
 
@@ -5438,6 +5438,7 @@ function sbSignUp() {
       toast('✅ Đăng ký thành công!');
       updGDBar();
       syncToSupabase();
+      syncClientRegistry();
       openSbModal();
     } else {
       toast('📧 Đăng ký thành công! Kiểm tra email để xác nhận rồi đăng nhập lại.');
@@ -5458,6 +5459,7 @@ function sbSignIn() {
     openSbModal();
     if (typeof verifyLicenseAntiCheat === 'function') verifyLicenseAntiCheat(); // xác minh hạn dùng qua vân tay thiết bị ngay sau khi đăng nhập
     setTimeout(restoreOrPushOnLogin, 1200); // đợi vân tay thiết bị xác minh xong hạn dùng trước khi push/restore, tránh đẩy nhầm hạn dùng sai lên máy chủ
+    setTimeout(syncClientRegistry, 1500); // đẩy hồ sơ khách hàng (không mật khẩu) lên bảng quản lý tập trung
   }).catch(function(e) { toast('❌ Lỗi: ' + e.message); });
 }
 
@@ -5739,6 +5741,7 @@ function syncToSupabase() {
     setPendingCount(0);
     localStorage.setItem('sb_last_sync', String(Date.now()));
     updGDBarStatus('Đã kết nối', 'synced');
+    syncClientRegistry();
     toast('✅ Đã đồng bộ lên Supabase!');
   }).catch(function(e) {
     sbSyncing = false;
@@ -5757,10 +5760,39 @@ function syncToSupabase_silent() {
     setPendingCount(0);
     localStorage.setItem('sb_last_sync', String(Date.now()));
     updGDBarStatus('Đã kết nối', 'synced');
+    syncClientRegistry();
   }).catch(function() {
     sbSyncing = false;
     updGDBarStatus('Lỗi đồng bộ (' + getPendingCount() + ')', 'offline');
   });
+}
+
+// ══════════════════════════════════════════
+// QUẢN LÝ KHÁCH CÀI ĐẶT APP (hỗ trợ tập trung)
+// Đồng bộ ngầm: mã thiết bị, mã gia hạn dùng gần nhất, hạn dùng còn lại —
+// theo TỪNG MÁY (khoá bằng dấu vân tay thiết bị), áp dụng cho MỌI máy kể cả
+// chưa đăng nhập Supabase lẫn Google Drive. Nếu máy có đăng nhập Supabase thì
+// kèm thêm email để dễ tra cứu. KHÔNG bao giờ gửi mật khẩu lên bảng này.
+// Được gọi lại mỗi khi kiểm tra bản quyền (mỗi lần mở app) và mỗi khi đồng bộ
+// dữ liệu thành công, nên luôn tự cập nhật. Bảng `client_registry` chỉ admin
+// (nguyentai219@gmail.com) mới đọc được toàn bộ — thực thi bằng Row Level
+// Security phía Supabase.
+// ══════════════════════════════════════════
+function syncClientRegistry() {
+  if (!sbClient) return;
+  try {
+    var used = getUsedExtCodes();
+    var lastCode = used.length ? used[used.length - 1] : null;
+    var row = {
+      fingerprint: getDeviceFingerprint(),
+      device_code: getDeviceCode(),
+      license_expiry: getLicenseExpiry(),
+      last_ext_code: lastCode,
+      updated_at: new Date().toISOString()
+    };
+    if (sbUser) { row.user_id = sbUser.id; row.email = sbUser.email; }
+    sbClient.from('client_registry').upsert([row], { onConflict: 'fingerprint' }).catch(function(){});
+  } catch(e) {}
 }
 
 function restoreFromSupabase(silent) {
@@ -8669,12 +8701,27 @@ function verifyLicenseAntiCheat() {
   if (!sbClient) { setTimeout(verifyLicenseAntiCheat, 1500); return; }
   var fp = getDeviceFingerprint();
   var localExpiry = parseInt(localStorage.getItem(_LSK) || '0');
-  sbClient.from('device_trials').select('license_expiry').eq('fingerprint', fp).then(function(res) {
-    if (res.error) return; // lỗi mạng/bảng chưa có -> bỏ qua, không chặn người dùng
+  sbClient.from('device_trials').select('license_expiry,admin_override_expiry,admin_override_at').eq('fingerprint', fp).then(function(res) {
+    if (res.error) { syncClientRegistry(); return; } // lỗi mạng/bảng chưa có -> bỏ qua, không chặn người dùng
     var rows = res.data || [];
     if (rows.length) {
-      var remoteExpiry = parseInt(rows[0].license_expiry) || 0;
+      var row = rows[0];
+      var remoteExpiry = parseInt(row.license_expiry) || 0;
       var finalExpiry = Math.max(localExpiry, remoteExpiry);
+
+      // Admin đã xem/thêm/bớt ngày sử dụng trực tiếp từ công cụ quản trị →
+      // áp dụng ĐÚNG giá trị admin đặt (kể cả khi THẤP HƠN hạn hiện có trên máy,
+      // bỏ qua logic "luôn lấy hạn lớn hơn" chỉ riêng trong trường hợp này).
+      // Chỉ áp dụng 1 LẦN cho mỗi lệnh của admin (so sánh mốc thời gian đã áp dụng
+      // gần nhất) để không chặn các lượt gia hạn hợp lệ sau đó của khách.
+      if (row.admin_override_at && (row.admin_override_expiry !== null && row.admin_override_expiry !== undefined)) {
+        var lastApplied = localStorage.getItem('admin_override_applied_at') || '';
+        if (row.admin_override_at !== lastApplied) {
+          finalExpiry = parseInt(row.admin_override_expiry) || 0;
+          localStorage.setItem('admin_override_applied_at', row.admin_override_at);
+        }
+      }
+
       if (finalExpiry !== localExpiry) {
         localStorage.setItem(_LSK, String(finalExpiry));
         localStorage.removeItem('license_is_new');
@@ -8686,6 +8733,7 @@ function verifyLicenseAntiCheat() {
       // Máy hoàn toàn mới trên server -> đăng ký lần đầu
       _pushTrialToServer(fp, localExpiry || getLicenseExpiry());
     }
+    syncClientRegistry();
   }).catch(function(){});
 }
 

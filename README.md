@@ -13,6 +13,8 @@ Số phiên bản cũ (v11.x) tăng quá cao nên đổi sang cơ chế mới: *
 
 ## 📋 Lịch sử phiên bản
 
+| **v1.6.5** | 2026-07 | **🗂️ Quản lý khách cài đặt app (hỗ trợ tập trung)** — mọi máy cài app tự đồng bộ ngầm (không cần đăng nhập bất kỳ tài khoản nào) mã thiết bị, mã gia hạn dùng gần nhất và hạn dùng còn lại về bảng `client_registry` trên Supabase — **không bao giờ đồng bộ mật khẩu**. Công cụ `cong-cu-tinh-ma-MG1-2-1.html` nay có: (1) cổng nhập **mật khẩu quản trị** khi mở tool, (2) mục đăng nhập tài khoản Supabase quản trị (nguyentai219@gmail.com) để xem danh sách toàn bộ khách hàng đã cài app (tìm theo email/mã thiết bị), (3) nút **Thêm/bớt ngày sử dụng trực tiếp** cho từng khách — lệnh điều chỉnh của admin (kể cả giảm ngày) sẽ được máy khách tự áp dụng đúng ở lần mở app kế tiếp, ưu tiên cao hơn logic chống gian lận thông thường. *Cần chạy 1 lần file `SETUP-quan-ly-khach-cai-dat.sql` trong Supabase SQL Editor trước khi dùng được tính năng này.* |
+
 | Phiên bản | Ngày | Thay đổi |
 |-----------|------|----------|
 | **v1.6.4** | 2026-07 | Viết lại màn "📁 Thư mục lưu trữ Supabase" thành **2 tab riêng biệt ngay từ đầu**: **💾 Dữ liệu** (bảng mucaosu_data, thanh dung lượng theo quota Database 500MB) và **🖼️ Ảnh** (bucket Storage giao-dich-anh, thanh dung lượng theo quota Storage 1GB) — mỗi tab hiện thanh dung lượng riêng đúng loại quota của tab đó, bấm chuyển tab không phải mở lại màn từ đầu. *Lưu ý: ảnh tải lên trước v1.6.3 vẫn giữ tên file cũ (không có tên khách/ngày) do đổi tên retroactive không khả thi — chỉ ảnh tải lên từ v1.6.3 trở đi mới có tên dạng `tab_tenkhach_ngay_thang_id.jpg`.* |
