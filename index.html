@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.6.7</title>
+<title>Mua Bán Mủ Cao Su v1.6.8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -504,7 +504,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.6.7 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.6.8 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1767,7 +1767,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.6.7</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.6.8</div>
       </div>
     </div>
 
@@ -1933,7 +1933,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.6.7</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.6.8</div>
       </div>
     </div>
 
@@ -5784,6 +5784,13 @@ function syncToSupabase_silent() {
 // phía Supabase.
 // ══════════════════════════════════════════
 function syncClientRegistry() {
+  // Nếu verifyLicenseAntiCheat() đang xác minh/áp dụng lệnh admin (đổi hạn
+  // dùng từ xa) mà CHƯA XONG, thì lùi lại lệnh đồng bộ này 1 chút rồi thử
+  // lại — để không bao giờ có chuyện đẩy nhầm hạn dùng CŨ (trước khi admin
+  // chỉnh) lên client_registry đè mất giá trị ĐÚNG vừa được áp dụng. Đây là
+  // nguyên nhân gây hiện tượng số ngày "tự nhảy lại về giá trị cũ" khi admin
+  // vừa Thêm/bớt ngày xong mà máy khách mở app đúng lúc đó.
+  if (typeof _antiCheatInFlight !== 'undefined' && _antiCheatInFlight) { setTimeout(syncClientRegistry, 800); return; }
   localStorage.setItem('registry_sync_debug', 'Đang gọi lúc ' + new Date().toLocaleTimeString('vi-VN') + '...');
   if (!sbClient) { localStorage.setItem('registry_sync_debug', 'Chưa khởi tạo sbClient lúc ' + new Date().toLocaleTimeString('vi-VN')); return; }
   try {
@@ -8727,13 +8734,15 @@ function _pushTrialToServer(fp, expiry) {
   ).catch(function(){});
 }
 
+var _antiCheatInFlight = false;
 function verifyLicenseAntiCheat() {
   if (!navigator.onLine) return;
   if (!sbClient) { setTimeout(verifyLicenseAntiCheat, 1500); return; }
+  _antiCheatInFlight = true;
   var fp = getDeviceFingerprint();
   var localExpiry = parseInt(localStorage.getItem(_LSK) || '0');
   sbClient.from('device_trials').select('license_expiry,admin_override_expiry,admin_override_at,pw_reset_at').eq('fingerprint', fp).then(function(res) {
-    if (res.error) { syncClientRegistry(); return; } // lỗi mạng/bảng chưa có -> bỏ qua, không chặn người dùng
+    if (res.error) { _antiCheatInFlight = false; syncClientRegistry(); return; } // lỗi mạng/bảng chưa có -> bỏ qua, không chặn người dùng
     var rows = res.data || [];
     if (rows.length) {
       var row = rows[0];
@@ -8776,8 +8785,9 @@ function verifyLicenseAntiCheat() {
       // Máy hoàn toàn mới trên server -> đăng ký lần đầu
       _pushTrialToServer(fp, localExpiry || getLicenseExpiry());
     }
+    _antiCheatInFlight = false;
     syncClientRegistry();
-  }).catch(function(){});
+  }).catch(function(){ _antiCheatInFlight = false; });
 }
 
 // Máy chưa từng kích hoạt lần nào (mới cài, chưa nhập mã lần nào)

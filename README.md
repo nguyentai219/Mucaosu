@@ -13,6 +13,9 @@ Số phiên bản cũ (v11.x) tăng quá cao nên đổi sang cơ chế mới: *
 
 ## 📋 Lịch sử phiên bản
 
+| **v1.6.8** | 2026-08 | **Sửa lỗi số ngày sử dụng bị "tự nhảy lùi" về giá trị cũ** sau khi admin điều chỉnh hạn dùng từ xa qua công cụ quản trị: khi mở app, có nhiều luồng đồng bộ cùng ghi lên bảng quản lý tập trung (`client_registry`) gần như song song — nếu luồng đồng bộ dữ liệu thông thường (mang giá trị hạn dùng CŨ đang có sẵn trên máy) hoàn tất SAU luồng xác minh lệnh admin (mang giá trị ĐÚNG vừa điều chỉnh), nó sẽ ghi đè lại thành giá trị cũ. Nay thêm cơ chế khoá: trong lúc đang xác minh lệnh admin, mọi lệnh đồng bộ khác phải đợi cho xác minh xong mới được gửi, đảm bảo luôn chỉ có đúng 1 giá trị "thắng cuộc" và luôn là giá trị đúng nhất |
+| **v1.6.7** | 2026-08 | Thêm tính năng **đặt lại "Mật khẩu quản lý giao dịch" từ xa** cho từng khách hàng, thao tác từ công cụ quản trị (không cần biết mật khẩu cũ của khách): máy khách tự phát hiện lệnh này ở lần mở app/có mạng kế tiếp, tự đổi mật khẩu về mặc định và báo cho người dùng biết bằng thông báo nhỏ (toast) |
+
 | **v1.6.5** | 2026-07 | Cải tiến quản lý nội bộ và bảo mật thông tin bản quyền. |
 
 | Phiên bản | Ngày | Thay đổi |
