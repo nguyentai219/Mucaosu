@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.6.8</title>
+<title>Mua Bán Mủ Cao Su v1.6.9</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -504,7 +504,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.6.8 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.6.9 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1767,7 +1767,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.6.8</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.6.9</div>
       </div>
     </div>
 
@@ -1933,7 +1933,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.6.8</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.6.9</div>
       </div>
     </div>
 
@@ -5682,7 +5682,14 @@ function _finishLoginMerge(cloud, opts){
     // Các giá trị đơn (không phải danh sách/đối tượng gộp được): đám mây có sẵn thì ưu tiên giữ
     // nguyên giá trị đám mây (không bị máy ghi đè khi đăng nhập); máy chỉ được dùng nếu đám mây
     // chưa từng có giá trị này.
-    ['license_expiry','admin_pw','thang_v1','setting_round','bang_ke_info', THANG_PW_SB_KEY].forEach(function(k){
+    // LƯU Ý: 'license_expiry' KHÔNG được đưa vào danh sách này (đã cố tình bỏ ra) — hạn dùng có
+    // nguồn xác thực RIÊNG và đáng tin cậy hơn là bảng device_trials (qua verifyLicenseAntiCheat,
+    // có tính đến cả lệnh admin điều chỉnh từ xa). Nếu để đám mây ghi đè ở đây, giá trị license_expiry
+    // CŨ còn sót trong mucaosu_data (từ trước khi admin điều chỉnh, nếu chưa kịp đồng bộ lại) sẽ ghi
+    // đè mất giá trị ĐÚNG vừa được verifyLicenseAntiCheat() sửa đúng ngay trước đó vài trăm mili giây
+    // — đây chính là nguyên nhân gây hiện tượng số ngày sử dụng "tự nhảy lùi về giá trị cũ" MỖI KHI
+    // vừa đăng nhập Supabase.
+    ['admin_pw','thang_v1','setting_round','bang_ke_info', THANG_PW_SB_KEY].forEach(function(k){
       if (cloud[k] !== undefined && cloud[k] !== null) {
         localStorage.setItem(k, typeof cloud[k]==='string' ? cloud[k] : JSON.stringify(cloud[k]));
       }
