@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.6.9</title>
+<title>Mua Bán Mủ Cao Su v1.7.2</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -504,7 +504,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.6.9 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.7.2 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -581,17 +581,22 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
     </div>
     <div class="fr">
-      <label class="fl">📷 Ảnh đính kèm <span style="font-weight:400;color:var(--g400);font-size:11px">(không bắt buộc, tự xoá sau vài ngày)</span></label>
-      <div id="mua-anh-preview-wrap" style="display:none;position:relative;margin-bottom:8px;width:110px">
-        <img id="mua-anh-preview" style="width:100%;border-radius:10px;display:block;border:1px solid var(--g200)">
-        <button type="button" onclick="xoaAnhPending('mua')" style="position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:#dc2626;color:#fff;border:none;font-size:13px;line-height:1;cursor:pointer">✕</button>
+      <label class="fl" onclick="toggleAnhPicker('mua')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+        <span>📷 Ảnh đính kèm <span style="font-weight:400;color:var(--g400);font-size:11px">(không bắt buộc)</span></span>
+        <span id="mua-anh-toggle-ico" style="color:var(--g400);font-size:11.5px;font-weight:600">▼ thêm ảnh</span>
+      </label>
+      <div id="mua-anh-panel" style="display:none">
+        <div id="mua-anh-preview-wrap" style="display:none;position:relative;margin:8px 0;width:110px">
+          <img id="mua-anh-preview" style="width:100%;border-radius:10px;display:block;border:1px solid var(--g200)">
+          <button type="button" onclick="xoaAnhPending('mua')" style="position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:#dc2626;color:#fff;border:none;font-size:13px;line-height:1;cursor:pointer">✕</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button type="button" onclick="chonAnh('mua','camera')" style="flex:1;padding:9px;background:var(--g50);border:1px solid var(--g200);border-radius:8px;font-size:12.5px;font-weight:600;color:var(--g800);cursor:pointer">📷 Chụp ảnh</button>
+          <button type="button" onclick="chonAnh('mua','gallery')" style="flex:1;padding:9px;background:var(--g50);border:1px solid var(--g200);border-radius:8px;font-size:12.5px;font-weight:600;color:var(--g800);cursor:pointer">🖼️ Chọn ảnh có sẵn</button>
+        </div>
+        <input type="file" accept="image/*" capture="environment" id="mua-anh-file-camera" style="display:none" onchange="onAnhFileChange('mua', this)">
+        <input type="file" accept="image/*" id="mua-anh-file-gallery" style="display:none" onchange="onAnhFileChange('mua', this)">
       </div>
-      <div style="display:flex;gap:8px">
-        <button type="button" onclick="chonAnh('mua','camera')" style="flex:1;padding:9px;background:var(--g50);border:1px solid var(--g200);border-radius:8px;font-size:12.5px;font-weight:600;color:var(--g800);cursor:pointer">📷 Chụp ảnh</button>
-        <button type="button" onclick="chonAnh('mua','gallery')" style="flex:1;padding:9px;background:var(--g50);border:1px solid var(--g200);border-radius:8px;font-size:12.5px;font-weight:600;color:var(--g800);cursor:pointer">🖼️ Chọn ảnh có sẵn</button>
-      </div>
-      <input type="file" accept="image/*" capture="environment" id="mua-anh-file-camera" style="display:none" onchange="onAnhFileChange('mua', this)">
-      <input type="file" accept="image/*" id="mua-anh-file-gallery" style="display:none" onchange="onAnhFileChange('mua', this)">
     </div>
     <div class="tt-box" style="position:relative">
       <div class="tt-lbl">Thành tiền</div>
@@ -699,17 +704,22 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
     </div>
     <div class="fr">
-      <label class="fl">📷 Ảnh đính kèm <span style="font-weight:400;color:var(--g400);font-size:11px">(không bắt buộc, tự xoá sau vài ngày)</span></label>
-      <div id="ban-anh-preview-wrap" style="display:none;position:relative;margin-bottom:8px;width:110px">
-        <img id="ban-anh-preview" style="width:100%;border-radius:10px;display:block;border:1px solid var(--g200)">
-        <button type="button" onclick="xoaAnhPending('ban')" style="position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:#dc2626;color:#fff;border:none;font-size:13px;line-height:1;cursor:pointer">✕</button>
+      <label class="fl" onclick="toggleAnhPicker('ban')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+        <span>📷 Ảnh đính kèm <span style="font-weight:400;color:var(--g400);font-size:11px">(không bắt buộc)</span></span>
+        <span id="ban-anh-toggle-ico" style="color:var(--g400);font-size:11.5px;font-weight:600">▼ thêm ảnh</span>
+      </label>
+      <div id="ban-anh-panel" style="display:none">
+        <div id="ban-anh-preview-wrap" style="display:none;position:relative;margin:8px 0;width:110px">
+          <img id="ban-anh-preview" style="width:100%;border-radius:10px;display:block;border:1px solid var(--g200)">
+          <button type="button" onclick="xoaAnhPending('ban')" style="position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:#dc2626;color:#fff;border:none;font-size:13px;line-height:1;cursor:pointer">✕</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button type="button" onclick="chonAnh('ban','camera')" style="flex:1;padding:9px;background:var(--g50);border:1px solid var(--g200);border-radius:8px;font-size:12.5px;font-weight:600;color:var(--g800);cursor:pointer">📷 Chụp ảnh</button>
+          <button type="button" onclick="chonAnh('ban','gallery')" style="flex:1;padding:9px;background:var(--g50);border:1px solid var(--g200);border-radius:8px;font-size:12.5px;font-weight:600;color:var(--g800);cursor:pointer">🖼️ Chọn ảnh có sẵn</button>
+        </div>
+        <input type="file" accept="image/*" capture="environment" id="ban-anh-file-camera" style="display:none" onchange="onAnhFileChange('ban', this)">
+        <input type="file" accept="image/*" id="ban-anh-file-gallery" style="display:none" onchange="onAnhFileChange('ban', this)">
       </div>
-      <div style="display:flex;gap:8px">
-        <button type="button" onclick="chonAnh('ban','camera')" style="flex:1;padding:9px;background:var(--g50);border:1px solid var(--g200);border-radius:8px;font-size:12.5px;font-weight:600;color:var(--g800);cursor:pointer">📷 Chụp ảnh</button>
-        <button type="button" onclick="chonAnh('ban','gallery')" style="flex:1;padding:9px;background:var(--g50);border:1px solid var(--g200);border-radius:8px;font-size:12.5px;font-weight:600;color:var(--g800);cursor:pointer">🖼️ Chọn ảnh có sẵn</button>
-      </div>
-      <input type="file" accept="image/*" capture="environment" id="ban-anh-file-camera" style="display:none" onchange="onAnhFileChange('ban', this)">
-      <input type="file" accept="image/*" id="ban-anh-file-gallery" style="display:none" onchange="onAnhFileChange('ban', this)">
     </div>
     <div class="tt-box ban-tt">
       <div class="tt-lbl">Thành tiền</div>
@@ -1767,7 +1777,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.6.9</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.7.2</div>
       </div>
     </div>
 
@@ -1933,7 +1943,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.6.9</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.7.2</div>
       </div>
     </div>
 
@@ -3528,6 +3538,7 @@ function editGD(tab,id){
   if(gd.anh){
     document.getElementById(tab+'-anh-preview').src=gd.anh;
     document.getElementById(tab+'-anh-preview-wrap').style.display='block';
+    toggleAnhPicker(tab, true); // mở sẵn khối ảnh để người dùng thấy ngay ảnh đã đính kèm
   }
   document.getElementById(tab+'-btns').style.display='none';
   document.getElementById(tab+'-edit-btns').style.display='flex';
@@ -3623,6 +3634,17 @@ function xoaAnhPending(tab){
   document.getElementById(tab+'-anh-preview-wrap').style.display = 'none';
   document.getElementById(tab+'-anh-preview').src = '';
 }
+// Thu/mở khối "Ảnh đính kèm" — mặc định thu gọn để tiết kiệm không gian, chỉ hiện 2 nút Chụp ảnh/Chọn
+// ảnh khi người dùng thực sự chạm vào tiêu đề (có nhu cầu đính kèm ảnh).
+function toggleAnhPicker(tab, forceOpen){
+  var panel = document.getElementById(tab+'-anh-panel');
+  var ico = document.getElementById(tab+'-anh-toggle-ico');
+  if (!panel) return;
+  var isOpen = panel.style.display !== 'none' && panel.style.display !== '';
+  var opening = (forceOpen === true) ? true : !isOpen;
+  panel.style.display = opening ? 'block' : 'none';
+  if (ico) ico.textContent = opening ? '▲ ẩn' : '▼ thêm ảnh';
+}
 function resetAnhPicker(tab){
   _pendingAnh[tab] = null;
   _pendingAnhRemoved[tab] = false;
@@ -3630,6 +3652,10 @@ function resetAnhPicker(tab){
   if (wrap) wrap.style.display = 'none';
   var img = document.getElementById(tab+'-anh-preview');
   if (img) img.src = '';
+  var panel = document.getElementById(tab+'-anh-panel');
+  if (panel) panel.style.display = 'none';
+  var ico = document.getElementById(tab+'-anh-toggle-ico');
+  if (ico) ico.textContent = '▼ thêm ảnh';
 }
 // Nén ảnh: co về tối đa 1024px chiều dài cạnh lớn nhất + nén JPEG chất lượng 72% — giảm dung lượng
 // đáng kể trước khi tải lên (đỡ tốn gói Storage miễn phí 1GB, tải nhanh hơn khi mạng yếu ở vườn/rẫy)
@@ -5440,6 +5466,9 @@ function sbSignUp() {
     if (res.error) { toast('❌ ' + res.error.message); return; }
     if (res.data && res.data.session) {
       sbUser = res.data.user;
+      setSyncProvider('supabase'); // QUAN TRỌNG: thiếu dòng này thì autoSync() sau mỗi giao dịch sẽ
+      // âm thầm không làm gì (vì getSyncProvider() vẫn rỗng trên máy mới), dữ liệu KHÔNG tự đồng bộ
+      // cho tới khi người dùng tự tay bấm "Đồng bộ ngay" — đây chính là lỗi đã gặp trên máy khách mới.
       toast('✅ Đăng ký thành công!');
       updGDBar();
       syncToSupabase();
@@ -5459,6 +5488,8 @@ function sbSignIn() {
   sbClient.auth.signInWithPassword({ email: email, password: pass }).then(function(res) {
     if (res.error) { toast('❌ ' + res.error.message); return; }
     sbUser = res.data.user;
+    setSyncProvider('supabase'); // QUAN TRỌNG: xem giải thích chi tiết ở sbSignUp() phía trên —
+    // thiếu dòng này thì mọi giao dịch thêm mới sau khi đăng nhập trên máy mới sẽ KHÔNG tự đồng bộ.
     toast('✅ Đăng nhập thành công!');
     updGDBar();
     openSbModal();
@@ -8743,7 +8774,11 @@ function _pushTrialToServer(fp, expiry) {
 
 var _antiCheatInFlight = false;
 function verifyLicenseAntiCheat() {
-  if (!navigator.onLine) return;
+  // KHÔNG kiểm tra navigator.onLine ở đây nữa — cờ này không đáng tin cậy trên nhiều
+  // trình duyệt/WebView Android (có thể báo sai "offline" ngay lúc app vừa mở, dù mạng vẫn
+  // tốt), khiến hàm này ÂM THẦM không chạy gì cả và "Trạng thái đồng bộ máy này" mãi mãi kẹt ở
+  // "Chưa từng chạy" dù có mạng đầy đủ. Cứ để hàm thử gọi thật — nếu thật sự mất mạng thì nhánh
+  // catch() bên dưới sẽ tự báo lỗi + tự thử lại, không còn im lặng không rõ nguyên nhân nữa.
   if (!sbClient) { setTimeout(verifyLicenseAntiCheat, 1500); return; }
   _antiCheatInFlight = true;
   var fp = getDeviceFingerprint();
@@ -8794,7 +8829,13 @@ function verifyLicenseAntiCheat() {
     }
     _antiCheatInFlight = false;
     syncClientRegistry();
-  }).catch(function(){ _antiCheatInFlight = false; });
+  }).catch(function(e) {
+    _antiCheatInFlight = false;
+    // Báo rõ lý do thay vì im lặng, và tự thử lại sau — tránh kẹt mãi ở "Chưa từng chạy"
+    localStorage.setItem('registry_sync_debug', '❌ Lỗi kết nối lúc ' + new Date().toLocaleTimeString('vi-VN') + ' (' + (e && e.message ? e.message : 'không rõ') + ') — sẽ tự thử lại');
+    if (typeof updRegistryDebugLine === 'function') updRegistryDebugLine();
+    setTimeout(verifyLicenseAntiCheat, 20000);
+  });
 }
 
 // Máy chưa từng kích hoạt lần nào (mới cài, chưa nhập mã lần nào)
