@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.7.2</title>
+<title>Mua Bán Mủ Cao Su v1.7.3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -504,7 +504,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.7.2 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.7.3 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1777,7 +1777,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.7.2</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.7.3</div>
       </div>
     </div>
 
@@ -1943,7 +1943,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.7.2</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.7.3</div>
       </div>
     </div>
 
@@ -2671,6 +2671,7 @@ function xoaKhachId(){
     renderKhachIdList();
     var conGiaoDichThat = getGD('mua').concat(getGD('ban')).some(function(g){return normTen(g.ten)===normTen(ten);});
     toastDeleted('🗑️ Đã xoá khỏi danh sách!' + (conGiaoDichThat ? ' (lịch sử giao dịch thật vẫn được giữ nguyên, chỉ ẩn khỏi danh sách quản lý)' : ''));
+    autoSync();
   });
 }
 // Khi load: gộp kh3_mua + kh3_ban vào kh3_all nếu chưa có
@@ -3582,6 +3583,7 @@ function xoaGD(tab){
     const all=getGD(tab).filter(g=>String(g.id)!==String(editId[tab]));
     setGD(tab,all); huySua(tab); renderTbl(tab); updTK(tab); updTK('ban'); if(typeof updThangData==='function') updThangData(); toastDeleted('🗑️ Đã xoá giao dịch!');
     if(_gdOld && _gdOld.anhPath && sbClient && sbUser) sbClient.storage.from(SB_ANH_BUCKET).remove([_gdOld.anhPath]).catch(function(){});
+    autoSync();
   });
 }
 
@@ -4414,6 +4416,7 @@ function sgCalc(){
   document.getElementById('sge-chu').textContent=docTien(t);
 }
 function luuSgEdit(){
+  if(guardLicense()) return;
   const sg=getSG();
   const idx=sg.findIndex(x=>String(x.id)===String(sgEditId));
   if(idx<0) return;
@@ -4431,14 +4434,17 @@ function luuSgEdit(){
   openSoGuiDetail(sgCurKH);
   toast('✅ Đã lưu!');
   playSaveSound();
+  autoSync();
 }
 function xoaSgEdit(){
+  if(guardLicense()) return;
   showDetail('🗑️','Xoá ghi chép sổ gửi?',[['Bạn có chắc muốn xoá?','']],null,'Xoá',()=>{
     const sg=getSG().filter(x=>String(x.id)!==String(sgEditId));
     setSG(sg);
     closeM('modal-sg-edit');
     openSoGuiDetail(sgCurKH);
     toastDeleted('🗑️ Đã xoá ghi chép!');
+    autoSync();
   });
 }
 
@@ -7560,6 +7566,7 @@ function xoaGhiChepSS() {
     localStorage.setItem('ss_data', JSON.stringify(ssData));
     renderSsHistoryBtn();
     toastDeleted('🗑️ Đã xoá ghi chép!');
+    autoSync();
   });
 }
 
@@ -7631,11 +7638,9 @@ function xemChiTietSS() {
   document.getElementById('ss-popup').classList.add('show');
 }
 
-function chupAnhSS() {
-  var box = document.querySelector('#ss-popup .ss-popup-box');
-  if (box) box.scrollTop = 0;
-  toast('📷 Chụp màn hình ngay!');
-}
+// (Đã gỡ bản chupAnhSS() cũ từng nằm ở đây — chỉ là bản tạm chưa hoàn thiện (chỉ nhắc chụp màn hình
+// thủ công), bị bản thật dùng html2canvas ở phía sau file đè lên nên chưa từng thực sự chạy. Giữ lại
+// đúng 1 bản thật để tránh nhầm lẫn khi bảo trì sau này.)
 
 function closeSSPopup() {
   document.getElementById('ss-popup').classList.remove('show');
@@ -9461,6 +9466,7 @@ function toggleChotAccordion(){
 }
 
 function xoaChotKH(ten){
+  if(guardLicense()) return;
   showDetail('🗑️','Xoá toàn bộ ghi chép của '+ten+'?',
     [['Lưu ý','Xoá tất cả ghi chép đã chốt của khách hàng này'],['Không thể','Khôi phục lại sau khi xoá']],
     null,'🗑️ Xoá tất cả',function(){
@@ -9468,6 +9474,7 @@ function xoaChotKH(ten){
       setSU(getSU().filter(function(r){return r.ten!==ten;}));
       renderSgTabContent();
       toastDeleted('🗑️ Đã xoá toàn bộ ghi chép của '+ten+'!');
+      autoSync();
     });
 }
 
@@ -9990,34 +9997,10 @@ function doChot(){
 
 
 
-// ── CẬP NHẬT PLACEHOLDER GỢI Ý CHO FORM BÁN ──
-function updBanHints() {
-  var loai = getLoai('ban');
-  var giaEl = document.getElementById('ban-gia');
-  var kgEl  = document.getElementById('ban-kg');
-  var doEl  = document.getElementById('ban-do');
-  var NO_DATA = 'Chưa có số liệu';
-  if (!loai) return;
-  var muaList = getGDDate('mua', curDate['ban']).filter(function(g){ return g.loai===loai; });
-  if (!muaList.length) {
-    // Không có dữ liệu thu mua cho loại mủ này → hiện chữ gợi ý mờ
-    if(giaEl && !giaEl.value) giaEl.placeholder = NO_DATA;
-    if(kgEl  && !kgEl.value)  kgEl.placeholder  = NO_DATA;
-    if(doEl  && !doEl.value)  doEl.placeholder   = NO_DATA;
-    return;
-  }
-  var totalKg=0, totalTien=0, dos=[], giaLast=0;
-  muaList.forEach(function(g){
-    totalKg += kgThuc(g.loai,g.kg,g.do,g.bi||0);
-    totalTien += parseFloat(g.tt)||0;
-    if(loai==='nuoc'&&g.do) dos.push(parseFloat(g.do)||0);
-    giaLast = parseFloat(g.gia)||giaLast;
-  });
-  var doTBval = dos.length ? dos.reduce(function(a,b){return a+b;})/dos.length : 0;
-  if(giaEl && !giaEl.value) giaEl.placeholder = giaLast>0 ? fmtNum(giaLast) : NO_DATA;
-  if(kgEl  && !kgEl.value)  kgEl.placeholder  = totalKg>0 ? fmtKg(totalKg)  : NO_DATA;
-  if(doEl  && !doEl.value)  doEl.placeholder   = doTBval>0 ? fmtDo(doTBval)  : NO_DATA;
-}
+// (Đã gỡ bản updBanHints() trùng lặp từng nằm ở đây — bản đó là bản CŨ, thiếu tính năng "gợi ý giá
+// từ lịch sử giá đã lưu" (giaHistory3_ban_...) mà bản định nghĩa phía trên (gần đầu file) đã có.
+// Do JavaScript lấy định nghĩa hàm cuối cùng, bản cũ nằm ở đây từng ÂM THẦM ĐÈ MẤT bản tốt hơn phía
+// trên, khiến tính năng gợi ý giá theo lịch sử không bao giờ thực sự chạy được — nay đã sửa.)
 
 // ══════════════════════════════════════════
 // HỆ THỐNG GIỚI HẠN THỜI GIAN SỬ DỤNG
@@ -10509,6 +10492,7 @@ function xoaCc(){
       closeM('modal-cc-detail');
       renderCcList();
       toastDeleted('🗑️ Đã xoá chấm công!');
+      autoSync();
     });
 }
 
@@ -10690,6 +10674,7 @@ function openSgGuiMoiClean(){
   openSgGuiMoi();
 }
 function xoaSgEntry(){
+  if(guardLicense()) return;
   if(!sgTabEditId||!sgTabEditType) return;
   var type=sgTabEditType, id=sgTabEditId;
   showDetail('🗑️','Xoá ghi chép?',
@@ -10726,6 +10711,7 @@ function xoaSgEntry(){
       closeSgModal();
       renderSgTabContent();
       toastDeleted('🗑️ Đã xoá ghi chép!');
+      autoSync();
     });
 }
 
