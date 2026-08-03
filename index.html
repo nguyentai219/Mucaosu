@@ -1114,12 +1114,27 @@ input[type=date]:focus{border-color:var(--gl)}
       <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 4px;border-bottom:1px solid var(--g100)">
         <div>
           <div style="font-size:14px;font-weight:700;color:var(--g800)">🫧 Bong bóng bảo vệ màn hình</div>
-          <div style="font-size:11px;color:var(--g400);margin-top:2px">Hiện hiệu ứng bong bóng nảy khi không chạm vào app 15 giây (mặc định tắt)</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:2px">Hiện hiệu ứng bong bóng nảy khi không chạm vào app (mặc định bật)</div>
         </div>
         <label class="toggle-sw">
           <input type="checkbox" id="setting-bubbleSaver" onchange="saveSetting('bubbleSaver',this.checked);resetIdleTimer()">
           <span class="toggle-slider"></span>
         </label>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 4px;border-bottom:1px solid var(--g100)">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--g800)">⏱️ Thời gian chờ trước khi bật</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:2px">Không chạm vào app bao lâu thì hiện bong bóng bảo vệ màn hình</div>
+        </div>
+        <select id="setting-bubbleIdleSec" onchange="saveSetting('bubbleIdleSec',parseInt(this.value));resetIdleTimer()" style="border:1px solid var(--g200);border-radius:8px;padding:6px 8px;font-size:13px;color:var(--g800);background:#fff">
+          <option value="5">5 giây</option>
+          <option value="10">10 giây</option>
+          <option value="15">15 giây</option>
+          <option value="30">30 giây</option>
+          <option value="60">1 phút</option>
+          <option value="120">2 phút</option>
+          <option value="300">5 phút</option>
+        </select>
       </div>
       <!-- MÀN HÌNH LUÔN BẬT -->
       <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 4px;border-bottom:1px solid var(--g100)">
@@ -7782,8 +7797,9 @@ document.addEventListener('visibilitychange', function(){
 });
 
 // ── BONG BÓNG BẢO VỆ MÀN HÌNH (giống screensaver Bubbles của Windows) ─────────────────────────
-// Mặc định TẮT (getSetting('bubbleSaver', false)) — chỉ bật khi người dùng tự bật trong ⚙️ Cài đặt.
-// Kích hoạt sau 15 giây không có bất kỳ thao tác chạm/gõ/cuộn nào trên toàn app; chạm bất kỳ đâu vào
+// Mặc định BẬT (getSetting('bubbleSaver', true)) — người dùng có thể tắt trong ⚙️ Cài đặt.
+// Thời gian chờ trước khi kích hoạt (mặc định 15 giây) có thể tuỳ chỉnh qua setting 'bubbleIdleSec'.
+// Kích hoạt sau N giây không có bất kỳ thao tác chạm/gõ/cuộn nào trên toàn app; chạm bất kỳ đâu vào
 // màn hình lúc đang hiện bong bóng sẽ tắt ngay và bắt đầu đếm lại từ đầu.
 var _idleTimer = null;
 var _bubbleActive = false;
@@ -7792,12 +7808,14 @@ var _bubbleEffects = []; // hiệu ứng vòng sáng lan toả tại điểm va 
 var _bubbleAnimId = null;
 var _bubbleCanvas = null, _bubbleCtx = null;
 var _bubbleColors = ['96,165,250', '52,211,153', '251,191,36', '244,114,182', '167,139,250', '45,212,191'];
+var _bubbleLogoJoinTimer = null;
 
 function resetIdleTimer(){
   clearTimeout(_idleTimer);
   if (_bubbleActive) stopBubbleSaver();
-  if (getSetting('bubbleSaver', false)) {
-    _idleTimer = setTimeout(startBubbleSaver, 15000);
+  if (getSetting('bubbleSaver', true)) {
+    var idleMs = getSetting('bubbleIdleSec', 15) * 1000;
+    _idleTimer = setTimeout(startBubbleSaver, idleMs);
   }
 }
 // Coi mọi tương tác của người dùng (chạm, gõ phím, cuộn, click) là "đang dùng app" → reset lại đếm giờ
@@ -7843,6 +7861,41 @@ function startBubbleSaver(){
     });
   }
   _bubbleAnimId = requestAnimationFrame(_bubbleTick);
+  _bubbleLaunchLogo();
+}
+// Cho logo app "bay" từ vị trí đang xoay trên header ra giữa màn hình, sau đó gia nhập danh sách
+// bong bóng để cùng va chạm/nảy như 1 quả bóng bình thường — chỉ khác là không đổi màu khi va chạm.
+function _bubbleLaunchLogo(){
+  var logoIco = document.querySelector('.logo-ico');
+  var wrap = document.getElementById('bubble-logo-wrap');
+  if (!logoIco || !wrap) return;
+  var startRect = logoIco.getBoundingClientRect();
+  var targetD = 56; // đường kính khi bay ra (to hơn 1 chút cho dễ thấy, nằm trong dải cỡ bong bóng)
+  var cx = _bubbleCanvas.width / 2, cy = _bubbleCanvas.height / 2;
+  wrap.style.transition = 'none';
+  wrap.style.left = startRect.left + 'px';
+  wrap.style.top = startRect.top + 'px';
+  wrap.style.width = startRect.width + 'px';
+  wrap.style.height = startRect.height + 'px';
+  wrap.style.display = 'block';
+  // Ép trình duyệt áp dụng vị trí ban đầu trước khi bắt đầu transition, tránh bị gộp animation
+  void wrap.offsetWidth;
+  wrap.style.transition = 'left .6s cubic-bezier(.34,1.4,.64,1), top .6s cubic-bezier(.34,1.4,.64,1), width .6s ease, height .6s ease';
+  wrap.style.left = (cx - targetD/2) + 'px';
+  wrap.style.top = (cy - targetD/2) + 'px';
+  wrap.style.width = targetD + 'px';
+  wrap.style.height = targetD + 'px';
+  clearTimeout(_bubbleLogoJoinTimer);
+  _bubbleLogoJoinTimer = setTimeout(function(){
+    if (!_bubbleActive) return;
+    wrap.style.transition = 'none';
+    _bubbleList.push({
+      x: cx, y: cy, r: targetD/2,
+      dx: (Math.random()-0.5) * (1.1 + Math.random()*2.0),
+      dy: (Math.random()-0.5) * (1.1 + Math.random()*2.0),
+      isLogo: true
+    });
+  }, 620);
 }
 // Giới hạn tốc độ tối đa để va chạm không làm bong bóng bắn nhanh vô hạn qua mỗi lần nẩy
 function _bubbleCapSpeed(b){
@@ -7878,8 +7931,8 @@ function _bubbleCollide(){
         b2.dx *= -1.03; b2.dy *= -1.03;
         _bubbleCapSpeed(b1); _bubbleCapSpeed(b2);
         // Đổi màu cả 2 quả bóng vừa va chạm sang màu ngẫu nhiên mới (khác màu cũ)
-        b1.color = _bubblePickNewColor(b1.color);
-        b2.color = _bubblePickNewColor(b2.color);
+        if (!b1.isLogo) b1.color = _bubblePickNewColor(b1.color);
+        if (!b2.isLogo) b2.color = _bubblePickNewColor(b2.color);
         // Tạo hiệu ứng vòng sáng lan toả ngay tại điểm va chạm (điểm giữa 2 tâm)
         _bubbleEffects.push({
           x: (b1.x + b2.x) / 2,
@@ -7904,7 +7957,17 @@ function _bubbleTick(){
     if (b.y + b.r > h) { b.y = h - b.r; b.dy *= -1; }
   });
   _bubbleCollide();
+  var logoWrap = null;
   _bubbleList.forEach(function(b){
+    if (b.isLogo) {
+      // Bóng logo: cập nhật vị trí phần tử DOM thay vì vẽ lên canvas, để giữ animation xoay 3D
+      if (!logoWrap) logoWrap = document.getElementById('bubble-logo-wrap');
+      if (logoWrap) {
+        logoWrap.style.left = (b.x - b.r) + 'px';
+        logoWrap.style.top = (b.y - b.r) + 'px';
+      }
+      return;
+    }
     // Vẽ bong bóng trong suốt kiểu thuỷ tinh: gradient tròn + viền sáng + điểm phản chiếu nhỏ
     var grad = _bubbleCtx.createRadialGradient(b.x - b.r*0.3, b.y - b.r*0.3, b.r*0.1, b.x, b.y, b.r);
     grad.addColorStop(0, 'rgba(255,255,255,' + (b.alpha + 0.25) + ')');
@@ -7940,8 +8003,11 @@ function _bubbleTick(){
 function stopBubbleSaver(){
   _bubbleActive = false;
   if (_bubbleAnimId) { cancelAnimationFrame(_bubbleAnimId); _bubbleAnimId = null; }
+  clearTimeout(_bubbleLogoJoinTimer);
   var overlay = document.getElementById('bubble-saver');
   if (overlay) overlay.style.display = 'none';
+  var logoWrap = document.getElementById('bubble-logo-wrap');
+  if (logoWrap) { logoWrap.style.display = 'none'; logoWrap.style.transition = 'none'; }
   _bubbleList = [];
   _bubbleEffects = [];
 }
@@ -7951,7 +8017,8 @@ function openSettings() {
   document.getElementById('setting-docTien').checked = getSetting('docTien', true);
   document.getElementById('setting-amBao').checked = getSetting('amBao', true);
   document.getElementById('setting-wakelock').checked = getSetting('wakelock', true);
-  document.getElementById('setting-bubbleSaver').checked = getSetting('bubbleSaver', false);
+  document.getElementById('setting-bubbleSaver').checked = getSetting('bubbleSaver', true);
+  document.getElementById('setting-bubbleIdleSec').value = getSetting('bubbleIdleSec', 15);
   document.getElementById('setting-anh-ngay').value = getAnhLuuNgay();
   var info = document.getElementById('settings-license-info');
   if (info) {
@@ -11035,10 +11102,15 @@ if ('serviceWorker' in navigator) {
     <button onclick="taiPdfBangKe()" id="bk-tai-pdf-btn" style="flex:1.3;padding:12px 2px;background:var(--gd);color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap">⬇️ Tải PDF</button>
   </div>
 </div>
-<!-- BONG BÓNG BẢO VỆ MÀN HÌNH — kích hoạt sau 15 giây không chạm vào app (nếu bật trong Cài đặt),
-     chạm bất kỳ đâu vào màn hình sẽ tắt ngay. Mặc định TẮT khi mới cài app. -->
+<!-- BONG BÓNG BẢO VỆ MÀN HÌNH — kích hoạt sau N giây không chạm vào app (nếu bật trong Cài đặt,
+     thời gian chờ tuỳ chỉnh được, mặc định BẬT + 15 giây), chạm bất kỳ đâu vào màn hình sẽ tắt ngay. -->
 <div id="bubble-saver" style="display:none;position:fixed;inset:0;z-index:9999;background:transparent">
   <canvas id="bubble-canvas" style="display:block;width:100%;height:100%"></canvas>
+  <!-- Logo app "bay" ra giữa màn hình khi bong bóng vừa xuất hiện, sau đó tham gia va chạm/nảy như
+       1 quả bóng bình thường (chỉ khác là không đổi màu khi va chạm), vẫn giữ animation xoay 3D -->
+  <div id="bubble-logo-wrap" style="display:none;position:fixed;z-index:10000;pointer-events:none;perspective:200px;border-radius:50%;overflow:hidden">
+    <img id="bubble-logo-img" src="logo.png" style="width:100%;height:100%;object-fit:cover;animation:coinSpin 3.2s linear infinite;backface-visibility:visible" alt="">
+  </div>
   <div style="position:absolute;bottom:36px;left:0;right:0;text-align:center;color:rgba(255,255,255,.55);font-size:12.5px;font-family:'Be Vietnam Pro',sans-serif;pointer-events:none">Chạm màn hình để tiếp tục</div>
 </div>
 </body>
