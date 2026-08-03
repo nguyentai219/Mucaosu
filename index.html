@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.7.3</title>
+<title>Mua Bán Mủ Cao Su v1.8.5</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -504,7 +504,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.7.3 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.8.5 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1107,6 +1107,17 @@ input[type=date]:focus{border-color:var(--gl)}
         </div>
         <label class="toggle-sw">
           <input type="checkbox" id="setting-amBao" onchange="saveSetting('amBao',this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <!-- BONG BÓNG BẢO VỆ MÀN HÌNH -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 4px;border-bottom:1px solid var(--g100)">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--g800)">🫧 Bong bóng bảo vệ màn hình</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:2px">Hiện hiệu ứng bong bóng nảy khi không chạm vào app 15 giây (mặc định tắt)</div>
+        </div>
+        <label class="toggle-sw">
+          <input type="checkbox" id="setting-bubbleSaver" onchange="saveSetting('bubbleSaver',this.checked);resetIdleTimer()">
           <span class="toggle-slider"></span>
         </label>
       </div>
@@ -1777,7 +1788,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.7.3</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.8.5</div>
       </div>
     </div>
 
@@ -1943,7 +1954,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.7.3</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.8.5</div>
       </div>
     </div>
 
@@ -2866,6 +2877,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   checkLicenseOnLoad();
   setTimeout(cleanupExpiredAnh, 6000); // đợi đăng nhập Supabase xong rồi mới quét ảnh hết hạn
   setInterval(cleanupExpiredAnh, 30*60*1000); // quét lại mỗi 30 phút trong lúc app vẫn đang mở
+  resetIdleTimer(); // bắt đầu đếm giờ rảnh cho hiệu ứng bong bóng bảo vệ màn hình (nếu đã bật)
 
   ['mua','ban'].forEach(t=>{
     updDate(t);
@@ -7768,11 +7780,178 @@ async function applyWakeLock(enabled){
 document.addEventListener('visibilitychange', function(){
   if (document.visibilityState === 'visible' && getSetting('wakelock', true)) applyWakeLock(true);
 });
+
+// ── BONG BÓNG BẢO VỆ MÀN HÌNH (giống screensaver Bubbles của Windows) ─────────────────────────
+// Mặc định TẮT (getSetting('bubbleSaver', false)) — chỉ bật khi người dùng tự bật trong ⚙️ Cài đặt.
+// Kích hoạt sau 15 giây không có bất kỳ thao tác chạm/gõ/cuộn nào trên toàn app; chạm bất kỳ đâu vào
+// màn hình lúc đang hiện bong bóng sẽ tắt ngay và bắt đầu đếm lại từ đầu.
+var _idleTimer = null;
+var _bubbleActive = false;
+var _bubbleList = [];
+var _bubbleEffects = []; // hiệu ứng vòng sáng lan toả tại điểm va chạm giữa 2 quả bóng
+var _bubbleAnimId = null;
+var _bubbleCanvas = null, _bubbleCtx = null;
+var _bubbleColors = ['96,165,250', '52,211,153', '251,191,36', '244,114,182', '167,139,250', '45,212,191'];
+
+function resetIdleTimer(){
+  clearTimeout(_idleTimer);
+  if (_bubbleActive) stopBubbleSaver();
+  if (getSetting('bubbleSaver', false)) {
+    _idleTimer = setTimeout(startBubbleSaver, 15000);
+  }
+}
+// Coi mọi tương tác của người dùng (chạm, gõ phím, cuộn, click) là "đang dùng app" → reset lại đếm giờ
+['mousedown','touchstart','keydown','scroll'].forEach(function(evt){
+  document.addEventListener(evt, resetIdleTimer, { passive: true });
+});
+// Tạm dừng hẳn khi app bị ẩn đi (chuyển app khác/khoá máy) — tránh tốn pin/CPU vẽ hiệu ứng trong nền,
+// và không tự bật bong bóng ngay khi vừa mở lại app.
+document.addEventListener('visibilitychange', function(){
+  if (document.visibilityState === 'visible') resetIdleTimer();
+  else { clearTimeout(_idleTimer); if (_bubbleActive) stopBubbleSaver(); }
+});
+
+function _bubbleResizeCanvas(){
+  if (!_bubbleCanvas) return;
+  _bubbleCanvas.width = window.innerWidth;
+  _bubbleCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', _bubbleResizeCanvas);
+
+function startBubbleSaver(){
+  if (_bubbleActive) return;
+  _bubbleActive = true;
+  var overlay = document.getElementById('bubble-saver');
+  _bubbleCanvas = document.getElementById('bubble-canvas');
+  _bubbleCtx = _bubbleCanvas.getContext('2d');
+  overlay.style.display = 'block';
+  _bubbleResizeCanvas();
+  // Tạo khoảng 9-13 bong bóng trong suốt, kích thước/tốc độ/màu ngẫu nhiên, giống hiệu ứng Bubbles
+  var n = 9 + Math.floor(Math.random()*5);
+  _bubbleList = [];
+  _bubbleEffects = [];
+  for (var i=0; i<n; i++) {
+    var r = 14 + Math.random()*28;
+    _bubbleList.push({
+      x: Math.random()*_bubbleCanvas.width,
+      y: Math.random()*_bubbleCanvas.height,
+      r: r,
+      dx: (Math.random()-0.5) * (1.1 + Math.random()*2.0),
+      dy: (Math.random()-0.5) * (1.1 + Math.random()*2.0),
+      color: _bubbleColors[Math.floor(Math.random()*_bubbleColors.length)],
+      alpha: 0.18 + Math.random()*0.22
+    });
+  }
+  _bubbleAnimId = requestAnimationFrame(_bubbleTick);
+}
+// Giới hạn tốc độ tối đa để va chạm không làm bong bóng bắn nhanh vô hạn qua mỗi lần nẩy
+function _bubbleCapSpeed(b){
+  var maxV = 3.0;
+  var sp = Math.sqrt(b.dx*b.dx + b.dy*b.dy);
+  if (sp > maxV) { b.dx = b.dx / sp * maxV; b.dy = b.dy / sp * maxV; }
+}
+// Chọn ngẫu nhiên 1 màu mới khác với màu hiện tại, dùng khi 2 quả bóng va chạm nhau
+function _bubblePickNewColor(current){
+  var pick = current;
+  var tries = 0;
+  while (pick === current && tries < 8) {
+    pick = _bubbleColors[Math.floor(Math.random()*_bubbleColors.length)];
+    tries++;
+  }
+  return pick;
+}
+// Kiểm tra va chạm giữa từng cặp bong bóng: nếu chạm nhau thì tách ra (chống dính lồng vào nhau),
+// đảo ngược hướng di chuyển của cả 2 quả, và tăng tốc độ nhẹ mỗi lần va để nhìn linh hoạt hơn.
+function _bubbleCollide(){
+  for (var i = 0; i < _bubbleList.length; i++) {
+    for (var j = i + 1; j < _bubbleList.length; j++) {
+      var b1 = _bubbleList[i], b2 = _bubbleList[j];
+      var ddx = b2.x - b1.x, ddy = b2.y - b1.y;
+      var dist = Math.sqrt(ddx*ddx + ddy*ddy);
+      var minDist = b1.r + b2.r;
+      if (dist > 0 && dist < minDist) {
+        var nx = ddx / dist, ny = ddy / dist;
+        var overlap = (minDist - dist) / 2;
+        b1.x -= nx * overlap; b1.y -= ny * overlap;
+        b2.x += nx * overlap; b2.y += ny * overlap;
+        b1.dx *= -1.03; b1.dy *= -1.03;
+        b2.dx *= -1.03; b2.dy *= -1.03;
+        _bubbleCapSpeed(b1); _bubbleCapSpeed(b2);
+        // Đổi màu cả 2 quả bóng vừa va chạm sang màu ngẫu nhiên mới (khác màu cũ)
+        b1.color = _bubblePickNewColor(b1.color);
+        b2.color = _bubblePickNewColor(b2.color);
+        // Tạo hiệu ứng vòng sáng lan toả ngay tại điểm va chạm (điểm giữa 2 tâm)
+        _bubbleEffects.push({
+          x: (b1.x + b2.x) / 2,
+          y: (b1.y + b2.y) / 2,
+          r: 4,
+          maxR: (b1.r + b2.r) * 0.55,
+          alpha: 0.6
+        });
+      }
+    }
+  }
+}
+function _bubbleTick(){
+  if (!_bubbleActive || !_bubbleCtx) return;
+  var w = _bubbleCanvas.width, h = _bubbleCanvas.height;
+  _bubbleCtx.clearRect(0, 0, w, h);
+  _bubbleList.forEach(function(b){
+    b.x += b.dx; b.y += b.dy;
+    if (b.x - b.r < 0) { b.x = b.r; b.dx *= -1; }
+    if (b.x + b.r > w) { b.x = w - b.r; b.dx *= -1; }
+    if (b.y - b.r < 0) { b.y = b.r; b.dy *= -1; }
+    if (b.y + b.r > h) { b.y = h - b.r; b.dy *= -1; }
+  });
+  _bubbleCollide();
+  _bubbleList.forEach(function(b){
+    // Vẽ bong bóng trong suốt kiểu thuỷ tinh: gradient tròn + viền sáng + điểm phản chiếu nhỏ
+    var grad = _bubbleCtx.createRadialGradient(b.x - b.r*0.3, b.y - b.r*0.3, b.r*0.1, b.x, b.y, b.r);
+    grad.addColorStop(0, 'rgba(255,255,255,' + (b.alpha + 0.25) + ')');
+    grad.addColorStop(0.5, 'rgba(' + b.color + ',' + b.alpha + ')');
+    grad.addColorStop(1, 'rgba(' + b.color + ',' + (b.alpha*0.5) + ')');
+    _bubbleCtx.beginPath();
+    _bubbleCtx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+    _bubbleCtx.fillStyle = grad;
+    _bubbleCtx.fill();
+    _bubbleCtx.lineWidth = 1.2;
+    _bubbleCtx.strokeStyle = 'rgba(255,255,255,' + (b.alpha + 0.15) + ')';
+    _bubbleCtx.stroke();
+    // Điểm phản chiếu ánh sáng nhỏ cho giống bong bóng xà phòng thật
+    _bubbleCtx.beginPath();
+    _bubbleCtx.arc(b.x - b.r*0.35, b.y - b.r*0.35, b.r*0.18, 0, Math.PI*2);
+    _bubbleCtx.fillStyle = 'rgba(255,255,255,' + (b.alpha + 0.35) + ')';
+    _bubbleCtx.fill();
+  });
+  // Vẽ + cập nhật hiệu ứng vòng sáng lan toả tại các điểm va chạm, tự xoá khi tan hết
+  for (var k = _bubbleEffects.length - 1; k >= 0; k--) {
+    var fx = _bubbleEffects[k];
+    fx.r += (fx.maxR - fx.r) * 0.25 + 0.6;
+    fx.alpha -= 0.055;
+    if (fx.alpha <= 0 || fx.r >= fx.maxR) { _bubbleEffects.splice(k, 1); continue; }
+    _bubbleCtx.beginPath();
+    _bubbleCtx.arc(fx.x, fx.y, fx.r, 0, Math.PI*2);
+    _bubbleCtx.lineWidth = 2;
+    _bubbleCtx.strokeStyle = 'rgba(255,255,255,' + fx.alpha + ')';
+    _bubbleCtx.stroke();
+  }
+  _bubbleAnimId = requestAnimationFrame(_bubbleTick);
+}
+function stopBubbleSaver(){
+  _bubbleActive = false;
+  if (_bubbleAnimId) { cancelAnimationFrame(_bubbleAnimId); _bubbleAnimId = null; }
+  var overlay = document.getElementById('bubble-saver');
+  if (overlay) overlay.style.display = 'none';
+  _bubbleList = [];
+  _bubbleEffects = [];
+}
+
 function openSettings() {
   document.getElementById('setting-round').checked = getSetting('round', true);
   document.getElementById('setting-docTien').checked = getSetting('docTien', true);
   document.getElementById('setting-amBao').checked = getSetting('amBao', true);
   document.getElementById('setting-wakelock').checked = getSetting('wakelock', true);
+  document.getElementById('setting-bubbleSaver').checked = getSetting('bubbleSaver', false);
   document.getElementById('setting-anh-ngay').value = getAnhLuuNgay();
   var info = document.getElementById('settings-license-info');
   if (info) {
@@ -10855,6 +11034,12 @@ if ('serviceWorker' in navigator) {
     <button onclick="inBangKe()" style="flex:0.75;padding:12px 2px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:11.5px;font-weight:700;cursor:pointer">🖨️ In</button>
     <button onclick="taiPdfBangKe()" id="bk-tai-pdf-btn" style="flex:1.3;padding:12px 2px;background:var(--gd);color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap">⬇️ Tải PDF</button>
   </div>
+</div>
+<!-- BONG BÓNG BẢO VỆ MÀN HÌNH — kích hoạt sau 15 giây không chạm vào app (nếu bật trong Cài đặt),
+     chạm bất kỳ đâu vào màn hình sẽ tắt ngay. Mặc định TẮT khi mới cài app. -->
+<div id="bubble-saver" style="display:none;position:fixed;inset:0;z-index:9999;background:transparent">
+  <canvas id="bubble-canvas" style="display:block;width:100%;height:100%"></canvas>
+  <div style="position:absolute;bottom:36px;left:0;right:0;text-align:center;color:rgba(255,255,255,.55);font-size:12.5px;font-family:'Be Vietnam Pro',sans-serif;pointer-events:none">Chạm màn hình để tiếp tục</div>
 </div>
 </body>
 </html>

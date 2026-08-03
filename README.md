@@ -2,19 +2,22 @@
 
 Phần mềm ghi chép **mua bán mủ cao su** — PWA cài được lên điện thoại như app thật, hoạt động offline.
 
-## 🔢 Quy tắc đánh số phiên bản (áp dụng từ v1.a1)
+## 🔢 Quy tắc đánh số phiên bản (hệ hiện hành: `1.X.Y`, áp dụng từ v1.1.0)
 
-Số phiên bản cũ (v11.x) tăng quá cao nên đổi sang cơ chế mới: **`1.<chữ><số>`**
+Số phiên bản theo dạng **`1.X.Y`**:
 
-- Số hàng đơn vị chạy từ **1 → 9**, hết thì chữ cái tăng lên và số quay lại 1.
-- Ví dụ thứ tự: `1.a1` → `1.a2` → ... → `1.a9` → `1.b1` → `1.b2` → ... → `1.b9` → `1.c1` → ... → `1.d1` → `1.e1` ...
-- Mỗi lần cập nhật chỉ tăng 1 bước theo đúng thứ tự trên, tại đúng 3 vị trí như quy tắc cũ (title/logo-ver trong index.html, description trong manifest.json, CACHE trong sw.js).
-- Các ghi chú phiên bản cũ (v7.x–v11.x) còn sót lại trong code là mốc lịch sử, không đổi lại theo hệ mới.
+- Số hàng cuối cùng bên phải (**Y**) tăng đúng **1 đơn vị** mỗi lần cập nhật, chạy từ **0 → 9**.
+- Hết 9 thì **X** (số hàng chục/ở giữa) tăng lên 1, **Y** quay lại **0**.
+- Ví dụ thứ tự: `1.8.0` → `1.8.1` → ... → `1.8.9` → `1.9.0` → `1.9.1` → ...
+- Mỗi lần cập nhật chỉ tăng đúng 1 bước theo đúng thứ tự trên, áp dụng ở **4 vị trí**: `<title>` + `logo-ver` + dòng hiển thị trong màn "Hướng dẫn sử dụng" (trong `index.html`), `description` trong `manifest.json`, và `CACHE` trong `sw.js` — sau khi đổi, luôn `grep` số cũ để chắc chắn không sót vị trí nào.
+- Các ghi chú phiên bản cũ hơn (hệ `v7.x`–`v11.14`, rồi hệ chữ-số `1.<chữ><số>` như `1.a1`...`1.b5`) còn sót lại trong code/bảng lịch sử bên dưới chỉ là mốc lịch sử, không quy đổi ngược.
 
 ## 📋 Lịch sử phiên bản
 
 | Phiên bản | Ngày | Thay đổi |
 |-----------|------|----------|
+| **v1.8.1 → v1.8.5** | 2026-08-03 | 🫧 **Chuỗi điều chỉnh hiệu ứng "Bong bóng bảo vệ màn hình"** (chỉ tinh chỉnh, không phải tính năng mới): nền phía sau đổi từ màu đặc sang **trong suốt hoàn toàn** để thấy rõ app đang chạy phía sau; thêm **va chạm giữa các quả bóng** (tự tách ra + nẩy ngược hướng thay vì xuyên qua nhau); giảm số lượng bóng còn **một nửa** và bỏ cỡ lớn nhất (nay 14-42px) cho có không gian di chuyển, phù hợp màn hình điện thoại; giảm bớt tốc độ tăng mỗi lần va chạm và giới hạn tốc độ tối đa cho nẩy nhẹ nhàng hơn; tăng nhẹ tốc độ di chuyển ban đầu; mỗi lần va chạm nay **đổi màu ngẫu nhiên** cả 2 quả + hiện **hiệu ứng vòng sáng lan toả** tại điểm va chạm |
+| **v1.8.0** | 2026-08 | **🫧 Tính năng mới: Bong bóng bảo vệ màn hình** — giống hiệu ứng "Bubbles" screensaver kinh điển của Windows: hàng chục bong bóng trong suốt, nhiều màu, tự nảy quanh màn hình. Tự kích hoạt sau **15 giây không chạm/gõ/cuộn** vào app, chạm bất kỳ đâu để tắt ngay. Bật/tắt tại ⚙️ Cài đặt → "🫧 Bong bóng bảo vệ màn hình" — **mặc định TẮT** khi mới cài. Tự dừng hẳn khi chuyển sang app khác/khoá máy (đỡ tốn pin), không chạy trong nền |
 | **v1.7.3** | 2026-08 | 🔍 **Quét lỗi toàn diện, tìm và sửa 12 lỗi:** (1) **Hàm `updBanHints()` bị định nghĩa trùng 2 lần** — bản cũ (thiếu tính năng "gợi ý giá từ lịch sử giá đã lưu") nằm SAU trong file nên âm thầm đè mất bản mới hơn, khiến gợi ý giá theo lịch sử ở tab Bán Ra chưa từng thực sự hoạt động — đã gỡ bản cũ. (2) Hàm `chupAnhSS()` cũng bị định nghĩa trùng 2 lần (1 bản tạm chưa hoàn thiện + 1 bản thật dùng html2canvas) — đã gỡ bản tạm cho gọn code. (3-10) **8 hàm xoá/sửa dữ liệu thiếu `autoSync()`** (chỉ đồng bộ lên Supabase qua vòng đồng bộ ngầm 15 giây thay vì ngay lập tức): `xoaGD`, `xoaKhachId`, `luuSgEdit`, `xoaSgEdit`, `xoaGhiChepSS`, `xoaChotKH`, `xoaCc`, `xoaSgEntry` — nay đều đồng bộ ngay sau khi thao tác thành công. (11-12) **Khoá nhất quán khi hết hạn dùng**: `luuSgEdit`, `xoaSgEdit`, `xoaSgEntry`, `xoaChotKH` (Sổ Gửi/Ứng tiền) trước đây KHÔNG bị khoá dù đã hết hạn — trong khi Thu Mua/Bán Ra thì có khoá — nay đã thêm khoá nhất quán, hết hạn thì các thao tác này cũng bị chặn như Thu Mua/Bán Ra. Đã rà soát thêm: không còn ID trùng lặp trong HTML, không còn hàm được gọi mà thiếu định nghĩa, các modal đều khớp id |
 | **v1.7.2** | 2026-08 | 🐛 **Sửa lỗi thật sự khiến "🔧 Trạng thái đồng bộ máy này" mãi kẹt ở "Chưa từng chạy"** dù máy có mạng đầy đủ (khác với nguyên nhân RLS đã đoán ở bản trước — đã xác minh lại bằng ảnh chụp thực tế). Nguyên nhân đúng: hàm `verifyLicenseAntiCheat()` có điều kiện kiểm tra `navigator.onLine` ở đầu hàm để tránh gọi mạng khi biết chắc đang offline — nhưng cờ `navigator.onLine` **không đáng tin cậy** trên nhiều trình duyệt/WebView Android, có thể báo sai "offline" ngay lúc app vừa mở dù mạng vẫn tốt, khiến cả hàm **âm thầm không chạy gì cả**, không lỗi không thành công, kẹt mãi ở trạng thái ban đầu. Đã bỏ hẳn điều kiện kiểm tra này (cứ để hàm thử gọi thật), đồng thời khi mất mạng thật sự thì nay sẽ **báo lỗi rõ ràng + tự động thử lại sau 20 giây** thay vì im lặng bỏ qua như trước |
 | **v1.7.1** | 2026-08 | 🐛 **Sửa lỗi quan trọng: máy mới đăng nhập Supabase không tự đồng bộ giao dịch mới.** Nguyên nhân: `sbSignIn()`/`sbSignUp()` (hàm xử lý khi bấm Đăng nhập/Đăng ký) thiếu bước ghi nhận "phương án đồng bộ đang dùng là Supabase" (`sync_provider`) trên chính máy đó — khiến `autoSync()` sau mỗi lần lưu giao dịch kiểm tra thấy phương án đồng bộ trống nên **âm thầm không làm gì cả** (không lỗi, không thông báo), giao dịch chỉ nằm im trên máy cho tới khi người dùng tự tay bấm "Đồng bộ ngay". Đã bổ sung bước ghi nhận này ngay khi đăng nhập/đăng ký thành công — từ nay máy mới đăng nhập xong là tự đồng bộ ngay sau mỗi giao dịch như bình thường, không cần thao tác thủ công |
