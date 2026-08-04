@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.9.1</title>
+<title>Mua Bán Mủ Cao Su v1.9.2</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -505,7 +505,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.9.1 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.9.2 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1093,7 +1093,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 4px;border-bottom:1px solid var(--g100)">
         <div>
           <div style="font-size:14px;font-weight:700;color:var(--g800)">🔊 Tự động đọc số tiền</div>
-          <div style="font-size:11px;color:var(--g400);margin-top:2px">Tab Thu Mua: đọc to số tiền ngay sau khi lưu giao dịch</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:2px">Đọc to số tiền ngay sau khi lưu giao dịch (cả tab Mua và tab Bán)</div>
         </div>
         <label class="toggle-sw">
           <input type="checkbox" id="setting-docTien" onchange="saveSetting('docTien',this.checked)">
@@ -1799,7 +1799,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.9.1</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.9.2</div>
       </div>
     </div>
 
@@ -1965,7 +1965,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.9.1</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.9.2</div>
       </div>
     </div>
 
@@ -2161,6 +2161,10 @@ input[type=date]:focus{border-color:var(--gl)}
 </div>
 
 <script>
+// Mốc thời gian ngay khi script bắt đầu chạy (≈ lúc trang mở) — dùng để đồng bộ pha animation xoay
+// đồng xu (coinSpin) giữa logo trên header và bản sao bay ra khi bong bóng bảo vệ màn hình hoạt động,
+// tránh bị "nhảy" góc xoay đột ngột (nhìn như khựng lại) mỗi khi hoán đổi qua lại giữa 2 phần tử.
+var _coinSpinRefTime = performance.now();
 // ============================================================
 // MỦ CAO SU PRO v1.3
 // Công thức:
@@ -3487,8 +3491,8 @@ function luuGD(tab){
 
   // Xây rows chi tiết
   const rows=buildRows(loai,ten,kg,gia,doV,bi);
-  // Đọc to số tiền NGAY khi bấm nút "Lưu giao dịch" (không chờ xác nhận trong popup) — chỉ áp dụng tab Thu Mua
-  if(tab==='mua') docTienTuDongSauLuu(tt);
+  // Đọc to số tiền NGAY khi bấm nút "Lưu giao dịch" (không chờ xác nhận trong popup) — áp dụng cả 2 tab Mua và Bán
+  docTienTuDongSauLuu(tt);
   showDetail('✅','Xác nhận lưu giao dịch',rows,tt,'Lưu',()=>{
     const gd={id:Date.now()+Math.random(), date:curDate[tab], ten, loai, kg, do:doV, bi, gia, tt, guiSo:false, edited:false};
     const all=getGD(tab); all.push(gd); setGD(tab,all);
@@ -7717,16 +7721,20 @@ function playSaveSound(){
 function speakVN(chu, so) {
   if (!chu || chu === '--') return;
   if (!('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
+  var synth = window.speechSynthesis;
+  synth.cancel();
   var msg = new SpeechSynthesisUtterance(chu);
   msg.lang = 'vi-VN';
   msg.rate = 0.9;
   msg.pitch = 1;
   // Tìm giọng tiếng Việt
-  var voices = window.speechSynthesis.getVoices();
+  var voices = synth.getVoices();
   var viVoice = voices.find(function(v){ return v.lang && v.lang.toLowerCase().startsWith('vi'); });
   if (viVoice) msg.voice = viVoice;
-  window.speechSynthesis.speak(msg);
+  synth.speak(msg);
+  // Khắc phục lỗi trễ hay gặp trên Chrome/Android: đôi khi gọi speak() xong không đọc ngay mà "treo"
+  // một khoảng ngắn rồi mới bắt đầu — ép engine chạy ngay bằng cách pause() rồi resume() liền sau đó
+  try { synth.pause(); synth.resume(); } catch(e) {}
   if (so) toast('🔊 ' + so);
 }
 function docThanhTien() {
@@ -7739,7 +7747,7 @@ function docThanhTien() {
   if (!('speechSynthesis' in window)) { toast('⚠️ Trình duyệt không hỗ trợ đọc!'); return; }
   speakVN(chu, so);
 }
-// Tự động đọc to số tiền ngay sau khi lưu giao dịch ở tab Thu Mua (không cần bấm nút loa)
+// Tự động đọc to số tiền ngay sau khi lưu giao dịch, áp dụng cả tab Mua và tab Bán (không cần bấm nút loa)
 // Có thể bật/tắt ở Cài đặt ⚙️ → "🔊 Tự động đọc số tiền" (mặc định BẬT khi cài mới / xoá lịch sử duyệt web)
 // Lưu ý: tt truyền vào đã được làm tròn theo cài đặt "Làm tròn số tiền" ngay tại thời điểm lưu giao dịch (xem luuGD)
 function docTienTuDongSauLuu(tt) {
@@ -7748,8 +7756,11 @@ function docTienTuDongSauLuu(tt) {
   var n = Math.round(tt || 0);
   speakVN(docTien(n), n.toLocaleString('vi-VN') + ' ₫');
 }
-// Load voices khi sẵn sàng
+// Tải sẵn danh sách giọng đọc NGAY khi trang vừa mở (thay vì chờ tới lần đọc đầu tiên mới tải) — giảm
+// hẳn độ trễ ở lần đọc số tiền đầu tiên sau khi mở app, vì trên nhiều trình duyệt danh sách giọng đọc
+// được tải bất đồng bộ và getVoices() lần đầu có thể trả về mảng rỗng, gây cảm giác đọc bị chậm/trễ.
 if ('speechSynthesis' in window) {
+  window.speechSynthesis.getVoices();
   window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
 }
 
@@ -7847,6 +7858,8 @@ function _bubbleDismiss(){
   var headerImg = document.getElementById('header-logo-img');
   if (logoBubble && wrap && logoIco) {
     var rect = logoIco.getBoundingClientRect();
+    wrap.style.transition = 'none';
+    void wrap.offsetWidth; // ép trình duyệt áp dụng trạng thái hiện tại trước khi bật transition mới
     wrap.style.transition = 'left .5s cubic-bezier(.34,1.4,.64,1), top .5s cubic-bezier(.34,1.4,.64,1), width .5s ease, height .5s ease';
     wrap.style.left = rect.left + 'px';
     wrap.style.top = rect.top + 'px';
@@ -7938,6 +7951,7 @@ function _bubbleLaunchLogo(){
   var logoIco = document.querySelector('.logo-ico');
   var headerImg = document.getElementById('header-logo-img');
   var wrap = document.getElementById('bubble-logo-wrap');
+  var logoImg = document.getElementById('bubble-logo-img');
   if (!logoIco || !wrap) return;
   var startRect = logoIco.getBoundingClientRect();
   var targetD = 56; // đường kính khi bay ra (to hơn 1 chút cho dễ thấy, nằm trong dải cỡ bong bóng)
@@ -7948,6 +7962,13 @@ function _bubbleLaunchLogo(){
   wrap.style.width = startRect.width + 'px';
   wrap.style.height = startRect.height + 'px';
   wrap.style.display = 'block';
+  // Đồng bộ pha xoay của bản sao trùng khớp với logo header (cùng chu kỳ 3.2s, lệch pha bằng đúng thời
+  // gian đã trôi qua kể từ mốc tham chiếu) — để khi header "biến mất"/hiện lại, góc xoay luôn liền mạch,
+  // không bị nhảy đột ngột tạo cảm giác khựng lại.
+  if (logoImg) {
+    var phase = (performance.now() - _coinSpinRefTime) % 3200;
+    logoImg.style.animationDelay = '-' + phase + 'ms';
+  }
   // Ép trình duyệt áp dụng vị trí ban đầu trước khi bắt đầu transition, tránh bị gộp animation
   void wrap.offsetWidth;
   // Icon xoay đồng xu ở vị trí cũ trên header "biến mất" ngay khi bản sao đã bắt đầu bay ra ngoài
