@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.9.5</title>
+<title>Mua Bán Mủ Cao Su v1.9.6</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -505,7 +505,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.9.5 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.9.6 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1809,7 +1809,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.9.5</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.9.6</div>
       </div>
     </div>
 
@@ -1975,7 +1975,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.9.5</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.9.6</div>
       </div>
     </div>
 
@@ -3435,7 +3435,11 @@ function calc(tab){
   }
   document.getElementById(tab+'-tt-so').textContent=fmtNum(tDisplay)+' ₫';
   document.getElementById(tab+'-tt-chu').textContent=tDisplay>0?docTien(tDisplay):'--';
-  _capNhatCompactForm(tab, tDisplay>0);
+  // Áp dụng cho cả tab Mua và Bán: chỉ cần vừa bắt đầu gõ số kg là hiện ngay nút Lưu/Huỷ + ô thành
+  // tiền (dù gõ dở chưa tính ra được thành tiền), để người dùng luôn có đường thoát bấm "Huỷ" xoá
+  // trắng form đang nhập dở
+  var daNhapKg = kg.trim()!=='';
+  _capNhatCompactForm(tab, tDisplay>0 || daNhapKg);
 }
 // Ẩn/hiện gộp: ô "Thành tiền" + hàng nút Lưu/Huỷ ở tab Mua, Bán — chỉ áp dụng khi setting 'compactForm'
 // đang BẬT (mặc định TẮT). Khi TẮT, luôn hiển thị đầy đủ như trước giờ (không đụng tới display).
