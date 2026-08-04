@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.8.9</title>
+<title>Mua Bán Mủ Cao Su v1.9.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -501,11 +501,11 @@ input[type=date]:focus{border-color:var(--gl)}
   <div class="hdr-top">
     <div class="logo">
       <div class="logo-ico" style="background:none;padding:0;width:40px;height:40px;border-radius:50%;overflow:hidden">
-        <img src="logo.png" style="width:40px;height:40px;object-fit:cover;border-radius:50%" alt="Logo">
+        <img id="header-logo-img" src="logo.png" style="width:40px;height:40px;object-fit:cover;border-radius:50%" alt="Logo">
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.8.9 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.9.1 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1799,7 +1799,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.8.9</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.9.1</div>
       </div>
     </div>
 
@@ -1965,7 +1965,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.8.9</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.9.1</div>
       </div>
     </div>
 
@@ -7801,6 +7801,7 @@ var _idleTimer = null;
 var _bubbleActive = false;
 var _bubbleList = [];
 var _bubbleEffects = []; // hiệu ứng vòng sáng lan toả tại điểm va chạm giữa 2 quả bóng
+var _bubbleFragments = []; // các mảnh vỡ nhỏ bắn ra khi bong bóng "nổ tung" lúc tắt overlay
 var _bubbleAnimId = null;
 var _bubbleCanvas = null, _bubbleCtx = null;
 var _bubbleColors = ['96,165,250', '52,211,153', '251,191,36', '244,114,182', '167,139,250', '45,212,191'];
@@ -7812,6 +7813,56 @@ function resetIdleTimer(){
   if (getSetting('bubbleSaver', true)) {
     _idleTimer = setTimeout(startBubbleSaver, 20000);
   }
+}
+var _bubbleDismissing = false;
+// Chạm để tắt bong bóng bảo vệ màn hình: không ẩn ngay lập tức mà chơi hiệu ứng "vỡ ra" cho từng quả
+// bong bóng thường, đồng thời logo (nếu đang là 1 quả bóng) bay ngược trở lại đúng vị trí xoay đồng
+// xu ban đầu trên header, rồi mới thật sự ẩn overlay + bắt đầu đếm giờ lại từ đầu.
+function _bubbleDismiss(){
+  if (!_bubbleActive || _bubbleDismissing) return;
+  _bubbleDismissing = true;
+  clearTimeout(_idleTimer);
+  var logoBubble = null;
+  _bubbleList.forEach(function(b){
+    if (b.isLogo) { logoBubble = b; return; }
+    // Mỗi quả bóng thường "vỡ ra": vòng tròn màu lan toả chậm rãi + các mảnh vỡ nhỏ bắn tung ra ngoài
+    _bubbleEffects.push({ x: b.x, y: b.y, r: b.r*0.5, maxR: b.r*3.2, alpha: 0.95, color: b.color, type: 'burst' });
+    var fragCount = 6 + Math.floor(Math.random()*3);
+    for (var fk = 0; fk < fragCount; fk++) {
+      var ang = (Math.PI*2 / fragCount) * fk + (Math.random()-0.5) * 0.6;
+      var spd = 1.3 + Math.random()*2.2;
+      _bubbleFragments.push({
+        x: b.x, y: b.y,
+        vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
+        size: 2 + Math.random()*2.5,
+        alpha: 0.95,
+        color: b.color
+      });
+    }
+  });
+  _bubblePlayPop();
+  _bubbleList = []; // đứng yên toàn bộ vật lý, chỉ còn hiệu ứng vỡ + logo bay về hiển thị
+  var wrap = document.getElementById('bubble-logo-wrap');
+  var logoIco = document.querySelector('.logo-ico');
+  var headerImg = document.getElementById('header-logo-img');
+  if (logoBubble && wrap && logoIco) {
+    var rect = logoIco.getBoundingClientRect();
+    wrap.style.transition = 'left .5s cubic-bezier(.34,1.4,.64,1), top .5s cubic-bezier(.34,1.4,.64,1), width .5s ease, height .5s ease';
+    wrap.style.left = rect.left + 'px';
+    wrap.style.top = rect.top + 'px';
+    wrap.style.width = rect.width + 'px';
+    wrap.style.height = rect.height + 'px';
+  }
+  setTimeout(function(){
+    // Logo đã bay về đúng chỗ cũ: hiện lại icon xoay đồng xu trên header, ẩn bản sao đang bay
+    if (headerImg) headerImg.style.visibility = 'visible';
+    if (wrap) { wrap.style.display = 'none'; wrap.style.transition = 'none'; }
+    _bubbleDismissing = false;
+    stopBubbleSaver();
+    if (getSetting('bubbleSaver', true)) {
+      _idleTimer = setTimeout(startBubbleSaver, 20000);
+    }
+  }, 950);
 }
 // QUAN TRỌNG: chạm để tắt bong bóng bảo vệ màn hình phải được chặn NGAY Ở PHA "CAPTURE" trên toàn bộ
 // document (không gắn trực tiếp lên phần tử overlay), vì phần tử #bubble-saver nằm ở cuối <body> —
@@ -7826,7 +7877,7 @@ function resetIdleTimer(){
     if (!_bubbleActive) return; // không đang hiện bong bóng thì để sự kiện chạy bình thường
     e.preventDefault();
     e.stopPropagation();
-    resetIdleTimer();
+    _bubbleDismiss();
   }, { passive: false, capture: true });
 });
 // Coi mọi tương tác của người dùng (chạm, gõ phím, cuộn, click) là "đang dùng app" → reset lại đếm giờ
@@ -7864,6 +7915,7 @@ function startBubbleSaver(){
   n = Math.max(6, n);
   _bubbleList = [];
   _bubbleEffects = [];
+  _bubbleFragments = [];
   for (var i=0; i<n; i++) {
     var r = 14 + Math.random()*28;
     _bubbleList.push({
@@ -7884,6 +7936,7 @@ function startBubbleSaver(){
 // bong bóng để cùng va chạm/nảy như 1 quả bóng bình thường — chỉ khác là không đổi màu khi va chạm.
 function _bubbleLaunchLogo(){
   var logoIco = document.querySelector('.logo-ico');
+  var headerImg = document.getElementById('header-logo-img');
   var wrap = document.getElementById('bubble-logo-wrap');
   if (!logoIco || !wrap) return;
   var startRect = logoIco.getBoundingClientRect();
@@ -7897,6 +7950,8 @@ function _bubbleLaunchLogo(){
   wrap.style.display = 'block';
   // Ép trình duyệt áp dụng vị trí ban đầu trước khi bắt đầu transition, tránh bị gộp animation
   void wrap.offsetWidth;
+  // Icon xoay đồng xu ở vị trí cũ trên header "biến mất" ngay khi bản sao đã bắt đầu bay ra ngoài
+  if (headerImg) headerImg.style.visibility = 'hidden';
   wrap.style.transition = 'left .6s cubic-bezier(.34,1.4,.64,1), top .6s cubic-bezier(.34,1.4,.64,1), width .6s ease, height .6s ease';
   wrap.style.left = (cx - targetD/2) + 'px';
   wrap.style.top = (cy - targetD/2) + 'px';
@@ -7983,7 +8038,8 @@ function _bubbleCollide(){
           y: (b1.y + b2.y) / 2,
           r: 4,
           maxR: (b1.r + b2.r) * 0.55,
-          alpha: 0.6
+          alpha: 0.6,
+          type: 'ring'
         });
       }
     }
@@ -8067,30 +8123,66 @@ function _bubbleTick(){
       _bubbleCtx.fill();
     }
   });
-  // Vẽ + cập nhật hiệu ứng vòng sáng lan toả tại các điểm va chạm, tự xoá khi tan hết
+  // Vẽ + cập nhật các hiệu ứng (vòng sáng va chạm 'ring', hoặc bong bóng vỡ ra 'burst'), tự xoá khi tan hết
   for (var k = _bubbleEffects.length - 1; k >= 0; k--) {
     var fx = _bubbleEffects[k];
-    fx.r += (fx.maxR - fx.r) * 0.25 + 0.6;
-    fx.alpha -= 0.055;
+    var isBurst = fx.type === 'burst';
+    // Hiệu ứng vỡ (burst) cố tình lan CHẬM và tan CHẬM hơn nhiều so với vòng va chạm (ring) để mắt
+    // kịp nhìn rõ cảm giác "nổ tung", thay vì chớp nhoáng khó nhận ra như trước
+    fx.r += isBurst ? ((fx.maxR - fx.r) * 0.09 + 0.55) : ((fx.maxR - fx.r) * 0.25 + 0.6);
+    fx.alpha -= isBurst ? 0.02 : 0.055;
     if (fx.alpha <= 0 || fx.r >= fx.maxR) { _bubbleEffects.splice(k, 1); continue; }
+    if (isBurst) {
+      // Bong bóng "vỡ ra": vòng màu đầy lan toả chậm rãi + viền nét rõ ràng phía ngoài
+      var burstGrad = _bubbleCtx.createRadialGradient(fx.x, fx.y, 0, fx.x, fx.y, fx.r);
+      burstGrad.addColorStop(0, 'rgba(255,255,255,' + (fx.alpha*0.85) + ')');
+      burstGrad.addColorStop(0.55, 'rgba(' + fx.color + ',' + (fx.alpha*0.55) + ')');
+      burstGrad.addColorStop(1, 'rgba(' + fx.color + ',0)');
+      _bubbleCtx.beginPath();
+      _bubbleCtx.arc(fx.x, fx.y, fx.r, 0, Math.PI*2);
+      _bubbleCtx.fillStyle = burstGrad;
+      _bubbleCtx.fill();
+      _bubbleCtx.beginPath();
+      _bubbleCtx.arc(fx.x, fx.y, fx.r, 0, Math.PI*2);
+      _bubbleCtx.lineWidth = 1.8;
+      _bubbleCtx.strokeStyle = 'rgba(' + fx.color + ',' + (fx.alpha*0.8) + ')';
+      _bubbleCtx.stroke();
+    } else {
+      _bubbleCtx.beginPath();
+      _bubbleCtx.arc(fx.x, fx.y, fx.r, 0, Math.PI*2);
+      _bubbleCtx.lineWidth = 2;
+      _bubbleCtx.strokeStyle = 'rgba(255,255,255,' + fx.alpha + ')';
+      _bubbleCtx.stroke();
+    }
+  }
+  // Vẽ + cập nhật các mảnh vỡ nhỏ bắn tung ra ngoài khi bong bóng "nổ" (chậm dần rồi mờ dần)
+  for (var fi = _bubbleFragments.length - 1; fi >= 0; fi--) {
+    var fr = _bubbleFragments[fi];
+    fr.x += fr.vx; fr.y += fr.vy;
+    fr.vx *= 0.965; fr.vy *= 0.965;
+    fr.alpha -= 0.016;
+    if (fr.alpha <= 0) { _bubbleFragments.splice(fi, 1); continue; }
     _bubbleCtx.beginPath();
-    _bubbleCtx.arc(fx.x, fx.y, fx.r, 0, Math.PI*2);
-    _bubbleCtx.lineWidth = 2;
-    _bubbleCtx.strokeStyle = 'rgba(255,255,255,' + fx.alpha + ')';
-    _bubbleCtx.stroke();
+    _bubbleCtx.arc(fr.x, fr.y, fr.size, 0, Math.PI*2);
+    _bubbleCtx.fillStyle = 'rgba(' + fr.color + ',' + fr.alpha + ')';
+    _bubbleCtx.fill();
   }
   _bubbleAnimId = requestAnimationFrame(_bubbleTick);
 }
 function stopBubbleSaver(){
   _bubbleActive = false;
+  _bubbleDismissing = false;
   if (_bubbleAnimId) { cancelAnimationFrame(_bubbleAnimId); _bubbleAnimId = null; }
   clearTimeout(_bubbleLogoJoinTimer);
   var overlay = document.getElementById('bubble-saver');
   if (overlay) overlay.style.display = 'none';
   var logoWrap = document.getElementById('bubble-logo-wrap');
   if (logoWrap) { logoWrap.style.display = 'none'; logoWrap.style.transition = 'none'; }
+  var headerImg = document.getElementById('header-logo-img');
+  if (headerImg) headerImg.style.visibility = 'visible';
   _bubbleList = [];
   _bubbleEffects = [];
+  _bubbleFragments = [];
 }
 
 function openSettings() {
