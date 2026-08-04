@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.9.3</title>
+<title>Mua Bán Mủ Cao Su v1.9.5</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -505,7 +505,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.9.3 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.9.5 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1156,9 +1156,9 @@ input[type=date]:focus{border-color:var(--gl)}
       <!-- SỐ NGÀY LƯU ẢNH ĐÍNH KÈM -->
       <div style="padding:14px 4px;border-bottom:1px solid var(--g100)">
         <div style="font-size:14px;font-weight:700;color:var(--g800)">📷 Ảnh đính kèm giao dịch</div>
-        <div style="font-size:11px;color:var(--g400);margin:2px 0 10px">Số ngày lưu ảnh trên Supabase trước khi tự xoá (giải phóng dung lượng). Đổi số ngày ở đây chỉ áp dụng cho ảnh tải lên SAU này, không ảnh hưởng ảnh đã có từ trước</div>
+        <div style="font-size:11px;color:var(--g400);margin:2px 0 10px">Số ngày lưu ảnh trên Supabase trước khi tự xoá (giải phóng dung lượng), mặc định 7 ngày, tối đa 30 ngày. Đổi số ngày ở đây chỉ áp dụng cho ảnh tải lên SAU này, không ảnh hưởng ảnh đã có từ trước</div>
         <div style="display:flex;gap:8px;align-items:center">
-          <input type="text" inputmode="numeric" id="setting-anh-ngay" class="fi" placeholder="30" style="flex:1" maxlength="3">
+          <input type="text" inputmode="numeric" id="setting-anh-ngay" class="fi" placeholder="7" style="flex:1" maxlength="2">
           <button onclick="onSaveAnhLuuNgay()" style="padding:10px 16px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">💾 Lưu</button>
         </div>
       </div>
@@ -1809,7 +1809,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.9.3</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.9.5</div>
       </div>
     </div>
 
@@ -1975,7 +1975,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.9.3</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.9.5</div>
       </div>
     </div>
 
@@ -3656,14 +3656,15 @@ function xoaGD(tab){
 // sang giá trị khác chỉ áp dụng cho ảnh tải lên SAU thời điểm đổi, không ảnh hưởng ảnh đã có từ trước.
 // ═══════════════════════════════════════════════════════
 var SB_ANH_BUCKET = 'giao-dich-anh'; // Cần tạo bucket này thủ công trên Supabase Dashboard (xem README)
-function getAnhLuuNgay(){ var v=parseInt(localStorage.getItem('anh_luu_ngay')); return (v>0) ? v : 30; }
-function setAnhLuuNgay(n){ n=parseInt(n)||30; if(n<1) n=1; if(n>365) n=365; localStorage.setItem('anh_luu_ngay', String(n)); }
+function getAnhLuuNgay(){ var v=parseInt(localStorage.getItem('anh_luu_ngay')); return (v>0) ? v : 7; }
+function setAnhLuuNgay(n){ n=parseInt(n)||7; if(n<1) n=1; if(n>30) n=30; localStorage.setItem('anh_luu_ngay', String(n)); }
 function onSaveAnhLuuNgay(){
   var v = parseInt(document.getElementById('setting-anh-ngay').value);
   if (!v || v < 1) { toast('⚠️ Nhập số ngày hợp lệ (tối thiểu 1)!'); return; }
+  var bigioihan = v > 30;
   setAnhLuuNgay(v);
   document.getElementById('setting-anh-ngay').value = getAnhLuuNgay();
-  toast('✅ Đã lưu! Ảnh tải lên từ giờ sẽ tự xoá sau ' + getAnhLuuNgay() + ' ngày (ảnh cũ không đổi)');
+  toast((bigioihan ? '⚠️ Tối đa 30 ngày, đã tự điều chỉnh. ' : '✅ Đã lưu! ') + 'Ảnh tải lên từ giờ sẽ tự xoá sau ' + getAnhLuuNgay() + ' ngày (ảnh cũ không đổi)');
   autoSync();
 }
 
@@ -4367,6 +4368,7 @@ function renderChiTietMua(){
 function toggleSgDrop(e){
   if(e&&e.stopPropagation) e.stopPropagation();
   var dd=document.getElementById('sg-dropdown');
+  if(!dd) return; // phần tử chưa tồn tại trong giao diện hiện tại (an toàn, tránh lỗi)
   var isOpen=dd.classList.contains('open');
   closeSgDrop();
   if(!isOpen){ renderSgDrop(); dd.classList.add('open'); }
