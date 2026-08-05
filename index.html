@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.9.6</title>
+<title>Mua Bán Mủ Cao Su v1.9.7</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -505,7 +505,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.9.6 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v1.9.7 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1809,7 +1809,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.9.6</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.9.7</div>
       </div>
     </div>
 
@@ -1975,7 +1975,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.9.6</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.9.7</div>
       </div>
     </div>
 
@@ -3435,11 +3435,11 @@ function calc(tab){
   }
   document.getElementById(tab+'-tt-so').textContent=fmtNum(tDisplay)+' ₫';
   document.getElementById(tab+'-tt-chu').textContent=tDisplay>0?docTien(tDisplay):'--';
-  // Áp dụng cho cả tab Mua và Bán: chỉ cần vừa bắt đầu gõ số kg là hiện ngay nút Lưu/Huỷ + ô thành
-  // tiền (dù gõ dở chưa tính ra được thành tiền), để người dùng luôn có đường thoát bấm "Huỷ" xoá
-  // trắng form đang nhập dở
-  var daNhapKg = kg.trim()!=='';
-  _capNhatCompactForm(tab, tDisplay>0 || daNhapKg);
+  // Áp dụng cho cả tab Mua và Bán: chỉ cần vừa bắt đầu gõ số kg HOẶC độ (bất kể ô nào nhập trước) là
+  // hiện ngay nút Lưu/Huỷ + ô thành tiền (dù gõ dở chưa tính ra được thành tiền), để người dùng luôn
+  // có đường thoát bấm "Huỷ" xoá trắng form đang nhập dở
+  var daNhapKgHoacDo = kg.trim()!=='' || doV.trim()!=='';
+  _capNhatCompactForm(tab, tDisplay>0 || daNhapKgHoacDo);
 }
 // Ẩn/hiện gộp: ô "Thành tiền" + hàng nút Lưu/Huỷ ở tab Mua, Bán — chỉ áp dụng khi setting 'compactForm'
 // đang BẬT (mặc định TẮT). Khi TẮT, luôn hiển thị đầy đủ như trước giờ (không đụng tới display).
@@ -3449,7 +3449,7 @@ function _capNhatCompactForm(tab, show){
   if (tab!=='mua' && tab!=='ban') return;
   var ttBox = document.getElementById(tab+'-tt-box');
   var btnRow = document.getElementById(tab+'-btns');
-  if (!getSetting('compactForm', false)) {
+  if (!getSetting('compactForm', true)) {
     // Tính năng đang TẮT: đảm bảo luôn hiển thị đầy đủ (phòng trường hợp vừa tắt setting lúc đang ẩn)
     if (ttBox) ttBox.style.display = '';
     if (btnRow) btnRow.style.display = '';
@@ -7771,10 +7771,10 @@ function speakVN(chu, so) {
   var voices = synth.getVoices();
   var viVoice = voices.find(function(v){ return v.lang && v.lang.toLowerCase().startsWith('vi'); });
   if (viVoice) msg.voice = viVoice;
+  // Lưu ý: KHÔNG gọi synth.pause()/resume() ngay sau speak() — từng thử dùng cặp lệnh này để chống
+  // trễ, nhưng trên một số trình duyệt/Android WebView lại khiến giọng đọc bị "treo" im lặng vĩnh
+  // viễn thay vì chỉ giảm độ trễ, gây lỗi nặng hơn (không đọc được gì cả). Đã bỏ hẳn.
   synth.speak(msg);
-  // Khắc phục lỗi trễ hay gặp trên Chrome/Android: đôi khi gọi speak() xong không đọc ngay mà "treo"
-  // một khoảng ngắn rồi mới bắt đầu — ép engine chạy ngay bằng cách pause() rồi resume() liền sau đó
-  try { synth.pause(); synth.resume(); } catch(e) {}
   if (so) toast('🔊 ' + so);
 }
 function docThanhTien() {
@@ -8303,7 +8303,7 @@ function openSettings() {
   document.getElementById('setting-wakelock').checked = getSetting('wakelock', true);
   document.getElementById('setting-bubbleSaver').checked = getSetting('bubbleSaver', true);
   document.getElementById('setting-bubblePopSound').checked = getSetting('bubblePopSound', true);
-  document.getElementById('setting-compactForm').checked = getSetting('compactForm', false);
+  document.getElementById('setting-compactForm').checked = getSetting('compactForm', true);
   document.getElementById('setting-anh-ngay').value = getAnhLuuNgay();
   var info = document.getElementById('settings-license-info');
   if (info) {
