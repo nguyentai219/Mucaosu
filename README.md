@@ -2,13 +2,14 @@
 
 Phần mềm ghi chép **mua bán mủ cao su** — PWA cài được lên điện thoại như app thật, hoạt động offline.
 
-## 🔢 Quy tắc đánh số phiên bản (hệ hiện hành: `1.X.Y`, áp dụng từ v1.1.0)
+## 🔢 Quy tắc đánh số phiên bản (hệ hiện hành: `Z.X.Y`, áp dụng từ v1.1.0, điều chỉnh cách sang số đầu từ v2.1.0)
 
-Số phiên bản theo dạng **`1.X.Y`**:
+Số phiên bản theo dạng **`Z.X.Y`**:
 
 - Số hàng cuối cùng bên phải (**Y**) tăng đúng **1 đơn vị** mỗi lần cập nhật, chạy từ **0 → 9**.
 - Hết 9 thì **X** (số hàng chục/ở giữa) tăng lên 1, **Y** quay lại **0**.
-- Ví dụ thứ tự: `1.8.0` → `1.8.1` → ... → `1.8.9` → `1.9.0` → `1.9.1` → ...
+- Khi **X.Y đạt tối đa `9.9`** thì tăng **Z** (số đầu tiên) lên 1, đồng thời **X quay lại 1** (không phải 0) và **Y quay lại 0**.
+- Ví dụ thứ tự: `1.8.0` → `1.8.1` → ... → `1.8.9` → `1.9.0` → `1.9.1` → ... → `1.9.9` → `2.1.0` → `2.1.1` → ... → `2.1.9` → `2.2.0` → ...
 - Mỗi lần cập nhật chỉ tăng đúng 1 bước theo đúng thứ tự trên, áp dụng ở **4 vị trí**: `<title>` + `logo-ver` + dòng hiển thị trong màn "Hướng dẫn sử dụng" (trong `index.html`), `description` trong `manifest.json`, và `CACHE` trong `sw.js` — sau khi đổi, luôn `grep` số cũ để chắc chắn không sót vị trí nào.
 - Các ghi chú phiên bản cũ hơn (hệ `v7.x`–`v11.14`, rồi hệ chữ-số `1.<chữ><số>` như `1.a1`...`1.b5`) còn sót lại trong code/bảng lịch sử bên dưới chỉ là mốc lịch sử, không quy đổi ngược.
 
@@ -16,6 +17,9 @@ Số phiên bản theo dạng **`1.X.Y`**:
 
 | Phiên bản | Ngày | Thay đổi |
 |-----------|------|----------|
+| **v2.1.0** | 2026-08-06 | 🔢 **Điều chỉnh quy tắc đánh số phiên bản**: khi X.Y đạt tối đa `9.9` thì tăng số đầu (Z) lên 1 thay vì cho X chạy tiếp lên 2 chữ số — nên bản này là `2.1.0` thay vì `1.10.0`. ✏️ Đổi tên setting "Gọn màn hình lúc chưa gõ gì" thành **"Ẩn nút Lưu khi chưa nhập dữ liệu"**. 🫧 Thời gian chờ trước khi bật bong bóng bảo vệ màn hình: **20 giây → 30 giây** |
+| **v1.9.9** | 2026-08-05 | 🩺 **Trạng thái lỗi hệ thống**: bỏ nút "Xoá" (không cần nữa — đã tự cuốn chiếu giữ đúng 30 lỗi gần nhất, lỗi cũ nhất tự bị thay bằng lỗi mới nhất). ☁️ **Đồng bộ nhật ký lỗi lên đám mây**: trước đây đồng bộ ngầm định kỳ chỉ ghi đè đơn giản (last-write-wins) nên lỗi phát sinh ở máy A có nguy cơ bị máy B (đăng nhập cùng tài khoản) ghi đè mất — đã thêm cơ chế **trộn thật sự** (hợp theo mã lỗi, không trùng) ở cả 2 thời điểm: lúc đăng nhập Supabase VÀ định kỳ mỗi 5 phút trong lúc máy đang mở, đảm bảo không mất lỗi từ bất kỳ máy nào. Mở "Xem chi tiết lỗi" cũng tự tải + trộn thêm dữ liệu mới nhất từ đám mây |
+| **v1.9.8** | 2026-08-05 | ✏️ Đổi tên setting "Ẩn bớt khi chưa nhập liệu" thành **"Gọn màn hình lúc chưa gõ gì"** cho dễ hiểu hơn. 🩺 **Tính năng mới: Trạng thái lỗi hệ thống** (⚙️ Cài đặt, cạnh "Trạng thái đồng bộ máy này") — tự động bắt mọi lỗi JS runtime và promise bị reject phát sinh **bất kỳ lúc nào** (không cần chờ kiểm tra định kỳ), đồng thời tự kiểm tra định kỳ mỗi 5 phút một số điều kiện sức khoẻ cơ bản (localStorage đọc/ghi được, phần tử giao diện cốt lõi còn đủ). Mỗi lỗi được gán 1 **mã lỗi ngắn gọn** (vd: `ERR-JS-143022-A1B2`), lưu tối đa 30 lỗi gần nhất, xem chi tiết + sao chép mã lỗi ngay trong Cài đặt để gửi cho người hỗ trợ khắc phục nhanh hơn thay vì phải mô tả bằng lời |
 | **v1.9.7** | 2026-08-05 | 🐛 **Sửa lỗi im lặng hoàn toàn khi đọc số tiền** (cả 2 tab Mua và Bán): nguyên nhân do bản v1.9.2 thêm thủ thuật `pause()`+`resume()` ngay sau `speak()` để chống trễ, nhưng trên một số trình duyệt/Android WebView cặp lệnh này lại khiến giọng đọc bị "treo" im lặng vĩnh viễn thay vì chỉ giảm độ trễ — gây lỗi nặng hơn hẳn (không đọc được gì cả). Đã gỡ bỏ hoàn toàn thủ thuật này. 📋 **Đổi mặc định "Ẩn bớt khi chưa nhập liệu" sang BẬT** (trước đây mặc định tắt) — ô Thành tiền + nút Lưu/Huỷ ở tab Mua, Bán giờ tự ẩn khi chưa nhập liệu ngay từ lần cài đặt đầu, có thể tắt lại trong ⚙️ Cài đặt nếu không thích |
 | **v1.9.6** | 2026-08-05 | 📋 **Ẩn bớt khi chưa nhập liệu (tab Mua)**: trước đó chỉ hiện nút Lưu/Huỷ + ô thành tiền khi đã nhập ĐỦ dữ liệu để tính ra thành tiền — nếu mới gõ dở số kg mà chưa nhập giá thì không có nút "Huỷ" để xoá trắng. Nay chỉ cần **bắt đầu gõ số kg** là hiện ngay cả 3 mục (dù chưa tính được thành tiền), luôn có đường thoát bấm Huỷ giữa chừng (chỉ áp dụng tab Mua theo yêu cầu; tab Bán vẫn giữ nguyên logic cũ) |
 | **v1.9.5** | 2026-08-05 | 📷 **Ảnh đính kèm giao dịch**: đổi mặc định số ngày tự xoá từ 30 → **7 ngày**, giới hạn tối đa cho phép chọn từ 365 → **30 ngày** (nhập quá 30 sẽ tự điều chỉnh lại và báo rõ trong thông báo). Không ảnh hưởng ảnh đã tải lên từ trước, chỉ áp dụng cho ảnh tải lên sau khi cập nhật |

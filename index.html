@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v1.9.7</title>
+<title>Mua Bán Mủ Cao Su v2.1.0</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -505,7 +505,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v1.9.7 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.1.0 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1115,7 +1115,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 4px;border-bottom:1px solid var(--g100)">
         <div>
           <div style="font-size:14px;font-weight:700;color:var(--g800)">🫧 Bong bóng bảo vệ màn hình</div>
-          <div style="font-size:11px;color:var(--g400);margin-top:2px">Hiện hiệu ứng bong bóng nảy khi không chạm vào app 20 giây (mặc định bật)</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:2px">Hiện hiệu ứng bong bóng nảy khi không chạm vào app 30 giây (mặc định bật)</div>
         </div>
         <label class="toggle-sw">
           <input type="checkbox" id="setting-bubbleSaver" onchange="saveSetting('bubbleSaver',this.checked);resetIdleTimer()">
@@ -1134,8 +1134,8 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 4px;border-bottom:1px solid var(--g100)">
         <div>
-          <div style="font-size:14px;font-weight:700;color:var(--g800)">📋 Ẩn bớt khi chưa nhập liệu</div>
-          <div style="font-size:11px;color:var(--g400);margin-top:2px">Tự ẩn ô thành tiền + nút Lưu/Huỷ ở tab Mua, Bán khi chưa nhập đủ dữ liệu tính tiền, đỡ chật màn hình</div>
+          <div style="font-size:14px;font-weight:700;color:var(--g800)">📋 Ẩn nút Lưu khi chưa nhập dữ liệu</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:2px">Tự ẩn ô thành tiền + nút Lưu/Huỷ ở tab Mua, Bán khi chưa gõ gì vào ô kg/độ, đỡ chật màn hình. Vừa gõ là hiện lại ngay</div>
         </div>
         <label class="toggle-sw">
           <input type="checkbox" id="setting-compactForm" onchange="saveSetting('compactForm',this.checked);if(typeof calc==='function'){calc('mua');calc('ban');}">
@@ -1173,6 +1173,16 @@ input[type=date]:focus{border-color:var(--gl)}
         <div style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:2px">🔧 Trạng thái đồng bộ máy này</div>
         <div id="registry-debug-line" style="font-size:11.5px;color:var(--g600);word-break:break-word;line-height:1.5">Chưa có thông tin</div>
       </div>
+      <!-- TRẠNG THÁI LỖI HỆ THỐNG: tự kiểm tra định kỳ + ghi nhận lỗi phát sinh ngoài kiểm tra định
+           kỳ (lỗi JS runtime, promise bị reject không xử lý), gán mã lỗi ngắn gọn để báo cho người
+           hỗ trợ khắc phục dễ hơn thay vì phải mô tả bằng lời. Tự lưu cuốn chiếu tối đa 30 lỗi gần
+           nhất (lỗi cũ nhất tự bị thay bằng lỗi mới nhất, không cần xoá thủ công) và đồng bộ lên
+           Supabase để không mất dữ liệu khi đổi máy/xoá lịch sử duyệt web -->
+      <div style="padding:14px 4px;border-top:1px solid var(--g100)">
+        <div style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:2px">🩺 Trạng thái lỗi hệ thống</div>
+        <div id="error-status-line" style="font-size:11.5px;color:var(--g600);word-break:break-word;line-height:1.5;margin-bottom:8px">Đang kiểm tra...</div>
+        <button onclick="openErrorLog()" style="width:100%;padding:9px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">📋 Xem chi tiết lỗi</button>
+      </div>
       <!-- ĐỔI MẬT KHẨU QUẢN LÝ GIAO DỊCH -->
       <div style="padding:14px 4px;border-top:1px solid var(--g100)">
         <div style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:2px">Mật khẩu quản lý giao dịch</div>
@@ -1185,6 +1195,16 @@ input[type=date]:focus{border-color:var(--gl)}
     <button onclick="openHuongDan()" style="width:100%;margin-top:10px;padding:11px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">📖 Hướng dẫn sử dụng</button>
     <button onclick="openGioiThieu()" style="width:100%;margin-top:8px;padding:11px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">ℹ️ Giới thiệu phần mềm</button>
     <button class="btn-huy" style="width:100%;margin-top:8px" onclick="closeM('modal-settings')">Đóng</button>
+  </div>
+</div>
+
+<!-- MODAL CHI TIẾT LỖI HỆ THỐNG -->
+<div class="modal center" id="modal-error-log">
+  <div class="modal-box center-box" style="max-width:420px;max-height:80vh;overflow-y:auto">
+    <div style="font-size:16px;font-weight:800;color:var(--g800);margin-bottom:4px">🩺 Nhật ký lỗi hệ thống</div>
+    <div style="font-size:11.5px;color:var(--g400);margin-bottom:12px">Tự động kiểm tra định kỳ + ghi nhận lỗi phát sinh bất kỳ lúc nào. Bấm "Sao chép" ở lỗi nào rồi gửi cho người hỗ trợ để khắc phục nhanh hơn.</div>
+    <div id="error-log-list"></div>
+    <button class="btn-huy" style="width:100%;margin-top:10px" onclick="closeM('modal-error-log')">Đóng</button>
   </div>
 </div>
 
@@ -1809,7 +1829,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v1.9.7</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.1.0</div>
       </div>
     </div>
 
@@ -1975,7 +1995,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v1.9.7</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.1.0</div>
       </div>
     </div>
 
@@ -5599,6 +5619,18 @@ function _isPlainObj(v){ return v && typeof v==='object' && !Array.isArray(v); }
 // theo id, bản ghi chỉ có ở 1 bên đều được giữ lại nguyên vẹn, không bao giờ mất. Dùng làm kết quả
 // MẶC ĐỊNH (chiến lược "Trộn") — với khách hàng chọn chiến lược khác, kết quả này sẽ được lọc lại
 // riêng cho tên khách đó bởi _applyPerCustomerDecision() bên dưới.
+// Trộn nhật ký lỗi hệ thống giữa máy và đám mây: hợp theo mã lỗi (mỗi lỗi có 1 mã duy nhất khi tạo ra),
+// sắp lại theo thời gian rồi chỉ giữ 30 lỗi GẦN NHẤT (đúng kiểu cuốn chiếu) — đảm bảo lỗi phát sinh ở
+// máy A không bị lỗi phát sinh ở máy B (đăng nhập cùng tài khoản) ghi đè mất khi đồng bộ định kỳ.
+function _mergeErrorLogs(cloudArr, localArr){
+  var seen = {}, out = [];
+  (Array.isArray(cloudArr)?cloudArr:[]).concat(Array.isArray(localArr)?localArr:[]).forEach(function(e){
+    if (!e || !e.code || seen[e.code]) return;
+    seen[e.code] = true; out.push(e);
+  });
+  out.sort(function(a,b){ return (a.time||0) - (b.time||0); }); // cũ → mới
+  return out.slice(-ERROR_LOG_MAX);
+}
 function _mergeArrById(cloudArr, localArr){
   var out = Array.isArray(cloudArr) ? cloudArr.slice() : [];
   var seen = {};
@@ -5732,11 +5764,13 @@ function _finishLoginMerge(cloud, opts){
   var localMua = getGD('mua'), localBan = getGD('ban'), localSg = getSG(), localSu = getSU(), localCc = getCC();
   var localKhIds = getKhIds(), localKhRole = lsGetO('kh_role_manual'), localMuaChot = lsGetO('mua_chot_moc'),
       localKhHidden = getKhHidden(), localKhInfo = getKhInfo(), localSsData = JSON.parse(localStorage.getItem('ss_data')||'{}');
+  var localErrLog = _getErrorLog();
   var mua = _mergeArrById(cloud.gd3_mua, localMua);
   var ban = _mergeArrById(cloud.gd3_ban, localBan);
   var sg  = _mergeArrById(cloud.sg3, localSg);
   var su  = _mergeArrById(cloud.su_data, localSu);
   var cc  = _mergeArrById(cloud.cc_data, localCc);
+  var finalErrLog = _mergeErrorLogs(cloud[ERROR_LOG_KEY], localErrLog);
   var khMerge = _mergeKhIdsDetectConflicts(_isPlainObj(cloud.kh_ids)?cloud.kh_ids:{}, localKhIds);
 
   function applyAndPush(khFinalMap, decisions){
@@ -5783,6 +5817,10 @@ function _finishLoginMerge(cloud, opts){
     lsSet('kh_hidden', finalKhHidden);
     lsSet('kh_info', finalKhInfo);
     lsSet('ss_data', finalSsData);
+    // Nhật ký lỗi hệ thống: lưu bản đã trộn NGAY (không đợi điều kiện "changed" bên dưới, vì đây chỉ
+    // là dữ liệu chẩn đoán, không cần thiết phải toast/reload trang chỉ vì có thêm lỗi từ máy khác)
+    _saveErrorLog(finalErrLog);
+    if (typeof _updateErrorStatusUI === 'function') _updateErrorStatusUI();
     // Các giá trị đơn (không phải danh sách/đối tượng gộp được): đám mây có sẵn thì ưu tiên giữ
     // nguyên giá trị đám mây (không bị máy ghi đè khi đăng nhập); máy chỉ được dùng nếu đám mây
     // chưa từng có giá trị này.
@@ -7845,8 +7883,8 @@ document.addEventListener('visibilitychange', function(){
 
 // ── BONG BÓNG BẢO VỆ MÀN HÌNH (giống screensaver Bubbles của Windows) ─────────────────────────
 // Mặc định BẬT (getSetting('bubbleSaver', true)) — người dùng có thể tắt trong ⚙️ Cài đặt.
-// Thời gian chờ trước khi kích hoạt CỐ ĐỊNH 20 giây (không cho tuỳ chỉnh, tránh lỗi khi đặt quá ngắn).
-// Kích hoạt sau 20 giây không có bất kỳ thao tác chạm/gõ/cuộn nào trên toàn app; chạm bất kỳ đâu vào
+// Thời gian chờ trước khi kích hoạt CỐ ĐỊNH 30 giây (không cho tuỳ chỉnh, tránh lỗi khi đặt quá ngắn).
+// Kích hoạt sau 30 giây không có bất kỳ thao tác chạm/gõ/cuộn nào trên toàn app; chạm bất kỳ đâu vào
 // màn hình lúc đang hiện bong bóng sẽ tắt ngay và bắt đầu đếm lại từ đầu.
 var _idleTimer = null;
 var _bubbleActive = false;
@@ -7862,7 +7900,7 @@ function resetIdleTimer(){
   clearTimeout(_idleTimer);
   if (_bubbleActive) stopBubbleSaver();
   if (getSetting('bubbleSaver', true)) {
-    _idleTimer = setTimeout(startBubbleSaver, 20000);
+    _idleTimer = setTimeout(startBubbleSaver, 30000);
   }
 }
 var _bubbleDismissing = false;
@@ -7913,7 +7951,7 @@ function _bubbleDismiss(){
     _bubbleDismissing = false;
     stopBubbleSaver();
     if (getSetting('bubbleSaver', true)) {
-      _idleTimer = setTimeout(startBubbleSaver, 20000);
+      _idleTimer = setTimeout(startBubbleSaver, 30000);
     }
   }, 950);
 }
@@ -8296,6 +8334,146 @@ function stopBubbleSaver(){
   _bubbleFragments = [];
 }
 
+// ══════════════════════════════════════════
+// HỆ THỐNG GHI NHẬN LỖI TỰ ĐỘNG (giống cơ chế trạng thái đồng bộ máy này ở trên)
+// - Bắt mọi lỗi JS runtime + promise bị reject không xử lý PHÁT SINH BẤT KỲ LÚC NÀO (window.onerror,
+//   unhandledrejection) — không cần chờ đến đợt kiểm tra định kỳ mới biết.
+// - Đồng thời tự kiểm tra định kỳ (mỗi 5 phút + 1 lần ngay sau khi mở app) một số điều kiện sức khoẻ
+//   cơ bản (localStorage đọc/ghi được, các phần tử giao diện cốt lõi còn tồn tại).
+// - Mỗi lỗi được gán 1 MÃ LỖI ngắn gọn (vd: ERR-JS-143022-A1B2), lưu tối đa 30 lỗi gần nhất trong
+//   localStorage, xem được ngay trong Cài đặt → "🩺 Trạng thái lỗi hệ thống", có nút sao chép mã lỗi
+//   để gửi cho người hỗ trợ khắc phục nhanh hơn thay vì phải mô tả bằng lời.
+// ══════════════════════════════════════════
+var ERROR_LOG_KEY = 'app_error_log_v1';
+var ERROR_LOG_MAX = 30;
+function _getErrorLog(){
+  try { return JSON.parse(localStorage.getItem(ERROR_LOG_KEY) || '[]'); } catch(e) { return []; }
+}
+function _saveErrorLog(list){
+  try { localStorage.setItem(ERROR_LOG_KEY, JSON.stringify(list.slice(-ERROR_LOG_MAX))); } catch(e) {}
+}
+function _pad2(n){ return String(n).padStart(2,'0'); }
+function _genErrorCode(type){
+  var d = new Date();
+  var ts = _pad2(d.getHours()) + _pad2(d.getMinutes()) + _pad2(d.getSeconds());
+  var rand = Math.random().toString(36).substr(2,4).toUpperCase();
+  return 'ERR-' + type + '-' + ts + '-' + rand;
+}
+function logAppError(type, message, detail){
+  try {
+    var list = _getErrorLog();
+    // Chống spam: nếu lỗi giống hệt (cùng type + message) vừa xảy ra trong vòng 10 giây gần nhất thì
+    // không ghi thêm bản mới, tránh 1 lỗi lặp lại liên tục (vd trong vòng lặp) làm đầy nhật ký
+    var now = Date.now();
+    var trung = list.some(function(e){ return e.type===type && e.message===message && (now-e.time)<10000; });
+    if (trung) return;
+    var code = _genErrorCode(type);
+    list.push({ code: code, type: type, message: String(message||'').slice(0,300), detail: String(detail||'').slice(0,500), time: now });
+    _saveErrorLog(list);
+    _updateErrorStatusUI();
+  } catch(e) { /* im lặng — tránh vòng lặp lỗi vô hạn nếu bản thân việc ghi log cũng lỗi */ }
+}
+function _escHtmlErr(s){
+  var d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+function _updateErrorStatusUI(){
+  var el = document.getElementById('error-status-line');
+  if (!el) return;
+  var list = _getErrorLog();
+  if (list.length === 0) {
+    el.innerHTML = '✅ Không phát hiện lỗi nào';
+  } else {
+    var last = list[list.length-1];
+    var d = new Date(last.time);
+    var timeStr = _pad2(d.getHours())+':'+_pad2(d.getMinutes())+' '+_pad2(d.getDate())+'/'+_pad2(d.getMonth()+1);
+    el.innerHTML = '⚠️ ' + list.length + ' lỗi gần đây · Mới nhất: <b style="color:#c2410c">' + last.code + '</b> lúc ' + timeStr;
+  }
+}
+function _renderErrorLogList(){
+  var list = _getErrorLog().slice().reverse(); // mới nhất lên đầu
+  var cont = document.getElementById('error-log-list');
+  if (!cont) return;
+  if (list.length === 0) {
+    cont.innerHTML = '<div style="text-align:center;padding:20px;color:var(--g400);font-size:13px">✅ Chưa ghi nhận lỗi nào</div>';
+  } else {
+    cont.innerHTML = list.map(function(e){
+      var d = new Date(e.time);
+      var timeStr = _pad2(d.getHours())+':'+_pad2(d.getMinutes())+':'+_pad2(d.getSeconds())+' '+_pad2(d.getDate())+'/'+_pad2(d.getMonth()+1)+'/'+d.getFullYear();
+      return '<div style="padding:10px 0;border-bottom:1px solid var(--g100)">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">'
+        + '<span style="font-weight:700;color:#c2410c;font-size:12.5px">' + e.code + '</span>'
+        + '<button onclick="_copyErrorCode(\'' + e.code + '\')" style="font-size:11px;padding:3px 10px;background:var(--gb);border:1px solid var(--gp);border-radius:6px;color:var(--gd);cursor:pointer;flex-shrink:0">📋 Sao chép</button>'
+        + '</div>'
+        + '<div style="font-size:11px;color:var(--g400);margin-top:3px">' + timeStr + ' · ' + e.type + '</div>'
+        + '<div style="font-size:12px;color:var(--g800);margin-top:3px;word-break:break-word">' + _escHtmlErr(e.message) + '</div>'
+        + '</div>';
+    }).join('');
+  }
+}
+function openErrorLog(){
+  _renderErrorLogList();
+  openM('modal-error-log');
+  _syncErrorLogFromCloud(); // tranh thủ tải + trộn thêm lỗi mới nhất từ đám mây (nếu có), tự render lại khi xong
+}
+function _copyErrorCode(code){
+  var list = _getErrorLog();
+  var found = list.find(function(e){ return e.code === code; });
+  var full = found
+    ? 'Mã lỗi: ' + found.code + '\nThời gian: ' + new Date(found.time).toLocaleString('vi-VN') + '\nLoại: ' + found.type + '\nChi tiết: ' + found.message + (found.detail ? ('\n' + found.detail) : '')
+    : 'Mã lỗi: ' + code;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(full).then(function(){ toast('📋 Đã sao chép mã lỗi'); }).catch(function(){ toast('Mã lỗi: ' + code); });
+  } else {
+    toast('Mã lỗi: ' + code);
+  }
+}
+// Bắt lỗi JS runtime phát sinh ở BẤT KỲ đâu trong app, bất kỳ lúc nào (không cần chờ kiểm tra định kỳ)
+window.addEventListener('error', function(e){
+  logAppError('JS', e.message || 'Lỗi không rõ', (e.filename||'') + ':' + (e.lineno||'') + ':' + (e.colno||''));
+});
+// Bắt Promise bị reject mà không có .catch() xử lý — thường gặp khi gọi Supabase/API mà quên bắt lỗi
+window.addEventListener('unhandledrejection', function(e){
+  var r = e.reason;
+  logAppError('PROMISE', (r && r.message) ? r.message : String(r), (r && r.stack) ? String(r.stack).slice(0,300) : '');
+});
+// Tự kiểm tra định kỳ một số điều kiện sức khoẻ cơ bản của app — chạy ngầm, không làm phiền người
+// dùng nếu mọi thứ bình thường, chỉ ghi log khi phát hiện bất thường
+function _healthCheckTick(){
+  try {
+    var testKey = '__health_test__';
+    localStorage.setItem(testKey, '1');
+    var ok = localStorage.getItem(testKey) === '1';
+    localStorage.removeItem(testKey);
+    if (!ok) { logAppError('HEALTH', 'localStorage đọc/ghi không khớp — có thể trình duyệt đang chặn lưu trữ', ''); return; }
+    var thieu = ['tab-mua','tab-ban','settings-btn'].filter(function(id){ return !document.getElementById(id); });
+    if (thieu.length) { logAppError('HEALTH', 'Thiếu phần tử giao diện cốt lõi: #' + thieu.join(', #'), ''); return; }
+  } catch(e) {
+    logAppError('HEALTH', e.message || 'Lỗi không rõ khi tự kiểm tra', '');
+  }
+}
+setTimeout(_healthCheckTick, 8000); // kiểm tra sớm 1 lần sau khi app khởi động xong (chờ 8s cho ổn định)
+setInterval(_healthCheckTick, 5*60*1000); // sau đó lặp lại mỗi 5 phút
+// Đồng bộ ngầm định kỳ (mỗi 15s) chỉ ghi đè đơn giản (last-write-wins) toàn bộ localStorage lên đám
+// mây, KHÔNG tự trộn — nếu để mặc định, lỗi phát sinh ở máy A có thể bị máy B (đăng nhập cùng tài
+// khoản) ghi đè mất qua các lần đồng bộ ngầm liên tiếp. Nhật ký lỗi CHỈ được trộn thật sự lúc đăng
+// nhập (_finishLoginMerge). Để không mất lỗi phát sinh khi máy đang mở lâu dài, chủ động tải + trộn
+// lại với đám mây theo cùng chu kỳ 5 phút này, trước khi lượt đồng bộ ngầm tiếp theo ghi đè lên.
+function _syncErrorLogFromCloud(){
+  if (getSyncProvider() !== 'supabase' || !sbClient || !sbUser || !navigator.onLine) return;
+  sbClient.from('mucaosu_data').select('data_value').eq('user_id', sbUser.id).eq('data_key', ERROR_LOG_KEY).maybeSingle().then(function(res){
+    if (res.error || !res.data) return;
+    var merged = _mergeErrorLogs(res.data.data_value, _getErrorLog());
+    _saveErrorLog(merged);
+    _updateErrorStatusUI();
+    var modal = document.getElementById('modal-error-log');
+    if (modal && modal.classList.contains('show')) _renderErrorLogList();
+  }).catch(function(){ /* không phải luồng chính, im lặng bỏ qua để tránh vòng lặp ghi log lỗi */ });
+}
+setTimeout(_syncErrorLogFromCloud, 10000);
+setInterval(_syncErrorLogFromCloud, 5*60*1000);
+
 function openSettings() {
   document.getElementById('setting-round').checked = getSetting('round', true);
   document.getElementById('setting-docTien').checked = getSetting('docTien', true);
@@ -8315,6 +8493,7 @@ function openSettings() {
       + ' &nbsp;·&nbsp; 🔢 Thuật toán mã: <b style="color:var(--gd)">' + EXT_ALGO_VERSION + '</b>';
   }
   updRegistryDebugLine();
+  _updateErrorStatusUI();
   openM('modal-settings');
 }
 
