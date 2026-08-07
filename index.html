@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.1.1</title>
+<title>Mua Bán Mủ Cao Su v2.1.0</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -505,7 +505,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.1.1 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.1.0 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1171,30 +1171,17 @@ input[type=date]:focus{border-color:var(--gl)}
       <!-- TRẠNG THÁI ĐỒNG BỘ (chẩn đoán) -->
       <div style="padding:14px 4px;border-top:1px solid var(--g100)">
         <div style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:2px">🔧 Trạng thái đồng bộ máy này</div>
-        <div id="registry-debug-line" style="font-size:11.5px;color:var(--g600);word-break:break-word;line-height:1.5;margin-bottom:6px">Chưa có thông tin</div>
-        <div id="sync-last-check-line" style="font-size:11px;color:var(--g400);margin-bottom:8px">🕐 Chưa kiểm tra lần nào</div>
-        <div id="sync-check-progress-wrap" style="display:none;background:var(--g100);border-radius:6px;height:6px;overflow:hidden;margin-bottom:8px">
-          <div id="sync-check-progress-bar" style="height:100%;width:0%;background:var(--gd);transition:width .2s ease"></div>
-        </div>
-        <button onclick="runManualSyncCheck()" style="width:100%;padding:9px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">🔄 Kiểm tra đồng bộ ngay</button>
+        <div id="registry-debug-line" style="font-size:11.5px;color:var(--g600);word-break:break-word;line-height:1.5">Chưa có thông tin</div>
       </div>
       <!-- TRẠNG THÁI LỖI HỆ THỐNG: tự kiểm tra định kỳ + ghi nhận lỗi phát sinh ngoài kiểm tra định
            kỳ (lỗi JS runtime, promise bị reject không xử lý), gán mã lỗi ngắn gọn để báo cho người
            hỗ trợ khắc phục dễ hơn thay vì phải mô tả bằng lời. Tự lưu cuốn chiếu tối đa 30 lỗi gần
            nhất (lỗi cũ nhất tự bị thay bằng lỗi mới nhất, không cần xoá thủ công) và đồng bộ lên
-           Supabase để không mất dữ liệu khi đổi máy/xoá lịch sử duyệt web. Nút "Kiểm tra lỗi ngay"
-           cho phép chủ động kiểm tra thủ công bất cứ lúc nào, không cần chờ đợt kiểm tra định kỳ -->
+           Supabase để không mất dữ liệu khi đổi máy/xoá lịch sử duyệt web -->
       <div style="padding:14px 4px;border-top:1px solid var(--g100)">
         <div style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:2px">🩺 Trạng thái lỗi hệ thống</div>
-        <div id="error-status-line" style="font-size:11.5px;color:var(--g600);word-break:break-word;line-height:1.5;margin-bottom:6px">Đang kiểm tra...</div>
-        <div id="error-last-check-line" style="font-size:11px;color:var(--g400);margin-bottom:8px">🕐 Chưa kiểm tra lần nào</div>
-        <div id="error-check-progress-wrap" style="display:none;background:var(--g100);border-radius:6px;height:6px;overflow:hidden;margin-bottom:8px">
-          <div id="error-check-progress-bar" style="height:100%;width:0%;background:#c2410c;transition:width .2s ease"></div>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button onclick="runManualErrorCheck()" style="flex:1;padding:9px;background:#fff7ed;color:#c2410c;border:1.5px solid #fdba74;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">🔍 Kiểm tra lỗi ngay</button>
-          <button onclick="openErrorLog()" style="flex:1;padding:9px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">📋 Xem chi tiết lỗi</button>
-        </div>
+        <div id="error-status-line" style="font-size:11.5px;color:var(--g600);word-break:break-word;line-height:1.5;margin-bottom:8px">Đang kiểm tra...</div>
+        <button onclick="openErrorLog()" style="width:100%;padding:9px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">📋 Xem chi tiết lỗi</button>
       </div>
       <!-- ĐỔI MẬT KHẨU QUẢN LÝ GIAO DỊCH -->
       <div style="padding:14px 4px;border-top:1px solid var(--g100)">
@@ -1842,7 +1829,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.1.1</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.1.0</div>
       </div>
     </div>
 
@@ -2008,7 +1995,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.1.1</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.1.0</div>
       </div>
     </div>
 
@@ -8404,132 +8391,6 @@ function _updateErrorStatusUI(){
     el.innerHTML = '⚠️ ' + list.length + ' lỗi gần đây · Mới nhất: <b style="color:#c2410c">' + last.code + '</b> lúc ' + timeStr;
   }
 }
-// ══════════════════════════════════════════
-// KIỂM TRA THỦ CÔNG (có thanh tiến trình 0% → 100%) — cho cả "Trạng thái lỗi hệ thống" và
-// "Trạng thái đồng bộ máy này". Chạy TRÊN THỰC TẾ từng bước kiểm tra (không phải progress giả), chỉ
-// thêm khoảng nghỉ ngắn giữa các bước để mắt kịp theo dõi tiến trình thay vì nhảy thẳng 0%→100%.
-// ══════════════════════════════════════════
-function _fmtCheckTime(ts){
-  if (!ts) return '';
-  var d = new Date(parseInt(ts,10));
-  return _pad2(d.getDate())+'/'+_pad2(d.getMonth()+1)+'/'+d.getFullYear()+' lúc '+_pad2(d.getHours())+':'+_pad2(d.getMinutes())+':'+_pad2(d.getSeconds());
-}
-function _runProgressSteps(barId, steps, onDone){
-  var bar = document.getElementById(barId);
-  if (bar) bar.style.width = '0%';
-  var i = 0, results = [];
-  function next(){
-    if (i >= steps.length) { onDone(results); return; }
-    setTimeout(function(){
-      var r;
-      try { r = steps[i](); } catch(e) { r = { ok:false, type:'JS', msg: e.message || 'Lỗi không rõ' }; }
-      results.push(r);
-      i++;
-      if (bar) bar.style.width = Math.round((i/steps.length)*100) + '%';
-      next();
-    }, 220);
-  }
-  next();
-}
-// Gợi ý cách khắc phục theo từng loại lỗi phát hiện được — hiển thị kèm mã lỗi trong nhật ký, giúp
-// người dùng (hoặc người hỗ trợ) biết hướng xử lý ngay thay vì chỉ thấy mỗi thông báo lỗi khô khan
-var ERROR_FIX_SUGGESTIONS = {
-  'STORAGE': 'Trình duyệt có thể đang chặn lưu trữ (đang ở chế độ ẩn danh?) hoặc bộ nhớ máy đầy. Thử tải lại trang hoặc đổi trình duyệt.',
-  'UI': 'Trang có thể chưa tải đầy đủ. Thử tải lại trang (kéo xuống làm mới hoặc đóng mở lại app).',
-  'NETWORK': 'Kiểm tra kết nối mạng (wifi/4G). Nếu mạng vẫn tốt, thử tắt bật lại mạng rồi kiểm tra lại.',
-  'SUPABASE': 'Kiểm tra kết nối mạng, hoặc thử đăng xuất và đăng nhập lại tài khoản đồng bộ trong Cài đặt.'
-};
-function _updateErrorLastCheckLine(){
-  var el = document.getElementById('error-last-check-line');
-  if (!el) return;
-  var ts = localStorage.getItem('error_last_check_time');
-  el.textContent = ts ? ('🕐 Kiểm tra lần cuối: ' + _fmtCheckTime(ts)) : '🕐 Chưa kiểm tra lần nào';
-}
-function runManualErrorCheck(){
-  var wrap = document.getElementById('error-check-progress-wrap');
-  if (wrap) wrap.style.display = 'block';
-  var steps = [
-    function(){ // 1) localStorage đọc/ghi
-      var testKey = '__manual_health_test__';
-      try {
-        localStorage.setItem(testKey, '1');
-        var ok = localStorage.getItem(testKey) === '1';
-        localStorage.removeItem(testKey);
-        return ok ? {ok:true} : {ok:false, type:'STORAGE', msg:'localStorage đọc/ghi không khớp'};
-      } catch(e) { return {ok:false, type:'STORAGE', msg:e.message || 'Không ghi được localStorage'}; }
-    },
-    function(){ // 2) phần tử giao diện cốt lõi
-      var thieu = ['tab-mua','tab-ban','settings-btn'].filter(function(id){ return !document.getElementById(id); });
-      return thieu.length ? {ok:false, type:'UI', msg:'Thiếu phần tử giao diện: #' + thieu.join(', #')} : {ok:true};
-    },
-    function(){ // 3) kết nối mạng cơ bản
-      return navigator.onLine ? {ok:true} : {ok:false, type:'NETWORK', msg:'Thiết bị đang không có kết nối mạng'};
-    },
-    function(){ // 4) đã khởi tạo kết nối Supabase hay chưa (kiểm tra kết nối THỰC SỰ nằm ở nút riêng
-      // "Kiểm tra đồng bộ ngay" bên trên, để tách bạch 2 việc — bước này chỉ kiểm tra nhanh)
-      if (getSyncProvider() === 'supabase' && !sbClient) return {ok:false, type:'SUPABASE', msg:'Chưa khởi tạo được kết nối Supabase'};
-      return {ok:true};
-    }
-  ];
-  _runProgressSteps('error-check-progress-bar', steps, function(results){
-    localStorage.setItem('error_last_check_time', String(Date.now()));
-    _updateErrorLastCheckLine();
-    var fails = results.filter(function(r){ return r && r.ok === false; });
-    setTimeout(function(){
-      if (wrap) wrap.style.display = 'none';
-      if (fails.length === 0) {
-        toast('✅ Kiểm tra xong — không phát hiện lỗi nào!');
-        _updateErrorStatusUI();
-      } else {
-        fails.forEach(function(f){
-          var suggestion = ERROR_FIX_SUGGESTIONS[f.type] || 'Thử tải lại trang, nếu vẫn còn lỗi hãy sao chép mã lỗi gửi cho người hỗ trợ.';
-          logAppError(f.type, f.msg, 'Đề xuất khắc phục: ' + suggestion);
-        });
-        _updateErrorStatusUI();
-        var logNow = _getErrorLog();
-        var last = logNow[logNow.length-1];
-        toast('⚠️ Phát hiện ' + fails.length + ' lỗi! Mã mới nhất: ' + (last ? last.code : ''));
-        openErrorLog();
-      }
-    }, 300);
-  });
-}
-function _updateSyncLastCheckLine(){
-  var el = document.getElementById('sync-last-check-line');
-  if (!el) return;
-  var ts = localStorage.getItem('sync_last_manual_check_time');
-  el.textContent = ts ? ('🕐 Kiểm tra lần cuối: ' + _fmtCheckTime(ts)) : '🕐 Chưa kiểm tra lần nào';
-}
-function runManualSyncCheck(){
-  var wrap = document.getElementById('sync-check-progress-wrap');
-  var bar = document.getElementById('sync-check-progress-bar');
-  if (wrap) wrap.style.display = 'block';
-  if (bar) bar.style.width = '0%';
-  var pct = 0;
-  var timer = setInterval(function(){
-    pct = Math.min(pct + 12, 90); // chạy tới 90% trong lúc chờ kết quả THẬT, nhảy 100% khi có kết quả
-    if (bar) bar.style.width = pct + '%';
-  }, 150);
-  syncClientRegistry(); // hàm này bất đồng bộ, tự cập nhật 'registry_sync_debug' khi có kết quả
-  setTimeout(function(){
-    clearInterval(timer);
-    if (bar) bar.style.width = '100%';
-    localStorage.setItem('sync_last_manual_check_time', String(Date.now()));
-    _updateSyncLastCheckLine();
-    var msg = localStorage.getItem('registry_sync_debug') || '';
-    setTimeout(function(){
-      if (wrap) wrap.style.display = 'none';
-      if (msg.indexOf('❌') > -1) {
-        var suggestion = ERROR_FIX_SUGGESTIONS['SUPABASE'];
-        logAppError('SUPABASE', msg, 'Đề xuất khắc phục: ' + suggestion);
-        _updateErrorStatusUI();
-        toast('❌ Đồng bộ thất bại — đã ghi vào nhật ký lỗi');
-      } else {
-        toast('✅ Đồng bộ máy này thành công!');
-      }
-    }, 300);
-  }, 1500);
-}
 function _renderErrorLogList(){
   var list = _getErrorLog().slice().reverse(); // mới nhất lên đầu
   var cont = document.getElementById('error-log-list');
@@ -8633,7 +8494,6 @@ function openSettings() {
   }
   updRegistryDebugLine();
   _updateErrorStatusUI();
-  _updateErrorLastCheckLine();
   openM('modal-settings');
 }
 
@@ -8644,8 +8504,7 @@ function updRegistryDebugLine() {
   var el = document.getElementById('registry-debug-line');
   if (!el) return;
   var msg = localStorage.getItem('registry_sync_debug') || 'Chưa từng chạy — có thể máy chưa cập nhật bản mới nhất, hoặc chưa có mạng.';
-  el.innerHTML = msg;
-  _updateSyncLastCheckLine();
+  el.innerHTML = msg + '<br><span style="color:var(--gd);text-decoration:underline;cursor:pointer" onclick="syncClientRegistry();setTimeout(updRegistryDebugLine,1200)">↻ Thử đồng bộ lại ngay</span>';
 }
 // ══════════════════════════════════════════
 // BẢNG KÊ THU MUA VÀ THANH TOÁN MỦ CAO SU
