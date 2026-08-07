@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.1.1</title>
+<title>Mua Bán Mủ Cao Su v2.1.5</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -505,7 +505,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.1.1 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.1.5 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1176,7 +1176,10 @@ input[type=date]:focus{border-color:var(--gl)}
         <div id="sync-check-progress-wrap" style="display:none;background:var(--g100);border-radius:6px;height:6px;overflow:hidden;margin-bottom:8px">
           <div id="sync-check-progress-bar" style="height:100%;width:0%;background:var(--gd);transition:width .2s ease"></div>
         </div>
-        <button onclick="runManualSyncCheck()" style="width:100%;padding:9px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">🔄 Kiểm tra đồng bộ ngay</button>
+        <div style="display:flex;gap:8px">
+          <button onclick="runManualSyncCheck()" style="flex:1;padding:9px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">🔄 Kiểm tra đồng bộ ngay</button>
+          <button onclick="openSyncLog()" style="flex:1;padding:9px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">📋 Xem chi tiết lỗi</button>
+        </div>
       </div>
       <!-- TRẠNG THÁI LỖI HỆ THỐNG: tự kiểm tra định kỳ + ghi nhận lỗi phát sinh ngoài kiểm tra định
            kỳ (lỗi JS runtime, promise bị reject không xử lý), gán mã lỗi ngắn gọn để báo cho người
@@ -1218,6 +1221,16 @@ input[type=date]:focus{border-color:var(--gl)}
     <div style="font-size:11.5px;color:var(--g400);margin-bottom:12px">Tự động kiểm tra định kỳ + ghi nhận lỗi phát sinh bất kỳ lúc nào. Bấm "Sao chép" ở lỗi nào rồi gửi cho người hỗ trợ để khắc phục nhanh hơn.</div>
     <div id="error-log-list"></div>
     <button class="btn-huy" style="width:100%;margin-top:10px" onclick="closeM('modal-error-log')">Đóng</button>
+  </div>
+</div>
+
+<!-- MODAL CHI TIẾT LỖI ĐỒNG BỘ MÁY NÀY -->
+<div class="modal center" id="modal-sync-log">
+  <div class="modal-box center-box" style="max-width:420px;max-height:80vh;overflow-y:auto">
+    <div style="font-size:16px;font-weight:800;color:var(--g800);margin-bottom:4px">🔧 Nhật ký lỗi đồng bộ máy này</div>
+    <div style="font-size:11.5px;color:var(--g400);margin-bottom:12px">Ghi lại tối đa 30 lỗi gần nhất khi đồng bộ hạn dùng/mã thiết bị lên trang quản lý (tự động lúc mở app + mỗi lần bấm "Kiểm tra đồng bộ ngay"). Bấm "Sao chép" ở lỗi nào rồi gửi cho người hỗ trợ để khắc phục nhanh hơn.</div>
+    <div id="sync-log-list"></div>
+    <button class="btn-huy" style="width:100%;margin-top:10px" onclick="closeM('modal-sync-log')">Đóng</button>
   </div>
 </div>
 
@@ -1304,8 +1317,8 @@ input[type=date]:focus{border-color:var(--gl)}
       <div id="gh-device-code" style="font-size:22px;font-weight:800;color:var(--gd);letter-spacing:2px"></div>
       <div style="font-size:10px;color:var(--g400);margin-top:2px">Thuật toán mã: <b id="gh-algo-ver"></b></div>
     </div>
-    <input type="text" inputmode="numeric" id="gh-pw-input" class="fi" placeholder="Mật khẩu hoặc Mã gia hạn 6 số" autocomplete="off" style="margin-bottom:8px" oninput="onGhPwInput()">
-    <input type="text" inputmode="numeric" id="gh-days-input" class="fi" placeholder="—" style="margin-bottom:8px" disabled>
+    <input type="text" inputmode="numeric" id="gh-pw-input" class="fi" placeholder="Nhập mã gia hạn" autocomplete="off" style="margin-bottom:8px" oninput="onGhPwInput()">
+    <input type="text" inputmode="numeric" id="gh-days-input" class="fi" placeholder="—" style="margin-bottom:8px;display:none" disabled>
     <div id="gh-adj-hint" style="display:none;font-size:11px;color:var(--g600);margin-bottom:6px;text-align:center">Nhập số ngày để thêm, nhập <b>-n</b> để bớt (VD: 30 hoặc -5)</div>
     <div id="gh-err" style="color:#dc2626;font-size:11px;margin-bottom:8px;display:none">❌ Mật khẩu không đúng!</div>
     <div id="gh-info" style="font-size:11px;color:var(--g600);margin-bottom:8px;text-align:center"></div>
@@ -1842,7 +1855,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.1.1</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.1.5</div>
       </div>
     </div>
 
@@ -2008,7 +2021,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.1.1</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.1.5</div>
       </div>
     </div>
 
@@ -3680,7 +3693,7 @@ function xoaGD(tab){
     var _gdOld = getGD(tab).find(function(g){ return String(g.id)===String(editId[tab]); });
     const all=getGD(tab).filter(g=>String(g.id)!==String(editId[tab]));
     setGD(tab,all); huySua(tab); renderTbl(tab); updTK(tab); updTK('ban'); if(typeof updThangData==='function') updThangData(); toastDeleted('🗑️ Đã xoá giao dịch!');
-    if(_gdOld && _gdOld.anhPath && sbClient && sbUser) sbClient.storage.from(SB_ANH_BUCKET).remove([_gdOld.anhPath]).catch(function(){});
+    if(_gdOld && _gdOld.anhPath && sbClient && sbUser) sbClient.storage.from(SB_ANH_BUCKET).remove([_gdOld.anhPath]).then(null, function(){});
     autoSync();
   });
 }
@@ -3820,7 +3833,7 @@ function uploadAnhGD(tab, gdId, blob){
       setGD(tab, all);
       renderTbl(tab);
     }
-    if (oldPath && oldPath !== path) sbClient.storage.from(SB_ANH_BUCKET).remove([oldPath]).catch(function(){}); // dọn file ảnh cũ tránh mồ côi
+    if (oldPath && oldPath !== path) sbClient.storage.from(SB_ANH_BUCKET).remove([oldPath]).then(null, function(){}); // dọn file ảnh cũ tránh mồ côi
     autoSync();
     toast('✅ Đã đính kèm ảnh! (tự xoá sau ' + soNgay + ' ngày)');
   }).catch(function(e){ toast('⚠️ Lỗi kết nối khi tải ảnh lên: ' + e.message); });
@@ -3834,7 +3847,7 @@ function xoaAnhOfGD(tab, gdId){
   delete all[idx].anh; delete all[idx].anhPath; delete all[idx].anhHetHan; delete all[idx].anhSoNgay;
   setGD(tab, all);
   renderTbl(tab);
-  if (path && sbClient && sbUser) sbClient.storage.from(SB_ANH_BUCKET).remove([path]).catch(function(){});
+  if (path && sbClient && sbUser) sbClient.storage.from(SB_ANH_BUCKET).remove([path]).then(null, function(){});
   autoSync();
 }
 // Xem ảnh phóng to toàn màn hình (chạm vào icon 📷 trong bảng giao dịch)
@@ -3863,7 +3876,7 @@ function cleanupExpiredAnh(){
     });
     if (touched) setGD(tab, all);
   });
-  if (pathsToDelete.length) sbClient.storage.from(SB_ANH_BUCKET).remove(pathsToDelete).catch(function(){});
+  if (pathsToDelete.length) sbClient.storage.from(SB_ANH_BUCKET).remove(pathsToDelete).then(null, function(){});
   if (changed) { autoSync(); renderTbl('mua'); renderTbl('ban'); }
 }
 
@@ -5963,6 +5976,12 @@ function syncClientRegistry() {
       device_code: getDeviceCode(),
       license_expiry: getLicenseExpiry(),
       last_ext_code: lastCode,
+      // Nhật ký lỗi đồng bộ CỦA RIÊNG MÁY NÀY — gắn vào đúng dòng client_registry theo fingerprint
+      // (khoá duy nhất của từng thiết bị), nên dù nhiều máy cùng đăng nhập chung 1 tài khoản Supabase,
+      // mỗi máy vẫn có đúng 1 dòng riêng, không bao giờ trộn lẫn nhật ký giữa các máy với nhau. Lưu ở
+      // cột riêng (sync_error_log) trong bảng client_registry — hoàn toàn khác bảng/khoá với nhật ký
+      // lỗi hệ thống (bảng mucaosu_data, khoá app_error_log_v1) nên không lẫn lộn 2 loại lỗi.
+      sync_error_log: _getSyncLog(),
       updated_at: new Date().toISOString()
     };
     if (sbUser) { row.user_id = sbUser.id; row.email = sbUser.email; }
@@ -5970,6 +5989,7 @@ function syncClientRegistry() {
       if (res && res.error) {
         console.error('[client_registry] lỗi đồng bộ:', res.error.message);
         localStorage.setItem('registry_sync_debug', '❌ Lỗi lúc ' + new Date().toLocaleTimeString('vi-VN') + ': ' + res.error.message);
+        logSyncError(res.error.message, 'client_registry upsert trả lỗi');
       } else {
         localStorage.setItem('registry_sync_debug', '✅ OK lúc ' + new Date().toLocaleTimeString('vi-VN') + ' (fp: ' + row.fingerprint + ')');
       }
@@ -5977,10 +5997,12 @@ function syncClientRegistry() {
     }).catch(function(e) {
       console.error('[client_registry] lỗi kết nối:', e && e.message);
       localStorage.setItem('registry_sync_debug', '❌ Lỗi kết nối lúc ' + new Date().toLocaleTimeString('vi-VN') + ': ' + (e && e.message));
+      logSyncError((e && e.message) || 'Lỗi kết nối không rõ', 'client_registry upsert .catch()');
       if (typeof updRegistryDebugLine === 'function') updRegistryDebugLine();
     });
   } catch(e) {
     localStorage.setItem('registry_sync_debug', '❌ Lỗi JS lúc ' + new Date().toLocaleTimeString('vi-VN') + ': ' + e.message);
+    logSyncError(e.message || 'Lỗi JS không rõ', 'syncClientRegistry try/catch');
   }
 }
 
@@ -8520,10 +8542,8 @@ function runManualSyncCheck(){
     setTimeout(function(){
       if (wrap) wrap.style.display = 'none';
       if (msg.indexOf('❌') > -1) {
-        var suggestion = ERROR_FIX_SUGGESTIONS['SUPABASE'];
-        logAppError('SUPABASE', msg, 'Đề xuất khắc phục: ' + suggestion);
-        _updateErrorStatusUI();
-        toast('❌ Đồng bộ thất bại — đã ghi vào nhật ký lỗi');
+        // syncClientRegistry() ở trên đã tự ghi lỗi này vào nhật ký đồng bộ riêng (logSyncError)
+        toast('❌ Đồng bộ thất bại — đã ghi vào nhật ký đồng bộ');
       } else {
         toast('✅ Đồng bộ máy này thành công!');
       }
@@ -8600,7 +8620,7 @@ setInterval(_healthCheckTick, 5*60*1000); // sau đó lặp lại mỗi 5 phút
 // nhập (_finishLoginMerge). Để không mất lỗi phát sinh khi máy đang mở lâu dài, chủ động tải + trộn
 // lại với đám mây theo cùng chu kỳ 5 phút này, trước khi lượt đồng bộ ngầm tiếp theo ghi đè lên.
 function _syncErrorLogFromCloud(){
-  if (getSyncProvider() !== 'supabase' || !sbClient || !sbUser || !navigator.onLine) return;
+  if (getSyncProvider() !== 'supabase' || !sbClient || !sbUser) return;
   sbClient.from('mucaosu_data').select('data_value').eq('user_id', sbUser.id).eq('data_key', ERROR_LOG_KEY).maybeSingle().then(function(res){
     if (res.error || !res.data) return;
     var merged = _mergeErrorLogs(res.data.data_value, _getErrorLog());
@@ -8635,6 +8655,88 @@ function openSettings() {
   _updateErrorStatusUI();
   _updateErrorLastCheckLine();
   openM('modal-settings');
+}
+
+// ══════════════════════════════════════════
+// NHẬT KÝ "TRẠNG THÁI ĐỒNG BỘ MÁY NÀY" — lưu cuốn chiếu tối đa 30 lỗi đồng bộ gần nhất (đồng bộ
+// hạn dùng + mã thiết bị lên trang quản lý admin qua client_registry/device_trials), có mã lỗi riêng
+// và màn "Xem chi tiết lỗi" — làm y hệt cách "🩺 Trạng thái lỗi hệ thống" ở trên, nhưng tách riêng
+// nhật ký để không lẫn lộn 2 loại lỗi khác bản chất với nhau.
+// ══════════════════════════════════════════
+var SYNC_LOG_KEY = 'app_sync_log_v1';
+var SYNC_LOG_MAX = 30;
+function _getSyncLog(){
+  try { return JSON.parse(localStorage.getItem(SYNC_LOG_KEY) || '[]'); } catch(e) { return []; }
+}
+function _saveSyncLog(list){
+  try { localStorage.setItem(SYNC_LOG_KEY, JSON.stringify(list.slice(-SYNC_LOG_MAX))); } catch(e) {}
+}
+function logSyncError(message, detail){
+  try {
+    var list = _getSyncLog();
+    var now = Date.now();
+    // Chống spam y hệt logAppError(): lỗi giống hệt vừa xảy ra trong 10 giây gần nhất thì bỏ qua,
+    // tránh 1 lỗi lặp lại liên tục (VD mất mạng kéo dài, cứ 15s thử lại 1 lần) làm đầy nhật ký
+    var trung = list.some(function(e){ return e.message===message && (now-e.time)<10000; });
+    if (trung) return;
+    var code = _genErrorCode('SYNC');
+    list.push({ code: code, message: String(message||'').slice(0,300), detail: String(detail||'').slice(0,500), time: now });
+    _saveSyncLog(list);
+  } catch(e) { /* im lặng — tránh vòng lặp lỗi vô hạn nếu bản thân việc ghi log cũng lỗi */ }
+}
+function _renderSyncLogList(){
+  var list = _getSyncLog().slice().reverse(); // mới nhất lên đầu
+  var cont = document.getElementById('sync-log-list');
+  if (!cont) return;
+  if (list.length === 0) {
+    cont.innerHTML = '<div style="text-align:center;padding:20px;color:var(--g400);font-size:13px">✅ Chưa ghi nhận lỗi đồng bộ nào</div>';
+  } else {
+    cont.innerHTML = list.map(function(e){
+      var d = new Date(e.time);
+      var timeStr = _pad2(d.getHours())+':'+_pad2(d.getMinutes())+':'+_pad2(d.getSeconds())+' '+_pad2(d.getDate())+'/'+_pad2(d.getMonth()+1)+'/'+d.getFullYear();
+      return '<div style="padding:10px 0;border-bottom:1px solid var(--g100)">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">'
+        + '<span style="font-weight:700;color:#c2410c;font-size:12.5px">' + e.code + '</span>'
+        + '<button onclick="_copySyncCode(\'' + e.code + '\')" style="font-size:11px;padding:3px 10px;background:var(--gb);border:1px solid var(--gp);border-radius:6px;color:var(--gd);cursor:pointer;flex-shrink:0">📋 Sao chép</button>'
+        + '</div>'
+        + '<div style="font-size:11px;color:var(--g400);margin-top:3px">' + timeStr + '</div>'
+        + '<div style="font-size:12px;color:var(--g800);margin-top:3px;word-break:break-word">' + _escHtmlErr(e.message) + '</div>'
+        + '</div>';
+    }).join('');
+  }
+}
+function openSyncLog(){
+  _renderSyncLogList();
+  openM('modal-sync-log');
+  _pullSyncLogFromCloud();
+}
+// Tải lại nhật ký lỗi đồng bộ từ đúng dòng client_registry của riêng máy này (theo fingerprint) —
+// đề phòng máy bị xoá dữ liệu duyệt web thì vẫn còn thấy lại lịch sử cũ đã từng đẩy lên trước đó.
+// Trộn với dữ liệu local hiện có (không đè mất), giữ tối đa 30 lỗi mới nhất. Nếu Supabase chưa cấp
+// quyền đọc (SELECT) bảng client_registry cho chính máy đó thì âm thầm bỏ qua, không báo lỗi phiền.
+function _pullSyncLogFromCloud(){
+  if (!sbClient || !sbUser) return;
+  var fp = getDeviceFingerprint();
+  sbClient.from('client_registry').select('sync_error_log').eq('fingerprint', fp).maybeSingle().then(function(res){
+    if (!res || res.error || !res.data) return;
+    var cloudLog = res.data.sync_error_log;
+    if (!Array.isArray(cloudLog) || !cloudLog.length) return;
+    var merged = _mergeErrorLogs(cloudLog, _getSyncLog());
+    _saveSyncLog(merged);
+    _renderSyncLogList();
+  }).catch(function(){ /* không có quyền đọc hoặc lỗi mạng — bỏ qua, dữ liệu local vẫn còn nguyên */ });
+}
+function _copySyncCode(code){
+  var list = _getSyncLog();
+  var found = list.find(function(e){ return e.code === code; });
+  var full = found
+    ? 'Mã lỗi: ' + found.code + '\nThời gian: ' + new Date(found.time).toLocaleString('vi-VN') + '\nChi tiết: ' + found.message + (found.detail ? ('\n' + found.detail) : '')
+    : 'Mã lỗi: ' + code;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(full).then(function(){ toast('📋 Đã sao chép mã lỗi'); }).catch(function(){ toast('Mã lỗi: ' + code); });
+  } else {
+    toast('Mã lỗi: ' + code);
+  }
 }
 
 // Hiển thị trạng thái đồng bộ ngầm về bảng quản lý khách hàng (chẩn đoán, xem
@@ -9622,10 +9724,14 @@ function getDeviceFingerprint() {
 
 function _pushTrialToServer(fp, expiry) {
   if (!sbClient) return;
+  // Dùng .then(null, fn) thay vì .catch(fn) — trên 1 số phiên bản trình duyệt/WebView iOS (Safari),
+  // object trả về trực tiếp từ .upsert() chỉ có sẵn .then(), CHƯA CHẮC có sẵn .catch() (chỉ khi đã
+  // gọi qua .then() trước thì kết quả mới chắc chắn là Promise thật có .catch()) — gọi .catch() ngay
+  // sau .upsert() như trước đây gây lỗi "catch is not a function" trên các máy đó.
   sbClient.from('device_trials').upsert(
     [{ fingerprint: fp, license_expiry: expiry, updated_at: new Date().toISOString() }],
     { onConflict: 'fingerprint' }
-  ).catch(function(){});
+  ).then(null, function(){});
 }
 
 var _antiCheatInFlight = false;
@@ -9689,6 +9795,7 @@ function verifyLicenseAntiCheat() {
     _antiCheatInFlight = false;
     // Báo rõ lý do thay vì im lặng, và tự thử lại sau — tránh kẹt mãi ở "Chưa từng chạy"
     localStorage.setItem('registry_sync_debug', '❌ Lỗi kết nối lúc ' + new Date().toLocaleTimeString('vi-VN') + ' (' + (e && e.message ? e.message : 'không rõ') + ') — sẽ tự thử lại');
+    logSyncError((e && e.message) || 'Lỗi kết nối không rõ', 'verifyLicenseAntiCheat .catch() (device_trials select)');
     if (typeof updRegistryDebugLine === 'function') updRegistryDebugLine();
     setTimeout(verifyLicenseAntiCheat, 20000);
   });
@@ -9827,7 +9934,7 @@ function openGiaHan() {
   var pwEl = document.getElementById('gh-pw-input');
   if(pwEl) pwEl.value='';
   var daysEl = document.getElementById('gh-days-input');
-  if(daysEl){ daysEl.value=''; daysEl.disabled=true; daysEl.placeholder='—'; }
+  if(daysEl){ daysEl.value=''; daysEl.disabled=true; daysEl.placeholder='—'; daysEl.style.display='none'; }
   var adjHint = document.getElementById('gh-adj-hint');
   if(adjHint) adjHint.style.display='none';
   var btn = document.getElementById('gh-btn-luu');
@@ -9931,16 +10038,16 @@ function onGhPwInput() {
 
   if (pw === getAdminPW()) {
     // Mật khẩu quản trị → nhập số ngày, có thể âm để bớt
-    if(daysEl){ daysEl.disabled=false; daysEl.placeholder='Số ngày (VD: 20 hoặc -5)'; daysEl.value=''; }
+    if(daysEl){ daysEl.style.display='block'; daysEl.disabled=false; daysEl.placeholder='Số ngày (VD: 20 hoặc -5)'; daysEl.value=''; }
     if(adjHint) adjHint.style.display='block';
     if(btn) btn.textContent='Áp dụng';
   } else if (pw === _LPW) {
     // Mật khẩu cố định → nhập số ngày thêm (chỉ dương)
-    if(daysEl){ daysEl.disabled=false; daysEl.placeholder='Số ngày muốn gia hạn (VD: 30)'; }
+    if(daysEl){ daysEl.style.display='block'; daysEl.disabled=false; daysEl.placeholder='Số ngày muốn gia hạn (VD: 30)'; }
     if(adjHint) adjHint.style.display='none';
     if(btn) btn.textContent='Gia hạn';
   } else {
-    if(daysEl){ daysEl.disabled=true; daysEl.value=''; daysEl.placeholder='—'; }
+    if(daysEl){ daysEl.style.display='none'; daysEl.disabled=true; daysEl.value=''; daysEl.placeholder='—'; }
     if(adjHint) adjHint.style.display='none';
     if(btn) btn.textContent='Gia hạn';
   }
