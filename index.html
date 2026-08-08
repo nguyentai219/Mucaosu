@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.1.5</title>
+<title>Mua Bán Mủ Cao Su v2.1.9</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -505,7 +505,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.1.5 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.1.9 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1177,7 +1177,7 @@ input[type=date]:focus{border-color:var(--gl)}
           <div id="sync-check-progress-bar" style="height:100%;width:0%;background:var(--gd);transition:width .2s ease"></div>
         </div>
         <div style="display:flex;gap:8px">
-          <button onclick="runManualSyncCheck()" style="flex:1;padding:9px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">🔄 Kiểm tra đồng bộ ngay</button>
+          <button onclick="runManualSyncCheck()" style="flex:1;padding:9px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">🔄 Kiểm tra đồng bộ</button>
           <button onclick="openSyncLog()" style="flex:1;padding:9px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">📋 Xem chi tiết lỗi</button>
         </div>
       </div>
@@ -1228,7 +1228,7 @@ input[type=date]:focus{border-color:var(--gl)}
 <div class="modal center" id="modal-sync-log">
   <div class="modal-box center-box" style="max-width:420px;max-height:80vh;overflow-y:auto">
     <div style="font-size:16px;font-weight:800;color:var(--g800);margin-bottom:4px">🔧 Nhật ký lỗi đồng bộ máy này</div>
-    <div style="font-size:11.5px;color:var(--g400);margin-bottom:12px">Ghi lại tối đa 30 lỗi gần nhất khi đồng bộ hạn dùng/mã thiết bị lên trang quản lý (tự động lúc mở app + mỗi lần bấm "Kiểm tra đồng bộ ngay"). Bấm "Sao chép" ở lỗi nào rồi gửi cho người hỗ trợ để khắc phục nhanh hơn.</div>
+    <div style="font-size:11.5px;color:var(--g400);margin-bottom:12px">Ghi lại tối đa 30 lỗi gần nhất khi đồng bộ hạn dùng/mã thiết bị lên trang quản lý (tự động lúc mở app + mỗi lần bấm "Kiểm tra đồng bộ"). Bấm "Sao chép" ở lỗi nào rồi gửi cho người hỗ trợ để khắc phục nhanh hơn.</div>
     <div id="sync-log-list"></div>
     <button class="btn-huy" style="width:100%;margin-top:10px" onclick="closeM('modal-sync-log')">Đóng</button>
   </div>
@@ -1855,7 +1855,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.1.5</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.1.9</div>
       </div>
     </div>
 
@@ -2021,7 +2021,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.1.5</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.1.9</div>
       </div>
     </div>
 
@@ -2949,6 +2949,9 @@ document.addEventListener('DOMContentLoaded',()=>{
   setTimeout(cleanupExpiredAnh, 6000); // đợi đăng nhập Supabase xong rồi mới quét ảnh hết hạn
   setInterval(cleanupExpiredAnh, 30*60*1000); // quét lại mỗi 30 phút trong lúc app vẫn đang mở
   resetIdleTimer(); // bắt đầu đếm giờ rảnh cho hiệu ứng bong bóng bảo vệ màn hình (nếu đã bật)
+  if (typeof scheduleIdleSync === 'function') scheduleIdleSync(); // kích hoạt ngay lưới an toàn đồng
+  // bộ ngầm (đếm 15s) ngay lúc mở app, không đợi người dùng chạm màn hình lần đầu mới bắt đầu đếm —
+  // đảm bảo mọi thay đổi chưa kịp đồng bộ từ phiên trước cũng được quét và đẩy lên sớm
 
   ['mua','ban'].forEach(t=>{
     updDate(t);
@@ -3029,7 +3032,13 @@ function switchTab(tab){
 
 // ─── DATE ───
 function updDate(tab){
-  document.getElementById(tab+'-date-val').textContent=fmtDate(curDate[tab]);
+  var dateStr = fmtDate(curDate[tab]);
+  try {
+    var d = new Date(curDate[tab]+'T00:00:00');
+    var lun = solar2Lunar(d.getDate(), d.getMonth()+1, d.getFullYear());
+    dateStr += ' - ' + lun.day + '/' + lun.month + (lun.leap ? ' (nhuận)' : '') + ' Âm lịch';
+  } catch(e) { /* lỗi tính âm lịch thì chỉ hiện ngày dương như cũ, không chặn hiển thị */ }
+  document.getElementById(tab+'-date-val').textContent = dateStr;
 }
 var calViewYear, calViewMonth, calSelectedDate;
 var MONTH_NAMES_VN = ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
@@ -8467,10 +8476,10 @@ function _updateErrorLastCheckLine(){
   var ts = localStorage.getItem('error_last_check_time');
   el.textContent = ts ? ('🕐 Kiểm tra lần cuối: ' + _fmtCheckTime(ts)) : '🕐 Chưa kiểm tra lần nào';
 }
-function runManualErrorCheck(){
-  var wrap = document.getElementById('error-check-progress-wrap');
-  if (wrap) wrap.style.display = 'block';
-  var steps = [
+// 4 bước kiểm tra lỗi hệ thống — dùng CHUNG cho cả bản thủ công (nút "🔍 Kiểm tra lỗi ngay") lẫn bản
+// tự động chạy ngầm lúc mở app + định kỳ mỗi 5 phút, đảm bảo 2 bản luôn kiểm tra giống hệt nhau.
+function _getErrorCheckSteps(){
+  return [
     function(){ // 1) localStorage đọc/ghi
       var testKey = '__manual_health_test__';
       try {
@@ -8493,7 +8502,11 @@ function runManualErrorCheck(){
       return {ok:true};
     }
   ];
-  _runProgressSteps('error-check-progress-bar', steps, function(results){
+}
+function runManualErrorCheck(){
+  var wrap = document.getElementById('error-check-progress-wrap');
+  if (wrap) wrap.style.display = 'block';
+  _runProgressSteps('error-check-progress-bar', _getErrorCheckSteps(), function(results){
     localStorage.setItem('error_last_check_time', String(Date.now()));
     _updateErrorLastCheckLine();
     var fails = results.filter(function(r){ return r && r.ok === false; });
@@ -8516,11 +8529,42 @@ function runManualErrorCheck(){
     }, 300);
   });
 }
+// Bản TỰ ĐỘNG của kiểm tra lỗi hệ thống — chạy ngầm hoàn toàn im lặng (không progress bar, không
+// toast, không tự mở popup nhật ký) để không làm phiền người dùng đang thao tác. Chạy đúng y hệt 4
+// bước như bản thủ công, chỉ khác cách hiển thị kết quả — lỗi vẫn được ghi vào nhật ký + cập nhật
+// dòng trạng thái + giờ "kiểm tra lần cuối" y hệt, để người dùng luôn thấy app đang tự kiểm tra định
+// kỳ chứ không phải đứng yên chờ họ tự bấm nút.
+function runAutoErrorCheck(){
+  _runProgressSteps('__no_progress_bar_for_auto_check__', _getErrorCheckSteps(), function(results){
+    localStorage.setItem('error_last_check_time', String(Date.now()));
+    _updateErrorLastCheckLine();
+    var fails = results.filter(function(r){ return r && r.ok === false; });
+    if (fails.length) {
+      fails.forEach(function(f){
+        var suggestion = ERROR_FIX_SUGGESTIONS[f.type] || 'Thử tải lại trang, nếu vẫn còn lỗi hãy sao chép mã lỗi gửi cho người hỗ trợ.';
+        logAppError(f.type, f.msg, 'Đề xuất khắc phục: ' + suggestion);
+      });
+    }
+    _updateErrorStatusUI();
+  });
+}
 function _updateSyncLastCheckLine(){
   var el = document.getElementById('sync-last-check-line');
   if (!el) return;
   var ts = localStorage.getItem('sync_last_manual_check_time');
   el.textContent = ts ? ('🕐 Kiểm tra lần cuối: ' + _fmtCheckTime(ts)) : '🕐 Chưa kiểm tra lần nào';
+}
+// Bản TỰ ĐỘNG của kiểm tra đồng bộ — chạy ngầm im lặng (không progress bar/toast), gọi thẳng
+// syncClientRegistry() (hàm này tự cập nhật 'registry_sync_debug' + tự ghi vào nhật ký lỗi đồng bộ
+// riêng nếu thất bại) rồi cập nhật dòng "kiểm tra lần cuối" để người dùng thấy app vẫn đang tự kiểm
+// tra định kỳ, không cần tự tay bấm "Kiểm tra đồng bộ ngay" mới thấy có gì chạy.
+function runAutoSyncCheck(){
+  if (!sbClient) return; // chưa khởi tạo xong Supabase thì chưa có gì để kiểm tra
+  syncClientRegistry();
+  setTimeout(function(){
+    localStorage.setItem('sync_last_manual_check_time', String(Date.now()));
+    _updateSyncLastCheckLine();
+  }, 1200);
 }
 function runManualSyncCheck(){
   var wrap = document.getElementById('sync-check-progress-wrap');
@@ -8599,21 +8643,14 @@ window.addEventListener('unhandledrejection', function(e){
 });
 // Tự kiểm tra định kỳ một số điều kiện sức khoẻ cơ bản của app — chạy ngầm, không làm phiền người
 // dùng nếu mọi thứ bình thường, chỉ ghi log khi phát hiện bất thường
-function _healthCheckTick(){
-  try {
-    var testKey = '__health_test__';
-    localStorage.setItem(testKey, '1');
-    var ok = localStorage.getItem(testKey) === '1';
-    localStorage.removeItem(testKey);
-    if (!ok) { logAppError('HEALTH', 'localStorage đọc/ghi không khớp — có thể trình duyệt đang chặn lưu trữ', ''); return; }
-    var thieu = ['tab-mua','tab-ban','settings-btn'].filter(function(id){ return !document.getElementById(id); });
-    if (thieu.length) { logAppError('HEALTH', 'Thiếu phần tử giao diện cốt lõi: #' + thieu.join(', #'), ''); return; }
-  } catch(e) {
-    logAppError('HEALTH', e.message || 'Lỗi không rõ khi tự kiểm tra', '');
-  }
-}
-setTimeout(_healthCheckTick, 8000); // kiểm tra sớm 1 lần sau khi app khởi động xong (chờ 8s cho ổn định)
-setInterval(_healthCheckTick, 5*60*1000); // sau đó lặp lại mỗi 5 phút
+// (Đã gỡ _healthCheckTick — bản kiểm tra RÚT GỌN chỉ 2/4 bước từng dùng ở đây. Nay dùng thẳng
+// runAutoErrorCheck() ở dưới, chạy đúng đủ 4 bước y hệt bản thủ công, tránh 2 bản kiểm tra lệch nhau.)
+//
+// LỊCH CHẠY TỰ ĐỘNG KHI KHỞI ĐỘNG APP: kiểm tra lỗi hệ thống + kiểm tra đồng bộ máy này chạy gần như
+// ngay lập tức (2 giây — chỉ chờ vừa đủ cho sbClient/init ổn định, không đợi lâu như trước 8-10 giây),
+// sau đó tự lặp lại đều đặn mỗi 5 phút trong suốt thời gian app còn mở, không cần người dùng tự bấm.
+setTimeout(function(){ runAutoErrorCheck(); runAutoSyncCheck(); }, 2000);
+setInterval(function(){ runAutoErrorCheck(); runAutoSyncCheck(); }, 5*60*1000);
 // Đồng bộ ngầm định kỳ (mỗi 15s) chỉ ghi đè đơn giản (last-write-wins) toàn bộ localStorage lên đám
 // mây, KHÔNG tự trộn — nếu để mặc định, lỗi phát sinh ở máy A có thể bị máy B (đăng nhập cùng tài
 // khoản) ghi đè mất qua các lần đồng bộ ngầm liên tiếp. Nhật ký lỗi CHỈ được trộn thật sự lúc đăng
@@ -8630,8 +8667,9 @@ function _syncErrorLogFromCloud(){
     if (modal && modal.classList.contains('show')) _renderErrorLogList();
   }).catch(function(){ /* không phải luồng chính, im lặng bỏ qua để tránh vòng lặp ghi log lỗi */ });
 }
-setTimeout(_syncErrorLogFromCloud, 10000);
+setTimeout(_syncErrorLogFromCloud, 3000); // gần như ngay lập tức lúc mở app (trước đây 10 giây)
 setInterval(_syncErrorLogFromCloud, 5*60*1000);
+
 
 function openSettings() {
   document.getElementById('setting-round').checked = getSetting('round', true);
@@ -9221,6 +9259,169 @@ function setPendingCount(n){ localStorage.setItem('pending_sync_count', String(M
 function incPendingCount(){ setPendingCount(getPendingCount()+1); }
 
 var _lastSyncAt = null;
+// ═══════════════════════════════════════════════════════
+// LỊCH ÂM VIỆT NAM (thuật toán thiên văn Hồ Ngọc Đức, múi giờ Việt Nam +7) — dùng cho thanh thông báo
+// đa nhiệm bên dưới: hiện ngày âm lịch hôm nay + cảnh báo ngày ăn chay (14, 15, 24, 29, 30 âm lịch)
+// ═══════════════════════════════════════════════════════
+function _lcJdFromDate(dd, mm, yy){
+  var a = Math.floor((14 - mm) / 12);
+  var y = yy + 4800 - a;
+  var m = mm + 12 * a - 3;
+  var jd = dd + Math.floor((153*m+2)/5) + 365*y + Math.floor(y/4) - Math.floor(y/100) + Math.floor(y/400) - 32045;
+  if (jd < 2299161) jd = dd + Math.floor((153*m+2)/5) + 365*y + Math.floor(y/4) - 32083;
+  return jd;
+}
+function _lcNewMoon(k){
+  var T = k/1236.85, T2=T*T, T3=T2*T, dr=Math.PI/180;
+  var Jd1 = 2415020.75933 + 29.53058868*k + 0.0001178*T2 - 0.000000155*T3;
+  Jd1 += 0.00033*Math.sin((166.56+132.87*T-0.009173*T2)*dr);
+  var M = 359.2242 + 29.10535608*k - 0.0000333*T2 - 0.00000347*T3;
+  var Mpr = 306.0253 + 385.81691806*k + 0.0107306*T2 + 0.00001236*T3;
+  var F = 21.2964 + 390.67050646*k - 0.0016528*T2 - 0.00000239*T3;
+  var C1 = (0.1734-0.000393*T)*Math.sin(M*dr) + 0.0021*Math.sin(2*dr*M);
+  C1 = C1 - 0.4068*Math.sin(Mpr*dr) + 0.0161*Math.sin(dr*2*Mpr);
+  C1 = C1 - 0.0004*Math.sin(dr*3*Mpr);
+  C1 = C1 + 0.0104*Math.sin(dr*2*F) - 0.0051*Math.sin(dr*(M+Mpr));
+  C1 = C1 - 0.0074*Math.sin(dr*(M-Mpr)) + 0.0004*Math.sin(dr*(2*F+M));
+  C1 = C1 - 0.0004*Math.sin(dr*(2*F-M)) - 0.0006*Math.sin(dr*(2*F+Mpr));
+  C1 = C1 + 0.0010*Math.sin(dr*(2*F-Mpr)) + 0.0005*Math.sin(dr*(2*Mpr+M));
+  var deltat = (T < -11) ? (0.001 + 0.000839*T + 0.0002261*T2 - 0.00000845*T3 - 0.000000081*T*T3) : (-0.000278 + 0.000265*T + 0.000262*T2);
+  return Jd1 + C1 - deltat;
+}
+function _lcSunLongitude(jdn){
+  var T = (jdn - 2451545.0) / 36525, T2=T*T, dr=Math.PI/180;
+  var M = 357.52910 + 35999.05030*T - 0.0001559*T2 - 0.00000048*T*T2;
+  var L0 = 280.46645 + 36000.76983*T + 0.0003032*T2;
+  var DL = (1.914600-0.004817*T-0.000014*T2)*Math.sin(dr*M);
+  DL = DL + (0.019993-0.000101*T)*Math.sin(dr*2*M) + 0.000290*Math.sin(dr*3*M);
+  var L = (L0+DL) * dr;
+  L = L - Math.PI*2*Math.floor(L/(Math.PI*2));
+  return L;
+}
+function _lcNewMoonDay(k, tz){ return Math.floor(_lcNewMoon(k) + 0.5 + tz/24); }
+function _lcSunLongitudeDay(dayNumber, tz){ return Math.floor(_lcSunLongitude(dayNumber - 0.5 - tz/24) / Math.PI * 6); }
+function _lcMonth11(yy, tz){
+  var off = _lcJdFromDate(31, 12, yy) - 2415021.076998695;
+  var k = Math.floor(off / 29.530588853);
+  var nm = _lcNewMoonDay(k, tz);
+  var sunLong = _lcSunLongitudeDay(nm, tz);
+  if (sunLong >= 9) nm = _lcNewMoonDay(k - 1, tz);
+  return nm;
+}
+function _lcLeapOffset(a11, tz){
+  var k = Math.floor((a11 - 2415021.076998695) / 29.530588853 + 0.5);
+  var last = 0, i = 1;
+  var arc = _lcSunLongitudeDay(_lcNewMoonDay(k+i, tz), tz);
+  do { last = arc; i++; arc = _lcSunLongitudeDay(_lcNewMoonDay(k+i, tz), tz); } while (arc !== last && i < 14);
+  return i - 1;
+}
+// Đổi ngày dương lịch (dd/mm/yy) sang âm lịch → {day, month, year, leap}
+function solar2Lunar(dd, mm, yy){
+  var tz = 7;
+  var dayNumber = _lcJdFromDate(dd, mm, yy);
+  var k = Math.floor((dayNumber - 2415021.076998695) / 29.530588853);
+  var monthStart = _lcNewMoonDay(k+1, tz);
+  if (monthStart > dayNumber) monthStart = _lcNewMoonDay(k, tz);
+  var a11 = _lcMonth11(yy, tz);
+  var b11 = a11;
+  var lunarYear;
+  if (a11 >= monthStart) { lunarYear = yy; a11 = _lcMonth11(yy-1, tz); }
+  else { lunarYear = yy+1; b11 = _lcMonth11(yy+1, tz); }
+  var lunarDay = dayNumber - monthStart + 1;
+  var diff = Math.floor((monthStart - a11) / 29);
+  var lunarLeap = 0;
+  var lunarMonth = diff + 11;
+  if (b11 - a11 > 365) {
+    var leapMonthDiff = _lcLeapOffset(a11, tz);
+    if (diff >= leapMonthDiff) { lunarMonth = diff + 10; if (diff === leapMonthDiff) lunarLeap = 1; }
+  }
+  if (lunarMonth > 12) lunarMonth -= 12;
+  if (lunarMonth >= 11 && diff < 4) lunarYear -= 1;
+  return { day: lunarDay, month: lunarMonth, year: lunarYear, leap: lunarLeap === 1 };
+}
+
+// ═══════════════════════════════════════════════════════
+// THANH THÔNG BÁO ĐA NHIỆM — thay cho thanh kết nối tĩnh cũ: tự xoay vòng hiện nhiều loại thông báo,
+// mỗi 10 giây chuyển sang thông báo tiếp theo. Slide "kết nối" luôn có mặt trong vòng xoay (đúng vai
+// trò "mặc định" khi không có sự kiện đặc biệt nào khác) — updGDBarStatus() vẫn ghi thẳng vào màn
+// hình như cũ để không mất phản hồi tức thời lúc đang đăng nhập/đồng bộ, đồng thời lưu vào
+// _gdBarConnStatus để vòng xoay dùng lại đúng nội dung mới nhất mỗi khi tới lượt slide này.
+// ═══════════════════════════════════════════════════════
+var _gdBarConnStatus = { msg: 'Đang kiểm tra kết nối...', cls: 'syncing' };
+var _notifySlideIdx = 0;
+var LUCKY_WISHES = [
+  '🍀 Chúc quý khách mua may bán đắt!',
+  '🌟 Chúc một ngày thu mua thuận lợi, đầy lộc!',
+  '💰 Chúc đắt hàng, khách đến đều tay!',
+  '🌤️ Chúc thời tiết thuận lợi, mủ tốt giá cao!'
+];
+// Kho thành ngữ, tục ngữ Việt Nam liên quan mua bán/buôn bán/kinh doanh — chọn NGẪU NHIÊN 1 câu mỗi
+// lần thanh thông báo xoay tới slide này (không cố định theo ngày như slide lời chúc bên trên).
+var MUA_BAN_PROVERBS = [
+  '📜 "Thuận mua vừa bán" — đôi bên cùng ưng thuận mới bền lâu',
+  '📜 "Của rẻ là của ôi" — hàng rẻ quá thường không tốt',
+  '📜 "Tiền trao cháo múc" — sòng phẳng, rõ ràng ngay từ đầu',
+  '📜 "Buôn có bạn, bán có phường" — làm ăn cần có anh em, hội nhóm',
+  '📜 "Một vốn bốn lời" — mong ước của người buôn bán',
+  '📜 "Đắt xắt ra miếng" — đắt nhưng chất lượng xứng đáng',
+  '📜 "Tiền nào của nấy"',
+  '📜 "Mua danh ba vạn, bán danh ba đồng" — giữ chữ tín quý hơn tiền bạc',
+  '📜 "Vui lòng khách đến, vừa lòng khách đi"',
+  '📜 "Đồng tiền đi liền khúc ruột" — tiền bạc phải cân nhắc kỹ',
+  '📜 "Phi thương bất phú" — không buôn bán thì khó giàu',
+  '📜 "Buôn tận gốc, bán tận ngọn" — làm ăn tận tâm, trọn vẹn',
+  '📜 "Được mùa chớ phụ ngô khoai" — được giá cũng đừng quên lúc khó khăn',
+  '📜 "Khéo ăn thì no, khéo co thì ấm" — biết tính toán thì làm ăn vững',
+  '📜 "Bán mở hàng, không bán mở miệng" — quý khách đầu ngày, khéo giữ duyên bán'
+];
+function _pickRandom(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+function _notifyBuildSlides(){
+  var slides = [];
+  slides.push({ icon:'☁️', text: _gdBarConnStatus.msg, cls: _gdBarConnStatus.cls });
+  try {
+    var now = new Date();
+    var lun = solar2Lunar(now.getDate(), now.getMonth()+1, now.getFullYear());
+    slides.push({ icon:'🌙', text: '🌙 Âm lịch: ngày ' + lun.day + (lun.leap ? ' (nhuận)' : '') + ' tháng ' + lun.month + ' năm ' + lun.year, cls:'synced' });
+    if ([14,15,24,29,30].indexOf(lun.day) !== -1) {
+      slides.push({ icon:'🙏', text: '🙏 Hôm nay ngày ' + lun.day + ' âm lịch — ngày ăn chay, nhắc quý khách lưu ý!', cls:'offline' });
+    }
+  } catch(e) { /* lỗi tính âm lịch thì bỏ qua slide này, không ảnh hưởng các slide khác */ }
+  try {
+    var syncMsg = localStorage.getItem('registry_sync_debug') || '';
+    if (syncMsg.indexOf('❌') !== -1) {
+      slides.push({ icon:'🔌', text: '🔌 Lỗi đồng bộ máy: ' + syncMsg.replace(/^❌\s*/, '').slice(0,80), cls:'offline' });
+    }
+  } catch(e) {}
+  try {
+    var errLog = (typeof _getErrorLog === 'function') ? _getErrorLog() : [];
+    var sysErr = null, otherErr = null;
+    for (var i = errLog.length - 1; i >= 0; i--) {
+      var t = errLog[i].type;
+      if (!sysErr && ['STORAGE','UI','NETWORK','SUPABASE','HEALTH'].indexOf(t) !== -1) sysErr = errLog[i];
+      if (!otherErr && ['JS','PROMISE'].indexOf(t) !== -1) otherErr = errLog[i];
+      if (sysErr && otherErr) break;
+    }
+    if (sysErr) slides.push({ icon:'🩺', text: '🩺 Lỗi hệ thống: ' + sysErr.message.slice(0,80), cls:'offline' });
+    if (otherErr) slides.push({ icon:'⚠️', text: '⚠️ Lỗi khác: ' + otherErr.message.slice(0,80), cls:'offline' });
+  } catch(e) {}
+  slides.push({ icon:'🍀', text: LUCKY_WISHES[new Date().getDate() % LUCKY_WISHES.length], cls:'synced' });
+  slides.push({ icon:'📜', text: _pickRandom(MUA_BAN_PROVERBS), cls:'synced' });
+  return slides;
+}
+function _notifyTick(){
+  var ico = document.getElementById('gd-bar-ico');
+  var nm = document.getElementById('gd-bar-name');
+  if (!nm) return;
+  var slides = _notifyBuildSlides();
+  if (!slides.length) return;
+  _notifySlideIdx = (_notifySlideIdx + 1) % slides.length;
+  var s = slides[_notifySlideIdx];
+  if (ico) ico.textContent = s.icon;
+  nm.textContent = s.text;
+  nm.className = 'gd-name gd-name-' + s.cls;
+}
+setInterval(_notifyTick, 10000); // xoay slide tiếp theo mỗi 10 giây
+
 function updGDBarStatus(msg, cls) {
   var nm = document.getElementById('gd-bar-name');
   if (!nm) return;
@@ -9237,6 +9438,7 @@ function updGDBarStatus(msg, cls) {
   } else {
     out = msg + (n > 0 ? (' (' + n + ')') : ''); // giữ nguyên các thông báo tiến trình cụ thể (đăng nhập, làm mới phiên...)
   }
+  _gdBarConnStatus = { msg: out, cls: cls }; // lưu lại để slide "kết nối" trong thanh thông báo đa nhiệm luôn đúng nội dung mới nhất
   nm.textContent = out;
   nm.className = 'gd-name gd-name-' + cls;
 }
