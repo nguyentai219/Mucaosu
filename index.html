@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.1.9</title>
+<title>Mua Bán Mủ Cao Su v2.2.0</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -233,7 +233,9 @@ input[type=date]:focus{border-color:var(--gl)}
 .gd-bar{background:rgba(255,255,255,.12);border-radius:8px;padding:4px 10px;display:flex;align-items:center;gap:6px;cursor:pointer;border:1px solid rgba(255,255,255,.2);margin:2px 14px 6px}
 .gd-bar:active{background:rgba(255,255,255,.2)}
 .gd-avatar{width:22px;height:22px;border-radius:50%;object-fit:cover}
-.gd-name{font-size:11px;font-weight:600;color:rgba(255,255,255,.9);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#gd-bar-ico{font-size:17px;filter:drop-shadow(0 0 3px rgba(255,255,255,.55));display:inline-block;line-height:1}
+.gd-name-clip{flex:1;overflow:hidden;position:relative}
+.gd-name{font-size:11px;font-weight:600;color:rgba(255,255,255,.9);display:inline-block;white-space:nowrap;position:relative;left:0}
 .gd-name-synced{color:#86efac}
 .gd-name-syncing{color:#fde68a}
 .gd-name-offline{color:#fca5a5}
@@ -505,7 +507,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.1.9 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.2.0 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -515,7 +517,7 @@ input[type=date]:focus{border-color:var(--gl)}
   </div>
   <div class="gd-bar" id="gd-bar" onclick="openSyncModal()">
     <span id="gd-bar-ico">&#x2601;&#xFE0F;</span>
-    <span class="gd-name" id="gd-bar-name">Đang kiểm tra kết nối...</span>
+    <div class="gd-name-clip"><span class="gd-name" id="gd-bar-name">Đang kiểm tra kết nối...</span></div>
   </div>
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('mua')">🛒 Thu Mua</button>
@@ -1855,7 +1857,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.1.9</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.2.0</div>
       </div>
     </div>
 
@@ -2021,7 +2023,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.1.9</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.2.0</div>
       </div>
     </div>
 
@@ -5111,11 +5113,14 @@ function updGDBar() {
 function _gdBarLocalPendingFallback(nm, label) {
   try {
     var _total = (getGD('mua')||[]).length + (getGD('ban')||[]).length + (getSG()||[]).length + (getSU()||[]).length;
-    nm.textContent = '⚠️ Mất kết nối - ' + (label || 'Chưa đăng nhập') + (_total > 0 ? (' (' + _total + ' mục chưa sao lưu)') : '');
+    var out = '⚠️ Mất kết nối - ' + (label || 'Chưa đăng nhập') + (_total > 0 ? (' (' + _total + ' mục chưa sao lưu)') : '');
+    nm.textContent = out;
     nm.className = 'gd-name gd-name-offline';
+    _gdBarConnStatus = { msg: out, cls: 'offline' };
   } catch(e) {
     nm.textContent = '⚠️ Mất kết nối';
     nm.className = 'gd-name gd-name-offline';
+    _gdBarConnStatus = { msg: '⚠️ Mất kết nối', cls: 'offline' };
   }
 }
 
@@ -9372,26 +9377,58 @@ var MUA_BAN_PROVERBS = [
   '📜 "Buôn tận gốc, bán tận ngọn" — làm ăn tận tâm, trọn vẹn',
   '📜 "Được mùa chớ phụ ngô khoai" — được giá cũng đừng quên lúc khó khăn',
   '📜 "Khéo ăn thì no, khéo co thì ấm" — biết tính toán thì làm ăn vững',
-  '📜 "Bán mở hàng, không bán mở miệng" — quý khách đầu ngày, khéo giữ duyên bán'
+  '📜 "Bán mở hàng, không bán mở miệng" — quý khách đầu ngày, khéo giữ duyên bán',
+  '📜 "Lời chào cao hơn mâm cỗ" — một lời niềm nở quý hơn cả mâm cao cỗ đầy',
+  '📜 "Khách hàng là thượng đế" — luôn đặt sự hài lòng của khách lên hàng đầu',
+  '📜 "Chữ tín quý hơn vàng" — làm ăn lâu dài nhờ giữ đúng lời hứa',
+  '📜 "Tiền vào nhà khó như gió vào nhà trống" — quản lý tiền bạc không khéo thì tiêu tan nhanh',
+  '📜 "Ăn nên làm ra" — chúc một mùa làm ăn phát đạt',
+  '📜 "Có làm thì mới có ăn, không dưng ai dễ đem phần đến cho"',
+  '📜 "Cần cù bù thông minh" — chăm chỉ rồi cũng có ngày thành quả',
+  '📜 "Muốn giàu nuôi cá, muốn khá nuôi heo, muốn nghèo nuôi vịt" — kinh nghiệm sinh kế dân gian',
+  '📜 "Ăn cây nào rào cây nấy" — gắn bó, giữ nghĩa với nơi mình làm ăn',
+  '📜 "Góp gió thành bão" — tích luỹ dần dần rồi cũng nên lớn',
+  '📜 "Tích tiểu thành đại" — dành dụm từng chút rồi sẽ thành nhiều',
+  '📜 "Ăn chắc mặc bền" — làm ăn chắc chắn hơn là phô trương',
+  '📜 "Nhất nghệ tinh, nhất thân vinh" — giỏi một nghề thì cả đời no ấm',
+  '📜 "Muốn ăn thì lăn vào bếp" — muốn có thành quả thì phải bắt tay vào làm'
 ];
 function _pickRandom(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+// Icon mặt trăng biến đổi theo đúng pha của ngày âm lịch hôm nay (mùng 1 = trăng non, 14-16 = trăng
+// tròn...) — CHỈ dùng cho slide âm lịch, các slide khác vẫn giữ icon cố định riêng của chúng.
+function _moonPhaseIcon(lunarDay){
+  var d = Math.max(1, Math.min(30, lunarDay || 1));
+  if (d === 1) return '🌑';
+  if (d <= 6) return '🌒';
+  if (d <= 8) return '🌓';
+  if (d <= 13) return '🌔';
+  if (d <= 16) return '🌕';
+  if (d <= 21) return '🌖';
+  if (d <= 23) return '🌗';
+  return '🌘';
+}
 function _notifyBuildSlides(){
   var slides = [];
   slides.push({ icon:'☁️', text: _gdBarConnStatus.msg, cls: _gdBarConnStatus.cls });
   try {
     var now = new Date();
     var lun = solar2Lunar(now.getDate(), now.getMonth()+1, now.getFullYear());
-    slides.push({ icon:'🌙', text: '🌙 Âm lịch: ngày ' + lun.day + (lun.leap ? ' (nhuận)' : '') + ' tháng ' + lun.month + ' năm ' + lun.year, cls:'synced' });
+    slides.push({ icon: _moonPhaseIcon(lun.day), text: 'Âm lịch: ngày ' + lun.day + (lun.leap ? ' (nhuận)' : '') + ' tháng ' + lun.month + ' năm ' + lun.year, cls:'synced' });
     if ([14,15,24,29,30].indexOf(lun.day) !== -1) {
       slides.push({ icon:'🙏', text: '🙏 Hôm nay ngày ' + lun.day + ' âm lịch — ngày ăn chay, nhắc quý khách lưu ý!', cls:'offline' });
     }
   } catch(e) { /* lỗi tính âm lịch thì bỏ qua slide này, không ảnh hưởng các slide khác */ }
+  // Trạng thái đồng bộ — LUÔN hiện 1 trong 2: xanh "không phát hiện lỗi" hoặc đỏ nêu rõ lỗi gì
   try {
     var syncMsg = localStorage.getItem('registry_sync_debug') || '';
     if (syncMsg.indexOf('❌') !== -1) {
-      slides.push({ icon:'🔌', text: '🔌 Lỗi đồng bộ máy: ' + syncMsg.replace(/^❌\s*/, '').slice(0,80), cls:'offline' });
+      slides.push({ icon:'🔌', text: '🔌 Lỗi đồng bộ máy: ' + syncMsg.replace(/^❌\s*/, '').slice(0,120), cls:'offline' });
+    } else {
+      slides.push({ icon:'🔧', text: '✅ Tự động kiểm tra đồng bộ KHÔNG phát hiện lỗi', cls:'synced' });
     }
   } catch(e) {}
+  // Trạng thái lỗi hệ thống — LUÔN hiện 1 trong 2, tách riêng "lỗi hệ thống" (từ đợt tự kiểm tra định
+  // kỳ) và "lỗi khác" (JS/Promise phát sinh bất kỳ lúc nào) như đã thống nhất ở bản trước
   try {
     var errLog = (typeof _getErrorLog === 'function') ? _getErrorLog() : [];
     var sysErr = null, otherErr = null;
@@ -9401,26 +9438,53 @@ function _notifyBuildSlides(){
       if (!otherErr && ['JS','PROMISE'].indexOf(t) !== -1) otherErr = errLog[i];
       if (sysErr && otherErr) break;
     }
-    if (sysErr) slides.push({ icon:'🩺', text: '🩺 Lỗi hệ thống: ' + sysErr.message.slice(0,80), cls:'offline' });
-    if (otherErr) slides.push({ icon:'⚠️', text: '⚠️ Lỗi khác: ' + otherErr.message.slice(0,80), cls:'offline' });
+    if (sysErr) {
+      slides.push({ icon:'🩺', text: '🩺 Lỗi hệ thống: ' + sysErr.message.slice(0,120), cls:'offline' });
+    } else {
+      slides.push({ icon:'🩺', text: '✅ Tự động kiểm tra hệ thống KHÔNG phát hiện lỗi', cls:'synced' });
+    }
+    if (otherErr) slides.push({ icon:'⚠️', text: '⚠️ Lỗi khác: ' + otherErr.message.slice(0,120), cls:'offline' });
   } catch(e) {}
   slides.push({ icon:'🍀', text: LUCKY_WISHES[new Date().getDate() % LUCKY_WISHES.length], cls:'synced' });
   slides.push({ icon:'📜', text: _pickRandom(MUA_BAN_PROVERBS), cls:'synced' });
   return slides;
 }
+// Hiện 1 slide lên thanh — nếu chữ dài hơn khung hiện có thì tự CUỘN từ phải qua trái để xem hết nội
+// dung rồi mới chuyển sang slide kế tiếp (thay vì bị cắt "..."); thời gian hiện tối đa 1 slide dài là
+// 20 giây (kể cả lúc dừng đầu/cuối để mắt kịp đọc), slide ngắn vừa khung thì vẫn hiện đúng 10 giây.
+var _notifyTimer = null;
 function _notifyTick(){
   var ico = document.getElementById('gd-bar-ico');
   var nm = document.getElementById('gd-bar-name');
-  if (!nm) return;
+  var clip = nm ? nm.parentElement : null;
+  if (!nm || !clip) return;
   var slides = _notifyBuildSlides();
   if (!slides.length) return;
   _notifySlideIdx = (_notifySlideIdx + 1) % slides.length;
   var s = slides[_notifySlideIdx];
   if (ico) ico.textContent = s.icon;
-  nm.textContent = s.text;
   nm.className = 'gd-name gd-name-' + s.cls;
+  nm.style.transition = 'none';
+  nm.style.transform = 'translateX(0)';
+  nm.textContent = s.text;
+  var DEFAULT_MS = 10000, MAX_MS = 20000, START_PAUSE = 700, END_PAUSE = 1200;
+  requestAnimationFrame(function(){
+    var overflow = nm.scrollWidth - clip.clientWidth;
+    if (overflow > 10) {
+      var scrollDist = overflow + 6;
+      var maxScrollMs = MAX_MS - START_PAUSE - END_PAUSE;
+      var scrollMs = Math.min(Math.max(scrollDist * 28, 2500), maxScrollMs);
+      setTimeout(function(){
+        nm.style.transition = 'transform ' + (scrollMs/1000).toFixed(2) + 's linear';
+        nm.style.transform = 'translateX(-' + scrollDist + 'px)';
+      }, START_PAUSE);
+      _notifyTimer = setTimeout(_notifyTick, Math.min(START_PAUSE + scrollMs + END_PAUSE, MAX_MS));
+    } else {
+      _notifyTimer = setTimeout(_notifyTick, DEFAULT_MS);
+    }
+  });
 }
-setInterval(_notifyTick, 10000); // xoay slide tiếp theo mỗi 10 giây
+_notifyTimer = setTimeout(_notifyTick, 10000); // xoay sang slide đầu tiên sau 10 giây, các lần sau tự lên lịch theo độ dài nội dung
 
 function updGDBarStatus(msg, cls) {
   var nm = document.getElementById('gd-bar-name');
