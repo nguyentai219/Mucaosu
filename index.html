@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.2.0</title>
+<title>Mua Bán Mủ Cao Su v2.2.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -507,7 +507,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.2.0 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.2.1 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1172,7 +1172,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <!-- TRẠNG THÁI ĐỒNG BỘ (chẩn đoán) -->
       <div style="padding:14px 4px;border-top:1px solid var(--g100)">
-        <div style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:2px">🔧 Trạng thái đồng bộ máy này</div>
+        <div style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:2px">☁️ Trạng thái kết nối và đồng bộ dữ liệu</div>
         <div id="registry-debug-line" style="font-size:11.5px;color:var(--g600);word-break:break-word;line-height:1.5;margin-bottom:6px">Chưa có thông tin</div>
         <div id="sync-last-check-line" style="font-size:11px;color:var(--g400);margin-bottom:8px">🕐 Chưa kiểm tra lần nào</div>
         <div id="sync-check-progress-wrap" style="display:none;background:var(--g100);border-radius:6px;height:6px;overflow:hidden;margin-bottom:8px">
@@ -1190,7 +1190,7 @@ input[type=date]:focus{border-color:var(--gl)}
            Supabase để không mất dữ liệu khi đổi máy/xoá lịch sử duyệt web. Nút "Kiểm tra lỗi ngay"
            cho phép chủ động kiểm tra thủ công bất cứ lúc nào, không cần chờ đợt kiểm tra định kỳ -->
       <div style="padding:14px 4px;border-top:1px solid var(--g100)">
-        <div style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:2px">🩺 Trạng thái lỗi hệ thống</div>
+        <div style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:2px">🩺 Tình trạng hoạt động hệ thống</div>
         <div id="error-status-line" style="font-size:11.5px;color:var(--g600);word-break:break-word;line-height:1.5;margin-bottom:6px">Đang kiểm tra...</div>
         <div id="error-last-check-line" style="font-size:11px;color:var(--g400);margin-bottom:8px">🕐 Chưa kiểm tra lần nào</div>
         <div id="error-check-progress-wrap" style="display:none;background:var(--g100);border-radius:6px;height:6px;overflow:hidden;margin-bottom:8px">
@@ -1857,7 +1857,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.2.0</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.2.1</div>
       </div>
     </div>
 
@@ -2023,7 +2023,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.2.0</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.2.1</div>
       </div>
     </div>
 
@@ -9407,6 +9407,30 @@ function _moonPhaseIcon(lunarDay){
   if (d <= 23) return '🌗';
   return '🌘';
 }
+// Tính độ dài tháng âm lịch (29 hoặc 30 ngày) chứa ngày `d` — dò từng ngày tới khi gặp lại "mùng 1"
+// của tháng kế tiếp, dùng để xác định đúng "2 ngày ăn chay cuối tháng" (29-30 nếu tháng đủ, 28-29
+// nếu tháng thiếu) thay vì cố định cứng 29/30 như trước (sai với tháng thiếu).
+function _lunarMonthLength(baseDate){
+  try {
+    var d = new Date(baseDate);
+    var lun0 = solar2Lunar(d.getDate(), d.getMonth()+1, d.getFullYear());
+    var first = new Date(d);
+    first.setDate(first.getDate() - (lun0.day - 1));
+    var probe = new Date(first);
+    for (var i = 0; i < 35; i++) {
+      probe.setDate(probe.getDate() + 1);
+      var lp = solar2Lunar(probe.getDate(), probe.getMonth()+1, probe.getFullYear());
+      if (lp.day === 1) return Math.round((probe - first) / 86400000);
+    }
+  } catch(e) {}
+  return 30; // dò không ra thì coi như tháng đủ, an toàn hơn báo sai
+}
+// Danh sách ngày ăn chay đúng cho tháng chứa ngày `d`: 14, 15, 24 cố định + 2 ngày cuối cùng thật sự
+// của tháng đó (29-30 nếu tháng đủ 30 ngày, 28-29 nếu tháng thiếu chỉ có 29 ngày).
+function _chayDaysOfMonth(d){
+  var len = _lunarMonthLength(d);
+  return (len >= 30) ? [14,15,24,29,30] : [14,15,24,len-1,len];
+}
 function _notifyBuildSlides(){
   var slides = [];
   slides.push({ icon:'☁️', text: _gdBarConnStatus.msg, cls: _gdBarConnStatus.cls });
@@ -9414,21 +9438,33 @@ function _notifyBuildSlides(){
     var now = new Date();
     var lun = solar2Lunar(now.getDate(), now.getMonth()+1, now.getFullYear());
     slides.push({ icon: _moonPhaseIcon(lun.day), text: 'Âm lịch: ngày ' + lun.day + (lun.leap ? ' (nhuận)' : '') + ' tháng ' + lun.month + ' năm ' + lun.year, cls:'synced' });
-    if ([14,15,24,29,30].indexOf(lun.day) !== -1) {
+    var chayDays = _chayDaysOfMonth(now);
+    if (chayDays.indexOf(lun.day) !== -1) {
       slides.push({ icon:'🙏', text: '🙏 Hôm nay ngày ' + lun.day + ' âm lịch — ngày ăn chay, nhắc quý khách lưu ý!', cls:'offline' });
+    } else {
+      // Báo trước 1 ngày: nếu NGÀY MAI rơi đúng ngày chay thì nhắc trước ngay từ hôm nay
+      var tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate() + 1);
+      var lunT = solar2Lunar(tomorrow.getDate(), tomorrow.getMonth()+1, tomorrow.getFullYear());
+      var chayDaysT = (lunT.month === lun.month && lunT.year === lun.year) ? chayDays : _chayDaysOfMonth(tomorrow);
+      if (chayDaysT.indexOf(lunT.day) !== -1) {
+        slides.push({ icon:'🙏', text: '🙏 Ngày mai (' + lunT.day + ' âm lịch) là ngày ăn chay — quý khách lưu ý chuẩn bị trước!', cls:'offline' });
+      }
     }
   } catch(e) { /* lỗi tính âm lịch thì bỏ qua slide này, không ảnh hưởng các slide khác */ }
-  // Trạng thái đồng bộ — LUÔN hiện 1 trong 2: xanh "không phát hiện lỗi" hoặc đỏ nêu rõ lỗi gì
+  // Trạng thái kết nối và đồng bộ dữ liệu — LUÔN hiện 1 trong 2: xanh "không phát hiện lỗi" (không cần
+  // thêm dấu ✅ vì chữ đã nói rõ là ổn) hoặc đỏ nêu rõ lỗi gì. Icon đám mây, đồng nhất với icon dùng
+  // trong Cài đặt → "☁️ Trạng thái kết nối và đồng bộ dữ liệu".
   try {
     var syncMsg = localStorage.getItem('registry_sync_debug') || '';
     if (syncMsg.indexOf('❌') !== -1) {
-      slides.push({ icon:'🔌', text: '🔌 Lỗi đồng bộ máy: ' + syncMsg.replace(/^❌\s*/, '').slice(0,120), cls:'offline' });
+      slides.push({ icon:'☁️', text: 'Lỗi đồng bộ máy: ' + syncMsg.replace(/^❌\s*/, '').slice(0,200), cls:'offline' });
     } else {
-      slides.push({ icon:'🔧', text: '✅ Tự động kiểm tra đồng bộ KHÔNG phát hiện lỗi', cls:'synced' });
+      slides.push({ icon:'☁️', text: 'Tự động kiểm tra đồng bộ KHÔNG phát hiện lỗi', cls:'synced' });
     }
   } catch(e) {}
-  // Trạng thái lỗi hệ thống — LUÔN hiện 1 trong 2, tách riêng "lỗi hệ thống" (từ đợt tự kiểm tra định
-  // kỳ) và "lỗi khác" (JS/Promise phát sinh bất kỳ lúc nào) như đã thống nhất ở bản trước
+  // Tình trạng hoạt động hệ thống — LUÔN hiện 1 trong 2, tách riêng "lỗi hệ thống" (từ đợt tự kiểm tra
+  // định kỳ) và "lỗi khác" (JS/Promise phát sinh bất kỳ lúc nào). Icon tai nghe bác sĩ, đồng nhất với
+  // icon dùng trong Cài đặt → "🩺 Tình trạng hoạt động hệ thống".
   try {
     var errLog = (typeof _getErrorLog === 'function') ? _getErrorLog() : [];
     var sysErr = null, otherErr = null;
@@ -9439,11 +9475,11 @@ function _notifyBuildSlides(){
       if (sysErr && otherErr) break;
     }
     if (sysErr) {
-      slides.push({ icon:'🩺', text: '🩺 Lỗi hệ thống: ' + sysErr.message.slice(0,120), cls:'offline' });
+      slides.push({ icon:'🩺', text: 'Lỗi hệ thống: ' + sysErr.message.slice(0,200), cls:'offline' });
     } else {
-      slides.push({ icon:'🩺', text: '✅ Tự động kiểm tra hệ thống KHÔNG phát hiện lỗi', cls:'synced' });
+      slides.push({ icon:'🩺', text: 'Tự động kiểm tra hệ thống KHÔNG phát hiện lỗi', cls:'synced' });
     }
-    if (otherErr) slides.push({ icon:'⚠️', text: '⚠️ Lỗi khác: ' + otherErr.message.slice(0,120), cls:'offline' });
+    if (otherErr) slides.push({ icon:'⚠️', text: 'Lỗi khác: ' + otherErr.message.slice(0,200), cls:'offline' });
   } catch(e) {}
   slides.push({ icon:'🍀', text: LUCKY_WISHES[new Date().getDate() % LUCKY_WISHES.length], cls:'synced' });
   slides.push({ icon:'📜', text: _pickRandom(MUA_BAN_PROVERBS), cls:'synced' });
@@ -9451,7 +9487,8 @@ function _notifyBuildSlides(){
 }
 // Hiện 1 slide lên thanh — nếu chữ dài hơn khung hiện có thì tự CUỘN từ phải qua trái để xem hết nội
 // dung rồi mới chuyển sang slide kế tiếp (thay vì bị cắt "..."); thời gian hiện tối đa 1 slide dài là
-// 20 giây (kể cả lúc dừng đầu/cuối để mắt kịp đọc), slide ngắn vừa khung thì vẫn hiện đúng 10 giây.
+// 20 giây (kể cả lúc dừng đầu/cuối để mắt kịp đọc). Slide ngắn vừa khung: 6 giây nếu là thông tin bình
+// thường (kết nối OK, âm lịch, lời chúc, tục ngữ...), riêng slide LỖI (màu đỏ) giữ 10 giây để đọc kỹ.
 var _notifyTimer = null;
 function _notifyTick(){
   var ico = document.getElementById('gd-bar-ico');
@@ -9467,7 +9504,8 @@ function _notifyTick(){
   nm.style.transition = 'none';
   nm.style.transform = 'translateX(0)';
   nm.textContent = s.text;
-  var DEFAULT_MS = 10000, MAX_MS = 20000, START_PAUSE = 700, END_PAUSE = 1200;
+  var NORMAL_MS = 6000, ERROR_MS = 10000, MAX_MS = 20000, START_PAUSE = 700, END_PAUSE = 1200;
+  var baseMs = (s.cls === 'offline') ? ERROR_MS : NORMAL_MS;
   requestAnimationFrame(function(){
     var overflow = nm.scrollWidth - clip.clientWidth;
     if (overflow > 10) {
@@ -9480,11 +9518,11 @@ function _notifyTick(){
       }, START_PAUSE);
       _notifyTimer = setTimeout(_notifyTick, Math.min(START_PAUSE + scrollMs + END_PAUSE, MAX_MS));
     } else {
-      _notifyTimer = setTimeout(_notifyTick, DEFAULT_MS);
+      _notifyTimer = setTimeout(_notifyTick, baseMs);
     }
   });
 }
-_notifyTimer = setTimeout(_notifyTick, 10000); // xoay sang slide đầu tiên sau 10 giây, các lần sau tự lên lịch theo độ dài nội dung
+_notifyTimer = setTimeout(_notifyTick, 6000); // xoay sang slide đầu tiên sau 6 giây, các lần sau tự lên lịch theo loại nội dung
 
 function updGDBarStatus(msg, cls) {
   var nm = document.getElementById('gd-bar-name');
@@ -9495,7 +9533,7 @@ function updGDBarStatus(msg, cls) {
     _lastSyncAt = new Date();
     var d = _lastSyncAt;
     var timeStr = d.toLocaleTimeString('vi-VN') + ' ngày ' + String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0');
-    out = '✅ Đã kết nối - cập nhật lúc: ' + timeStr + (n > 0 ? (' (' + n + ')') : '');
+    out = 'Bộ nhớ đám mây đã kết nối - cập nhật lúc ' + timeStr + (n > 0 ? (' (' + n + ')') : '');
   } else if (cls === 'offline') {
     var isErr = /lỗi/i.test(msg || '');
     out = (isErr ? '❌ Lỗi đồng bộ' : '⚠️ Mất kết nối') + (n > 0 ? (' (' + n + ')') : '');
