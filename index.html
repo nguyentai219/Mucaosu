@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.2.2</title>
+<title>Mua Bán Mủ Cao Su v2.2.3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -507,7 +507,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.2.2 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.2.3 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1860,7 +1860,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.2.2</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.2.3</div>
       </div>
     </div>
 
@@ -2026,7 +2026,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.2.2</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.2.3</div>
       </div>
     </div>
 
@@ -2226,6 +2226,7 @@ input[type=date]:focus{border-color:var(--gl)}
   <div class="modal-box">
     <div class="modal-handle"></div>
     <div class="modal-title">💡 Gợi Ý Người Bán Hôm Nay</div>
+    <div id="goi-y-ban-title-count" style="font-size:14.5px;font-weight:800;color:var(--gd);background:var(--g50);border-radius:10px;padding:8px 12px;margin-bottom:8px">Hôm nay sẽ có: 0 khách bán</div>
     <div style="font-size:11.5px;color:var(--g600);margin-bottom:10px">Dựa theo chu kỳ cạo mủ của từng khách: <b>D3</b> = cạo 1 ngày nghỉ 2 ngày, <b>D2</b> = cạo 1 ngày nghỉ 1 ngày. Nhấn tên để điền nhanh vào ô "Tên người bán". Nhấn thẻ D2/D3 để đổi chu kỳ của khách đó.</div>
     <div id="goi-y-ban-list"></div>
     <button class="btn-huy" style="width:100%;margin-top:12px" onclick="closeM('modal-goi-y-ban')">Đóng</button>
@@ -2455,9 +2456,11 @@ function openGoiYBanHomNay(){
 }
 function renderGoiYBanHomNay(){
   var box = document.getElementById('goi-y-ban-list');
+  var titleCount = document.getElementById('goi-y-ban-title-count');
   if (!box) return;
   var all = buildGoiYBanHomNay();
   var dueList = all.filter(function(x){ return x.due; });
+  if (titleCount) titleCount.textContent = 'Hôm nay sẽ có: ' + dueList.length + ' khách bán';
   if (!dueList.length){
     box.innerHTML = '<div class="sg-empty-name">Chưa có khách hàng nào dự kiến bán mủ hôm nay</div>';
     return;
@@ -3055,6 +3058,21 @@ document.addEventListener('DOMContentLoaded',()=>{
     localStorage.removeItem('gia3_mua');
     localStorage.removeItem('gia3_ban');
     localStorage.setItem('gia_day', todayKey);
+  }
+
+  // Tự động quét "Gợi Ý Người Bán Hôm Nay" — CHỈ 1 LẦN vào lần mở app ĐẦU TIÊN trong ngày (dựa theo
+  // chu kỳ D2/D3 đã đặt cho từng khách + ngày bán gần nhất của lần thu mua trước đó). Không cần người
+  // dùng tự mở popup mới biết trước — báo ngay bằng toast để chủ vựa chủ động chuẩn bị từ sáng sớm.
+  var goiYScanDay = localStorage.getItem('goi_y_ban_scan_day');
+  if (goiYScanDay !== todayKey) {
+    localStorage.setItem('goi_y_ban_scan_day', todayKey);
+    setTimeout(function(){
+      try {
+        if (typeof buildGoiYBanHomNay !== 'function') return;
+        var dueCount = buildGoiYBanHomNay().filter(function(x){ return x.due; }).length;
+        if (dueCount > 0) toast('💡 Hôm nay dự kiến có ' + dueCount + ' khách bán mủ — xem ở ô "Tên người bán"');
+      } catch(e){}
+    }, 3500); // đợi rebuildKHRoleLists() + dữ liệu đồng bộ đầu phiên load xong hẳn rồi mới quét cho chính xác
   }
 
   initGoogleAuth();
@@ -5351,7 +5369,7 @@ var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','kh_ids','
 // vụ cần đồng bộ và sẽ tự động được quét kèm theo, kể cả khi quên thêm vào SB_DATA_KEYS phía trên.
 var SB_NO_SYNC_KEYS = ['device_code','gd_token','gd_token_expiry','gd_folder_id','gd_user','gd_silent_failed',
   'gd_last_sync','sb_last_sync','pending_sync_count','sync_provider','active_tab','used_ext_codes',
-  'license_is_new','gia_day','ban_last_buyer','ss_state','setting_wakelock'];
+  'license_is_new','gia_day','ban_last_buyer','ss_state','setting_wakelock','goi_y_ban_scan_day'];
 // Danh sách khoá THỰC SỰ sẽ đồng bộ mỗi lần: hợp của SB_DATA_KEYS (đảm bảo có giá trị mặc định hợp lý
 // nếu máy chưa từng có khoá đó) VÀ toàn bộ khoá đang thực sự tồn tại trong localStorage của app (trừ
 // danh sách chỉ-riêng-máy-này ở trên) — để không bỏ sót dữ liệu của các tính năng thêm sau này mà lỡ
