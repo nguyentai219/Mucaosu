@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.2.3</title>
+<title>Mua Bán Mủ Cao Su v2.2.4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -507,7 +507,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.2.3 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.2.4 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1860,7 +1860,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.2.3</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.2.4</div>
       </div>
     </div>
 
@@ -2026,7 +2026,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.2.3</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.2.4</div>
       </div>
     </div>
 
@@ -2226,10 +2226,32 @@ input[type=date]:focus{border-color:var(--gl)}
   <div class="modal-box">
     <div class="modal-handle"></div>
     <div class="modal-title">💡 Gợi Ý Người Bán Hôm Nay</div>
+    <div class="date-bar" onclick="openGoiyDate()" style="border:1.5px solid var(--gd);cursor:pointer;margin-bottom:8px">
+      <span>📅</span>
+      <span class="date-val" id="goiy-date-val">--</span>
+      <span class="date-hint">Nhấn để đổi ngày</span>
+    </div>
     <div id="goi-y-ban-title-count" style="font-size:14.5px;font-weight:800;color:var(--gd);background:var(--g50);border-radius:10px;padding:8px 12px;margin-bottom:8px">Hôm nay sẽ có: 0 khách bán</div>
     <div style="font-size:11.5px;color:var(--g600);margin-bottom:10px">Dựa theo chu kỳ cạo mủ của từng khách: <b>D3</b> = cạo 1 ngày nghỉ 2 ngày, <b>D2</b> = cạo 1 ngày nghỉ 1 ngày. Nhấn tên để điền nhanh vào ô "Tên người bán". Nhấn thẻ D2/D3 để đổi chu kỳ của khách đó.</div>
     <div id="goi-y-ban-list"></div>
     <button class="btn-huy" style="width:100%;margin-top:12px" onclick="closeM('modal-goi-y-ban')">Đóng</button>
+  </div>
+</div>
+
+<!-- Lịch tuỳ chỉnh chọn ngày tham chiếu cho popup Gợi Ý Người Bán Hôm Nay (độc lập với ngày giao dịch đang nhập) -->
+<div class="modal" id="modal-goiy-date">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="color:var(--gd)">📅 Chọn ngày xem gợi ý</div>
+    <div class="cal-header">
+      <button onclick="goiyCalNav(-1)" style="color:var(--gd);background:var(--gb)">‹</button>
+      <span id="goiy-cal-month-label"></span>
+      <button onclick="goiyCalNav(1)" style="color:var(--gd);background:var(--gb)">›</button>
+    </div>
+    <div class="cal-grid" id="goiy-cal-grid"></div>
+    <div class="cal-legend"><span class="cal-dot"></span> Ngày có giao dịch thu mua</div>
+    <button class="btn-luu" style="width:100%;margin-top:10px" onclick="applyGoiyDate()">Xác nhận</button>
+    <button class="btn-huy" style="width:100%;margin-top:6px" onclick="closeM('modal-goiy-date')">Đóng</button>
   </div>
 </div>
 
@@ -2434,35 +2456,47 @@ function _layNgayBanGanNhatTheoKhach(){
 }
 // Trả về mảng khách được DỰ ĐOÁN sẽ bán mủ hôm nay, theo đúng chu kỳ D2/D3 của từng người,
 // tính từ lần bán gần nhất của họ. Khách chưa từng có giao dịch thì không đủ dữ liệu để dự đoán.
-function buildGoiYBanHomNay(){
-  var todayStr = today();
+// refDate: ngày dùng làm mốc "hôm nay" để tính — mặc định là ngày thật hôm nay, nhưng có thể truyền
+// ngày khác (khi người dùng đổi ngày trên thanh chọn ngày của popup) để xem lại/xem trước danh sách
+// của 1 ngày cụ thể khác. CHỈ xét khách có lần bán gần nhất trong vòng ĐÚNG chu kỳ của họ (tối đa 3
+// ngày trước — bằng đúng chu kỳ dài nhất D3) — khách đã quá lâu không bán (bỏ lỡ nhiều chu kỳ) sẽ
+// KHÔNG còn được gợi ý lại nữa, tránh hiện dữ liệu quá cũ không còn đáng tin cậy.
+function buildGoiYBanHomNay(refDate){
+  var refStr = refDate || today();
   var lastMap = _layNgayBanGanNhatTheoKhach();
   var out = [];
   Object.keys(lastMap).forEach(function(k){
     var info = lastMap[k];
     var chuKy = getCaoChuKy(info.ten);
-    var soNgayCach = _soNgayGiua(info.ngay, todayStr);
+    var soNgayCach = _soNgayGiua(info.ngay, refStr);
     var kyCao = (chuKy === 'D2') ? 2 : 3;
-    var duDoanHomNay = soNgayCach > 0 && (soNgayCach % kyCao === 0);
+    var duDoanHomNay = (soNgayCach === kyCao); // đúng khớp chu kỳ ngay-sau-lần-bán-cuối, không xét bội số xa hơn
     out.push({ ten: info.ten, chuKy: chuKy, ngayBanCuoi: info.ngay, soNgayCach: soNgayCach, due: duDoanHomNay });
   });
   out.sort(function(a,b){ return a.ten.localeCompare(b.ten,'vi'); });
   return out;
 }
+// Ngày tham chiếu đang chọn trên thanh chọn ngày của popup Gợi Ý (mặc định = hôm nay thật)
+var goiyRefDate = null;
 function openGoiYBanHomNay(){
   rebuildKHRoleLists();
+  goiyRefDate = today();
   renderGoiYBanHomNay();
   openM('modal-goi-y-ban');
 }
 function renderGoiYBanHomNay(){
   var box = document.getElementById('goi-y-ban-list');
   var titleCount = document.getElementById('goi-y-ban-title-count');
+  var dateVal = document.getElementById('goiy-date-val');
   if (!box) return;
-  var all = buildGoiYBanHomNay();
+  if (!goiyRefDate) goiyRefDate = today();
+  if (dateVal) dateVal.textContent = fmtDate(goiyRefDate);
+  var all = buildGoiYBanHomNay(goiyRefDate);
   var dueList = all.filter(function(x){ return x.due; });
-  if (titleCount) titleCount.textContent = 'Hôm nay sẽ có: ' + dueList.length + ' khách bán';
+  var tieuDeNgay = (goiyRefDate === today()) ? 'Hôm nay' : fmtDateVN2gy(goiyRefDate);
+  if (titleCount) titleCount.textContent = tieuDeNgay + ' sẽ có: ' + dueList.length + ' khách bán';
   if (!dueList.length){
-    box.innerHTML = '<div class="sg-empty-name">Chưa có khách hàng nào dự kiến bán mủ hôm nay</div>';
+    box.innerHTML = '<div class="sg-empty-name">Chưa có khách hàng nào dự kiến bán mủ ngày này</div>';
     return;
   }
   box.innerHTML = dueList.map(function(x){
@@ -2495,6 +2529,50 @@ function toggleGoiYChuKyDD(el, ten){
 function chonGoiYChuKy(ten, val){
   setCaoChuKy(ten, val);
   renderGoiYBanHomNay();
+}
+// ── Lịch tuỳ chỉnh chọn ngày tham chiếu cho popup Gợi Ý Người Bán Hôm Nay ──
+// Hoàn toàn độc lập với ngày giao dịch (curDate['mua']) đang nhập ở form phía sau — chỉ dùng để
+// xem lại/xem trước danh sách gợi ý của 1 ngày cụ thể khác, không ảnh hưởng gì tới dữ liệu đang nhập.
+var goiyCalYear, goiyCalMonth, goiyCalSel;
+function openGoiyDate(){
+  var cur = goiyRefDate || today();
+  var d = new Date(cur+'T00:00:00');
+  goiyCalYear = d.getFullYear(); goiyCalMonth = d.getMonth(); goiyCalSel = cur;
+  renderGoiyCal();
+  openM('modal-goiy-date');
+}
+function goiyCalNav(delta){
+  goiyCalMonth += delta;
+  if (goiyCalMonth < 0) { goiyCalMonth = 11; goiyCalYear--; }
+  if (goiyCalMonth > 11) { goiyCalMonth = 0; goiyCalYear++; }
+  renderGoiyCal();
+}
+function renderGoiyCal(){
+  var datesWithData = {};
+  getGD('mua').forEach(function(g){ if (g.date) datesWithData[g.date] = true; });
+  var todayD = today();
+  document.getElementById('goiy-cal-month-label').textContent = MONTH_NAMES_VN[goiyCalMonth] + ' ' + goiyCalYear;
+  var firstDay = new Date(goiyCalYear, goiyCalMonth, 1);
+  var startWD = (firstDay.getDay()+6)%7;
+  var daysInM = new Date(goiyCalYear, goiyCalMonth+1, 0).getDate();
+  var html = '';
+  ['T2','T3','T4','T5','T6','T7','CN'].forEach(function(d){ html += '<div class="cal-wd">'+d+'</div>'; });
+  for (var i=0;i<startWD;i++) html += '<div class="cal-cell empty"></div>';
+  for (var day=1; day<=daysInM; day++){
+    var ds = goiyCalYear + '-' + String(goiyCalMonth+1).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+    var cls = 'cal-cell';
+    if (ds === todayD) cls += ' today';
+    if (ds === goiyCalSel) cls += ' selected';
+    var dot = datesWithData[ds] ? '<span class="cal-dot"></span>' : '';
+    html += '<div class="'+cls+'" onclick="goiyCalSel=&quot;'+ds+'&quot;;renderGoiyCal()">'+day+dot+'</div>';
+  }
+  document.getElementById('goiy-cal-grid').innerHTML = html;
+}
+function applyGoiyDate(){
+  if (!goiyCalSel){ closeM('modal-goiy-date'); return; }
+  goiyRefDate = goiyCalSel;
+  closeM('modal-goiy-date');
+  renderGoiYBanHomNay(); // đổi ngày xong tự tính lại ngay danh sách khách hàng sẽ bán
 }
 document.addEventListener('click', function(e){
   if (!e.target.closest('.goi-y-chuky-dd') && !e.target.closest('[onclick*="toggleGoiYChuKyDD"]')) {
