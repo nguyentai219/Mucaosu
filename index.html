@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.3.1</title>
+<title>Mua Bán Mủ Cao Su v2.3.2</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -507,7 +507,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.3.1 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.3.2 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1860,7 +1860,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.3.1</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.3.2</div>
       </div>
     </div>
 
@@ -2026,7 +2026,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.3.1</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.3.2</div>
       </div>
     </div>
 
@@ -6287,6 +6287,7 @@ function syncClientRegistry() {
         logSyncError(res.error.message, 'client_registry upsert trả lỗi');
       } else {
         localStorage.setItem('registry_sync_debug', '✅ OK lúc ' + new Date().toLocaleTimeString('vi-VN') + ' (fp: ' + row.fingerprint + ')');
+        _lastRegistrySyncAt = new Date();
       }
       if (typeof updRegistryDebugLine === 'function') updRegistryDebugLine();
     }).catch(function(e) {
@@ -9545,6 +9546,7 @@ function setPendingCount(n){ localStorage.setItem('pending_sync_count', String(M
 function incPendingCount(){ setPendingCount(getPendingCount()+1); }
 
 var _lastSyncAt = null;
+var _lastRegistrySyncAt = null; // mốc thời gian đồng bộ THÀNH CÔNG gần nhất lên client_registry (dữ liệu cho trang quản lý admin đọc) — dùng riêng cho slide thông báo, tách biệt khỏi registry_sync_debug (chuỗi debug kỹ thuật dùng ở màn Cài đặt)
 // ═══════════════════════════════════════════════════════
 // LỊCH ÂM VIỆT NAM (thuật toán thiên văn Hồ Ngọc Đức, múi giờ Việt Nam +7) — dùng cho thanh thông báo
 // đa nhiệm bên dưới: hiện ngày âm lịch hôm nay + cảnh báo ngày ăn chay (14, 15, 24, 29, 30 âm lịch)
@@ -9854,14 +9856,18 @@ function _notifyBuildSlides(){
       }
     }
   } catch(e) { /* lỗi tính âm lịch thì bỏ qua slide này, không ảnh hưởng các slide khác */ }
-  // Kiểm tra đồng bộ máy (registry) — CHỈ thêm 1 slide riêng nếu phát hiện LỖI thật sự cần báo. Nếu
-  // không có lỗi thì KHÔNG thêm slide "OK" nữa — vì slide "kết nối" (đầu danh sách) đã nói rõ tình trạng
-  // kết nối/đồng bộ chung rồi, thêm 1 slide "OK" khác với nội dung gần giống hệt chỉ gây cảm giác thấy
-  // "2 thông báo giống nhau liên tiếp", không có thêm thông tin gì mới cho người dùng.
+  // Đồng bộ dữ liệu lên client_registry (dữ liệu cho trang quản lý admin đọc: hạn dùng, fingerprint...).
+  // Đây là slide RIÊNG với slide "kết nối" ở đầu danh sách (khác bảng, khác mục đích: 1 bên là dữ liệu
+  // giao dịch, 1 bên là dữ liệu cho admin quản lý license) nên không phải trùng lặp — có lỗi thì báo lỗi,
+  // thành công thì báo đúng mốc giờ đồng bộ thành công gần nhất.
   try {
     var syncMsg = localStorage.getItem('registry_sync_debug') || '';
     if (syncMsg.indexOf('❌') !== -1) {
       slides.push({ icon:'☁️', text: 'Lỗi đồng bộ máy: ' + syncMsg.replace(/^❌\s*/, '').slice(0,200), cls:'offline' });
+    } else if (_lastRegistrySyncAt) {
+      var rd = _lastRegistrySyncAt;
+      var rTimeStr = rd.toLocaleTimeString('vi-VN') + ' ngày ' + String(rd.getDate()).padStart(2,'0') + '/' + String(rd.getMonth()+1).padStart(2,'0');
+      slides.push({ icon:'☁️', text: 'Kết nối server thành công - đã cập nhật dữ liệu lúc: ' + rTimeStr, cls:'synced' });
     }
   } catch(e) {}
   // Tình trạng hoạt động hệ thống — LUÔN hiện 1 trong 2, tách riêng "lỗi hệ thống" (từ đợt tự kiểm tra
