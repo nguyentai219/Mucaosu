@@ -1,4 +1,4 @@
-const CACHE = 'mu-cao-su-v2.3.0';
+const CACHE = 'mu-cao-su-v2.3.1';
 const FILES = ['/Mucaosu/','/Mucaosu/index.html','/Mucaosu/manifest.json','/Mucaosu/icon-192.png','/Mucaosu/icon-512.png','/Mucaosu/apple-touch-icon.png','/Mucaosu/logo.png','/Mucaosu/splash.png'];
 
 self.addEventListener('install', e => {
@@ -18,6 +18,13 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
+  // CHỈ can thiệp (cache) các request CÙNG GỐC với app — mọi request ra ngoài (API thời tiết, Supabase,
+  // Google Drive...) phải để trình duyệt tự xử lý bình thường, KHÔNG được đi qua logic cache/fallback
+  // phía dưới. Nếu không loại trừ, một request ra ngoài lỡ thất bại (mạng chập chờn, CORS...) sẽ bị rơi
+  // vào nhánh dự phòng "trả về index.html đã cache" ở bên dưới — khiến bên gọi (ví dụ: lấy dữ liệu thời
+  // tiết) nhận nhầm HTML thay vì JSON thật, tưởng thành công nhưng không đọc được dữ liệu, lỗi rất khó
+  // nhận ra vì không có thông báo lỗi rõ ràng nào cả.
+  if (url.origin !== self.location.origin) return;
   const isHTML = e.request.destination === 'document' || url.pathname.endsWith('.html') || url.pathname.endsWith('/');
 
   if (isHTML) {
