@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.3.2</title>
+<title>Mua Bán Mủ Cao Su v2.3.3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -507,7 +507,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.3.2 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.3.3 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1860,7 +1860,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.3.2</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.3.3</div>
       </div>
     </div>
 
@@ -2026,7 +2026,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.3.2</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.3.3</div>
       </div>
     </div>
 
@@ -9858,8 +9858,11 @@ function _notifyBuildSlides(){
   } catch(e) { /* lỗi tính âm lịch thì bỏ qua slide này, không ảnh hưởng các slide khác */ }
   // Đồng bộ dữ liệu lên client_registry (dữ liệu cho trang quản lý admin đọc: hạn dùng, fingerprint...).
   // Đây là slide RIÊNG với slide "kết nối" ở đầu danh sách (khác bảng, khác mục đích: 1 bên là dữ liệu
-  // giao dịch, 1 bên là dữ liệu cho admin quản lý license) nên không phải trùng lặp — có lỗi thì báo lỗi,
-  // thành công thì báo đúng mốc giờ đồng bộ thành công gần nhất.
+  // giao dịch, 1 bên là dữ liệu cho admin quản lý license) nên không phải trùng lặp. QUAN TRỌNG: chỉ báo
+  // "đã kết nối" khi _lastRegistrySyncAt đã được set — mà biến này CHỈ được gán trong đúng nhánh THÀNH
+  // CÔNG của syncClientRegistry() (sau khi Supabase xác nhận ghi xong, không có lỗi trả về) — nghĩa là
+  // không bao giờ báo "thành công" dựa trên phỏng đoán, chỉ khi dữ liệu mới nhất đã thực sự đẩy lên VÀ
+  // ghi thành công lên máy chủ. Có lỗi thì báo lỗi rõ ràng.
   try {
     var syncMsg = localStorage.getItem('registry_sync_debug') || '';
     if (syncMsg.indexOf('❌') !== -1) {
@@ -9867,7 +9870,7 @@ function _notifyBuildSlides(){
     } else if (_lastRegistrySyncAt) {
       var rd = _lastRegistrySyncAt;
       var rTimeStr = rd.toLocaleTimeString('vi-VN') + ' ngày ' + String(rd.getDate()).padStart(2,'0') + '/' + String(rd.getMonth()+1).padStart(2,'0');
-      slides.push({ icon:'☁️', text: 'Kết nối server thành công - đã cập nhật dữ liệu lúc: ' + rTimeStr, cls:'synced' });
+      slides.push({ icon:'☁️', text: 'Đã kết nối Máy Chủ - đã cập nhật dữ liệu lúc: ' + rTimeStr, cls:'synced' });
     }
   } catch(e) {}
   // Tình trạng hoạt động hệ thống — LUÔN hiện 1 trong 2, tách riêng "lỗi hệ thống" (từ đợt tự kiểm tra
@@ -9953,13 +9956,41 @@ function _notifyShowContent(icon, text, cls){
   });
 }
 function _notifyTick(){
-  var slides = _notifyBuildSlides();
-  if (!slides.length) return;
-  _notifySlideIdx = (_notifySlideIdx + 1) % slides.length;
-  var s = slides[_notifySlideIdx];
-  _notifyShowContent(s.icon, s.text, s.cls);
+  try {
+    var slides = _notifyBuildSlides();
+    if (!slides.length) return;
+    _notifySlideIdx = (_notifySlideIdx + 1) % slides.length;
+    var s = slides[_notifySlideIdx];
+    _notifyShowContent(s.icon, s.text, s.cls);
+  } catch(e) {
+    // Bất kỳ lỗi bất ngờ nào ở đây (dữ liệu hỏng, phần tử DOM chưa sẵn sàng...) tuyệt đối KHÔNG được để
+    // làm "chết đứng" cả vòng xoay mãi mãi — luôn tự đặt lịch thử lại sau 10 giây để tự phục hồi.
+    _notifyTimer = setTimeout(_notifyTick, 10000);
+  }
 }
 _notifyTimer = setTimeout(_notifyTick, 10000); // xoay sang slide đầu tiên sau 10 giây, các lần sau tự lên lịch theo loại nội dung
+
+// Buộc làm mới NGAY LẬP TỨC (không đợi lịch cũ) — dùng khi app vừa quay lại hiển thị sau khi bị ẩn/thu
+// nhỏ một khoảng thời gian, để: (1) luôn hiện đúng dữ liệu MỚI NHẤT ngay lập tức thay vì phải đợi tới
+// lượt của bộ đếm cũ (vốn có thể đã bị trình duyệt "đóng băng"/làm chậm suốt thời gian ẩn app — hành vi
+// tiết kiệm pin tiêu chuẩn của mọi trình duyệt di động), và (2) vì _notifyBuildSlides() luôn tự ưu tiên
+// xếp thời tiết lên vị trí đầu tiên khi đã có dữ liệu, việc bắt đầu lại từ đầu vòng xoay ở đây cũng đồng
+// thời làm cho thời tiết hiện lên đầu tiên đúng như yêu cầu "lúc mở app, lúc ẩn app lâu rồi mở lại".
+function _notifyForceRefreshNow(){
+  if (_notifyTimer) { clearTimeout(_notifyTimer); _notifyTimer = null; }
+  _notifySlideIdx = -1;
+  _notifyTick();
+}
+document.addEventListener('visibilitychange', function(){
+  if (document.visibilityState === 'visible') _notifyForceRefreshNow();
+});
+// Lưới an toàn dự phòng cuối cùng: cứ mỗi 45 giây kiểm tra xem bộ đếm xoay vòng có còn "sống" hay không
+// (ví dụ lỡ có tình huống hiếm gặp nào đó khiến _notifyTimer bị null mà không có lịch nào được đặt lại) —
+// nếu phát hiện bị "đứng" thì tự khởi động lại ngay, đảm bảo vòng xoay KHÔNG BAO GIỜ dừng hẳn vĩnh viễn
+// trong bất kỳ trường hợp nào, kể cả sau reload trang hay sau khi thoát bong bóng bảo vệ màn hình.
+setInterval(function(){
+  if (!_notifyTimer) _notifyTick();
+}, 45000);
 
 function updGDBarStatus(msg, cls) {
   var nm = document.getElementById('gd-bar-name');
