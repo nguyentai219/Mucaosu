@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.2.4</title>
+<title>Mua Bán Mủ Cao Su v2.2.7</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -507,7 +507,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.2.4 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.2.7 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1860,7 +1860,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.2.4</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.2.7</div>
       </div>
     </div>
 
@@ -2026,7 +2026,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.2.4</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.2.7</div>
       </div>
     </div>
 
@@ -2232,7 +2232,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span class="date-hint">Nhấn để đổi ngày</span>
     </div>
     <div id="goi-y-ban-title-count" style="font-size:14.5px;font-weight:800;color:var(--gd);background:var(--g50);border-radius:10px;padding:8px 12px;margin-bottom:8px">Hôm nay sẽ có: 0 khách bán</div>
-    <div style="font-size:11.5px;color:var(--g600);margin-bottom:10px">Dựa theo chu kỳ cạo mủ của từng khách: <b>D3</b> = cạo 1 ngày nghỉ 2 ngày, <b>D2</b> = cạo 1 ngày nghỉ 1 ngày. Nhấn tên để điền nhanh vào ô "Tên người bán". Nhấn thẻ D2/D3 để đổi chu kỳ của khách đó.</div>
+    <div style="font-size:11.5px;color:var(--g600);margin-bottom:10px">Dựa theo chu kỳ cạo mủ của từng khách: <b>D3</b> = cạo 1 ngày nghỉ 2 ngày, <b>D2</b> = cạo 1 ngày nghỉ 1 ngày, <b>D2+D3</b> = khách có 2 phần cạo độc lập (gần như ngày nào cũng có thể bán). Nhấn tên để điền nhanh vào ô "Tên người bán". Nhấn thẻ D2/D3 để đổi chu kỳ của khách đó.</div>
     <div id="goi-y-ban-list"></div>
     <button class="btn-huy" style="width:100%;margin-top:12px" onclick="closeM('modal-goi-y-ban')">Đóng</button>
   </div>
@@ -2424,19 +2424,22 @@ function backfillAllKhachIds(){
   getCcCongNhanNames().forEach(function(ten){ getOrCreateKhachId(ten); });
 }
 
-// ═══════════ GỢI Ý NGƯỜI BÁN HÔM NAY (chu kỳ cạo mủ D2/D3) ═══════════
+// ═══════════ GỢI Ý NGƯỜI BÁN HÔM NAY (chu kỳ cạo mủ D2/D3, hỗ trợ khách có 2 PHẦN CẠO ĐỘC LẬP) ═══════════
 // Lưu chu kỳ cạo mủ riêng cho từng khách bán (tab Thu Mua). Không set thì mặc định D3.
-// Cấu trúc: { normTen: 'D2' | 'D3' }
+// Cấu trúc: { normTen: 'D2' | 'D3' | 'D2D3' } — 'D2D3' nghĩa là khách có CẢ 2 PHẦN cạo độc lập
+// (1 phần cạo D3, 1 phần cạo D2 — ví dụ 2 lô/phần đất khác nhau), nên gần như ngày nào cũng có thể
+// bán, có ngày chỉ bán phần D3, có ngày chỉ bán phần D2, có ngày bán trùng cả 2 phần cùng lúc.
 const KH_CAO_SCHEDULE_KEY = 'kh_cao_schedule';
 function getKhCaoSchedule(){ return lsGetO(KH_CAO_SCHEDULE_KEY); }
 function setKhCaoSchedule(v){ lsSet(KH_CAO_SCHEDULE_KEY, v); }
 function getCaoChuKy(ten){
   var map = getKhCaoSchedule();
-  return map[normTen(ten)] === 'D2' ? 'D2' : 'D3'; // mặc định D3 nếu chưa từng đặt
+  var v = map[normTen(ten)];
+  return (v === 'D2' || v === 'D2D3') ? v : 'D3'; // mặc định D3 nếu chưa từng đặt
 }
 function setCaoChuKy(ten, val){
   var map = getKhCaoSchedule();
-  map[normTen(ten)] = (val === 'D2') ? 'D2' : 'D3';
+  map[normTen(ten)] = (val === 'D2' || val === 'D2D3') ? val : 'D3';
   setKhCaoSchedule(map);
   autoSync();
 }
@@ -2444,34 +2447,64 @@ function setCaoChuKy(ten, val){
 function _soNgayGiua(a, b){
   return Math.round((new Date(b+'T00:00:00') - new Date(a+'T00:00:00')) / 86400000);
 }
-// Với mỗi khách BÁN (có giao dịch thật ở tab Thu Mua), tìm ngày giao dịch GẦN NHẤT của người đó.
-function _layNgayBanGanNhatTheoKhach(){
+// Lùi lại "soNgay" ngày trước mốc dateStr ('YYYY-MM-DD'), trả về chuỗi cùng định dạng
+function _luiNgay(dateStr, soNgay){
+  var d = new Date(dateStr+'T00:00:00');
+  d.setDate(d.getDate() - soNgay);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+// Với mỗi khách BÁN (có giao dịch thật ở tab Thu Mua), tìm ngày giao dịch GẦN NHẤT của người đó
+// TÍNH ĐẾN ĐÚNG NGÀY refStr (không tính các giao dịch SAU ngày refStr) — bắt buộc phải giới hạn thế
+// này để khi người dùng đổi ngày xem lại 1 ngày trong quá khứ, kết quả đúng như thể đang đứng ở đúng
+// ngày đó mà xem, không bị các giao dịch phát sinh SAU ngày đó (thuộc tương lai so với refStr) làm
+// lệch "lần bán gần nhất" đi mất, khiến số ngày cách bị sai và không khớp chu kỳ D2/D3 nữa.
+function _layNgayBanGanNhatTheoKhach(refStr){
   var map = {}; // normTen -> {ten, ngay}
   getGD('mua').forEach(function(g){
     if (!g.ten || !g.date) return;
+    if (refStr && g.date > refStr) return; // bỏ qua giao dịch phát sinh SAU ngày đang xem
     var k = normTen(g.ten);
     if (!map[k] || g.date > map[k].ngay) map[k] = { ten: g.ten, ngay: g.date };
   });
   return map;
 }
-// Trả về mảng khách được DỰ ĐOÁN sẽ bán mủ hôm nay, theo đúng chu kỳ D2/D3 của từng người,
-// tính từ lần bán gần nhất của họ. Khách chưa từng có giao dịch thì không đủ dữ liệu để dự đoán.
-// refDate: ngày dùng làm mốc "hôm nay" để tính — mặc định là ngày thật hôm nay, nhưng có thể truyền
-// ngày khác (khi người dùng đổi ngày trên thanh chọn ngày của popup) để xem lại/xem trước danh sách
-// của 1 ngày cụ thể khác. CHỈ xét khách có lần bán gần nhất trong vòng ĐÚNG chu kỳ của họ (tối đa 3
-// ngày trước — bằng đúng chu kỳ dài nhất D3) — khách đã quá lâu không bán (bỏ lỡ nhiều chu kỳ) sẽ
-// KHÔNG còn được gợi ý lại nữa, tránh hiện dữ liệu quá cũ không còn đáng tin cậy.
+// Khách có giao dịch Thu Mua đúng vào ngày dateStr hay không (dùng để dò riêng từng phần D2/D3 độc lập)
+function _coBanVaoNgay(ten, dateStr){
+  var k = normTen(ten);
+  return getGD('mua').some(function(g){ return g.date === dateStr && normTen(g.ten) === k; });
+}
+// Trả về mảng khách được DỰ ĐOÁN sẽ bán mủ hôm nay. refDate: ngày dùng làm mốc "hôm nay" để tính —
+// mặc định là ngày thật hôm nay, nhưng có thể truyền ngày khác (khi đổi ngày trên thanh chọn ngày của
+// popup) để xem lại/xem trước danh sách của 1 ngày cụ thể khác.
+//
+// • Khách chu kỳ ĐƠN (D2 hoặc D3): CHỈ xét khách có lần bán gần nhất khớp ĐÚNG chu kỳ của họ (tối đa
+//   3 ngày trước) — khách đã quá lâu không bán (bỏ lỡ nhiều chu kỳ) sẽ KHÔNG còn được gợi ý lại nữa.
+// • Khách có CẢ 2 PHẦN (D2D3): vì mỗi phần chạy độc lập nên không thể chỉ nhìn "lần bán gần nhất duy
+//   nhất" — thay vào đó kiểm tra riêng từng phần: có bán đúng 3 ngày trước không (phần D3 tới hạn) và
+//   có bán đúng 2 ngày trước không (phần D2 tới hạn), CHỈ CẦN 1 trong 2 phần khớp là được gợi ý; nếu cả
+//   2 phần cùng khớp (2 phần trùng ngày) thì báo rõ "cả 2 phần" để chủ vựa chuẩn bị đủ khối lượng.
 function buildGoiYBanHomNay(refDate){
   var refStr = refDate || today();
-  var lastMap = _layNgayBanGanNhatTheoKhach();
+  var lastMap = _layNgayBanGanNhatTheoKhach(refStr);
   var out = [];
   Object.keys(lastMap).forEach(function(k){
     var info = lastMap[k];
     var chuKy = getCaoChuKy(info.ten);
-    var soNgayCach = _soNgayGiua(info.ngay, refStr);
-    var kyCao = (chuKy === 'D2') ? 2 : 3;
-    var duDoanHomNay = (soNgayCach === kyCao); // đúng khớp chu kỳ ngay-sau-lần-bán-cuối, không xét bội số xa hơn
-    out.push({ ten: info.ten, chuKy: chuKy, ngayBanCuoi: info.ngay, soNgayCach: soNgayCach, due: duDoanHomNay });
+    var duDoanHomNay, ngayHienThi, phanDue;
+    if (chuKy === 'D2D3') {
+      var coD3 = _coBanVaoNgay(info.ten, _luiNgay(refStr, 3));
+      var coD2 = _coBanVaoNgay(info.ten, _luiNgay(refStr, 2));
+      duDoanHomNay = coD3 || coD2;
+      phanDue = (coD3 && coD2) ? 'D2+D3' : (coD3 ? 'D3' : (coD2 ? 'D2' : ''));
+      ngayHienThi = info.ngay; // vẫn hiện ngày bán gần nhất để tham khảo
+    } else {
+      var soNgayCach = _soNgayGiua(info.ngay, refStr);
+      var kyCao = (chuKy === 'D2') ? 2 : 3;
+      duDoanHomNay = (soNgayCach === kyCao); // đúng khớp chu kỳ ngay-sau-lần-bán-cuối, không xét bội số xa hơn
+      phanDue = chuKy;
+      ngayHienThi = info.ngay;
+    }
+    out.push({ ten: info.ten, chuKy: chuKy, phanDue: phanDue, ngayBanCuoi: ngayHienThi, due: duDoanHomNay });
   });
   out.sort(function(a,b){ return a.ten.localeCompare(b.ten,'vi'); });
   return out;
@@ -2501,17 +2534,23 @@ function renderGoiYBanHomNay(){
   }
   box.innerHTML = dueList.map(function(x){
     var tenEsc = x.ten.replace(/"/g,'&quot;').replace(/'/g,"\\'");
-    var nghiText = (x.chuKy === 'D2') ? 'cạo 1 ngày nghỉ 1 ngày' : 'cạo 1 ngày nghỉ 2 ngày';
+    var nghiText = (x.chuKy === 'D2') ? 'cạo 1 ngày nghỉ 1 ngày'
+      : (x.chuKy === 'D2D3') ? 'có 2 phần cạo (D3 + D2) — hôm nay tới hạn phần ' + x.phanDue
+      : 'cạo 1 ngày nghỉ 2 ngày';
+    var tagText = (x.chuKy === 'D2D3') ? 'D2+D3' : x.chuKy;
+    var tagBg = (x.chuKy==='D2') ? '#eff6ff' : (x.chuKy==='D2D3' ? '#fef3c7' : '#f0fdf4');
+    var tagColor = (x.chuKy==='D2') ? '#1e40af' : (x.chuKy==='D2D3' ? '#92400e' : '#15803d');
     return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--g50);border-radius:10px;padding:10px 12px;margin-bottom:6px">'
       + '<div onclick="pickGoiYBanTen(\'' + tenEsc + '\')" style="min-width:0;flex:1;cursor:pointer">'
       + '<div style="font-weight:700;font-size:13.5px;color:var(--g800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">👤 ' + x.ten + '</div>'
       + '<div style="font-size:10.5px;color:var(--g600);margin-top:2px">Lần bán gần nhất: ' + fmtDateVN2gy(x.ngayBanCuoi) + ' · ' + nghiText + '</div>'
       + '</div>'
       + '<div style="position:relative;flex:0 0 auto">'
-      + '<span onclick="toggleGoiYChuKyDD(this,\'' + tenEsc + '\')" style="display:inline-block;font-size:12px;font-weight:800;padding:5px 10px;border-radius:8px;cursor:pointer;background:' + (x.chuKy==='D2'?'#eff6ff':'#f0fdf4') + ';color:' + (x.chuKy==='D2'?'#1e40af':'#15803d') + '">' + x.chuKy + ' ▾</span>'
-      + '<div class="goi-y-chuky-dd" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#fff;border:1px solid var(--g200);border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.15);overflow:hidden;z-index:10;min-width:70px">'
+      + '<span onclick="toggleGoiYChuKyDD(this,\'' + tenEsc + '\')" style="display:inline-block;font-size:12px;font-weight:800;padding:5px 10px;border-radius:8px;cursor:pointer;background:' + tagBg + ';color:' + tagColor + '">' + tagText + ' ▾</span>'
+      + '<div class="goi-y-chuky-dd" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#fff;border:1px solid var(--g200);border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.15);overflow:hidden;z-index:10;min-width:100px">'
       + '<div onclick="chonGoiYChuKy(\'' + tenEsc + '\',\'D3\')" style="padding:8px 12px;font-size:12.5px;font-weight:700;color:#15803d;cursor:pointer">D3</div>'
       + '<div onclick="chonGoiYChuKy(\'' + tenEsc + '\',\'D2\')" style="padding:8px 12px;font-size:12.5px;font-weight:700;color:#1e40af;cursor:pointer;border-top:1px solid var(--g100)">D2</div>'
+      + '<div onclick="chonGoiYChuKy(\'' + tenEsc + '\',\'D2D3\')" style="padding:8px 12px;font-size:12.5px;font-weight:700;color:#92400e;cursor:pointer;border-top:1px solid var(--g100)">D2+D3 <span style="font-weight:400;font-size:10px">(2 phần)</span></div>'
       + '</div></div></div>';
   }).join('');
 }
@@ -3152,6 +3191,40 @@ document.addEventListener('DOMContentLoaded',()=>{
       } catch(e){}
     }, 3500); // đợi rebuildKHRoleLists() + dữ liệu đồng bộ đầu phiên load xong hẳn rồi mới quét cho chính xác
   }
+
+  // Theo dõi SANG NGÀY MỚI trong lúc app vẫn đang mở (không tải lại trang) — nếu không có cơ chế này,
+  // để app mở từ tối hôm trước qua nửa đêm sẽ khiến ngày giao dịch (curDate, thanh "Nhấn để đổi ngày")
+  // bị "đứng yên" ở ngày cũ, trong khi thanh thông báo đa nhiệm (luôn tính theo giờ thực tế) đã tự nhảy
+  // sang ngày mới — gây hiển thị LỆCH NGÀY ÂM LỊCH giữa 2 nơi trên cùng màn hình (đã xảy ra thực tế).
+  var _lastKnownDay = todayKey;
+  setInterval(function(){
+    var d = today();
+    if (d === _lastKnownDay) return; // vẫn cùng ngày, chưa cần làm gì
+    var ngayCu = _lastKnownDay;
+    _lastKnownDay = d;
+    // Xoá giá cũ + đặt lại mốc ngày cho giá, y hệt logic lúc mới mở app
+    localStorage.removeItem('gia3_mua');
+    localStorage.removeItem('gia3_ban');
+    localStorage.setItem('gia_day', d);
+    // Chỉ tự đẩy ngày giao dịch đang xem sang ngày mới cho tab nào ĐANG ĐỨNG ĐÚNG ở ngày cũ (chưa tự
+    // tay đổi sang xem 1 ngày cụ thể khác) — tránh làm xáo trộn nếu người dùng đang cố tình xem lại ngày
+    // quá khứ/tương lai khác lúc app tự chuyển sang ngày mới.
+    ['mua','ban'].forEach(function(tab){
+      if (curDate[tab] === ngayCu) {
+        curDate[tab] = d;
+        if (typeof updDate === 'function') updDate(tab);
+      }
+    });
+    // Tự động quét lại Gợi Ý Người Bán cho ngày mới + báo toast, y hệt logic lúc mới mở app
+    localStorage.setItem('goi_y_ban_scan_day', d);
+    setTimeout(function(){
+      try {
+        if (typeof buildGoiYBanHomNay !== 'function') return;
+        var dueCount = buildGoiYBanHomNay().filter(function(x){ return x.due; }).length;
+        if (dueCount > 0) toast('💡 Đã sang ngày mới — dự kiến có ' + dueCount + ' khách bán mủ');
+      } catch(e){}
+    }, 800);
+  }, 60000); // kiểm tra mỗi 1 phút — đủ nhanh để phát hiện đúng lúc sang ngày mới, không tốn tài nguyên
 
   initGoogleAuth();
   initSupabase();
@@ -9693,34 +9766,36 @@ function _notifyBuildSlides(){
   slides.push({ icon:'📜', text: _pickRandom(MUA_BAN_PROVERBS), cls:'synced' });
   return slides;
 }
-// Hiện 1 slide lên thanh. Slide ngắn vừa khung: giữ 10 giây nếu là thông tin bình thường (kết nối OK,
-// âm lịch, lời chúc, tục ngữ...), riêng slide LỖI/NHẮC ĂN CHAY (màu đỏ) giữ 15 giây để đọc kỹ. Slide dài
-// hơn khung thì BẮT BUỘC cuộn hết chữ từ phải qua trái cho đọc hết, rồi NẰM IM tại vị trí cuối (không
-// quay lại đầu) đủ 5 giây — tổng thời gian hiện 1 slide dài tối đa không quá 30 giây. Mỗi lần chuyển
-// sang thông báo mới (dù slide ngắn hay vừa cuộn xong) đều có hiệu ứng cuốn chiếu từ dưới lên trên,
-// đồng bộ với hiệu ứng đã dùng ở khung thông tin khách hàng (khTickerIn).
+// Hiện 1 nội dung lên thanh — DÙNG CHUNG cho cả vòng xoay tự động (_notifyTick) LẪN việc ghi trực tiếp
+// trạng thái kết nối (updGDBarStatus, cần phản hồi tức thời). Nhờ dùng chung 1 hàm nên slide nào cũng
+// được xử lý NHẤT QUÁN: chữ dài luôn tự cuộn (không còn tình trạng bị cắt đứng yên khi ghi trực tiếp),
+// và luôn HUỶ lịch xoay cũ trước khi đặt lịch mới (không còn tình trạng 2 bộ đếm thời gian chạy song
+// song đè lên nhau gây lặp/nhảy cóc slide).
+//
+// Slide ngắn vừa khung: giữ 10 giây nếu là thông tin bình thường (kết nối OK, âm lịch, lời chúc, tục
+// ngữ...), riêng slide LỖI/NHẮC ĂN CHAY (màu đỏ) giữ 15 giây để đọc kỹ. Slide dài hơn khung thì BẮT
+// BUỘC cuộn hết chữ từ phải qua trái cho đọc hết, rồi NẰM IM tại vị trí cuối (không quay lại đầu) đủ 5
+// giây — tổng thời gian hiện 1 slide dài tối đa không quá 30 giây. Mỗi lần đổi nội dung đều có hiệu
+// ứng cuốn chiếu từ dưới lên trên, đồng bộ với hiệu ứng đã dùng ở khung thông tin khách hàng (khTickerIn).
 var _notifyTimer = null;
-function _notifyTick(){
+function _notifyShowContent(icon, text, cls){
   var ico = document.getElementById('gd-bar-ico');
   var nm = document.getElementById('gd-bar-name');
   var clip = nm ? nm.parentElement : null;
   if (!nm || !clip) return;
-  var slides = _notifyBuildSlides();
-  if (!slides.length) return;
-  _notifySlideIdx = (_notifySlideIdx + 1) % slides.length;
-  var s = slides[_notifySlideIdx];
-  if (ico) ico.textContent = s.icon;
-  nm.className = 'gd-name gd-name-' + s.cls;
+  if (_notifyTimer) { clearTimeout(_notifyTimer); _notifyTimer = null; } // huỷ lịch xoay cũ, tránh chạy chồng 2 timer
+  if (icon && ico) ico.textContent = icon;
+  nm.className = 'gd-name gd-name-' + cls;
   // Đặt lại vị trí cuộn ngang về 0 (không hiệu ứng) TRƯỚC khi đổi nội dung, tránh chữ mới bị lệch vị trí
   nm.style.transition = 'none';
   nm.style.transform = 'translateX(0)';
-  nm.textContent = s.text;
+  nm.textContent = text;
   // Hiệu ứng chuyển sang thông báo mới: cuốn chiếu từ dưới lên trên
   nm.style.animation = 'none';
   void nm.offsetWidth; // reflow để animation chạy lại từ đầu mỗi lần đổi thông báo
   nm.style.animation = 'khTickerIn .35s ease';
   var NORMAL_MS = 10000, ERROR_MS = 15000, MAX_MS = 30000, START_PAUSE = 500, END_PAUSE = 5000;
-  var baseMs = (s.cls === 'offline') ? ERROR_MS : NORMAL_MS;
+  var baseMs = (cls === 'offline') ? ERROR_MS : NORMAL_MS;
   requestAnimationFrame(function(){
     var overflow = nm.scrollWidth - clip.clientWidth;
     if (overflow > 10) {
@@ -9737,6 +9812,13 @@ function _notifyTick(){
       _notifyTimer = setTimeout(_notifyTick, baseMs);
     }
   });
+}
+function _notifyTick(){
+  var slides = _notifyBuildSlides();
+  if (!slides.length) return;
+  _notifySlideIdx = (_notifySlideIdx + 1) % slides.length;
+  var s = slides[_notifySlideIdx];
+  _notifyShowContent(s.icon, s.text, s.cls);
 }
 _notifyTimer = setTimeout(_notifyTick, 10000); // xoay sang slide đầu tiên sau 10 giây, các lần sau tự lên lịch theo loại nội dung
 
@@ -9757,8 +9839,14 @@ function updGDBarStatus(msg, cls) {
     out = msg + (n > 0 ? (' (' + n + ')') : ''); // giữ nguyên các thông báo tiến trình cụ thể (đăng nhập, làm mới phiên...)
   }
   _gdBarConnStatus = { msg: out, cls: cls }; // lưu lại để slide "kết nối" trong thanh thông báo đa nhiệm luôn đúng nội dung mới nhất
-  nm.textContent = out;
-  nm.className = 'gd-name gd-name-' + cls;
+  _notifySlideIdx = 0; // slide "kết nối" luôn là slide đầu tiên (index 0) — reset về đây để lần xoay tự động
+                        // KẾ TIẾP tiếp tục đúng thứ tự sang slide 1 trở đi, không bị lặp lại slide này
+  if (typeof _notifyShowContent === 'function') {
+    _notifyShowContent('☁️', out, cls); // dùng chung cơ chế cuộn chữ dài + huỷ lịch cũ với vòng xoay tự động
+  } else { // fallback cực hiếm khi hàm chưa kịp định nghĩa — vẫn ghi được nội dung, chỉ là chưa có hiệu ứng cuộn
+    nm.textContent = out;
+    nm.className = 'gd-name gd-name-' + cls;
+  }
 }
 
 function autoSync() {
