@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.3.7</title>
+<title>Mua Bán Mủ Cao Su v2.3.8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -507,7 +507,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.3.7 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.3.8 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1860,7 +1860,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.3.7</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.3.8</div>
       </div>
     </div>
 
@@ -2026,7 +2026,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.3.7</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.3.8</div>
       </div>
     </div>
 
@@ -2312,7 +2312,17 @@ let sgEditId = null; // id record đang sửa trong sổ gửi
 
 // ─── STORAGE ───
 function lsGet(k){ try{ return JSON.parse(localStorage.getItem(k))||[] }catch{ return [] } }
-function lsGetO(k){ try{ return JSON.parse(localStorage.getItem(k))||{} }catch{ return {} } }
+// Đọc 1 khoá localStorage dạng OBJECT — LƯU Ý: nếu dữ liệu lưu bị SAI KIỂU (VD: mảng [] thay vì
+// object {} — từng xảy ra do lỗi cũ ở _sbRowsPayload()/_finishLoginMerge() đẩy nhầm mảng rỗng lên
+// đám mây rồi ghi đè lại xuống máy), phải coi như KHÔNG có dữ liệu ({}) thay vì trả thẳng giá trị sai
+// kiểu đó ra — vì mảng [] vẫn "truthy" trong JS (JSON.parse(...)||{} sẽ KHÔNG bắt được lỗi này), nếu
+// không chặn ở đây các màn hình đọc field kiểu obj.tenField sẽ luôn ra rỗng một cách khó hiểu.
+function lsGetO(k){
+  try{
+    var v = JSON.parse(localStorage.getItem(k));
+    return (v && typeof v==='object' && !Array.isArray(v)) ? v : {};
+  }catch{ return {} }
+}
 function lsSet(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
 
 const gdKey = t => 'gd3_'+t;
@@ -6210,7 +6220,8 @@ function _finishLoginMerge(cloud, opts){
   opts = opts || {};
   var localMua = getGD('mua'), localBan = getGD('ban'), localSg = getSG(), localSu = getSU(), localCc = getCC();
   var localKhIds = getKhIds(), localKhRole = lsGetO('kh_role_manual'), localMuaChot = lsGetO('mua_chot_moc'),
-      localKhHidden = getKhHidden(), localKhInfo = getKhInfo(), localSsData = JSON.parse(localStorage.getItem('ss_data')||'{}');
+      localKhHidden = getKhHidden(), localKhInfo = getKhInfo(), localSsData = JSON.parse(localStorage.getItem('ss_data')||'{}'),
+      localBangKe = getBangKeInfo();
   var localErrLog = _getErrorLog();
   var mua = _mergeArrById(cloud.gd3_mua, localMua);
   var ban = _mergeArrById(cloud.gd3_ban, localBan);
@@ -6246,6 +6257,11 @@ function _finishLoginMerge(cloud, opts){
     var finalKhHidden = _mergeArrStrUnion(cloud.kh_hidden, localKhHidden);
     var finalKhInfo = _mergeObjUnionCloudWins(cloud.kh_info, localKhInfo);
     var finalSsData = _mergeObjUnionCloudWins(cloud.ss_data, localSsData);
+    // "Thông tin xuất bảng kê": TRỘN an toàn thay vì ghi đè thẳng như trước (xem lỗi đã sửa ở
+    // _sbRowsPayload — nếu đám mây lỡ còn giá trị SAI KIỂU (VD: mảng [] do lỗi cũ) thì _isPlainObj
+    // bên trong _mergeObjUnionCloudWins sẽ tự bỏ qua, giữ nguyên dữ liệu máy đang có, KHÔNG bao giờ
+    // ghi đè mất thông tin thật đã lưu trước đó nữa.
+    var finalBangKe = _mergeObjUnionCloudWins(cloud.bang_ke_info, localBangKe);
 
     // Kiểm tra THỰC SỰ có gì mới sau khi trộn hay không (so với đúng trạng thái máy TRƯỚC khi trộn) —
     // chỉ khi có gì mới mới toast + tải lại trang; nếu không, chỉ lặng lẽ đẩy phần máy đang có (nếu còn
@@ -6255,7 +6271,7 @@ function _finishLoginMerge(cloud, opts){
       || finalKhHidden.length!==localKhHidden.length
       || _objDiffers(khFinalMap, localKhIds) || _objDiffers(finalKhRole, localKhRole)
       || _objDiffers(finalMuaChot, localMuaChot) || _objDiffers(finalKhInfo, localKhInfo)
-      || _objDiffers(finalSsData, localSsData);
+      || _objDiffers(finalSsData, localSsData) || _objDiffers(finalBangKe, localBangKe);
 
     setGD('mua', finalMua); setGD('ban', finalBan); setSG(finalSg); setSU(finalSu); setCC(finalCc);
     setKhIds(khFinalMap);
@@ -6264,13 +6280,18 @@ function _finishLoginMerge(cloud, opts){
     lsSet('kh_hidden', finalKhHidden);
     lsSet('kh_info', finalKhInfo);
     lsSet('ss_data', finalSsData);
+    setBangKeInfo(finalBangKe);
     // Nhật ký lỗi hệ thống: lưu bản đã trộn NGAY (không đợi điều kiện "changed" bên dưới, vì đây chỉ
     // là dữ liệu chẩn đoán, không cần thiết phải toast/reload trang chỉ vì có thêm lỗi từ máy khác)
     _saveErrorLog(finalErrLog);
     if (typeof _updateErrorStatusUI === 'function') _updateErrorStatusUI();
-    // Các giá trị đơn (không phải danh sách/đối tượng gộp được): đám mây có sẵn thì ưu tiên giữ
-    // nguyên giá trị đám mây (không bị máy ghi đè khi đăng nhập); máy chỉ được dùng nếu đám mây
-    // chưa từng có giá trị này.
+    // Các giá trị đơn kiểu CHUỖI/MẢNG ĐƠN GIẢN (không phải object nhiều field): đám mây có sẵn thì ưu
+    // tiên giữ nguyên giá trị đám mây (không bị máy ghi đè khi đăng nhập); máy chỉ được dùng nếu đám
+    // mây chưa từng có giá trị này.
+    // LƯU Ý: 'bang_ke_info' đã được lấy RA khỏi danh sách này (xem finalBangKe ở trên, dùng
+    // _mergeObjUnionCloudWins như kh_info) — vì đây là object nhiều field, ghi đè thẳng kiểu này từng
+    // là nguyên nhân gây mất "Thông tin xuất bảng kê" đã lưu trước đó khi đám mây lỡ có giá trị sai
+    // kiểu (mảng rỗng) từ 1 lần đồng bộ trước khi có dữ liệu.
     // LƯU Ý: 'license_expiry' KHÔNG được đưa vào danh sách này (đã cố tình bỏ ra) — hạn dùng có
     // nguồn xác thực RIÊNG và đáng tin cậy hơn là bảng device_trials (qua verifyLicenseAntiCheat,
     // có tính đến cả lệnh admin điều chỉnh từ xa). Nếu để đám mây ghi đè ở đây, giá trị license_expiry
@@ -6278,7 +6299,7 @@ function _finishLoginMerge(cloud, opts){
     // đè mất giá trị ĐÚNG vừa được verifyLicenseAntiCheat() sửa đúng ngay trước đó vài trăm mili giây
     // — đây chính là nguyên nhân gây hiện tượng số ngày sử dụng "tự nhảy lùi về giá trị cũ" MỖI KHI
     // vừa đăng nhập Supabase.
-    ['admin_pw','thang_v1','setting_round','bang_ke_info', THANG_PW_SB_KEY].forEach(function(k){
+    ['admin_pw','thang_v1','setting_round', THANG_PW_SB_KEY].forEach(function(k){
       if (cloud[k] !== undefined && cloud[k] !== null) {
         localStorage.setItem(k, typeof cloud[k]==='string' ? cloud[k] : JSON.stringify(cloud[k]));
       }
@@ -6323,9 +6344,26 @@ function _sbRowsPayload() {
     var raw = localStorage.getItem(k);
     var val;
     if (raw == null) {
-      val = (k === 'license_expiry') ? null : (k === 'kh_ids' ? {} : (k === 'kh_role_manual' ? {} : (k === 'admin_pw' ? '28082008' : (k === 'mua_chot_moc' ? {} : (k === 'ss_data' ? {} : (k === THANG_PW_SB_KEY ? RESET_PW_DEFAULT : []))))));
+      // QUAN TRỌNG: các khoá dạng OBJECT (kh_info, bang_ke_info...) PHẢI mặc định {} khi máy CHƯA
+      // từng có dữ liệu — TUYỆT ĐỐI không được lọt xuống nhánh mặc định [] ở cuối, vì lỡ đẩy [] lên
+      // rồi máy khác/lần đăng nhập sau đọc về sẽ hiểu nhầm là "có dữ liệu" (mảng rỗng vẫn truthy)
+      // và ghi đè mất dữ liệu THẬT đang có sẵn — đây chính là nguyên nhân từng gây mất "Thông tin
+      // xuất bảng kê" đã lưu trước đó. Bổ sung khoá object mới sau này PHẢI khai báo default {} ở đây.
+      val = (k === 'license_expiry') ? null
+        : (k === 'kh_ids' || k === 'kh_role_manual' || k === 'mua_chot_moc' || k === 'ss_data' || k === 'kh_info' || k === 'bang_ke_info') ? {}
+        : (k === 'admin_pw') ? '28082008'
+        : (k === THANG_PW_SB_KEY) ? RESET_PW_DEFAULT
+        : (k === 'kh_id_numeric_v1') ? null // cờ 1 lần — để trống (falsy) khi chưa có, KHÔNG được là [] (truthy sai)
+        : [];
     } else {
       try { val = JSON.parse(raw); } catch(e) { val = raw; }
+      // Chốt chặn cuối: nếu khoá này BẮT BUỘC là object (VD: kh_info, bang_ke_info) mà giá trị đang
+      // lưu cục bộ lỡ SAI KIỂU (VD: mảng [] sót lại từ lỗi cũ nói trên) thì coi như KHÔNG có dữ liệu —
+      // đẩy {} lên thay vì đẩy tiếp giá trị sai kiểu đó, để không tiếp tục lan truyền lỗi lên đám mây.
+      if ((k === 'kh_info' || k === 'bang_ke_info' || k === 'kh_ids' || k === 'kh_role_manual' || k === 'mua_chot_moc' || k === 'ss_data')
+          && !(val && typeof val === 'object' && !Array.isArray(val))) {
+        val = {};
+      }
     }
     return { user_id: sbUser.id, data_key: k, data_value: val, updated_at: now };
   });
@@ -9772,7 +9810,7 @@ var _notifySlideIdx = -1; // -1 để lần _notifyTick() ĐẦU TIÊN tăng lê
 // sau 10 giây, LẶP LẠI liên tục cho đến khi tải thành công. Nếu ĐÃ tải thành công thì tự làm mới lại sau
 // mỗi 5 phút. Toàn bộ quá trình chạy ÂM THẦM — thời tiết là tính năng phụ tham khảo, không phải lỗi hệ
 // thống nên không cần báo lỗi làm phiền người dùng, chỉ tự lặp lại cho tới khi có dữ liệu.
-var _weatherCache = null; // { temp, code, rainPeriods:[{startHour,endHour,prob}], maxProbToday, fetchedAt }
+var _weatherCache = null; // { temp, code, rainPeriods:[{startHour,endHour,prob,mucMua}], maxProbToday, fetchedAt }
 var _weatherFirstReady = false; // đảm bảo chỉ "ngắt ngang hiện ngay" đúng 1 lần — lần ĐẦU TIÊN có dữ liệu
 function _weatherIcon(code){
   if (code === 0) return '☀️';
@@ -9802,37 +9840,54 @@ function _weatherText(code){
   };
   return map[code] || 'không rõ tình trạng';
 }
-// Dò trong mảng % khả năng mưa theo từng giờ (từ giờ hiện tại trở đi trong ngày), gom các giờ LIÊN TIẾP
-// có khả năng mưa đáng chú ý (>=40%) thành từng "cơn mưa" — mỗi cơn ghi rõ khung giờ bắt đầu/kết thúc
-// và % cao nhất trong khung đó, để báo được CHI TIẾT "mưa mấy giờ đến mấy giờ" thay vì chỉ 1 con số chung.
-function _phanTichCacConMua(times, probs, tuGioIdx){
+// Phân loại mức độ mưa theo lượng mưa (mm/giờ) — theo thang phổ biến trong dự báo thời tiết tiếng Việt.
+function _mucDoMua(mm){
+  if (mm >= 8) return 'to';
+  if (mm >= 4) return 'vừa';
+  return 'nhỏ';
+}
+// Dò trong mảng % khả năng mưa + lượng mưa (mm) theo từng giờ (từ giờ hiện tại trở đi trong ngày), gom
+// các giờ LIÊN TIẾP có khả năng mưa đáng chú ý (>=40%) thành từng "khung giờ mưa" — mỗi khung ghi rõ
+// giờ bắt đầu/kết thúc, % cao nhất, và MỨC ĐỘ mưa (nhỏ/vừa/to dựa theo lượng mưa mm cao nhất trong
+// khung). QUAN TRỌNG: 1 khung giờ tự động TÁCH RA thành khung mới ngay khi mức độ mưa đổi khác (VD:
+// đang mưa nhỏ chuyển sang mưa to) dù % khả năng mưa vẫn liên tục >=40% xuyên suốt — để hiển thị được
+// ĐẦY ĐỦ diễn biến trong ngày thay vì gộp chung 1 khung "mưa" mơ hồ không phân biệt nặng nhẹ.
+function _phanTichCacConMua(times, probs, mms, tuGioIdx){
   var NGUONG = 40;
   var periods = [];
-  var start = null, maxInRun = 0;
+  var start = null, maxProbInRun = 0, curMuc = null;
   for (var i = tuGioIdx; i < probs.length; i++){
     var p = probs[i] || 0;
-    if (p >= NGUONG) {
-      if (start === null) { start = i; maxInRun = p; }
-      else if (p > maxInRun) maxInRun = p;
+    var mm = (mms && mms[i]) || 0;
+    var dangMua = p >= NGUONG;
+    var muc = dangMua ? _mucDoMua(mm) : null;
+    if (dangMua && (start === null || muc !== curMuc)) {
+      if (start !== null) { // mức độ mưa vừa đổi khác -> chốt khung cũ lại trước khi mở khung mới
+        periods.push({ startHour: parseInt(times[start].slice(11,13),10), endHour: parseInt(times[i-1].slice(11,13),10) + 1, prob: maxProbInRun, mucMua: curMuc });
+      }
+      start = i; maxProbInRun = p; curMuc = muc;
+    } else if (dangMua) {
+      if (p > maxProbInRun) maxProbInRun = p; // vẫn cùng mức mưa như khung đang mở -> chỉ cập nhật % cao nhất
     } else if (start !== null) {
-      periods.push({ startHour: parseInt(times[start].slice(11,13),10), endHour: parseInt(times[i-1].slice(11,13),10) + 1, prob: maxInRun });
-      start = null; maxInRun = 0;
+      periods.push({ startHour: parseInt(times[start].slice(11,13),10), endHour: parseInt(times[i-1].slice(11,13),10) + 1, prob: maxProbInRun, mucMua: curMuc });
+      start = null; maxProbInRun = 0; curMuc = null;
     }
   }
   if (start !== null) {
-    periods.push({ startHour: parseInt(times[start].slice(11,13),10), endHour: parseInt(times[probs.length-1].slice(11,13),10) + 1, prob: maxInRun });
+    periods.push({ startHour: parseInt(times[start].slice(11,13),10), endHour: parseInt(times[probs.length-1].slice(11,13),10) + 1, prob: maxProbInRun, mucMua: curMuc });
   }
   return periods;
 }
-// Ghép thành 1 dòng thông báo súc tích nhưng đủ chi tiết: nhiệt độ + mây/mưa hiện tại, kèm chi tiết từng
-// cơn mưa dự báo trong ngày (nếu có) hoặc % khả năng mưa cao nhất trong ngày (nếu không có cơn nào đáng kể).
+// Ghép thành 1 dòng thông báo súc tích nhưng đủ chi tiết: nhiệt độ + mây/mưa hiện tại, kèm chi tiết
+// TỪNG KHUNG GIỜ mưa dự báo trong ngày (giờ bắt đầu/kết thúc + mức độ nhỏ/vừa/to + % khả năng), hoặc
+// % khả năng mưa cao nhất trong ngày (nếu không có khung nào đáng kể).
 function _buildWeatherText(w){
   var base = w.temp + '°C - ' + _weatherText(w.code);
   if (w.rainPeriods && w.rainPeriods.length) {
-    var parts = w.rainPeriods.slice(0,3).map(function(p){
-      return p.startHour + 'h-' + p.endHour + 'h (~' + p.prob + '%)';
+    var parts = w.rainPeriods.slice(0,4).map(function(p){
+      return p.startHour + 'h-' + p.endHour + 'h mưa ' + (p.mucMua||'nhỏ') + ' (~' + p.prob + '%)';
     });
-    return base + '. Dự báo mưa: ' + parts.join(', ');
+    return base + '. Dự báo: ' + parts.join(', ');
   }
   return base + ', khả năng mưa thấp (~' + (w.maxProbToday||0) + '%)';
 }
@@ -9842,20 +9897,22 @@ function _fetchWeather(){
     navigator.geolocation.getCurrentPosition(function(pos){
       var lat = pos.coords.latitude, lon = pos.coords.longitude;
       // current: nhiệt độ + mã tình trạng trời NGAY LÚC NÀY. hourly.precipitation_probability: % khả
-      // năng mưa theo TỪNG GIỜ trong ngày — dùng để dò các "cơn mưa" (xem _phanTichCacConMua ở trên).
+      // năng mưa theo TỪNG GIỜ trong ngày. hourly.precipitation: LƯỢNG MƯA (mm) theo từng giờ — dùng
+      // để phân biệt mưa nhỏ/vừa/to (xem _mucDoMua), không chỉ riêng % khả năng mưa như trước.
       var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon
-        + '&current=temperature_2m,weather_code&hourly=precipitation_probability&forecast_days=1&timezone=auto';
+        + '&current=temperature_2m,weather_code&hourly=precipitation_probability,precipitation&forecast_days=1&timezone=auto';
       fetch(url).then(function(r){ return r.json(); }).then(function(data){
         if (!data || !data.current) { setTimeout(_fetchWeather, 10000); return; }
         var rainPeriods = [], maxProbToday = 0;
         if (data.hourly && data.hourly.time && data.hourly.precipitation_probability) {
           var probs = data.hourly.precipitation_probability;
+          var mms = data.hourly.precipitation || [];
           var times = data.hourly.time;
           var d = new Date();
           var localHourStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + 'T' + String(d.getHours()).padStart(2,'0');
           var curIdx = times.findIndex(function(t){ return t.slice(0,13) === localHourStr; });
           if (curIdx === -1) curIdx = 0;
-          rainPeriods = _phanTichCacConMua(times, probs, curIdx);
+          rainPeriods = _phanTichCacConMua(times, probs, mms, curIdx);
           for (var i = curIdx; i < probs.length; i++) { if ((probs[i]||0) > maxProbToday) maxProbToday = probs[i]; }
         }
         _weatherCache = {
