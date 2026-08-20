@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.3.4</title>
+<title>Mua Bán Mủ Cao Su v2.3.7</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -507,7 +507,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.3.4 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.3.7 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1860,7 +1860,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.3.4</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.3.7</div>
       </div>
     </div>
 
@@ -2026,7 +2026,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.3.4</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.3.7</div>
       </div>
     </div>
 
@@ -2232,7 +2232,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span class="date-hint">Nhấn để đổi ngày</span>
     </div>
     <div id="goi-y-ban-title-count" style="font-size:14.5px;font-weight:800;color:var(--gd);background:var(--g50);border-radius:10px;padding:8px 12px;margin-bottom:8px">Hôm nay sẽ có: 0 khách bán</div>
-    <div style="font-size:11.5px;color:var(--g600);margin-bottom:10px">Dựa theo chu kỳ cạo mủ của từng khách: <b>D3</b> = cạo 1 ngày nghỉ 2 ngày, <b>D2</b> = cạo 1 ngày nghỉ 1 ngày, <b>D2+D3</b> = khách có 2 phần cạo độc lập (gần như ngày nào cũng có thể bán). Nhấn tên để điền nhanh vào ô "Tên người bán". Nhấn thẻ D2/D3 để đổi chu kỳ của khách đó.</div>
+    <div style="font-size:11.5px;color:var(--g600);margin-bottom:10px">Dựa theo chu kỳ cạo mủ của từng khách: <b>D3</b> = cạo 1 ngày nghỉ 2 ngày, <b>D2</b> = cạo 1 ngày nghỉ 1 ngày, <b>D2+D3</b> = khách có 2 phần cạo độc lập (gần như ngày nào cũng có thể bán). Nhấn tên để điền nhanh vào ô "Tên người bán". Nhấn ✏️ để đặt tên hiển thị riêng cho lô cạo của ngày đang xem (không đổi tên thật). Nhấn thẻ D2/D3 để đổi chu kỳ của khách đó. Khách đã lưu giao dịch trong ngày sẽ tự động biến mất khỏi danh sách này.</div>
     <div id="goi-y-ban-list"></div>
     <button class="btn-huy" style="width:100%;margin-top:12px" onclick="closeM('modal-goi-y-ban')">Đóng</button>
   </div>
@@ -2252,6 +2252,32 @@ input[type=date]:focus{border-color:var(--gl)}
     <div class="cal-legend"><span class="cal-dot"></span> Ngày có giao dịch thu mua</div>
     <button class="btn-luu" style="width:100%;margin-top:10px" onclick="applyGoiyDate()">Xác nhận</button>
     <button class="btn-huy" style="width:100%;margin-top:6px" onclick="closeM('modal-goiy-date')">Đóng</button>
+  </div>
+</div>
+
+<!-- MODAL ĐẶT TÊN HIỂN THỊ RIÊNG cho 1 khách trong Gợi Ý Người Bán Hôm Nay (chỉ áp dụng cho đúng
+     ngày đang xem, không đổi tên thật dùng để ghi giao dịch) -->
+<div class="modal" id="modal-tht">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-title">✏️ Đặt tên hiển thị</div>
+    <div style="font-size:12px;color:var(--g600);line-height:1.6;margin-bottom:12px">
+      Chỉ để dễ phân biệt trong danh sách gợi ý, <b>không</b> thay đổi tên dùng khi ghi giao dịch.
+      Nhãn này chỉ áp dụng cho lô cạo của <b>ngày <span id="tht-ngay-ap-dung" style="color:var(--gd)">--</span></b>,
+      không áp dụng cho các ngày khác.
+    </div>
+    <div class="fr">
+      <label class="fl">Tên thật (dùng khi ghi giao dịch)</label>
+      <div id="tht-ten-that" style="font-weight:700;font-size:14px;color:var(--g800);padding:8px 0">--</div>
+    </div>
+    <div class="fr">
+      <label class="fl">Tên hiển thị riêng cho ngày này</label>
+      <input type="text" id="tht-inp" class="fi" placeholder="Để trống = dùng lại tên thật" autocomplete="off" onfocus="scrollInputUp(this)">
+    </div>
+    <div class="btn-row" style="margin-top:10px">
+      <button class="btn-huy" onclick="closeM('modal-tht')">Huỷ</button>
+      <button class="btn-luu" onclick="luuTenHienThi()">💾 Lưu</button>
+    </div>
   </div>
 </div>
 
@@ -2443,6 +2469,71 @@ function setCaoChuKy(ten, val){
   setKhCaoSchedule(map);
   autoSync();
 }
+// Nhãn hiển thị TUỲ CHỌN cho 1 khách trong danh sách Gợi Ý Người Bán Hôm Nay — chỉ để chủ vựa dễ
+// phân biệt khi nhìn danh sách (VD: nhiều khách trùng tên "chị Tư" ở các lô khác nhau). Nhãn này áp
+// dụng RIÊNG CHO ĐÚNG NGÀY đang chọn trên popup (key = tên + ngày), KHÔNG áp dụng chung cho mọi ngày/
+// mọi giao dịch của khách đó — vì lô cạo tới hạn có thể khác nhau giữa các ngày. KHÔNG thay thế "tên
+// thật" dùng để ghi/tra cứu giao dịch — khi bấm chọn từ danh sách vẫn luôn điền đúng tên thật vào ô
+// "Tên người bán" như trước giờ, để không làm lệch lịch sử giao dịch đã có.
+const KH_TEN_HIEN_THI_KEY = 'kh_ten_hien_thi';
+function getTenHienThiMap(){ return lsGetO(KH_TEN_HIEN_THI_KEY); }
+function setTenHienThiMap(v){ lsSet(KH_TEN_HIEN_THI_KEY, v); }
+function _thtKey(ten, ngay){ return normTen(ten) + '|' + (ngay || ''); }
+function getTenHienThi(ten, ngay){
+  var v = getTenHienThiMap()[_thtKey(ten, ngay)];
+  return (v && v.trim()) ? v.trim() : '';
+}
+// ── Popup đặt tên hiển thị (thay cho prompt() mặc định của trình duyệt) ──
+var _thtEditTen = '', _thtEditNgay = '';
+function openTenHienThiModal(ten){
+  _thtEditTen = ten;
+  _thtEditNgay = goiyRefDate || today();
+  var elTen = document.getElementById('tht-ten-that');
+  var elNgay = document.getElementById('tht-ngay-ap-dung');
+  var elInp = document.getElementById('tht-inp');
+  if (elTen) elTen.textContent = ten;
+  if (elNgay) elNgay.textContent = fmtDateVN2gy(_thtEditNgay);
+  if (elInp) elInp.value = getTenHienThi(ten, _thtEditNgay);
+  openM('modal-tht');
+  setTimeout(function(){ var el=document.getElementById('tht-inp'); if(el){ el.focus(); el.select(); } }, 250);
+}
+function luuTenHienThi(){
+  var elInp = document.getElementById('tht-inp');
+  var moi = elInp ? elInp.value.trim() : '';
+  var map = getTenHienThiMap();
+  var key = _thtKey(_thtEditTen, _thtEditNgay);
+  if (!moi || normTen(moi) === normTen(_thtEditTen)) delete map[key]; // rỗng hoặc gõ lại đúng tên thật -> bỏ nhãn riêng của ngày này
+  else map[key] = moi;
+  // Dọn bớt các nhãn quá cũ (>90 ngày) để dữ liệu không phình to mãi theo thời gian — chỉ dọn nhãn
+  // gắn với 1 ngày cụ thể đã lùi xa, không đụng gì tới dữ liệu giao dịch thật.
+  var gioiHan = _luiNgay(today(), 90);
+  Object.keys(map).forEach(function(k){
+    var d = k.split('|')[1];
+    if (d && d < gioiHan) delete map[k];
+  });
+  setTenHienThiMap(map);
+  autoSync();
+  closeM('modal-tht');
+  renderGoiYBanHomNay();
+  toast('✅ Đã lưu tên hiển thị!');
+}
+function escHtml(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+// Định dạng ngắn gọn 1 giao dịch cho phần "sản lượng kỳ trước": dd/mm - kg (x độ nếu là mủ nước)
+// (loại, chỉ hiện nếu KHÔNG PHẢI mủ nước — vì mủ nước là loại mặc định/phổ biến nhất, không cần
+// nhắc lại) x giá = tiền — giúp chủ vựa so sánh nhanh trước khi cân mà không cần mở "Xem lại GD cũ".
+function _fmtGiaoDichNgan(g){
+  var p = g.date ? g.date.split('-') : [];
+  var ngayNgan = p.length===3 ? (p[2]+'/'+p[1]) : (g.date||'');
+  var laMuNuoc = (g.loai === 'nuoc');
+  var loaiTxt = LOAI_LBL[g.loai] || g.loai || '';
+  var doPhan = (laMuNuoc && g.do) ? (' x ' + fmtDo(g.do) + ' độ') : '';
+  var loaiPhan = laMuNuoc ? '' : (' (' + loaiTxt + ')');
+  return ngayNgan + ' - ' + fmtKg(g.kg) + 'kg' + doPhan + loaiPhan + ' x ' + fmtNum(g.gia) + 'đ = ' + fmtNum(g.tt) + 'đ';
+}
 // Số ngày nguyên giữa 2 mốc 'YYYY-MM-DD' (b - a)
 function _soNgayGiua(a, b){
   return Math.round((new Date(b+'T00:00:00') - new Date(a+'T00:00:00')) / 86400000);
@@ -2473,6 +2564,17 @@ function _coBanVaoNgay(ten, dateStr){
   var k = normTen(ten);
   return getGD('mua').some(function(g){ return g.date === dateStr && normTen(g.ten) === k; });
 }
+// Lấy tối đa 2 lần bán GẦN NHẤT (kg + ngày) của 1 khách, tính TRƯỚC ngày refStr (không tính giao
+// dịch của chính ngày refStr) — để hiển thị "sản lượng 2 kỳ trước" trong danh sách Gợi Ý, giúp chủ
+// vựa so sánh nhanh trước khi cân, không cần mở riêng "Xem lại giao dịch cũ".
+function _lay2KyGanNhat(ten, refStr){
+  var k = normTen(ten);
+  var list = getGD('mua').filter(function(g){
+    return g.ten && normTen(g.ten) === k && g.date && g.date < refStr;
+  });
+  list.sort(function(a,b){ return b.date.localeCompare(a.date); });
+  return list.slice(0,2);
+}
 // Trả về mảng khách được DỰ ĐOÁN sẽ bán mủ hôm nay. refDate: ngày dùng làm mốc "hôm nay" để tính —
 // mặc định là ngày thật hôm nay, nhưng có thể truyền ngày khác (khi đổi ngày trên thanh chọn ngày của
 // popup) để xem lại/xem trước danh sách của 1 ngày cụ thể khác.
@@ -2489,6 +2591,11 @@ function buildGoiYBanHomNay(refDate){
   var out = [];
   Object.keys(lastMap).forEach(function(k){
     var info = lastMap[k];
+    // Khách đã có giao dịch bán mủ ĐÚNG vào ngày đang xem (refStr) rồi -> bỏ khỏi danh sách dự kiến
+    // ngay, không xét chu kỳ nữa. Áp dụng chung cho cả D2/D3/D2D3, để sau khi lưu giao dịch thành công
+    // (dù tự gõ tay hay chọn nhanh từ danh sách gợi ý) khách đó biến mất khỏi danh sách, giúp biết
+    // còn lại bao nhiêu người CHƯA bán trong ngày.
+    if (_coBanVaoNgay(info.ten, refStr)) return;
     var chuKy = getCaoChuKy(info.ten);
     var duDoanHomNay, ngayHienThi, phanDue;
     if (chuKy === 'D2D3') {
@@ -2540,10 +2647,24 @@ function renderGoiYBanHomNay(){
     var tagText = (x.chuKy === 'D2D3') ? 'D2+D3' : x.chuKy;
     var tagBg = (x.chuKy==='D2') ? '#eff6ff' : (x.chuKy==='D2D3' ? '#fef3c7' : '#f0fdf4');
     var tagColor = (x.chuKy==='D2') ? '#1e40af' : (x.chuKy==='D2D3' ? '#92400e' : '#15803d');
+    var tenRieng = getTenHienThi(x.ten, goiyRefDate);
+    var tenHienThi = tenRieng || x.ten;
+    var tenGocLine = tenRieng ? '<div style="font-size:10px;color:var(--g500);margin-top:1px">(Tên gốc: ' + escHtml(x.ten) + ')</div>' : '';
+    var kyTruoc = _lay2KyGanNhat(x.ten, goiyRefDate);
+    var kyTruocLine = kyTruoc.length
+      ? '<div style="margin-top:4px">' + kyTruoc.map(function(g){
+          return '<div style="font-size:10.5px;color:var(--g600);line-height:1.5">📦 ' + escHtml(_fmtGiaoDichNgan(g)) + '</div>';
+        }).join('') + '</div>'
+      : '';
     return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--g50);border-radius:10px;padding:10px 12px;margin-bottom:6px">'
       + '<div onclick="pickGoiYBanTen(\'' + tenEsc + '\')" style="min-width:0;flex:1;cursor:pointer">'
-      + '<div style="font-weight:700;font-size:13.5px;color:var(--g800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">👤 ' + x.ten + '</div>'
+      + '<div style="display:flex;align-items:center;gap:6px;min-width:0">'
+      +   '<div style="font-weight:700;font-size:13.5px;color:var(--g800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">👤 ' + escHtml(tenHienThi) + '</div>'
+      +   '<span onclick="event.stopPropagation();openTenHienThiModal(\'' + tenEsc + '\')" style="flex:0 0 auto;font-size:12px;padding:1px 3px;cursor:pointer" title="Đặt tên hiển thị riêng cho ngày này">✏️</span>'
+      + '</div>'
+      + tenGocLine
       + '<div style="font-size:10.5px;color:var(--g600);margin-top:2px">Lần bán gần nhất: ' + fmtDateVN2gy(x.ngayBanCuoi) + ' · ' + nghiText + '</div>'
+      + kyTruocLine
       + '</div>'
       + '<div style="position:relative;flex:0 0 auto">'
       + '<span onclick="toggleGoiYChuKyDD(this,\'' + tenEsc + '\')" style="display:inline-block;font-size:12px;font-weight:800;padding:5px 10px;border-radius:8px;cursor:pointer;background:' + tagBg + ';color:' + tagColor + '">' + tagText + ' ▾</span>'
@@ -3873,6 +3994,10 @@ function luuGD(tab){
     const all=getGD(tab); all.push(gd); setGD(tab,all);
     var _anhBlob = _pendingAnh[tab]; // lấy trước khi resetF (bên dưới) xoá mất biến tạm
     toast('✅ Đã lưu!'); resetF(tab); renderTbl(tab, gd.id); updTK(tab); updTK('ban'); if(typeof updSSSummary==='function') updSSSummary(); if(typeof updThangData==='function') updThangData(); autoSync();
+    // Nếu vừa lưu 1 giao dịch THU MUA, làm mới ngay danh sách "Gợi Ý Người Bán Hôm Nay" (nếu đã từng mở
+    // trong phiên này) để khách vừa bán biến mất khỏi danh sách ngay lập tức — không cần đóng/mở lại
+    // popup mới thấy cập nhật, đúng theo yêu cầu biết còn bao nhiêu người CHƯA bán trong ngày.
+    if (tab === 'mua' && typeof renderGoiYBanHomNay === 'function') renderGoiYBanHomNay();
     playSaveSound();
     if(_tenLaKhachMoi) showKhNeedInfoNotice(ten); // nhắc bổ sung thông tin nếu là khách hoàn toàn mới
     if(_anhBlob) uploadAnhGD(tab, gd.id, _anhBlob);
@@ -3985,6 +4110,7 @@ function xoaGD(tab){
     var _gdOld = getGD(tab).find(function(g){ return String(g.id)===String(editId[tab]); });
     const all=getGD(tab).filter(g=>String(g.id)!==String(editId[tab]));
     setGD(tab,all); huySua(tab); renderTbl(tab); updTK(tab); updTK('ban'); if(typeof updThangData==='function') updThangData(); toastDeleted('🗑️ Đã xoá giao dịch!');
+    if (tab === 'mua' && typeof renderGoiYBanHomNay === 'function') renderGoiYBanHomNay(); // khách vừa bị xoá GD hôm nay -> có thể cần hiện lại trong Gợi Ý
     if(_gdOld && _gdOld.anhPath && sbClient && sbUser) sbClient.storage.from(SB_ANH_BUCKET).remove([_gdOld.anhPath]).then(null, function(){});
     autoSync();
   });
