@@ -1,4 +1,4 @@
-const CACHE = 'mu-cao-su-v2.3.9';
+const CACHE = 'mu-cao-su-v2.4.0';
 const FILES = ['/Mucaosu/','/Mucaosu/index.html','/Mucaosu/manifest.json','/Mucaosu/icon-192.png','/Mucaosu/icon-512.png','/Mucaosu/apple-touch-icon.png','/Mucaosu/logo.png','/Mucaosu/splash.png'];
 
 self.addEventListener('install', e => {
@@ -27,12 +27,19 @@ self.addEventListener('fetch', e => {
   if (url.origin !== self.location.origin) return;
   const isHTML = e.request.destination === 'document' || url.pathname.endsWith('.html') || url.pathname.endsWith('/');
 
-  if (isHTML) {
-    // HTML: Network First — luôn lấy bản mới nhất, cache làm dự phòng offline
+  // Icon và manifest phải dùng Network First để Chrome luôn so sánh được hash thật từ server
+  // — nếu dùng Cache First, Chrome nhận icon từ cache (qua SW) có thể không khớp với server
+  // → hiện popup "Xem lại bản cập nhật biểu tượng" mỗi lần mở app dù icon không hề đổi.
+  const isNetworkFirst = isHTML
+    || url.pathname.endsWith('.png')
+    || url.pathname.endsWith('.ico')
+    || url.pathname.endsWith('manifest.json');
+
+  if (isNetworkFirst) {
+    // Network First — luôn lấy bản mới nhất từ server, cache làm dự phòng offline
     e.respondWith(
       fetch(e.request)
         .then(response => {
-          // Cập nhật cache với bản mới
           const clone = response.clone();
           caches.open(CACHE).then(c => c.put(e.request, clone));
           return response;
@@ -40,7 +47,7 @@ self.addEventListener('fetch', e => {
         .catch(() => caches.match(e.request))
     );
   } else {
-    // Tài nguyên tĩnh (icon, manifest): Cache First — nhanh hơn
+    // Tài nguyên tĩnh khác: Cache First — nhanh hơn
     e.respondWith(
       caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('/Mucaosu/index.html')))
     );
