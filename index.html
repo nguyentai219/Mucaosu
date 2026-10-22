@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.4.3</title>
+<title>Mua Bán Mủ Cao Su v2.4.4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -507,7 +507,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.4.3 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.4.4 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1371,7 +1371,7 @@ input[type=date]:focus{border-color:var(--gl)}
     <div class="modal-title">🖨️ Xuất Bảng kê thu mua</div>
     <div style="font-size:11.5px;color:var(--g600);margin-bottom:12px">Gồm khách hàng có giao dịch trong ngày chọn, mỗi khách 1 dòng theo loại mủ (mủ nước tính độ riêng, mủ tạp tính theo kg).</div>
     <div style="font-size:12px;font-weight:700;color:var(--g700);margin-bottom:4px">Nguồn dữ liệu</div>
-    <select id="bk-nguon" class="fi" style="margin-bottom:10px">
+    <select id="bk-nguon" class="fi" style="margin-bottom:10px" onchange="_bkSaveNguon()">
       <option value="thu_mua">📥 Dữ liệu Thu Mua (giao dịch thật)</option>
       <option value="tinh_toan">⚡ Dữ liệu Tính Toán (đã lưu ở tab Tính Toán)</option>
     </select>
@@ -1871,7 +1871,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.4.3</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.4.4</div>
       </div>
     </div>
 
@@ -2037,7 +2037,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.4.3</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.4.4</div>
       </div>
     </div>
 
@@ -9267,7 +9267,7 @@ function openBangKeInfo(){
   openM('modal-bangke-info');
 }
 function luuBangKeInfo(){
-  var info = {
+  var info = Object.assign({}, getBangKeInfo(), {
     tenDN: (document.getElementById('bk-tenDN').value||'').trim(),
     mst: (document.getElementById('bk-mst').value||'').trim(),
     diaChi: (document.getElementById('bk-diaChi').value||'').trim(),
@@ -9276,7 +9276,7 @@ function luuBangKeInfo(){
     nguoiPhuTrach: (document.getElementById('bk-nguoiPhuTrach').value||'').trim(),
     giaMuNuoc: (document.getElementById('bk-giaMuNuoc').value||'').trim(),
     giaMuTap: (document.getElementById('bk-giaMuTap').value||'').trim()
-  };
+  });
   setBangKeInfo(info);
   toast('✅ Đã lưu thông tin xuất bảng kê!');
   playSaveSound();
@@ -9285,11 +9285,34 @@ function luuBangKeInfo(){
 }
 // Nhớ lựa chọn 2 tick "Điền tháng/năm xuất" và "Điền ngày/tháng/năm ký" cho lần xuất bảng kê sau, khỏi
 // phải tick lại mỗi lần nếu Tài luôn dùng cùng 1 lựa chọn.
+// Các lựa chọn khi xuất bảng kê (2 ô tick + nguồn dữ liệu) được lưu CHUNG trong đối tượng
+// 'bang_ke_info' (các khoá dienThangNam, dienNgayKy, nguonXuat) — nhờ vậy tự đi theo đúng đường đồng bộ
+// Supabase đã có sẵn của "Thông tin xuất bảng kê" (đẩy lên + trộn an toàn khi đăng nhập/mở app),
+// dùng được trên mọi thiết bị. Chỉ đẩy khi giá trị THỰC SỰ đổi, tránh đồng bộ thừa.
+function _bkSetting(patch){
+  var info = getBangKeInfo(), changed = false;
+  Object.keys(patch).forEach(function(k){ if (info[k] !== patch[k]) { info[k] = patch[k]; changed = true; } });
+  if (!changed) return;
+  setBangKeInfo(info);
+  autoSync();
+}
 function _bkSaveDienOpts(){
-  lsSet('bk_dien_opts', {
-    thangNam: !!(document.getElementById('bk-dienThangNam')||{}).checked,
-    ngayKy: !!(document.getElementById('bk-dienNgayKy')||{}).checked
+  _bkSetting({
+    dienThangNam: !!(document.getElementById('bk-dienThangNam')||{}).checked,
+    dienNgayKy: !!(document.getElementById('bk-dienNgayKy')||{}).checked
   });
+}
+// Nhớ nguồn dữ liệu (Thu Mua / Tính Toán) đã chọn lần trước, dùng chung cho MỌI tab: lần sau mở xuất
+// bảng kê từ tab nào cũng tự chọn lại đúng nguồn đó. defaultNguon (theo tab) chỉ dùng khi CHƯA từng chọn.
+function _bkSaveNguon(){
+  var v = (document.getElementById('bk-nguon')||{}).value;
+  if (v === 'thu_mua' || v === 'tinh_toan') _bkSetting({ nguonXuat: v });
+}
+function _bkGetNguonNho(){
+  var v = getBangKeInfo().nguonXuat;
+  if (v === 'thu_mua' || v === 'tinh_toan') return v;
+  try { v = JSON.parse(localStorage.getItem('bk_nguon')); } catch(e){ v = ''; } // khoá cũ (v2.4.4, chỉ trên máy)
+  return (v === 'thu_mua' || v === 'tinh_toan') ? v : '';
 }
 function openBangKeExport(defaultNguon){
   var t = today(); // yyyy-mm-dd, giờ địa phương
@@ -9297,11 +9320,11 @@ function openBangKeExport(defaultNguon){
   el.textContent = fmtDate(t);
   el.dataset.val = t;
   document.getElementById('bk-loaiMu').value = 'all';
-  var _bkDienOpts = lsGetO('bk_dien_opts');
-  document.getElementById('bk-dienThangNam').checked = !!_bkDienOpts.thangNam;
-  document.getElementById('bk-dienNgayKy').checked = !!_bkDienOpts.ngayKy;
+  var _bkInfo = getBangKeInfo(), _bkOld = lsGetO('bk_dien_opts'); // _bkOld: khoá cũ chỉ trên máy, dùng khi chưa có bản đồng bộ
+  document.getElementById('bk-dienThangNam').checked = ('dienThangNam' in _bkInfo) ? !!_bkInfo.dienThangNam : !!_bkOld.thangNam;
+  document.getElementById('bk-dienNgayKy').checked = ('dienNgayKy' in _bkInfo) ? !!_bkInfo.dienNgayKy : !!_bkOld.ngayKy;
   document.getElementById('bk-soBangKe').value = '';
-  document.getElementById('bk-nguon').value = defaultNguon || 'thu_mua';
+  document.getElementById('bk-nguon').value = _bkGetNguonNho() || defaultNguon || 'thu_mua';
   openM('modal-bangke-export');
 }
 // ── Lịch chọn ngày xuất bảng kê (đánh dấu ngày có dữ liệu theo đúng nguồn đang chọn) ──
@@ -9384,6 +9407,7 @@ function bkNoInfoTiepTuc(){
   xuatBangKe(true);
 }
 function xuatBangKe(boQuaThongTin){
+  _bkSaveNguon();
   var ngay = (document.getElementById('bk-ngayXuat-val')||{}).dataset.val;
   if (!ngay){ toast('⚠️ Chọn ngày xuất!'); return; }
   if (boQuaThongTin !== true && _bkInfoTrong(getBangKeInfo())){ openM('modal-bangke-noinfo'); return; }
