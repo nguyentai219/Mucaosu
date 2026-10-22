@@ -1,8 +1,15 @@
-const CACHE = 'mu-cao-su-v2.4.8';
+const CACHE = 'mu-cao-su-v2.5.0';
 const FILES = ['/Mucaosu/','/Mucaosu/index.html','/Mucaosu/manifest.json','/Mucaosu/icon-192.png','/Mucaosu/icon-512.png','/Mucaosu/apple-touch-icon.png','/Mucaosu/logo.png','/Mucaosu/splash.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).catch(()=>{}));
+  // Tải các file với cache:'reload' (bỏ qua HẲN bộ nhớ đệm HTTP của trình duyệt). GitHub Pages trả header
+  // max-age=600 (10 phút) — nếu dùng c.addAll(FILES) thông thường, bản index.html CŨ còn trong bộ nhớ đệm HTTP
+  // có thể bị nhét vào cache của phiên bản MỚI, khiến app đã "cập nhật" nhưng vẫn hiện bản cũ.
+  e.waitUntil(
+    caches.open(CACHE).then(c => Promise.all(FILES.map(u =>
+      fetch(new Request(u, { cache: 'reload' })).then(r => { if (r && r.ok) return c.put(u, r); }).catch(()=>{})
+    ))).catch(()=>{})
+  );
   self.skipWaiting(); // kích hoạt SW mới ngay lập tức
 });
 
@@ -25,6 +32,7 @@ self.addEventListener('fetch', e => {
   // tiết) nhận nhầm HTML thay vì JSON thật, tưởng thành công nhưng không đọc được dữ liệu, lỗi rất khó
   // nhận ra vì không có thông báo lỗi rõ ràng nào cả.
   if (url.origin !== self.location.origin) return;
+  if (e.request.method !== 'GET') return;
   const isHTML = e.request.destination === 'document' || url.pathname.endsWith('.html') || url.pathname.endsWith('/');
 
   // Icon và manifest phải dùng Network First để Chrome luôn so sánh được hash thật từ server
@@ -37,11 +45,15 @@ self.addEventListener('fetch', e => {
 
   if (isNetworkFirst) {
     // Network First — luôn lấy bản mới nhất từ server, cache làm dự phòng offline
+    // cache:'no-cache' = luôn hỏi lại server (gửi yêu cầu điều kiện, nếu không đổi server chỉ trả 304 rất nhẹ)
+    // thay vì dùng bản trong bộ nhớ đệm HTTP còn hạn tới 10 phút → bản mới trên GitHub Pages hiện ngay khi đã triển khai.
     e.respondWith(
-      fetch(e.request)
+      fetch(new Request(e.request.url, { cache: 'no-cache' }))
         .then(response => {
-          const clone = response.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
+          if (response && response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE).then(c => c.put(e.request, clone));
+          }
           return response;
         })
         .catch(() => caches.match(e.request))

@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.4.8</title>
+<title>Mua Bán Mủ Cao Su v2.5.0</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -26,6 +26,13 @@
   --s1:0 1px 4px rgba(0,0,0,.1);--s2:0 4px 16px rgba(0,0,0,.12);--s3:0 8px 32px rgba(0,0,0,.18);
   --r:12px;--rs:8px;
 }
+.mm-toggle{width:100%;margin-top:10px;padding:11px;background:#fff;border:1.5px solid var(--gd);border-radius:var(--r);color:var(--gd);font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.mm-arrow{display:inline-block;font-size:12px;transition:transform .25s}
+.mm-toggle.open .mm-arrow{transform:rotate(180deg)}
+.mm-body{max-height:0;overflow:hidden;visibility:hidden;transition:max-height .3s ease,visibility 0s linear .3s}
+.mm-body.open{max-height:260px;visibility:visible;transition:max-height .3s ease,visibility 0s}
+.mm-btn{width:100%;margin-top:8px;padding:11px;background:var(--gb);border:1.5px solid var(--gl);border-radius:var(--r);color:var(--gd);font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 1px 4px rgba(26,71,42,.18)}
+.mm-btn:active{background:var(--gp)}
 .bk-card{border:1.5px solid var(--gp);border-radius:var(--r);overflow:hidden}
 .bk-card-hd{background:var(--gb);color:var(--gd);font-weight:700;font-size:13.5px;padding:10px 12px}
 .bk-card-body{padding:12px;background:#fff}
@@ -521,7 +528,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.4.8 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.5.0 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -655,8 +662,13 @@ input[type=date]:focus{border-color:var(--gl)}
   <div class="sec-divider"></div>
   <div class="sec-title">📊 Thống kê trong ngày</div>
   <div class="tk-grid" id="mua-tk"></div>
-  <button onclick="openXemGDCu()" style="width:100%;margin-top:10px;padding:11px;background:#fff;border:1.5px solid var(--gd);border-radius:var(--r);color:var(--gd);font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🔍 Xem lại giao dịch của khách hàng</button>
-  <button onclick="openBangKeExport('thu_mua')" style="width:100%;margin-top:10px;padding:11px;background:#fff;border:1.5px solid var(--gd);border-radius:var(--r);color:var(--gd);font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🖨️ Xuất bảng kê thu mua &amp; thanh toán</button>
+  <!-- NHÓM "CÁC GIAO DỊCH KHÁC": mặc định thu gọn; bấm để xổ 3 nút; 15 giây không thao tác thì tự thu gọn -->
+  <button class="mm-toggle" id="mua-more-toggle" onclick="toggleMuaMore()" aria-expanded="false">Các Giao Dịch Khác <span class="mm-arrow">▼</span></button>
+  <div class="mm-body" id="mua-more-body" ontouchstart="_mmReset()" onclick="_mmReset()">
+    <button class="mm-btn" onclick="openChiTietMua()">📋 Xem chi tiết thu mua trong ngày</button>
+    <button class="mm-btn" onclick="openXemGDCu()">🔍 Xem lại giao dịch của khách hàng</button>
+    <button class="mm-btn" onclick="openBangKeExport('thu_mua')">🖨️ Xuất bảng kê thu mua &amp; thanh toán</button>
+  </div>
 </div>
 </div>
 
@@ -1868,7 +1880,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.4.8</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.5.0</div>
       </div>
     </div>
 
@@ -2034,7 +2046,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.4.8</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.5.0</div>
       </div>
     </div>
 
@@ -4636,8 +4648,6 @@ function updTK(tab){
     });
     html+='<div class="tk-card full total"><div class="tk-lbl">Tổng tiền thu mua</div><div class="tk-val">'+fmtNum(total)+' ₫</div></div>';
     html+='</div>';
-    // Nút xem chi tiết
-    html+='<button onclick="openChiTietMua()" style="width:100%;margin-top:6px;padding:10px;background:#fff;border:1.5px solid var(--gd);border-radius:var(--r);color:var(--gd);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">📋 Xem chi tiết thu mua trong ngày</button>';
     cont.innerHTML=html;
 
   } else {
@@ -9308,7 +9318,7 @@ function _bkSaveNguon(){
 function _bkGetNguonNho(){
   var v = getBangKeInfo().nguonXuat;
   if (v === 'thu_mua' || v === 'tinh_toan') return v;
-  try { v = JSON.parse(localStorage.getItem('bk_nguon')); } catch(e){ v = ''; } // khoá cũ (v2.4.8, chỉ trên máy)
+  try { v = JSON.parse(localStorage.getItem('bk_nguon')); } catch(e){ v = ''; } // khoá cũ (v2.5.0, chỉ trên máy)
   return (v === 'thu_mua' || v === 'tinh_toan') ? v : '';
 }
 function openBangKeExport(defaultNguon){
@@ -12880,6 +12890,28 @@ function initSsDateSelect() {
   el.value = val;
   var lbl = document.getElementById('ss-date-val');
   if(lbl) lbl.textContent = fmtDate(val);
+}
+
+// ─── NHÓM "CÁC GIAO DỊCH KHÁC" (tab Thu Mua) ───
+// Mặc định thu gọn. Bấm tiêu đề để xổ/thu. Khi đang xổ, mỗi lần chạm vào nhóm thì đếm lại 15 giây;
+// hết 15 giây không có thao tác nào với 3 nút thì tự thu gọn.
+var _mmTimer = null;
+function _mmSet(open){
+  var body = document.getElementById('mua-more-body'), tg = document.getElementById('mua-more-toggle');
+  if (!body || !tg) return;
+  body.classList.toggle('open', !!open);
+  tg.classList.toggle('open', !!open);
+  tg.setAttribute('aria-expanded', open ? 'true' : 'false');
+  clearTimeout(_mmTimer); _mmTimer = null;
+  if (open) _mmTimer = setTimeout(function(){ _mmSet(false); }, 15000);
+}
+function toggleMuaMore(){
+  var body = document.getElementById('mua-more-body');
+  _mmSet(!(body && body.classList.contains('open')));
+}
+function _mmReset(){
+  var body = document.getElementById('mua-more-body');
+  if (body && body.classList.contains('open')) _mmSet(true);
 }
 
 // ─── SERVICE WORKER ───
