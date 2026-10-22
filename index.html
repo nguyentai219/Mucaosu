@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.4.2</title>
+<title>Mua Bán Mủ Cao Su v2.4.3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -507,7 +507,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.4.2 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.4.3 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1335,7 +1335,7 @@ input[type=date]:focus{border-color:var(--gl)}
 </div>
 
 <!-- MODAL THÔNG TIN DOANH NGHIỆP XUẤT BẢNG KÊ -->
-<div class="modal center" id="modal-bangke-info" style="z-index:900">
+<div class="modal center" id="modal-bangke-info" style="z-index:920">
   <div class="modal-box center-box" style="max-width:360px;max-height:85vh;overflow-y:auto">
     <div class="modal-title">🏢 Thông tin xuất bảng kê</div>
     <div style="font-size:11.5px;color:var(--g600);margin-bottom:12px">Điền 1 lần, dùng lại cho mọi lần xuất "Bảng kê thu mua và thanh toán mủ cao su". Để trống ô nào thì ô đó để trống trên bảng kê.</div>
@@ -1351,6 +1351,17 @@ input[type=date]:focus{border-color:var(--gl)}
     </div>
     <button onclick="luuBangKeInfo()" style="width:100%;padding:10px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">💾 Lưu</button>
     <button class="btn-huy" style="width:100%" onclick="closeM('modal-bangke-info')">Đóng</button>
+  </div>
+</div>
+
+<!-- MODAL BÁO CHƯA CÓ THÔNG TIN XUẤT BẢNG KÊ -->
+<div class="modal center" id="modal-bangke-noinfo" style="z-index:910">
+  <div class="modal-box center-box" style="max-width:340px">
+    <div class="modal-title">⚠️ Chưa có thông tin xuất</div>
+    <div style="font-size:12.5px;color:var(--g700);margin-bottom:14px;line-height:1.5">Bạn chưa điền <b>Thông tin xuất bảng kê</b> (tên doanh nghiệp, mã số thuế, địa chỉ, người phụ trách, đơn giá…). Nếu tiếp tục, các mục này trên bảng kê sẽ để trống.</div>
+    <button onclick="bkNoInfoDienThem()" style="width:100%;padding:10px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">🏢 Điền thông tin xuất</button>
+    <button onclick="bkNoInfoTiepTuc()" style="width:100%;padding:10px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">📄 Tiếp tục xuất (không có thông tin)</button>
+    <button class="btn-huy" style="width:100%" onclick="closeM('modal-bangke-noinfo')">Huỷ</button>
   </div>
 </div>
 
@@ -1860,7 +1871,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.4.2</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.4.3</div>
       </div>
     </div>
 
@@ -2026,7 +2037,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.4.2</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.4.3</div>
       </div>
     </div>
 
@@ -9358,9 +9369,24 @@ function _bkInfoRow(label, val){
 // thật). Có bao nhiêu giao dịch/dòng thì kê ra bấy nhiêu dòng, mỗi dòng lấy NGUYÊN VẸN kg/độ/giá/thành
 // tiền trực tiếp từ dữ liệu gốc đã lưu (r.kg, r.do, r.gia, r.tt) — khớp 100% với "Chi tiết thu mua" (nguồn
 // thu_mua) hoặc "Chi tiết thu mua theo số liệu mới" (nguồn tinh_toan) tuỳ theo nguồn đã chọn khi xuất.
-function xuatBangKe(){
+// Thông tin xuất coi là "chưa có" khi TẤT CẢ các ô đều trống (chưa từng điền/lưu).
+function _bkInfoTrong(info){
+  info = info || {};
+  return ['tenDN','mst','diaChi','diaDiemThuMua','diaChiToChuc','nguoiPhuTrach','giaMuNuoc','giaMuTap']
+    .every(function(k){ return !String(info[k]||'').trim(); });
+}
+function bkNoInfoDienThem(){
+  closeM('modal-bangke-noinfo');
+  openBangKeInfo();
+}
+function bkNoInfoTiepTuc(){
+  closeM('modal-bangke-noinfo');
+  xuatBangKe(true);
+}
+function xuatBangKe(boQuaThongTin){
   var ngay = (document.getElementById('bk-ngayXuat-val')||{}).dataset.val;
   if (!ngay){ toast('⚠️ Chọn ngày xuất!'); return; }
+  if (boQuaThongTin !== true && _bkInfoTrong(getBangKeInfo())){ openM('modal-bangke-noinfo'); return; }
   var soBangKe = (document.getElementById('bk-soBangKe').value||'').trim();
   var nguon = (document.getElementById('bk-nguon')||{}).value || 'thu_mua';
   var loaiMuLoc = (document.getElementById('bk-loaiMu')||{}).value || 'all';
@@ -9486,10 +9512,10 @@ function renderBangKePrint(info, ngay, soBangKe, rows, tongCong, dienThangNam, d
       + '</tr></thead><tbody>'
       + rowsHtml
       + '<tr style="font-weight:bold"><td colspan="5" style="text-align:right;border:1px solid #000;padding:3px">Tổng giá trị hàng hoá mua vào:</td>'
-      + '<td style="text-align:center;border:1px solid #000;padding:3px">' + fmtKg(tongKg) + '</td>'
-      + '<td style="text-align:center;border:1px solid #000;padding:3px">' + (doTB!=null ? fmtDo(doTB) : '') + '</td>'
+      + '<td style="text-align:center;border:1px solid #000;padding:3px">' + fmtKg(tongKg) + ' kg</td>'
+      + '<td style="text-align:center;border:1px solid #000;padding:3px">' + (doTB!=null ? fmtDo(doTB) + ' độ' : '') + '</td>'
       + '<td style="border:1px solid #000;padding:3px"></td>'
-      + '<td style="text-align:center;border:1px solid #000;padding:3px">' + fmtNum(tongCong) + '</td>'
+      + '<td style="text-align:center;border:1px solid #000;padding:3px">' + fmtNum(tongCong) + ' đ</td>'
       + '<td style="border:1px solid #000;padding:3px"></td><td style="border:1px solid #000;padding:3px"></td></tr>'
       + '</tbody></table>'
     + '<div style="margin-top:20px;display:flex;justify-content:space-between">'
@@ -9523,23 +9549,36 @@ function _bkGeneratePreviewImage(){
   var scrollEl = document.getElementById('bangke-preview-scroll');
   if (!srcHtml || !scrollEl) return;
   _bkLastCanvas = null;
-  scrollEl.innerHTML = '<div style="color:#fff;text-align:center;padding:60px 16px;font-size:13px">⏳ Đang dựng bản xem trước…</div>';
+  scrollEl.innerHTML = '<div style=\"color:#fff;text-align:center;padding:60px 16px;font-size:13px\">⏳ Đang dựng bản xem trước…</div>';
   var tmp = document.createElement('div');
   tmp.style.cssText = 'position:fixed;left:-99999px;top:0;width:1050px;background:#fff;z-index:-1';
   tmp.innerHTML = srcHtml;
   document.body.appendChild(tmp);
+  var xong = false, timer = null;
+  function don(){ if (tmp.parentNode) tmp.parentNode.removeChild(tmp); clearTimeout(timer); }
+  // Mọi lỗi/quá thời gian đều HIỆN RÕ trên khung xem trước kèm nút thử lại — không còn treo im lặng.
+  function baoLoi(msg){
+    if (xong) return; xong = true; don();
+    scrollEl.innerHTML = '<div style=\"color:#fff;text-align:center;padding:60px 16px;font-size:13px;line-height:1.6\">❌ ' + msg
+      + '<br><button onclick=\"_bkGeneratePreviewImage()\" style=\"margin-top:14px;padding:10px 18px;background:#fff;color:#14532d;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer\">🔄 Thử lại</button></div>';
+  }
+  timer = setTimeout(function(){ baoLoi('Dựng xem trước quá lâu (có thể do mạng yếu hoặc máy thiếu bộ nhớ).'); }, 25000);
   ensureHtml2Canvas(function(){
-    html2canvas(tmp, { scale:2, useCORS:true, backgroundColor:'#ffffff' }).then(function(canvas){
-      document.body.removeChild(tmp);
-      _bkLastCanvas = canvas;
-      scrollEl.innerHTML = '<div id="bk-panzoom-wrap"><div id="bk-rotate-box"><img id="bangke-preview-img" src="' + canvas.toDataURL('image/png') + '"></div></div>';
-      _bkScale = 1; _bkPanX = 0; _bkPanY = 0;
-      _bkLayoutRotateImg();
-      _bkApplyTransform();
-    }).catch(function(e){
-      document.body.removeChild(tmp);
-      scrollEl.innerHTML = '<div style="color:#fff;text-align:center;padding:60px 16px;font-size:13px">❌ Lỗi dựng xem trước: ' + (e&&e.message?e.message:'không rõ nguyên nhân') + '</div>';
-    });
+    if (xong) return;
+    try {
+      html2canvas(tmp, { scale:2, useCORS:true, backgroundColor:'#ffffff' }).then(function(canvas){
+        if (xong) return; xong = true; don();
+        _bkLastCanvas = canvas;
+        scrollEl.innerHTML = '<div id=\"bk-panzoom-wrap\"><div id=\"bk-rotate-box\"><img id=\"bangke-preview-img\" src=\"' + canvas.toDataURL('image/png') + '\"></div></div>';
+        _bkScale = 1; _bkPanX = 0; _bkPanY = 0;
+        _bkLayoutRotateImg();
+        _bkApplyTransform();
+      }).catch(function(e){
+        baoLoi('Lỗi dựng xem trước: ' + (e&&e.message?e.message:'không rõ nguyên nhân'));
+      });
+    } catch(e) { baoLoi('Lỗi dựng xem trước: ' + (e&&e.message?e.message:'không rõ nguyên nhân')); }
+  }, function(){
+    baoLoi('Không tải được thư viện dựng bản xem trước. Kiểm tra kết nối mạng rồi thử lại.');
   });
 }
 // Đo đúng kích thước khung cuộn rồi đặt khung xoay có kích thước HOÁN ĐỔI (rộng↔cao) trước khi xoay
@@ -9621,12 +9660,12 @@ function _bkInitPinch(){
   });
   window.addEventListener('mouseup', function(){ _bkDragging = false; });
 }
-function ensureHtml2Canvas(cb){
+function ensureHtml2Canvas(cb, errCb){
   if (window.html2canvas) { cb(); return; }
   var s = document.createElement('script');
   s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
   s.onload = cb;
-  s.onerror = function(){ toast('❌ Không tải được thư viện xuất PDF, kiểm tra kết nối mạng'); };
+  s.onerror = function(){ toast('❌ Không tải được thư viện xuất PDF, kiểm tra kết nối mạng'); if (errCb) errCb(); };
   document.head.appendChild(s);
 }
 // Dựng PDF (A4 NGANG, tự chia nhiều trang nếu dài) từ đúng ảnh đã chụp cho bản xem trước — dùng chung
