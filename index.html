@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.5.2</title>
+<title>Mua Bán Mủ Cao Su v2.5.3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -522,6 +522,23 @@ input[type=date]:focus{border-color:var(--gl)}
 .sgpick-name{font-size:14px;font-weight:700;color:var(--g800)}
 .sgpick-meta{font-size:11px;color:var(--g600);margin-top:2px}
 .sgpick-tien{font-size:13px;font-weight:800;color:var(--gd)}
+/* ===== THỐNG NHẤT KHỐI THẺ: bo góc + viền mảnh 1.5px theo màu chủ đạo của TỪNG TAB ===== */
+#tab-mua{--tb:var(--gp)}
+#tab-ban{--tb:var(--am)}
+#tab-sg{--tb:var(--gp)}
+#tab-ss{--tb:#a78bfa}
+.tab-pane .fc,
+.tab-pane .tbl-wrap,
+.tab-pane .mm-card,
+.tab-pane .ss-check-card,
+.tab-pane .cc-card,
+.tab-pane .sg-overview-card,
+.tab-pane .date-bar{border:1.5px solid var(--tb)!important;border-radius:var(--r)}
+.tab-pane .sg-overview-card.sg-card-gui{border-left:3px solid var(--gd)!important}
+.tab-pane .sg-overview-card.sg-card-ung{border-left:3px solid #d97706!important}
+/* Dải phân cách xám cũ không còn cần vì các khối thẻ đã tự tách: chỉ giữ khoảng cách */
+.tab-pane .sec-divider{height:0;background:none;border:none;margin:8px 0}
+.tab-pane .mm-card.tk .sec-title,.tab-pane .mm-card.tk .tk-grid{min-width:0}
 </style>
 </head>
 <body>
@@ -535,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.5.2 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.5.3 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -786,17 +803,19 @@ input[type=date]:focus{border-color:var(--gl)}
       <tbody id="ban-tbody"></tbody>
     </table>
   </div>
-  <div class="sec-divider"></div>
-  <div class="sec-title" style="color:var(--ad)">📊 Thống kê bán ra trong ngày</div>
-  <div class="tk-grid" id="ban-tk"></div>
+  <div class="mm-card tk">
+    <div class="sec-title" style="color:var(--ad)">📊 Thống kê bán ra trong ngày</div>
+    <div class="tk-grid" id="ban-tk"></div>
+  </div>
 
   <!-- THỐNG KÊ THÁNG -->
-  <div class="sec-divider" style="margin-top:16px"></div>
-  <div style="display:flex;align-items:center;justify-content:space-between;margin:10px 0 8px">
+  <div class="mm-card tk">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin:0 0 8px">
     <div class="sec-title" style="color:#b5341a;margin:0">📅 Thống kê trong tháng</div>
     <button onclick="resetThang()" style="background:#fee2e2;color:#991b1b;border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0">🔄 Chốt tháng</button>
   </div>
   <div id="ban-thang-tk"><div class="no-data">Chưa có dữ liệu tháng</div></div>
+  </div>
 
 </div>
 </div>
@@ -1891,7 +1910,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.5.2</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.5.3</div>
       </div>
     </div>
 
@@ -2057,7 +2076,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.5.2</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.5.3</div>
       </div>
     </div>
 
@@ -9329,7 +9348,7 @@ function _bkSaveNguon(){
 function _bkGetNguonNho(){
   var v = getBangKeInfo().nguonXuat;
   if (v === 'thu_mua' || v === 'tinh_toan') return v;
-  try { v = JSON.parse(localStorage.getItem('bk_nguon')); } catch(e){ v = ''; } // khoá cũ (v2.5.2, chỉ trên máy)
+  try { v = JSON.parse(localStorage.getItem('bk_nguon')); } catch(e){ v = ''; } // khoá cũ (v2.5.3, chỉ trên máy)
   return (v === 'thu_mua' || v === 'tinh_toan') ? v : '';
 }
 function openBangKeExport(defaultNguon){
