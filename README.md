@@ -17,6 +17,7 @@ Số phiên bản theo dạng **`Z.X.Y`**:
 
 | Phiên bản | Ngày | Thay đổi |
 |-----------|------|----------|
+| **v2.5.2** | 2026-10-23 | 🧱 **Tab Thu Mua: thêm 2 khối thẻ trắng bo góc có bóng** (cùng kiểu thẻ phía trên) để phân biệt rõ: khối **Thống kê trong ngày** và khối **Các Giao Dịch Khác** (viền xanh nhạt). Bỏ dải phân cách cũ giữa bảng chi tiết và thống kê vì khối thẻ đã tách. |
 | **v2.5.1** | 2026-10-23 | 🗂️ **Nhóm "Các Giao Dịch Khác"**: (1) đang xổ mà chạm vào bất kỳ ô nhập liệu nào thì **tự thu gọn ngay** (sự kiện `focusin`); (2) nút tiêu đề nay có **nền xanh đậm chuyển sắc, chữ trắng, icon 🗂️, bóng đổ** để nổi bật. |
 | **v2.5.0** | 2026-10-23 | 🗂️ **Tab Thu Mua: gom 3 nút vào nhóm xổ xuống "Các Giao Dịch Khác ▼"** (Xem chi tiết thu mua trong ngày / Xem lại giao dịch của khách hàng / Xuất bảng kê thu mua & thanh toán). Mặc định thu gọn; bấm để xổ; mỗi lần chạm vào nhóm thì đếm lại, **15 giây không thao tác tự thu gọn**. 3 nút có nền xanh nhạt + viền xanh + bóng nhẹ cho nổi bật, đồng bộ màu chủ đạo của tab. Nút "Xem chi tiết" chuyển từ phần render thống kê ra HTML tĩnh của nhóm. |
 | **v2.4.9** | 2026-10-23 | 🔄 **Sửa lỗi đã up GitHub nhưng app không tự lên bản mới**: GitHub Pages gửi header `max-age=600` nên bản `index.html` cũ có thể nằm trong bộ nhớ đệm HTTP tới 10 phút, và Service Worker (cả lúc cài `addAll` lẫn Network First) đọc nhầm bản cũ đó. Nay `sw.js` tải với `cache:'reload'` khi cài và `cache:'no-cache'` (luôn hỏi lại server) khi mở app; chỉ cache phản hồi hợp lệ, chỉ xử lý GET. |
