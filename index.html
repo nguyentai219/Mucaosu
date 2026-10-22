@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.4.4</title>
+<title>Mua Bán Mủ Cao Su v2.4.5</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -165,10 +165,23 @@ input[type="search"]::-webkit-search-decoration{-webkit-appearance:none;appearan
 /* MODAL OVERLAY */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(2px)}
 #bangke-print-area{display:none}
+/* In bảng kê: chỉ in các ảnh trang (#bk-print-wrap) chụp đúng từ bản xem trước — cho ra giống hệt xem trước.
+   Mặc định in ngang (A4 landscape). Nếu hộp thoại in Android bỏ qua khổ ngang và in dọc, media query
+   (orientation:portrait) bên dưới tự chuyển sang ảnh ĐÃ XOAY 90° để vẫn vừa trang, không bị cắt/lệch. */
+#bk-print-wrap{display:none}
 @media print{
-  body>*:not(#bangke-print-area){display:none!important}
-  #bangke-print-area{display:block!important;position:static!important}
-  @page{size:A4 landscape;margin:10mm}
+  body>*:not(#bk-print-wrap){display:none!important}
+  #bk-print-wrap{display:block!important;margin:0;padding:0}
+  .bk-pp{display:none;page-break-inside:avoid;break-inside:avoid;text-align:center}
+  .bk-pp img{display:block;margin:0 auto;width:auto;height:auto;max-width:100%;max-height:97vh}
+  .bk-pp-land:not(:last-child){page-break-after:always;break-after:page}
+  .bk-pp-land{display:block}
+  @page{size:A4 landscape;margin:8mm}
+}
+@media print and (orientation:portrait){
+  .bk-pp-land{display:none!important}
+  .bk-pp-port{display:block!important}
+  .bk-pp-port:not(:last-child){page-break-after:always;break-after:page}
 }
 #bangke-preview-overlay{display:none;position:fixed;inset:0;z-index:5000;background:#525659;flex-direction:column}
 #bk-panzoom-wrap{position:absolute;inset:0;overflow:hidden;touch-action:none;transform-origin:center center}
@@ -507,7 +520,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.4.4 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.4.5 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1871,7 +1884,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.4.4</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.4.5</div>
       </div>
     </div>
 
@@ -2037,7 +2050,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.4.4</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.4.5</div>
       </div>
     </div>
 
@@ -9311,7 +9324,7 @@ function _bkSaveNguon(){
 function _bkGetNguonNho(){
   var v = getBangKeInfo().nguonXuat;
   if (v === 'thu_mua' || v === 'tinh_toan') return v;
-  try { v = JSON.parse(localStorage.getItem('bk_nguon')); } catch(e){ v = ''; } // khoá cũ (v2.4.4, chỉ trên máy)
+  try { v = JSON.parse(localStorage.getItem('bk_nguon')); } catch(e){ v = ''; } // khoá cũ (v2.4.5, chỉ trên máy)
   return (v === 'thu_mua' || v === 'tinh_toan') ? v : '';
 }
 function openBangKeExport(defaultNguon){
@@ -9727,13 +9740,51 @@ function taiPdfBangKe(){
     if (btn) { btn.disabled = false; btn.textContent = '⬇️ Tải PDF'; }
   });
 }
+// In: mở THẲNG hộp thoại in mặc định của Android (chọn máy in/in ra PDF…) bằng window.print(), thay vì mở
+// file PDF trong trình xem. Nội dung in là các ảnh trang cắt từ đúng ảnh xem trước (chia trang theo tỉ lệ
+// A4 ngang, trừ lề 8mm) nên ra giống hệt xem trước và tự xuống trang khi bảng dài.
+// Mỗi trang có 2 bản: bản ngang và bản xoay 90° — CSS tự chọn bản hợp với hướng giấy mà hộp thoại in dùng.
+function _bkBuildPrintPages(canvas){
+  var sliceH = Math.floor(canvas.width * 194 / 281); // vùng in A4 ngang: 281 x 194 mm
+  var n = Math.max(1, Math.ceil(canvas.height / sliceH));
+  var html = '';
+  for (var i = 0; i < n; i++) {
+    var y = i * sliceH, h = Math.min(sliceH, canvas.height - y);
+    var c = document.createElement('canvas');
+    c.width = canvas.width; c.height = h;
+    var cx = c.getContext('2d');
+    cx.fillStyle = '#fff'; cx.fillRect(0, 0, c.width, c.height);
+    cx.drawImage(canvas, 0, y, canvas.width, h, 0, 0, canvas.width, h);
+    var r = document.createElement('canvas');
+    r.width = h; r.height = canvas.width;
+    var rx = r.getContext('2d');
+    rx.fillStyle = '#fff'; rx.fillRect(0, 0, r.width, r.height);
+    rx.translate(r.width, 0); rx.rotate(Math.PI / 2); rx.drawImage(c, 0, 0);
+    html += '<div class="bk-pp bk-pp-land"><img src="' + c.toDataURL('image/jpeg', 0.95) + '"></div>'
+          + '<div class="bk-pp bk-pp-port"><img src="' + r.toDataURL('image/jpeg', 0.95) + '"></div>';
+  }
+  return html;
+}
 function inBangKe(){
   if (!_bkLastCanvas) { toast('⏳ Bản xem trước chưa dựng xong, thử lại sau giây lát!'); return; }
-  toast('⏳ Đang mở file PDF để in…');
-  _bkBuildPdfFromCanvas(_bkLastCanvas, function(pdf){
-    var blobUrl = pdf.output('bloburl');
-    window.open(blobUrl, '_blank');
+  var wrap = document.getElementById('bk-print-wrap');
+  if (!wrap) return;
+  try { wrap.innerHTML = _bkBuildPrintPages(_bkLastCanvas); }
+  catch(e){ toast('❌ Không chuẩn bị được bản in: ' + (e && e.message ? e.message : 'không rõ nguyên nhân')); return; }
+  var imgs = Array.prototype.slice.call(wrap.querySelectorAll('img'));
+  var pending = imgs.length, started = false;
+  function dongBo(){ if (wrap) wrap.innerHTML = ''; window.removeEventListener('afterprint', dongBo); }
+  function batDau(){
+    if (started) return; started = true;
+    window.addEventListener('afterprint', dongBo);
+    setTimeout(function(){ try { window.print(); } catch(e){ dongBo(); toast('❌ Thiết bị không mở được hộp thoại in'); } }, 150);
+  }
+  if (!pending) { batDau(); return; }
+  imgs.forEach(function(im){
+    var xong = function(){ if (--pending <= 0) batDau(); };
+    if (im.complete) xong(); else { im.onload = xong; im.onerror = xong; }
   });
+  setTimeout(batDau, 2500); // phòng ảnh nạp chậm — không để nút In im lặng
 }
 // Chia sẻ file PDF bảng kê thẳng qua Zalo/Messenger/Gmail/... bằng Web Share API của điện thoại — mở
 // ĐÚNG bảng "Chia sẻ" gốc của hệ điều hành (giống mọi app khác), Zalo sẽ tự xuất hiện trong danh sách
@@ -12850,6 +12901,8 @@ if ('serviceWorker' in navigator) {
 <!-- Vùng in Bảng kê thu mua — bình thường ẩn, chỉ hiện khi bấm In (window.print), nội dung được JS
      đổ vào lúc xuất bảng kê (xem hàm renderBangKePrint) -->
 <div id="bangke-print-area"></div>
+<!-- Các ảnh trang dùng riêng cho lệnh in (được JS đổ vào lúc bấm In, xoá sau khi in xong) -->
+<div id="bk-print-wrap"></div>
 
 <!-- OVERLAY XEM TRƯỚC BẢNG KÊ — hiện đúng nội dung sẽ in/xuất PDF/chụp ảnh. Trang là A4 NGANG nên nội
      dung tự co giãn (scale) vừa khít bề ngang màn hình điện thoại ngay khi mở, xem được toàn bộ mà
