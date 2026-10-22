@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.4.7</title>
+<title>Mua Bán Mủ Cao Su v2.4.8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -521,7 +521,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.4.7 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.4.8 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -655,17 +655,8 @@ input[type=date]:focus{border-color:var(--gl)}
   <div class="sec-divider"></div>
   <div class="sec-title">📊 Thống kê trong ngày</div>
   <div class="tk-grid" id="mua-tk"></div>
-  <button onclick="openXemGDCu()" style="width:100%;margin-top:10px;padding:11px;background:#fff;border:1.5px solid var(--gd);border-radius:var(--r);color:var(--gd);font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🔍 Xem lại giao dịch cũ</button>
-  <div class="bk-card" style="margin-top:14px">
-    <div class="bk-card-hd">📄 Bảng kê thu mua &amp; thanh toán</div>
-    <div class="bk-card-body">
-      <div style="font-size:11px;color:var(--g400);margin-bottom:8px">Xuất bảng kê theo đúng mẫu quy định, gồm khách hàng có giao dịch trong khoảng ngày chọn</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="openBangKeInfo()" style="flex:1;padding:10px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">🏢 Thông tin xuất</button>
-        <button onclick="openBangKeExport('thu_mua')" style="flex:1;padding:10px;background:var(--gd);color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">🖨️ Xuất bảng kê</button>
-      </div>
-    </div>
-  </div>
+  <button onclick="openXemGDCu()" style="width:100%;margin-top:10px;padding:11px;background:#fff;border:1.5px solid var(--gd);border-radius:var(--r);color:var(--gd);font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🔍 Xem lại giao dịch của khách hàng</button>
+  <button onclick="openBangKeExport('thu_mua')" style="width:100%;margin-top:10px;padding:11px;background:#fff;border:1.5px solid var(--gd);border-radius:var(--r);color:var(--gd);font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🖨️ Xuất bảng kê thu mua &amp; thanh toán</button>
 </div>
 </div>
 
@@ -1040,16 +1031,7 @@ input[type=date]:focus{border-color:var(--gl)}
   </div>
 
   <!-- 5. XUẤT BẢNG KÊ (đầy đủ như tab Thu Mua, chỉ khác mặc định chọn nguồn Dữ liệu Tính Toán) -->
-  <div class="bk-card tt" style="margin-top:14px">
-    <div class="bk-card-hd">📄 Bảng kê thu mua &amp; thanh toán</div>
-    <div class="bk-card-body">
-      <div style="font-size:11px;color:var(--g400);margin-bottom:8px">Xuất bảng kê theo đúng mẫu quy định, gồm khách hàng có giao dịch trong khoảng ngày chọn</div>
-      <div style="display:flex;gap:8px">
-        <button onclick="openBangKeInfo()" style="flex:1;padding:10px;background:#ede9fe;color:#5b21b6;border:1.5px solid #c4b5fd;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">🏢 Thông tin xuất</button>
-        <button onclick="openBangKeExport('tinh_toan')" style="flex:1;padding:10px;background:linear-gradient(135deg,#5b21b6,#7c3aed);color:#fff;border:none;border-radius:var(--r);font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer">🖨️ Xuất bảng kê</button>
-      </div>
-    </div>
-  </div>
+  <button onclick="openBangKeExport('tinh_toan')" style="width:100%;margin-top:14px;padding:11px;background:#fff;border:1.5px solid #7c3aed;border-radius:var(--r);color:#5b21b6;font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">🖨️ Xuất bảng kê thu mua &amp; thanh toán</button>
 
   <!-- 6. LỊCH SỬ TÍNH TOÁN ĐÃ LƯU -->
   <div class="sec-divider" style="margin-top:14px"></div>
@@ -1412,6 +1394,7 @@ input[type=date]:focus{border-color:var(--gl)}
     </label>
     <div style="font-size:12px;font-weight:700;color:var(--g700);margin-bottom:4px">Số bảng kê (không bắt buộc)</div>
     <input type="text" id="bk-soBangKe" class="fi" placeholder="VD: 07/2026" style="margin-bottom:14px" autocomplete="off">
+    <button onclick="openBangKeInfo()" style="width:100%;padding:10px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">🏢 Cập nhật thông tin xuất bảng kê</button>
     <button onclick="xuatBangKe()" style="width:100%;padding:10px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">📄 Xuất bảng kê</button>
     <button class="btn-huy" style="width:100%" onclick="closeM('modal-bangke-export')">Huỷ</button>
   </div>
@@ -1562,7 +1545,7 @@ input[type=date]:focus{border-color:var(--gl)}
   <div class="modal-box" style="max-height:94vh;display:flex;flex-direction:column">
     <div class="modal-handle"></div>
     <div id="xgc-search-wrap">
-      <div class="modal-title" style="color:var(--gd);flex-shrink:0">🔍 Xem lại giao dịch cũ</div>
+      <div class="modal-title" style="color:var(--gd);flex-shrink:0">🔍 Xem lại giao dịch của khách hàng</div>
       <div style="font-size:11.5px;color:var(--g600);text-align:center;margin-bottom:10px;flex-shrink:0">Tra cứu toàn bộ giao dịch Thu Mua đã lưu của 1 khách hàng, phân theo từng ngày</div>
       <div class="fr" style="position:relative;flex-shrink:0">
         <label class="fl">Tên khách hàng</label>
@@ -1885,7 +1868,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.4.7</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.4.8</div>
       </div>
     </div>
 
@@ -2051,7 +2034,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.4.7</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.4.8</div>
       </div>
     </div>
 
@@ -9325,7 +9308,7 @@ function _bkSaveNguon(){
 function _bkGetNguonNho(){
   var v = getBangKeInfo().nguonXuat;
   if (v === 'thu_mua' || v === 'tinh_toan') return v;
-  try { v = JSON.parse(localStorage.getItem('bk_nguon')); } catch(e){ v = ''; } // khoá cũ (v2.4.7, chỉ trên máy)
+  try { v = JSON.parse(localStorage.getItem('bk_nguon')); } catch(e){ v = ''; } // khoá cũ (v2.4.8, chỉ trên máy)
   return (v === 'thu_mua' || v === 'tinh_toan') ? v : '';
 }
 function openBangKeExport(defaultNguon){
