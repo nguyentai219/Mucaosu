@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.4.5</title>
+<title>Mua Bán Mủ Cao Su v2.4.6</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -165,18 +165,19 @@ input[type="search"]::-webkit-search-decoration{-webkit-appearance:none;appearan
 /* MODAL OVERLAY */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(2px)}
 #bangke-print-area{display:none}
-/* In bảng kê: chỉ in các ảnh trang (#bk-print-wrap) chụp đúng từ bản xem trước — cho ra giống hệt xem trước.
-   Mặc định in ngang (A4 landscape). Nếu hộp thoại in Android bỏ qua khổ ngang và in dọc, media query
-   (orientation:portrait) bên dưới tự chuyển sang ảnh ĐÃ XOAY 90° để vẫn vừa trang, không bị cắt/lệch. */
+/* In bảng kê: chỉ in các ảnh trang (#bk-print-wrap) chụp đúng từ bản xem trước. KHÔNG khai báo cỡ/hướng
+   giấy trong @page để hộp thoại in Android tự quyết (ngang/dọc), rồi CSS chọn bản ảnh hợp hướng giấy:
+   giấy ngang → ảnh ngang; giấy dọc → ảnh đã xoay 90°. Kích thước từng ảnh do JS tính sẵn theo mm
+   (xem _bkBuildPrintPages) để luôn phóng đầy vùng in, không phụ thuộc vh/% vốn lệch khi in trên Android. */
 #bk-print-wrap{display:none}
 @media print{
   body>*:not(#bk-print-wrap){display:none!important}
   #bk-print-wrap{display:block!important;margin:0;padding:0}
-  .bk-pp{display:none;page-break-inside:avoid;break-inside:avoid;text-align:center}
-  .bk-pp img{display:block;margin:0 auto;width:auto;height:auto;max-width:100%;max-height:97vh}
-  .bk-pp-land:not(:last-child){page-break-after:always;break-after:page}
+  .bk-pp{display:none;page-break-inside:avoid;break-inside:avoid}
+  .bk-pp img{display:block;margin:0 auto;max-width:none;max-height:none}
   .bk-pp-land{display:block}
-  @page{size:A4 landscape;margin:8mm}
+  .bk-pp-land:not(:last-child){page-break-after:always;break-after:page}
+  @page{margin:8mm}
 }
 @media print and (orientation:portrait){
   .bk-pp-land{display:none!important}
@@ -520,7 +521,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.4.5 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.4.6 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1884,7 +1885,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.4.5</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.4.6</div>
       </div>
     </div>
 
@@ -2050,7 +2051,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.4.5</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.4.6</div>
       </div>
     </div>
 
@@ -9324,7 +9325,7 @@ function _bkSaveNguon(){
 function _bkGetNguonNho(){
   var v = getBangKeInfo().nguonXuat;
   if (v === 'thu_mua' || v === 'tinh_toan') return v;
-  try { v = JSON.parse(localStorage.getItem('bk_nguon')); } catch(e){ v = ''; } // khoá cũ (v2.4.5, chỉ trên máy)
+  try { v = JSON.parse(localStorage.getItem('bk_nguon')); } catch(e){ v = ''; } // khoá cũ (v2.4.6, chỉ trên máy)
   return (v === 'thu_mua' || v === 'tinh_toan') ? v : '';
 }
 function openBangKeExport(defaultNguon){
@@ -9760,8 +9761,14 @@ function _bkBuildPrintPages(canvas){
     var rx = r.getContext('2d');
     rx.fillStyle = '#fff'; rx.fillRect(0, 0, r.width, r.height);
     rx.translate(r.width, 0); rx.rotate(Math.PI / 2); rx.drawImage(c, 0, 0);
-    html += '<div class="bk-pp bk-pp-land"><img src="' + c.toDataURL('image/jpeg', 0.95) + '"></div>'
-          + '<div class="bk-pp bk-pp-port"><img src="' + r.toDataURL('image/jpeg', 0.95) + '"></div>';
+    // Vùng in sau khi trừ lề 8mm (A4): ngang 281x194mm, dọc 194x281mm; chừa thêm ~4mm cho an toàn.
+    // Phóng ảnh sao cho VỪA KHÍT vùng in (giữ nguyên tỉ lệ), tính bằng mm để máy in/Chrome không co lại.
+    var aL = c.width / c.height;                       // tỉ lệ ngang của ảnh trang
+    var wL = Math.min(277, 190 * aL);                  // ảnh ngang: rộng tối đa 277mm, cao tối đa 190mm
+    var aP = r.width / r.height;                       // tỉ lệ của ảnh đã xoay (<1)
+    var hP = Math.min(277, 190 / aP);                  // ảnh xoay: cao tối đa 277mm, rộng tối đa 190mm
+    html += '<div class="bk-pp bk-pp-land"><img style="width:' + wL.toFixed(1) + 'mm;height:auto" src="' + c.toDataURL('image/jpeg', 0.95) + '"></div>'
+          + '<div class="bk-pp bk-pp-port"><img style="height:' + hP.toFixed(1) + 'mm;width:auto" src="' + r.toDataURL('image/jpeg', 0.95) + '"></div>';
   }
   return html;
 }
