@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.4.1</title>
+<title>Mua Bán Mủ Cao Su v2.4.2</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -507,7 +507,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.4.1 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.4.2 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1860,7 +1860,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.4.1</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.4.2</div>
       </div>
     </div>
 
@@ -2026,7 +2026,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.4.1</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.4.2</div>
       </div>
     </div>
 
@@ -9409,20 +9409,25 @@ function xuatBangKe(){
     return c!==0 ? c : ((a.loai==='nuoc'?0:1) - (b.loai==='nuoc'?0:1));
   });
 
-  var tongCong = 0;
+  var tongCong = 0, tongKg = 0, dosNuoc = [];
   var rows = list.map(function(g, i){
     var khInfo = getKhInfoOf(g.ten);
     tongCong += g.tt;
+    tongKg += (parseFloat(g.kg)||0);
+    // Độ TB: CÙNG công thức "Chi tiết thu mua" đang dùng (trung bình cộng số độ các dòng mủ nước,
+    // mủ tạp không có số độ nên không tính).
+    if (typeof g.do === 'number' && g.do > 0) dosNuoc.push(g.do);
     // Định dạng Số độ giống HỆT cách "Chi tiết thu mua" hiển thị (fmtDo, không làm tròn — chỉ bỏ số 0
     // thừa phía sau dấu phẩy), để khớp 100% với bản chi tiết. Mủ tạp giữ nguyên nhãn (Mủ chén/dây/đông).
     var doDisp = (typeof g.do === 'number') ? fmtDo(g.do) : g.do;
     return { stt:i+1, ten:g.ten, diaChi:khInfo.diaChi, cccd:khInfo.cccd, sdt:khInfo.sdt, kg:g.kg, do:doDisp, gia:g.gia, tt:g.tt };
   });
 
-  renderBangKePrint(getBangKeInfo(), ngay, soBangKe, rows, tongCong, dienThangNam, dienNgayKy);
+  var doTB = dosNuoc.length ? dosNuoc.reduce(function(a,b){return a+b;},0)/dosNuoc.length : null;
+  renderBangKePrint(getBangKeInfo(), ngay, soBangKe, rows, tongCong, dienThangNam, dienNgayKy, tongKg, doTB);
   closeM('modal-bangke-export');
 }
-function renderBangKePrint(info, ngay, soBangKe, rows, tongCong, dienThangNam, dienNgayKy){
+function renderBangKePrint(info, ngay, soBangKe, rows, tongCong, dienThangNam, dienNgayKy, tongKg, doTB){
   var area = document.getElementById('bangke-print-area');
   if (!area) return;
   var ngayP = ngay.split('-');
@@ -9480,8 +9485,11 @@ function renderBangKePrint(info, ngay, soBangKe, rows, tongCong, dienThangNam, d
       + '<th style="border:1px solid #000;padding:3px">Ký xác nhận CK</th>'
       + '</tr></thead><tbody>'
       + rowsHtml
-      + '<tr style="font-weight:bold"><td colspan="8" style="text-align:right;border:1px solid #000;padding:3px">Tổng giá trị hàng hoá mua vào:</td>'
-      + '<td style="text-align:right;border:1px solid #000;padding:3px">' + fmtNum(tongCong) + '</td>'
+      + '<tr style="font-weight:bold"><td colspan="5" style="text-align:right;border:1px solid #000;padding:3px">Tổng giá trị hàng hoá mua vào:</td>'
+      + '<td style="text-align:center;border:1px solid #000;padding:3px">' + fmtKg(tongKg) + '</td>'
+      + '<td style="text-align:center;border:1px solid #000;padding:3px">' + (doTB!=null ? fmtDo(doTB) : '') + '</td>'
+      + '<td style="border:1px solid #000;padding:3px"></td>'
+      + '<td style="text-align:center;border:1px solid #000;padding:3px">' + fmtNum(tongCong) + '</td>'
       + '<td style="border:1px solid #000;padding:3px"></td><td style="border:1px solid #000;padding:3px"></td></tr>'
       + '</tbody></table>'
     + '<div style="margin-top:20px;display:flex;justify-content:space-between">'
