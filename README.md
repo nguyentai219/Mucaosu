@@ -17,6 +17,7 @@ Số phiên bản theo dạng **`Z.X.Y`**:
 
 | Phiên bản | Ngày | Thay đổi |
 |-----------|------|----------|
+| **v2.5.4** | 2026-10-23 | 📆 **Thống kê trong tháng (tab Bán Ra) có menu xổ chọn tháng/năm** (dạng 08/2026): liệt kê tháng hiện tại và mọi tháng đã có dữ liệu, mới nhất trước. **Luôn mặc định tháng hiện tại**; chọn tháng khác chỉ nhớ trong phiên đang mở (biến `_thangSel`, không lưu) nên thoát/mở lại app tự về tháng hiện tại. Tháng không có dữ liệu hiện thông báo riêng. Thống kê tháng nay cũng được vẽ ngay khi mở app. |
 | **v2.5.3** | 2026-10-23 | 🎨 **Thống nhất khối thẻ ở cả 4 tab**: mọi thẻ (form nhập, bảng chi tiết, thống kê, nhóm Các Giao Dịch Khác, thẻ chấm công, thẻ tổng quan Sổ Gửi, thanh ngày, thẻ kiểm tra Tính Toán) đều bo góc 12px + **viền mảnh 1.5px theo màu chủ đạo từng tab** (biến `--tb`: Thu Mua xanh lá, Bán Ra cam, Sổ Gửi xanh lá, Tính Toán tím). Tab Bán Ra: 2 khối thống kê (ngày, tháng) được bọc thành thẻ riêng. Dải phân cách xám cũ chỉ còn là khoảng cách. Thẻ Sổ Gửi giữ vạch trái phân biệt Gửi sổ / Ứng tiền. |
 | **v2.5.2** | 2026-10-23 | 🧱 **Tab Thu Mua: thêm 2 khối thẻ trắng bo góc có bóng** (cùng kiểu thẻ phía trên) để phân biệt rõ: khối **Thống kê trong ngày** và khối **Các Giao Dịch Khác** (viền xanh nhạt). Bỏ dải phân cách cũ giữa bảng chi tiết và thống kê vì khối thẻ đã tách. |
 | **v2.5.1** | 2026-10-23 | 🗂️ **Nhóm "Các Giao Dịch Khác"**: (1) đang xổ mà chạm vào bất kỳ ô nhập liệu nào thì **tự thu gọn ngay** (sự kiện `focusin`); (2) nút tiêu đề nay có **nền xanh đậm chuyển sắc, chữ trắng, icon 🗂️, bóng đổ** để nổi bật. |

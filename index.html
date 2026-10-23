@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.5.3</title>
+<title>Mua Bán Mủ Cao Su v2.5.4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.5.3 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.5.4 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -814,7 +814,7 @@ input[type=date]:focus{border-color:var(--gl)}
     <div class="sec-title" style="color:#b5341a;margin:0">📅 Thống kê trong tháng</div>
     <button onclick="resetThang()" style="background:#fee2e2;color:#991b1b;border:none;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0">🔄 Chốt tháng</button>
   </div>
-  <div id="ban-thang-tk"><div class="no-data">Chưa có dữ liệu tháng</div></div>
+  <div id="ban-thang-tk"></div>
   </div>
 
 </div>
@@ -1910,7 +1910,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.5.3</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.5.4</div>
       </div>
     </div>
 
@@ -2076,7 +2076,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.5.3</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.5.4</div>
       </div>
     </div>
 
@@ -9348,7 +9348,7 @@ function _bkSaveNguon(){
 function _bkGetNguonNho(){
   var v = getBangKeInfo().nguonXuat;
   if (v === 'thu_mua' || v === 'tinh_toan') return v;
-  try { v = JSON.parse(localStorage.getItem('bk_nguon')); } catch(e){ v = ''; } // khoá cũ (v2.5.3, chỉ trên máy)
+  try { v = JSON.parse(localStorage.getItem('bk_nguon')); } catch(e){ v = ''; } // khoá cũ (v2.5.4, chỉ trên máy)
   return (v === 'thu_mua' || v === 'tinh_toan') ? v : '';
 }
 function openBangKeExport(defaultNguon){
@@ -10663,11 +10663,30 @@ function updThangData(){
   }catch(e){ console.error('updThangData error:',e); }
 }
 
+// Chọn tháng/năm xem thống kê. _thangSel chỉ nằm trong bộ nhớ (KHÔNG lưu): null = tháng hiện tại,
+// nên mỗi lần mở lại app luôn quay về tháng hiện tại.
+var _thangSel = null;
+function _thangCur(){ return today().slice(0,7); }
+function onThangSelect(v){ _thangSel = (v === _thangCur()) ? null : v; renderThangTK(); }
+// Vẽ thống kê tháng ngay khi mở app (luôn ở tháng hiện tại), không chờ đến lần lưu giao dịch đầu tiên.
+window.addEventListener('load', function(){ setTimeout(function(){ try{ renderThangTK(); }catch(e){} }, 300); });
 function renderThangTK(){
   var cont = document.getElementById('ban-thang-tk');
   if(!cont) return;
-  var rows = getThangData();
-  if(!rows.length){ cont.innerHTML='<div class="no-data">Chưa có dữ liệu tháng</div>'; return; }
+  var allRows = getThangData();
+  var cur = _thangCur(), sel = _thangSel || cur;
+  // Danh sách tháng: tháng hiện tại + mọi tháng đang có dữ liệu (mới nhất trước)
+  var mset = {}; mset[cur] = true; mset[sel] = true;
+  allRows.forEach(function(r){ if(r.date && r.date.length >= 7) mset[r.date.slice(0,7)] = true; });
+  var months = Object.keys(mset).sort().reverse();
+  function lblM(m){ var p = m.split('-'); return p[1] + '/' + p[0]; }
+  var selHtml = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'
+    + '<span style="font-size:12px;font-weight:700;color:var(--g600);white-space:nowrap">📆 Tháng/năm:</span>'
+    + '<select class="fi" style="flex:1;margin:0;padding:8px 10px;font-size:13px;font-weight:700;color:var(--ad)" onchange="onThangSelect(this.value)">'
+    + months.map(function(m){ return '<option value="'+m+'"'+(m===sel?' selected':'')+'>'+lblM(m)+(m===cur?' (tháng này)':'')+'</option>'; }).join('')
+    + '</select></div>';
+  var rows = allRows.filter(function(r){ return r.date && r.date.slice(0,7) === sel; });
+  if(!rows.length){ cont.innerHTML = selHtml + '<div class="no-data">Chưa có dữ liệu tháng '+lblM(sel)+'</div>'; return; }
 
   // Group by loai
   var byLoai = {};
@@ -10749,7 +10768,7 @@ function renderThangTK(){
     +'<span style="color:'+(grandLoi>0?'#86efac':'#fca5a5')+'">'+(grandLoi>0?'+':'')+fmtNum(Math.round(grandLoi))+' ₫</span></div>'
     +'</div>';
 
-  cont.innerHTML = html;
+  cont.innerHTML = selHtml + html;
 }
 
 function resetThang(){
