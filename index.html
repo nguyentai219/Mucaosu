@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.5.4</title>
+<title>Mua Bán Mủ Cao Su v2.5.6</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.5.4 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.5.6 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1910,7 +1910,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.5.4</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.5.6</div>
       </div>
     </div>
 
@@ -2076,7 +2076,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.5.4</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.5.6</div>
       </div>
     </div>
 
@@ -9348,7 +9348,7 @@ function _bkSaveNguon(){
 function _bkGetNguonNho(){
   var v = getBangKeInfo().nguonXuat;
   if (v === 'thu_mua' || v === 'tinh_toan') return v;
-  try { v = JSON.parse(localStorage.getItem('bk_nguon')); } catch(e){ v = ''; } // khoá cũ (v2.5.4, chỉ trên máy)
+  try { v = JSON.parse(localStorage.getItem('bk_nguon')); } catch(e){ v = ''; } // khoá cũ (v2.5.6, chỉ trên máy)
   return (v === 'thu_mua' || v === 'tinh_toan') ? v : '';
 }
 function openBangKeExport(defaultNguon){
@@ -10668,6 +10668,12 @@ function updThangData(){
 var _thangSel = null;
 function _thangCur(){ return today().slice(0,7); }
 function onThangSelect(v){ _thangSel = (v === _thangCur()) ? null : v; renderThangTK(); }
+// Đổi năm: giữ nguyên số tháng đang chọn (VD đang 10/2026 → chọn 2025 thì sang 10/2025)
+function onThangYear(y){
+  var cur = _thangCur(); var m = (_thangSel || cur).slice(5,7);
+  if (y === cur.slice(0,4) && parseInt(m,10) > parseInt(cur.slice(5,7),10)) m = cur.slice(5,7); // năm nay: không quá tháng hiện tại
+  var v = y + '-' + m; _thangSel = (v === cur) ? null : v; renderThangTK();
+}
 // Vẽ thống kê tháng ngay khi mở app (luôn ở tháng hiện tại), không chờ đến lần lưu giao dịch đầu tiên.
 window.addEventListener('load', function(){ setTimeout(function(){ try{ renderThangTK(); }catch(e){} }, 300); });
 function renderThangTK(){
@@ -10675,15 +10681,35 @@ function renderThangTK(){
   if(!cont) return;
   var allRows = getThangData();
   var cur = _thangCur(), sel = _thangSel || cur;
-  // Danh sách tháng: tháng hiện tại + mọi tháng đang có dữ liệu (mới nhất trước)
-  var mset = {}; mset[cur] = true; mset[sel] = true;
-  allRows.forEach(function(r){ if(r.date && r.date.length >= 7) mset[r.date.slice(0,7)] = true; });
-  var months = Object.keys(mset).sort().reverse();
+  // Tháng nào có dữ liệu (để đánh dấu "không có dữ liệu" cho các tháng còn lại)
+  var hasData = {}, yset = {};
+  allRows.forEach(function(r){ if(r.date && r.date.length >= 7){ hasData[r.date.slice(0,7)] = true; yset[r.date.slice(0,4)] = true; } });
+  var selY = sel.slice(0,4), selM = sel.slice(5,7);
+  // Năm: LUÔN hiện 5 năm gần nhất (năm nay lùi về trước); năm nào chưa có dữ liệu sẽ ghi chú phía sau.
+  // (Năm cũ hơn 5 năm mà vẫn có dữ liệu thì thêm xuống cuối danh sách để không mất lối xem.)
+  var curY = parseInt(cur.slice(0,4), 10), curM = parseInt(cur.slice(5,7), 10);
+  var years = [];
+  for (var yy = curY; yy > curY - 5; yy--) years.push(String(yy));
+  Object.keys(yset).sort().reverse().forEach(function(y){ if (years.indexOf(y) < 0) years.push(y); });
+  if (years.indexOf(selY) < 0) years.push(selY);
   function lblM(m){ var p = m.split('-'); return p[1] + '/' + p[0]; }
+  var selStyle = 'margin:0;padding:8px 8px;font-size:12.5px;font-weight:700;color:var(--ad)';
+  // Hàng chọn: [Năm ▾] [Tháng/năm ▾] — đủ 12 tháng của năm đang chọn; tháng không có dữ liệu ghi chú phía sau
   var selHtml = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'
-    + '<span style="font-size:12px;font-weight:700;color:var(--g600);white-space:nowrap">📆 Tháng/năm:</span>'
-    + '<select class="fi" style="flex:1;margin:0;padding:8px 10px;font-size:13px;font-weight:700;color:var(--ad)" onchange="onThangSelect(this.value)">'
-    + months.map(function(m){ return '<option value="'+m+'"'+(m===sel?' selected':'')+'>'+lblM(m)+(m===cur?' (tháng này)':'')+'</option>'; }).join('')
+    + '<span style="font-size:16px">📆</span>'
+    + '<select class="fi" style="flex:0 0 38%;min-width:0;'+selStyle+'" onchange="onThangYear(this.value)" aria-label="Năm">'
+    + years.map(function(y){ return '<option value="'+y+'"'+(y===selY?' selected':'')+'>'+y+(yset[y]?'':' (không có dữ liệu)')+'</option>'; }).join('')
+    + '</select>'
+    + '<select class="fi" style="flex:1;min-width:0;'+selStyle+'" onchange="onThangSelect(this.value)" aria-label="Tháng/năm">'
+    + ['01','02','03','04','05','06','07','08','09','10','11','12'].filter(function(mm){
+        // Không liệt kê tháng chưa tới (năm hiện tại chỉ có từ tháng 1 đến tháng hiện tại)
+        return !(parseInt(selY,10) === curY && parseInt(mm,10) > curM);
+      }).map(function(mm){
+        var v = selY + '-' + mm;
+        // Tháng hiện tại luôn ghi "(tháng này)"; tháng khác có dữ liệu chỉ hiện MM/YYYY; chưa có dữ liệu ghi chú phía sau
+        var note = (v === cur) ? ' (tháng này)' : (hasData[v] ? '' : ' (không có dữ liệu)');
+        return '<option value="'+v+'"'+(v===sel?' selected':'')+'>'+lblM(v)+note+'</option>';
+      }).join('')
     + '</select></div>';
   var rows = allRows.filter(function(r){ return r.date && r.date.slice(0,7) === sel; });
   if(!rows.length){ cont.innerHTML = selHtml + '<div class="no-data">Chưa có dữ liệu tháng '+lblM(sel)+'</div>'; return; }
