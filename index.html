@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.5.9</title>
+<title>Mua Bán Mủ Cao Su v2.6.0</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.5.9 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.6.0 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1910,7 +1910,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.5.9</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.6.0</div>
       </div>
     </div>
 
@@ -2007,9 +2007,9 @@ input[type=date]:focus{border-color:var(--gl)}
         • Có thể đổi qua lại giữa 2 phương án bất cứ lúc nào trong menu đồng bộ, không mất dữ liệu<br>
         • Ngoài việc tự đồng bộ ngay sau mỗi giao dịch, app còn <b>tự đồng bộ ngầm mỗi 15 giây</b> nếu không có thao tác nào (chạm/gõ) — quét toàn bộ dữ liệu, chạy im lặng không chớp màn hình, phòng trường hợp có chỗ nào lỡ chưa kịp đồng bộ ngay<br>
         • Đọc thanh trạng thái để biết tình trạng đồng bộ hiện tại:<br>
-        &nbsp;&nbsp;– <b style="color:#16a34a">✅ Đã kết nối - cập nhật lúc: HH:MM:SS ngày dd/mm</b>: mọi thứ đã lưu lên máy chủ, kèm giờ đồng bộ gần nhất<br>
-        &nbsp;&nbsp;– <b style="color:#dc2626">⚠️ Mất kết nối</b>: chưa đăng nhập hoặc đang mất mạng — kèm số mục chưa sao lưu nếu có, app sẽ tự đồng bộ lại ngay khi có mạng<br>
-        &nbsp;&nbsp;– <b style="color:#dc2626">❌ Lỗi đồng bộ</b>: có lỗi khi lưu lên máy chủ — kèm số ghi chép chưa lưu, tự thử lại ở lần ghi chép/cài đặt tiếp theo
+        &nbsp;&nbsp;– <b style="color:#16a34a">☁️ Bộ nhớ đám mây Supabase (hoặc Google Drive) &lt;email&gt; đã kết nối - cập nhật lúc HH:MM:SS ngày dd/mm</b>: mọi thứ đã lưu lên máy chủ của đúng tài khoản đó, kèm giờ đồng bộ gần nhất<br>
+        &nbsp;&nbsp;– <b style="color:#dc2626">⚠️ Mất kết nối bộ nhớ đám mây … &lt;email&gt;</b>: chưa đăng nhập hoặc đang mất mạng — kèm số mục chưa sao lưu nếu có, app sẽ tự đồng bộ lại ngay khi có mạng<br>
+        &nbsp;&nbsp;– <b style="color:#dc2626">❌ Lỗi đồng bộ bộ nhớ đám mây … &lt;email&gt;</b>: có lỗi khi lưu lên máy chủ — kèm số ghi chép chưa lưu, tự thử lại ở lần ghi chép/cài đặt tiếp theo
       </div>
     </div>
 
@@ -2076,7 +2076,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.5.9</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.6.0</div>
       </div>
     </div>
 
@@ -10420,6 +10420,22 @@ setInterval(function(){
   if (!_notifyTimer) _notifyTick();
 }, 45000);
 
+// Tên bộ nhớ đám mây đang dùng kèm tài khoản, VD "Supabase abc@gmail.com" / "Google Drive abc@gmail.com"
+// (phiên đã mất thì lấy email dùng gần nhất trên máy này). Chưa chọn phương án đồng bộ → chuỗi rỗng.
+function _cloudAcctLabel(){
+  try {
+    var prov = getSyncProvider(), em = '';
+    if (prov === 'supabase') {
+      em = (typeof sbUser !== 'undefined' && sbUser && sbUser.email) ? sbUser.email : _acctLastEmail('supabase');
+      return 'Supabase' + (em ? ' ' + em : '');
+    }
+    if (prov === 'gdrive') {
+      em = (typeof gdUser !== 'undefined' && gdUser && gdUser.email) ? gdUser.email : _acctLastEmail('google');
+      return 'Google Drive' + (em ? ' ' + em : '');
+    }
+  } catch(e){}
+  return '';
+}
 function updGDBarStatus(msg, cls) {
   var nm = document.getElementById('gd-bar-name');
   if (!nm) return;
@@ -10429,10 +10445,12 @@ function updGDBarStatus(msg, cls) {
     _lastSyncAt = new Date();
     var d = _lastSyncAt;
     var timeStr = d.toLocaleTimeString('vi-VN') + ' ngày ' + String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0');
-    out = 'Bộ nhớ đám mây đã kết nối - cập nhật lúc ' + timeStr + (n > 0 ? (' (' + n + ')') : '');
+    var _cl = _cloudAcctLabel();
+    out = 'Bộ nhớ đám mây ' + (_cl ? _cl + ' ' : '') + 'đã kết nối - cập nhật lúc ' + timeStr + (n > 0 ? (' (' + n + ')') : '');
   } else if (cls === 'offline') {
     var isErr = /lỗi/i.test(msg || '');
-    out = (isErr ? '❌ Lỗi đồng bộ' : '⚠️ Mất kết nối') + (n > 0 ? (' (' + n + ')') : '');
+    var _cl2 = _cloudAcctLabel();
+    out = (isErr ? '❌ Lỗi đồng bộ' : '⚠️ Mất kết nối') + (_cl2 ? ' bộ nhớ đám mây ' + _cl2 : '') + (n > 0 ? (' (' + n + ')') : '');
   } else {
     out = msg + (n > 0 ? (' (' + n + ')') : ''); // giữ nguyên các thông báo tiến trình cụ thể (đăng nhập, làm mới phiên...)
   }
