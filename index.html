@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.6.5</title>
+<title>Mua Bán Mủ Cao Su v2.6.6</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.6.5 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.6.6 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1910,7 +1910,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.6.5</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.6.6</div>
       </div>
     </div>
 
@@ -2076,7 +2076,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.6.5</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.6.6</div>
       </div>
     </div>
 
@@ -11157,6 +11157,7 @@ function _pushTrialToServer(fp, expiry) {
 }
 
 var _antiCheatInFlight = false;
+var _verifyAgain = false;
 var _lastVerifyAt = 0;
 // App để mở/chạy nền lâu ngày (nhất là bản APK) thì vẫn nhận lệnh admin: mỗi lần mở lại app, nếu lần xác
 // minh gần nhất đã quá 10 phút thì xác minh lại (áp dụng thêm/bớt ngày, đặt lại mật khẩu từ trang quản lý).
@@ -11172,12 +11173,23 @@ function verifyLicenseAntiCheat() {
   // "Chưa từng chạy" dù có mạng đầy đủ. Cứ để hàm thử gọi thật — nếu thật sự mất mạng thì nhánh
   // catch() bên dưới sẽ tự báo lỗi + tự thử lại, không còn im lặng không rõ nguyên nhân nữa.
   if (!sbClient) { setTimeout(verifyLicenseAntiCheat, 1500); return; }
+  // CHỈ CHẠY 1 LƯỢT MỘT LÚC: lúc mở app hàm này được gọi gần như cùng lúc từ nhiều nơi (kiểm tra bản quyền,
+  // khôi phục phiên Supabase...). Trước đây 2 lượt chạy song song: lượt 1 áp dụng lệnh "bớt ngày" của admin,
+  // lượt 2 vẫn cầm hạn dùng CŨ đọc từ trước (cao hơn), thấy lệnh admin đã đánh dấu áp dụng nên bỏ qua, rồi
+  // đẩy ngược hạn dùng cũ lên máy chủ → lần mở app sau hạn dùng nhảy về lại số cũ. Nay lượt gọi trùng chỉ
+  // hẹn chạy lại 1 lần sau khi lượt đang chạy xong.
+  if (_antiCheatInFlight) { _verifyAgain = true; return; }
   _antiCheatInFlight = true;
   _lastVerifyAt = Date.now();
   var fp = getDeviceFingerprint(), legacyFp = getLegacyDeviceFingerprint();
-  var localExpiry = parseInt(localStorage.getItem(_LSK) || '0');
+  function _verifyDone() {
+    _antiCheatInFlight = false;
+    if (_verifyAgain) { _verifyAgain = false; setTimeout(verifyLicenseAntiCheat, 0); }
+  }
   sbClient.from('device_trials').select('fingerprint,license_expiry,admin_override_expiry,admin_override_at,pw_reset_at').in('fingerprint', fp === legacyFp ? [fp] : [fp, legacyFp]).then(function(res) {
-    if (res.error) { _antiCheatInFlight = false; syncClientRegistry(); return; } // lỗi mạng/bảng chưa có -> bỏ qua, không chặn người dùng
+    if (res.error) { _verifyDone(); syncClientRegistry(); return; } // lỗi mạng/bảng chưa có -> bỏ qua, không chặn người dùng
+    // Đọc hạn dùng trên máy NGAY LÚC CÓ KẾT QUẢ (không phải lúc bắt đầu gọi) để luôn là giá trị mới nhất
+    var localExpiry = parseInt(localStorage.getItem(_LSK) || '0');
     var all = res.data || [];
     var rows = all.filter(function(r){ return r.fingerprint === fp; });
     var migrateFrom = null;
@@ -11244,10 +11256,10 @@ function verifyLicenseAntiCheat() {
       // Máy hoàn toàn mới trên server -> đăng ký lần đầu
       _pushTrialToServer(fp, localExpiry || getLicenseExpiry());
     }
-    _antiCheatInFlight = false;
+    _verifyDone();
     syncClientRegistry();
   }).catch(function(e) {
-    _antiCheatInFlight = false;
+    _verifyDone();
     // Báo rõ lý do thay vì im lặng, và tự thử lại sau — tránh kẹt mãi ở "Chưa từng chạy"
     localStorage.setItem('registry_sync_debug', '❌ Lỗi kết nối lúc ' + new Date().toLocaleTimeString('vi-VN') + ' (' + (e && e.message ? e.message : 'không rõ') + ') — sẽ tự thử lại');
     logSyncError((e && e.message) || 'Lỗi kết nối không rõ', 'verifyLicenseAntiCheat .catch() (device_trials select)');
