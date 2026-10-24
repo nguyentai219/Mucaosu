@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.6.2</title>
+<title>Mua Bán Mủ Cao Su v2.6.3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.6.2 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.6.3 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1910,7 +1910,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.6.2</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.6.3</div>
       </div>
     </div>
 
@@ -2076,7 +2076,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.6.2</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.6.3</div>
       </div>
     </div>
 
@@ -6498,6 +6498,16 @@ function syncClientRegistry() {
   if (!sbClient) { localStorage.setItem('registry_sync_debug', 'Chưa khởi tạo sbClient lúc ' + new Date().toLocaleTimeString('vi-VN')); return; }
   try {
     var used = getUsedExtCodes();
+    // Máy CHƯA KÍCH HOẠT lần nào, chưa đăng nhập tài khoản, chưa dùng mã gia hạn nào → chưa đăng ký lên
+    // trang quản lý. Mỗi lần app mở trong 1 trình duyệt có bộ nhớ trống (trình duyệt trong Zalo, trình duyệt
+    // khác, sau khi xoá dữ liệu Chrome...) đều sinh 1 mã thiết bị mới — trước đây mỗi lần như vậy thêm 1 dòng
+    // "chưa đăng nhập tài khoản / hết hạn" ảo trên trang quản lý. Admin tính mã gia hạn theo mã thiết bị khách
+    // đọc qua điện thoại nên không cần dòng này; máy sẽ tự đăng ký ngay khi được kích hoạt/đăng nhập.
+    if (isNeverActivated() && !sbUser && !used.length) {
+      localStorage.setItem('registry_sync_debug', 'ℹ️ Máy chưa kích hoạt — chưa đăng ký lên trang quản lý (' + new Date().toLocaleTimeString('vi-VN') + ')');
+      if (typeof updRegistryDebugLine === 'function') updRegistryDebugLine();
+      return;
+    }
     var lastCode = used.length ? used[used.length - 1] : null;
     var row = {
       fingerprint: getDeviceFingerprint(),
