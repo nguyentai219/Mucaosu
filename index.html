@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.6.0</title>
+<title>Mua Bán Mủ Cao Su v2.6.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.6.0 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.6.1 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1910,7 +1910,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.6.0</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.6.1</div>
       </div>
     </div>
 
@@ -2076,7 +2076,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.6.0</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.6.1</div>
       </div>
     </div>
 
@@ -9991,7 +9991,8 @@ function solar2Lunar(dd, mm, yy){
 var _gdBarConnStatus = { msg: 'Đang kiểm tra kết nối...', cls: 'syncing' };
 var _gdBarFirstShown = false; // đảm bảo updGDBarStatus() chỉ hiện trực tiếp lên thanh ĐÚNG 1 LẦN duy nhất (xem giải thích trong hàm)
 // ═══════ THÔNG BÁO "TÀI KHOẢN ĐỒNG BỘ" (luôn xếp ĐẦU TIÊN trong vòng xoay) ═══════
-// Dạng: "Tài khoản đồng bộ Supabase <email> đã đăng nhập thành công/thất bại" (hoặc "Google"). Chỉ hiện khi
+// Dạng: "Tài khoản đồng bộ Supabase <email> đang đăng nhập/đăng nhập thất bại" (hoặc "Google"). Đăng nhập
+// THÀNH CÔNG thì không có thông báo riêng (trùng với slide "Bộ nhớ đám mây <tên> <email> đã kết nối"). Chỉ hiện khi
 // máy đã chọn phương án đồng bộ (Supabase hoặc Google Drive). Trạng thái lấy từ phiên đăng nhập THẬT
 // (sbUser / gdUser+gdToken) và từ kết quả các lần đăng nhập chủ động — không phỏng đoán.
 // 'acct_last_email' = email dùng gần nhất (chỉ trên máy này, không đồng bộ) để thông báo THẤT BẠI vẫn nêu
@@ -10013,7 +10014,7 @@ function _acctSlide(){
     var em = (typeof sbUser !== 'undefined' && sbUser && sbUser.email) ? sbUser.email : '';
     if (em) _acctLastEmail('supabase', em);
     var nm = em || _acctLastEmail('supabase');
-    if (em && !_acctFail.supabase) return { icon:'✅', text:'Tài khoản đồng bộ Supabase ' + em + ' đã đăng nhập thành công', cls:'synced' };
+    if (em && !_acctFail.supabase) return null; // thành công: không hiện riêng — slide bộ nhớ đám mây đã ghi rõ "Supabase <email> đã kết nối"
     if (!_sbSessionChecked && !_acctFail.supabase) return { icon:'⏳', text:'Đang đăng nhập tài khoản đồng bộ Supabase' + (nm ? ' ' + nm : '') + '...', cls:'syncing' };
     return { icon:'❌', text:'Tài khoản đồng bộ Supabase' + (nm ? ' ' + nm : '') + ' đăng nhập thất bại', cls:'offline' };
   }
@@ -10022,7 +10023,7 @@ function _acctSlide(){
     if (ge) _acctLastEmail('google', ge);
     var gn = ge || _acctLastEmail('google');
     var ok = !!(ge && typeof gdToken !== 'undefined' && gdToken) && !(typeof _gdSilentFailed !== 'undefined' && _gdSilentFailed) && !_acctFail.google;
-    if (ok) return { icon:'✅', text:'Tài khoản đồng bộ Google ' + ge + ' đã đăng nhập thành công', cls:'synced' };
+    if (ok) return null; // thành công: không hiện riêng — slide bộ nhớ đám mây đã ghi rõ "Google Drive <email> đã kết nối"
     return { icon:'❌', text:'Tài khoản đồng bộ Google' + (gn ? ' ' + gn : '') + ' đăng nhập thất bại', cls:'offline' };
   }
   return null; // chưa chọn phương án đồng bộ → không có thông báo này
@@ -10032,7 +10033,18 @@ function _acctSlide(){
 function _acctNotifyResult(force){
   try {
     var sl = _acctSlide();
-    if (!sl || sl.cls === 'syncing') return;
+    if (!sl) {
+      // Đăng nhập thành công → không có thông báo tài khoản riêng: thay ngay dòng "Đang đăng nhập…" (nếu đang
+      // hiện) bằng slide bộ nhớ đám mây — vốn đã ghi rõ tên bộ nhớ + email.
+      if (!getSyncProvider() || (_acctResultShown && !force)) return;
+      _acctResultShown = true; _acctShownAt = Date.now();
+      var ss = _notifyBuildSlides(), ci = 0;
+      for (var i = 0; i < ss.length; i++) { if (ss[i].text === _gdBarConnStatus.msg) { ci = i; break; } }
+      _notifySlideIdx = ci;
+      _notifyShowContent('☁️', _gdBarConnStatus.msg, _gdBarConnStatus.cls);
+      return;
+    }
+    if (sl.cls === 'syncing') return;
     if (_acctResultShown && !force) return;
     _acctResultShown = true; _acctShownAt = Date.now();
     _notifySlideIdx = 0; // slide tài khoản luôn ở vị trí 0 → lần xoay kế tiếp sang vị trí 1
