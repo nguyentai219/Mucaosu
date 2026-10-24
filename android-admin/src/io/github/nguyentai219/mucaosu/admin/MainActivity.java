@@ -43,6 +43,13 @@ public class MainActivity extends Activity {
         ws.setDomStorageEnabled(true);
         ws.setDatabaseEnabled(true);
         ws.setTextZoom(100);
+        ws.setSaveFormData(false);
+        // Tắt gợi ý tự điền của Android (email/mật khẩu đã lưu) cho cả trang — ô mật khẩu quản trị chỉ nhập số.
+        // setImportantForAutofill có từ Android 8 (API 26); gọi qua reflection vì bộ công cụ build dùng API 23.
+        try {
+            android.view.View.class.getMethod("setImportantForAutofill", int.class)
+                .invoke(web, 0x8 /* IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS */);
+        } catch (Exception e) { }
         web.addJavascriptInterface(new Clip(), "AndroidClip");
         web.setWebViewClient(new WebViewClient() {
             @Override
