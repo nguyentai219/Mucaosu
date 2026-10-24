@@ -1,4 +1,4 @@
-const CACHE = 'mu-cao-su-v2.5.8';
+const CACHE = 'mu-cao-su-v2.5.9';
 const FILES = ['/Mucaosu/','/Mucaosu/index.html','/Mucaosu/manifest.json','/Mucaosu/icon-192.png','/Mucaosu/icon-512.png','/Mucaosu/apple-touch-icon.png','/Mucaosu/logo.png','/Mucaosu/splash.png'];
 
 self.addEventListener('install', e => {
@@ -56,7 +56,11 @@ self.addEventListener('fetch', e => {
           }
           return response;
         })
-        .catch(() => caches.match(e.request))
+        // Mất mạng: tìm đúng bản đã lưu; nếu là yêu cầu mở trang mà không khớp (VD địa chỉ có thêm ?...)
+        // thì vẫn mở app bằng index.html đã lưu thay vì để trình duyệt hiện trang lỗi.
+        .catch(() => caches.match(e.request).then(r => r || (e.request.mode === 'navigate' || e.request.destination === 'document'
+          ? caches.match('/Mucaosu/index.html', { ignoreSearch: true })
+          : undefined)))
     );
   } else {
     // Tài nguyên tĩnh khác: Cache First — nhanh hơn
