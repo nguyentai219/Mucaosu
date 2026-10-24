@@ -20,7 +20,8 @@ import java.util.List;
  * trang web được cập nhật mà không cần cài lại APK.
  *
  * Không dùng thư viện AndroidX: tự nói chuyện với dịch vụ Custom Tabs của trình duyệt qua Binder
- * (giao thức ICustomTabsService: warmup = mã 1, newSession = mã 2).
+ * (giao thức ICustomTabsService.aidl khai báo id tường minh warmup = 1, newSession = 2; mã Binder thật
+ * = FIRST_CALL_TRANSACTION + id, tức 2 và 3).
  */
 public class LauncherActivity extends Activity {
     private static final String URL = "https://nguyentai219.github.io/Mucaosu/index.html";
@@ -31,6 +32,8 @@ public class LauncherActivity extends Activity {
     private static final String EXTRA_TWA = "android.support.customtabs.extra.LAUNCH_AS_TRUSTED_WEB_ACTIVITY";
     private static final String EXTRA_TOOLBAR_COLOR = "android.support.customtabs.extra.TOOLBAR_COLOR";
     private static final String EXTRA_NAVBAR_COLOR = "androidx.browser.customtabs.extra.NAVIGATION_BAR_COLOR";
+    private static final int TX_WARMUP = IBinder.FIRST_CALL_TRANSACTION + 1;
+    private static final int TX_NEW_SESSION = IBinder.FIRST_CALL_TRANSACTION + 2;
     private static final int THEME_COLOR = 0xFF1A472A;
     // Trình duyệt ưu tiên (đều hỗ trợ TWA); không có thì lấy trình duyệt đầu tiên hỗ trợ Custom Tabs
     private static final String[] PREFERRED = {
@@ -68,8 +71,8 @@ public class LauncherActivity extends Activity {
         if (pkg == null) { launchPlain(); return; }
         connection = new ServiceConnection() {
             @Override public void onServiceConnected(ComponentName name, IBinder service) {
-                call(service, 1, false); // warmup(0)
-                call(service, 2, true);  // newSession(callback)
+                call(service, TX_WARMUP, false);
+                call(service, TX_NEW_SESSION, true);
                 launchTwa(pkg);
             }
             @Override public void onServiceDisconnected(ComponentName name) { }
