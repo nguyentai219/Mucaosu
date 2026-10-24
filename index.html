@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.6.1</title>
+<title>Mua Bán Mủ Cao Su v2.6.2</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.6.1 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.6.2 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1910,7 +1910,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.6.1</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.6.2</div>
       </div>
     </div>
 
@@ -2076,7 +2076,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.6.1</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.6.2</div>
       </div>
     </div>
 
@@ -5711,7 +5711,11 @@ var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','kh_ids','
 // vụ cần đồng bộ và sẽ tự động được quét kèm theo, kể cả khi quên thêm vào SB_DATA_KEYS phía trên.
 var SB_NO_SYNC_KEYS = ['device_code','gd_token','gd_token_expiry','gd_folder_id','gd_user','gd_silent_failed',
   'gd_last_sync','sb_last_sync','acct_last_email','pending_sync_count','sync_provider','active_tab','used_ext_codes',
-  'license_is_new','gia_day','ban_last_buyer','ss_state','setting_wakelock','goi_y_ban_scan_day'];
+  'license_is_new','gia_day','ban_last_buyer','ss_state','setting_wakelock','goi_y_ban_scan_day',
+  // Mốc "đã áp dụng lệnh admin" và nhật ký kỹ thuật là của RIÊNG từng máy (khoá theo vân tay thiết bị):
+  // đồng bộ sang máy khác cùng tài khoản sẽ làm máy đó áp dụng lại lệnh cũ (mất ngày gia hạn hợp lệ,
+  // hoặc tự đặt lại mật khẩu giao dịch về mặc định).
+  'admin_override_applied_at','pw_reset_applied_at','registry_sync_debug'];
 // Danh sách khoá THỰC SỰ sẽ đồng bộ mỗi lần: hợp của SB_DATA_KEYS (đảm bảo có giá trị mặc định hợp lý
 // nếu máy chưa từng có khoá đó) VÀ toàn bộ khoá đang thực sự tồn tại trong localStorage của app (trừ
 // danh sách chỉ-riêng-máy-này ở trên) — để không bỏ sót dữ liệu của các tính năng thêm sau này mà lỡ
@@ -6539,6 +6543,9 @@ function restoreFromSupabase(silent) {
     var rows = res.data || [];
     if (!rows.length) { if (!silent) toast('ℹ️ Chưa có dữ liệu nào trên Supabase'); return; }
     rows.forEach(function(r) {
+      // Bỏ qua hạn dùng (nguồn đúng là device_trials theo từng máy — ghi đè từ đám mây sẽ làm mất lệnh
+      // "bớt ngày" của admin, hoặc lấy nhầm hạn dùng của máy khác cùng tài khoản) và các khoá riêng máy.
+      if (r.data_key === 'license_expiry' || SB_NO_SYNC_KEYS.indexOf(r.data_key) !== -1) return;
       if (r.data_value !== null && r.data_value !== undefined) {
         localStorage.setItem(r.data_key, JSON.stringify(r.data_value));
       }
@@ -11007,7 +11014,13 @@ function isLicenseExpired() {
 // server, luôn lấy hạn LỚN HƠN giữa máy và server (chặn reset lùi ngày,
 // vẫn giữ nguyên hạn nếu đã gia hạn hợp lệ).
 // ══════════════════════════════════════════
-function getDeviceFingerprint() {
+// Vân tay thiết bị — bỏ hết SỐ PHIÊN BẢN trong userAgent (Chrome/130.0.0.0, iPhone OS 17_5...) vì
+// Chrome tự cập nhật khoảng 4 tuần/lần: giữ số phiên bản thì vân tay đổi theo mỗi lần cập nhật → máy bị
+// coi là "máy mới" (thêm dòng trùng trên trang quản lý, lệnh admin gửi theo dòng cũ không tới được máy).
+function getDeviceFingerprint() { return _calcDeviceFingerprint(true); }
+// Công thức CŨ (còn số phiên bản) — chỉ dùng để tìm lại dòng device_trials cũ khi chuyển sang vân tay mới.
+function getLegacyDeviceFingerprint() { return _calcDeviceFingerprint(false); }
+function _calcDeviceFingerprint(stable) {
   try {
     // Chuẩn hoá kích thước màn hình theo cạnh lớn/nhỏ (KHÔNG phân biệt xoay dọc/ngang) —
     // trước đây dùng thẳng screen.width+'x'+screen.height, nhưng 2 giá trị này ĐỔI CHỖ
@@ -11019,8 +11032,10 @@ function getDeviceFingerprint() {
     // xoay chiều nào cũng ra cùng 1 cặp số.
     var w = screen.width || 0, h = screen.height || 0;
     var dims = Math.max(w,h) + 'x' + Math.min(w,h);
+    var ua = navigator.userAgent || '';
+    if (stable) ua = ua.replace(/\/[\d._]+/g, '/').replace(/(OS|Android|Windows NT|Mac OS X) [\d._]+/g, '$1');
     var parts = [
-      navigator.userAgent || '',
+      ua,
       dims,
       navigator.language || '',
       (Intl.DateTimeFormat().resolvedOptions().timeZone) || '',
@@ -11044,6 +11059,14 @@ function _pushTrialToServer(fp, expiry) {
 }
 
 var _antiCheatInFlight = false;
+var _lastVerifyAt = 0;
+// App để mở/chạy nền lâu ngày (nhất là bản APK) thì vẫn nhận lệnh admin: mỗi lần mở lại app, nếu lần xác
+// minh gần nhất đã quá 10 phút thì xác minh lại (áp dụng thêm/bớt ngày, đặt lại mật khẩu từ trang quản lý).
+document.addEventListener('visibilitychange', function(){
+  if (document.visibilityState === 'visible' && _lastVerifyAt && !_antiCheatInFlight && Date.now() - _lastVerifyAt > 10*60000) {
+    try { verifyLicenseAntiCheat(); } catch(e){}
+  }
+});
 function verifyLicenseAntiCheat() {
   // KHÔNG kiểm tra navigator.onLine ở đây nữa — cờ này không đáng tin cậy trên nhiều
   // trình duyệt/WebView Android (có thể báo sai "offline" ngay lúc app vừa mở, dù mạng vẫn
@@ -11052,11 +11075,19 @@ function verifyLicenseAntiCheat() {
   // catch() bên dưới sẽ tự báo lỗi + tự thử lại, không còn im lặng không rõ nguyên nhân nữa.
   if (!sbClient) { setTimeout(verifyLicenseAntiCheat, 1500); return; }
   _antiCheatInFlight = true;
-  var fp = getDeviceFingerprint();
+  _lastVerifyAt = Date.now();
+  var fp = getDeviceFingerprint(), legacyFp = getLegacyDeviceFingerprint();
   var localExpiry = parseInt(localStorage.getItem(_LSK) || '0');
-  sbClient.from('device_trials').select('license_expiry,admin_override_expiry,admin_override_at,pw_reset_at').eq('fingerprint', fp).then(function(res) {
+  sbClient.from('device_trials').select('fingerprint,license_expiry,admin_override_expiry,admin_override_at,pw_reset_at').in('fingerprint', fp === legacyFp ? [fp] : [fp, legacyFp]).then(function(res) {
     if (res.error) { _antiCheatInFlight = false; syncClientRegistry(); return; } // lỗi mạng/bảng chưa có -> bỏ qua, không chặn người dùng
-    var rows = res.data || [];
+    var all = res.data || [];
+    var rows = all.filter(function(r){ return r.fingerprint === fp; });
+    var migrateFrom = null;
+    if (!rows.length) {
+      // Chuyển từ vân tay cũ (còn số phiên bản Chrome) sang vân tay mới: lấy dữ liệu của dòng cũ
+      rows = all.filter(function(r){ return r.fingerprint === legacyFp; });
+      if (rows.length) migrateFrom = rows[0];
+    }
     if (rows.length) {
       var row = rows[0];
       var remoteExpiry = parseInt(row.license_expiry) || 0;
@@ -11070,7 +11101,11 @@ function verifyLicenseAntiCheat() {
       if (row.admin_override_at && (row.admin_override_expiry !== null && row.admin_override_expiry !== undefined)) {
         var lastApplied = localStorage.getItem('admin_override_applied_at') || '';
         if (row.admin_override_at !== lastApplied) {
-          finalExpiry = parseInt(row.admin_override_expiry) || 0;
+          var ovExpiry = parseInt(row.admin_override_expiry) || 0;
+          // Hạn trên máy chủ đã LỚN HƠN giá trị lệnh admin → lệnh này đã được áp dụng từ trước rồi khách mới
+          // gia hạn thêm (VD: máy vừa xoá dữ liệu duyệt web nên mất mốc đã áp dụng) → chỉ ghi nhận, không áp
+          // dụng lại (nếu áp dụng lại sẽ làm mất số ngày khách đã gia hạn hợp lệ sau đó).
+          if (remoteExpiry <= ovExpiry) finalExpiry = ovExpiry;
           localStorage.setItem('admin_override_applied_at', row.admin_override_at);
         }
       }
@@ -11081,7 +11116,15 @@ function verifyLicenseAntiCheat() {
         updLicenseCountdown();
         if (isLicenseExpired()) applyLicenseLock(); else applyLicenseUnlock();
       }
-      if (finalExpiry > remoteExpiry) _pushTrialToServer(fp, finalExpiry);
+      if (migrateFrom) {
+        // Tạo dòng theo vân tay mới, mang theo các mốc lệnh admin để không bị áp dụng lại lần nữa
+        var mig = { fingerprint: fp, license_expiry: finalExpiry, updated_at: new Date().toISOString(),
+          admin_override_expiry: migrateFrom.admin_override_expiry, admin_override_at: migrateFrom.admin_override_at,
+          pw_reset_at: migrateFrom.pw_reset_at };
+        sbClient.from('device_trials').upsert([mig], { onConflict: 'fingerprint' }).then(function(r2){
+          if (r2 && r2.error) _pushTrialToServer(fp, finalExpiry); // không ghi được các cột lệnh admin → ít nhất giữ hạn dùng
+        }, function(){ _pushTrialToServer(fp, finalExpiry); });
+      } else if (finalExpiry > remoteExpiry) _pushTrialToServer(fp, finalExpiry);
 
       // Admin đặt lại "Mật khẩu quản lý giao dịch" từ xa (không cần biết mật
       // khẩu cũ) → khi máy phát hiện lệnh mới (khác mốc đã áp dụng gần nhất),
