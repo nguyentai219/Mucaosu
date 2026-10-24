@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.6.7</title>
+<title>Mua Bán Mủ Cao Su v2.6.8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.6.7 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.6.8 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1910,7 +1910,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.6.7</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.6.8</div>
       </div>
     </div>
 
@@ -2076,7 +2076,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.6.7</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.6.8</div>
       </div>
     </div>
 
@@ -11068,13 +11068,13 @@ function updBanHints() {
 // ══════════════════════════════════════════
 // HỆ THỐNG GIỚI HẠN THỜI GIAN SỬ DỤNG
 // ══════════════════════════════════════════
-// Mật khẩu gia hạn trực tiếp trên app = tiền tố + mã thiết bị (4 số) + ngày tháng HÔM NAY trên máy (DDMM),
-// VD máy 9465, ngày 24/10 → tiền tố + "9465" + "2410". Đổi theo từng máy và từng ngày; công cụ quản trị
+// Mật khẩu gia hạn trực tiếp trên app = tiền tố + mã thiết bị (4 số) + tháng ngày HÔM NAY trên máy (MMDD),
+// VD máy 9465, ngày 24/10 → tiền tố + "9465" + "1024". Đổi theo từng máy và từng ngày; công cụ quản trị
 // tính sẵn mật khẩu hôm nay cho mã máy khách đọc. Thay cho mật khẩu cố định / mật khẩu quản trị trước đây.
 var _GH_PW_PREFIX = _dc('X1tDSl1b');
 function _matKhauGiaHanHomNay() {
   var d = new Date();
-  return _GH_PW_PREFIX + getDeviceCode() + String(d.getDate()).padStart(2,'0') + String(d.getMonth()+1).padStart(2,'0');
+  return _GH_PW_PREFIX + getDeviceCode() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
 }
 var _TD  = parseInt(_dc('Xg=='));  // _TD (mã hoá)
 var _LSK = _dc('AQoQFwMQFi0IGwMbHxo='); // localStorage key cho license expiry (mã hoá)
