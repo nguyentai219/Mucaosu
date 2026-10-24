@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.5.7</title>
+<title>Mua Bán Mủ Cao Su v2.5.8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.5.7 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.5.8 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1910,7 +1910,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.5.7</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.5.8</div>
       </div>
     </div>
 
@@ -2076,7 +2076,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.5.7</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.5.8</div>
       </div>
     </div>
 
@@ -5508,8 +5508,11 @@ function signInGoogle() {
     callback: function(resp) {
       if (resp.error || !resp.access_token) {
         toast('Đăng nhập thất bại: ' + (resp.error || 'Không nhận được token'));
+        _acctFail.google = true;
+        if (getSyncProvider() === 'gdrive') _acctNotifyResult(true);
         return;
       }
+      _acctFail.google = false;
       gdToken = resp.access_token;
       gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000;
       localStorage.setItem('gd_token', gdToken);
@@ -5536,9 +5539,11 @@ function fetchGoogleUser() {
     updGDBar();
     closeM('modal-gd');
     toast('✅ Đăng nhập thành công: ' + gdUser.email);
+    _acctFail.google = false; _acctNotifyResult(true);
     findOrCreateFolder();
   }).catch(function(e) {
     toast('❌ Lỗi lấy thông tin tài khoản: ' + e.message);
+    _acctFail.google = true; if (getSyncProvider() === 'gdrive') _acctNotifyResult(true);
     console.error('fetchGoogleUser error:', e);
   });
 }
@@ -5705,7 +5710,7 @@ var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','kh_ids','
 // được cho máy B). Bất kỳ khoá localStorage nào KHÁC ngoài danh sách này đều được coi là dữ liệu nghiệp
 // vụ cần đồng bộ và sẽ tự động được quét kèm theo, kể cả khi quên thêm vào SB_DATA_KEYS phía trên.
 var SB_NO_SYNC_KEYS = ['device_code','gd_token','gd_token_expiry','gd_folder_id','gd_user','gd_silent_failed',
-  'gd_last_sync','sb_last_sync','pending_sync_count','sync_provider','active_tab','used_ext_codes',
+  'gd_last_sync','sb_last_sync','acct_last_email','pending_sync_count','sync_provider','active_tab','used_ext_codes',
   'license_is_new','gia_day','ban_last_buyer','ss_state','setting_wakelock','goi_y_ban_scan_day'];
 // Danh sách khoá THỰC SỰ sẽ đồng bộ mỗi lần: hợp của SB_DATA_KEYS (đảm bảo có giá trị mặc định hợp lý
 // nếu máy chưa từng có khoá đó) VÀ toàn bộ khoá đang thực sự tồn tại trong localStorage của app (trừ
@@ -5728,6 +5733,7 @@ function initSupabase() {
   if (!sbClient) sbClient = window.supabase.createClient(SB_URL, SB_ANON_KEY);
   sbClient.auth.getSession().then(function(res) {
     var session = res.data && res.data.session;
+    _sbSessionChecked = true;
     if (session && session.user) {
       sbUser = session.user;
       updGDBar();
@@ -5742,9 +5748,11 @@ function initSupabase() {
         setTimeout(function(){ restoreOrPushOnLogin({ silent:true }); }, 3000);
       }
     }
-  }).catch(function(){});
+    _acctNotifyResult(); // biết kết quả phiên đăng nhập → hiện lên đầu thanh thông báo
+  }).catch(function(){ _sbSessionChecked = true; _acctFail.supabase = true; _acctNotifyResult(); });
   sbClient.auth.onAuthStateChange(function(_event, session) {
     sbUser = (session && session.user) ? session.user : null;
+    _sbSessionChecked = true;
     updGDBar();
   });
 }
@@ -6086,12 +6094,19 @@ function sbSignIn() {
   if (!email || !pass) { toast('⚠️ Nhập đầy đủ email và mật khẩu'); return; }
   toast('⏳ Đang đăng nhập...');
   sbClient.auth.signInWithPassword({ email: email, password: pass }).then(function(res) {
-    if (res.error) { toast('❌ ' + res.error.message); return; }
+    if (res.error) {
+      toast('❌ ' + res.error.message);
+      _sbSessionChecked = true; _acctFail.supabase = true; _acctLastEmail('supabase', email);
+      if (getSyncProvider() === 'supabase') _acctNotifyResult(true);
+      return;
+    }
     sbUser = res.data.user;
+    _sbSessionChecked = true; _acctFail.supabase = false; _acctLastEmail('supabase', sbUser.email || email);
     setSyncProvider('supabase'); // QUAN TRỌNG: xem giải thích chi tiết ở sbSignUp() phía trên —
     // thiếu dòng này thì mọi giao dịch thêm mới sau khi đăng nhập trên máy mới sẽ KHÔNG tự đồng bộ.
     toast('✅ Đăng nhập thành công!');
     updGDBar();
+    _acctNotifyResult(true);
     openSbModal();
     if (typeof verifyLicenseAntiCheat === 'function') verifyLicenseAntiCheat(); // xác minh hạn dùng qua vân tay thiết bị ngay sau khi đăng nhập
     setTimeout(restoreOrPushOnLogin, 1200); // đợi vân tay thiết bị xác minh xong hạn dùng trước khi push/restore, tránh đẩy nhầm hạn dùng sai lên máy chủ
@@ -9350,7 +9365,7 @@ function _bkSaveNguon(){
 function _bkGetNguonNho(){
   var v = getBangKeInfo().nguonXuat;
   if (v === 'thu_mua' || v === 'tinh_toan') return v;
-  try { v = JSON.parse(localStorage.getItem('bk_nguon')); } catch(e){ v = ''; } // khoá cũ (v2.5.7, chỉ trên máy)
+  try { v = JSON.parse(localStorage.getItem('bk_nguon')); } catch(e){ v = ''; } // khoá cũ (v2.5.8, chỉ trên máy)
   return (v === 'thu_mua' || v === 'tinh_toan') ? v : '';
 }
 function openBangKeExport(defaultNguon){
@@ -9975,6 +9990,55 @@ function solar2Lunar(dd, mm, yy){
 // ═══════════════════════════════════════════════════════
 var _gdBarConnStatus = { msg: 'Đang kiểm tra kết nối...', cls: 'syncing' };
 var _gdBarFirstShown = false; // đảm bảo updGDBarStatus() chỉ hiện trực tiếp lên thanh ĐÚNG 1 LẦN duy nhất (xem giải thích trong hàm)
+// ═══════ THÔNG BÁO "TÀI KHOẢN ĐỒNG BỘ" (luôn xếp ĐẦU TIÊN trong vòng xoay) ═══════
+// Dạng: "Tài khoản đồng bộ Supabase <email> đã đăng nhập thành công/thất bại" (hoặc "Google"). Chỉ hiện khi
+// máy đã chọn phương án đồng bộ (Supabase hoặc Google Drive). Trạng thái lấy từ phiên đăng nhập THẬT
+// (sbUser / gdUser+gdToken) và từ kết quả các lần đăng nhập chủ động — không phỏng đoán.
+// 'acct_last_email' = email dùng gần nhất (chỉ trên máy này, không đồng bộ) để thông báo THẤT BẠI vẫn nêu
+// được tên tài khoản dù phiên đã mất.
+var _sbSessionChecked = false;   // đã kiểm tra xong phiên Supabase lúc mở app chưa
+var _acctFail = {};              // { supabase:true/false, google:true/false } — kết quả đăng nhập chủ động gần nhất
+var _acctResultShown = false;    // đã hiện kết quả đăng nhập lên thanh lúc mở app chưa
+var _acctShownAt = 0;            // mốc thời gian lần hiện gần nhất (để thời tiết không chen ngang ngay)
+function _acctLastEmail(prov, setTo){
+  try {
+    var o = JSON.parse(localStorage.getItem('acct_last_email') || '{}') || {};
+    if (setTo) { o[prov] = setTo; localStorage.setItem('acct_last_email', JSON.stringify(o)); return setTo; }
+    return o[prov] || '';
+  } catch(e){ return setTo || ''; }
+}
+function _acctSlide(){
+  var prov = getSyncProvider();
+  if (prov === 'supabase') {
+    var em = (typeof sbUser !== 'undefined' && sbUser && sbUser.email) ? sbUser.email : '';
+    if (em) _acctLastEmail('supabase', em);
+    var nm = em || _acctLastEmail('supabase');
+    if (em && !_acctFail.supabase) return { icon:'✅', text:'Tài khoản đồng bộ Supabase ' + em + ' đã đăng nhập thành công', cls:'synced' };
+    if (!_sbSessionChecked && !_acctFail.supabase) return { icon:'⏳', text:'Đang đăng nhập tài khoản đồng bộ Supabase' + (nm ? ' ' + nm : '') + '...', cls:'syncing' };
+    return { icon:'❌', text:'Tài khoản đồng bộ Supabase' + (nm ? ' ' + nm : '') + ' đăng nhập thất bại', cls:'offline' };
+  }
+  if (prov === 'gdrive') {
+    var ge = (typeof gdUser !== 'undefined' && gdUser && gdUser.email) ? gdUser.email : '';
+    if (ge) _acctLastEmail('google', ge);
+    var gn = ge || _acctLastEmail('google');
+    var ok = !!(ge && typeof gdToken !== 'undefined' && gdToken) && !(typeof _gdSilentFailed !== 'undefined' && _gdSilentFailed) && !_acctFail.google;
+    if (ok) return { icon:'✅', text:'Tài khoản đồng bộ Google ' + ge + ' đã đăng nhập thành công', cls:'synced' };
+    return { icon:'❌', text:'Tài khoản đồng bộ Google' + (gn ? ' ' + gn : '') + ' đăng nhập thất bại', cls:'offline' };
+  }
+  return null; // chưa chọn phương án đồng bộ → không có thông báo này
+}
+// Hiện kết quả đăng nhập lên thanh NGAY (đưa lên đầu vòng xoay): gọi khi vừa biết kết quả lúc mở app, hoặc
+// khi người dùng vừa đăng nhập chủ động (force). Các lần sau chỉ âm thầm cập nhật theo vòng xoay tự nhiên.
+function _acctNotifyResult(force){
+  try {
+    var sl = _acctSlide();
+    if (!sl || sl.cls === 'syncing') return;
+    if (_acctResultShown && !force) return;
+    _acctResultShown = true; _acctShownAt = Date.now();
+    _notifySlideIdx = 0; // slide tài khoản luôn ở vị trí 0 → lần xoay kế tiếp sang vị trí 1
+    _notifyShowContent(sl.icon, sl.text, sl.cls);
+  } catch(e){}
+}
 var _notifySlideIdx = -1; // -1 để lần _notifyTick() ĐẦU TIÊN tăng lên đúng 0 (trước đây để 0 khiến lần
                            // đầu tiên bị tăng thành 1, bỏ qua mất slide đầu tiên trong danh sách)
 
@@ -10103,8 +10167,10 @@ function _fetchWeather(){
         // nguyên tắc không để 1 slide liên tục "cướp lượt" các thông báo khác).
         if (!_weatherFirstReady) {
           _weatherFirstReady = true;
-          _notifySlideIdx = 0;
-          if (typeof _notifyShowContent === 'function') {
+          // Thông báo tài khoản đồng bộ được ưu tiên cao hơn: nếu vừa hiện (trong 12 giây) thì thời tiết KHÔNG
+          // chen ngang, sẽ hiện ngay sau đó theo vòng xoay (vị trí thứ 2).
+          if (typeof _notifyShowContent === 'function' && (Date.now() - _acctShownAt) > 12000) {
+            _notifySlideIdx = 0;
             _notifyShowContent(_weatherIcon(_weatherCache.code), _buildWeatherText(_weatherCache), 'synced');
           }
         }
@@ -10263,6 +10329,8 @@ function _notifyBuildSlides(){
   } else {
     slides.splice(2, 0, { icon:'🌡️', text: 'Đang cập nhật dữ liệu thời tiết...', cls:'synced' });
   }
+  // Thông báo tài khoản đồng bộ: ƯU TIÊN CAO NHẤT, luôn đứng đầu vòng xoay (trên cả thời tiết)
+  try { var _as = _acctSlide(); if (_as) slides.unshift(_as); } catch(e){}
   return slides;
 }
 // Hiện 1 nội dung lên thanh — DÙNG CHUNG cho cả vòng xoay tự động (_notifyTick) LẪN việc ghi trực tiếp
@@ -10378,7 +10446,14 @@ function updGDBarStatus(msg, cls) {
   // mãi không bao giờ nhường lượt được cho các thông báo khác — đúng lỗi đã gặp phải trước đây.
   if (!_gdBarFirstShown) {
     _gdBarFirstShown = true;
-    if (typeof _notifyShowContent === 'function') {
+    var _as0 = null;
+    try { _as0 = _acctSlide(); } catch(e){}
+    if (_as0 && typeof _notifyShowContent === 'function') {
+      // Mở app: thông báo TÀI KHOẢN ĐỒNG BỘ hiện đầu tiên (đang đăng nhập → kết quả sẽ tự thay ngay khi có)
+      _notifySlideIdx = 0; _acctShownAt = Date.now();
+      if (_as0.cls !== 'syncing') _acctResultShown = true;
+      _notifyShowContent(_as0.icon, _as0.text, _as0.cls);
+    } else if (typeof _notifyShowContent === 'function') {
       _notifyShowContent('☁️', out, cls);
     } else {
       nm.textContent = out;
