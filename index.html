@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.6.4</title>
+<title>Mua Bán Mủ Cao Su v2.6.5</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.6.4 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.6.5 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1910,7 +1910,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.6.4</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.6.5</div>
       </div>
     </div>
 
@@ -2076,7 +2076,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.6.4</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.6.5</div>
       </div>
     </div>
 
@@ -5715,7 +5715,7 @@ var SB_NO_SYNC_KEYS = ['device_code','gd_token','gd_token_expiry','gd_folder_id'
   // Mốc "đã áp dụng lệnh admin" và nhật ký kỹ thuật là của RIÊNG từng máy (khoá theo vân tay thiết bị):
   // đồng bộ sang máy khác cùng tài khoản sẽ làm máy đó áp dụng lại lệnh cũ (mất ngày gia hạn hợp lệ,
   // hoặc tự đặt lại mật khẩu giao dịch về mặc định).
-  'admin_override_applied_at','pw_reset_applied_at','registry_sync_debug'];
+  'admin_override_applied_at','pw_reset_applied_at','registry_sync_debug','last_ext_info'];
 // Danh sách khoá THỰC SỰ sẽ đồng bộ mỗi lần: hợp của SB_DATA_KEYS (đảm bảo có giá trị mặc định hợp lý
 // nếu máy chưa từng có khoá đó) VÀ toàn bộ khoá đang thực sự tồn tại trong localStorage của app (trừ
 // danh sách chỉ-riêng-máy-này ở trên) — để không bỏ sót dữ liệu của các tính năng thêm sau này mà lỡ
@@ -6486,7 +6486,8 @@ function syncToSupabase_silent() {
 // khoản quản trị mới đọc được toàn bộ — thực thi bằng Row Level Security
 // phía Supabase.
 // ══════════════════════════════════════════
-var _registryNoDeviceNameCol = false;
+var _REGISTRY_OPTIONAL_COLS = ['device_name', 'last_ext_at', 'last_ext_note'];
+var _registryMissingCols = {};
 // ── Tên thiết bị tự nhận dạng ──
 // Chrome Android ẩn tên máy trong userAgent ("Android 10; K"), nên hỏi thêm qua User-Agent Client Hints
 // (tên model thật, VD "SM-A525F", "Redmi Note 12"), rồi đoán hãng theo tiền tố model. Kèm ghi chú nếu app
@@ -6587,16 +6588,30 @@ function syncClientRegistry() {
     // đăng nhập tài khoản đồng bộ. Cột device_name có thể chưa được tạo trên Supabase: khi đó máy chủ báo
     // lỗi thiếu cột → gửi lại không kèm tên (để vẫn đồng bộ được hạn dùng) và nhớ lại, không gửi kèm nữa.
     var _dn = getDeviceName();
-    if (_dn && !_registryNoDeviceNameCol) row.device_name = _dn;
+    if (_dn) row.device_name = _dn;
+    var _ext = _getLastExtInfo();
+    if (_ext && _ext.at) {
+      row.last_ext_at = _ext.at;
+      row.last_ext_note = (_ext.days > 0 ? '+' : '') + _ext.days + ' ngày · ' + (_ext.cach || '');
+    }
+    // Các cột bổ sung (thêm từ v2.6.4/v2.6.5) có thể chưa được tạo trên Supabase: máy chủ báo lỗi thiếu cột
+    // → bỏ đúng cột đó, gửi lại (vẫn đồng bộ được hạn dùng) và nhớ lại để lần sau không gửi kèm nữa.
+    _REGISTRY_OPTIONAL_COLS.forEach(function(c){ if (_registryMissingCols[c]) delete row[c]; });
     function _upsertRegistry(r) { return sbClient.from('client_registry').upsert([r], { onConflict: 'fingerprint' }); }
-    _upsertRegistry(row).then(function(res) {
-      if (res && res.error && row.device_name !== undefined && /device_name/.test(res.error.message || '')) {
-        _registryNoDeviceNameCol = true;
-        delete row.device_name;
-        return _upsertRegistry(row);
-      }
-      return res;
-    }).then(function(res) {
+    function _upsertBoQuaCotThieu(r, lanThu) {
+      return _upsertRegistry(r).then(function(res) {
+        var msg = (res && res.error && res.error.message) || '';
+        var cot = null;
+        _REGISTRY_OPTIONAL_COLS.forEach(function(c){ if (r[c] !== undefined && msg.indexOf(c) !== -1) cot = c; });
+        if (cot && lanThu < _REGISTRY_OPTIONAL_COLS.length) {
+          _registryMissingCols[cot] = true;
+          delete r[cot];
+          return _upsertBoQuaCotThieu(r, lanThu + 1);
+        }
+        return res;
+      });
+    }
+    _upsertBoQuaCotThieu(row, 0).then(function(res) {
       if (res && res.error) {
         console.error('[client_registry] lỗi đồng bộ:', res.error.message);
         localStorage.setItem('registry_sync_debug', '❌ Lỗi lúc ' + new Date().toLocaleTimeString('vi-VN') + ': ' + res.error.message);
@@ -11188,7 +11203,12 @@ function verifyLicenseAntiCheat() {
           // Hạn trên máy chủ đã LỚN HƠN giá trị lệnh admin → lệnh này đã được áp dụng từ trước rồi khách mới
           // gia hạn thêm (VD: máy vừa xoá dữ liệu duyệt web nên mất mốc đã áp dụng) → chỉ ghi nhận, không áp
           // dụng lại (nếu áp dụng lại sẽ làm mất số ngày khách đã gia hạn hợp lệ sau đó).
-          if (remoteExpiry <= ovExpiry) finalExpiry = ovExpiry;
+          if (remoteExpiry <= ovExpiry) {
+            finalExpiry = ovExpiry;
+            var _ovStart = new Date(); _ovStart.setHours(0,0,0,0);
+            var _baseLocal = localExpiry > _ovStart.getTime() ? localExpiry : _ovStart.getTime();
+            _ghiNhanGiaHan(Math.round((ovExpiry - _baseLocal) / MS_PER_DAY), 'lệnh từ trang quản lý');
+          }
           localStorage.setItem('admin_override_applied_at', row.admin_override_at);
         }
       }
@@ -11445,6 +11465,19 @@ function decodeExtCode(deviceCode, code) {
   return days;
 }
 
+// Lần gia hạn gần nhất của RIÊNG máy này (mọi cách: mã 6 số, mật khẩu gia hạn, mật khẩu quản trị trên app,
+// lệnh từ trang quản lý) — gửi lên trang quản lý (cột last_ext_at, last_ext_note) để admin luôn thấy máy
+// được gia hạn lúc nào, bao nhiêu ngày, bằng cách nào.
+function _ghiNhanGiaHan(days, cach) {
+  try {
+    localStorage.setItem('last_ext_info', JSON.stringify({ at: new Date().toISOString(), days: days, cach: cach }));
+  } catch(e) {}
+  try { setTimeout(syncClientRegistry, 1500); } catch(e) {}
+}
+function _getLastExtInfo() {
+  try { return JSON.parse(localStorage.getItem('last_ext_info') || 'null'); } catch(e) { return null; }
+}
+
 // Danh sách mã gia hạn đã dùng (chống dùng lại)
 function getUsedExtCodes() {
   try { return JSON.parse(localStorage.getItem('used_ext_codes')||'[]'); }
@@ -11528,6 +11561,7 @@ function _doGiaHanInner() {
     toast('✅ Đã ' + (adjDays>0?'thêm '+adjDays:'bớt '+Math.abs(adjDays)) + ' ngày. Còn lại: ' + getRemainingDays() + ' ngày');
     try { updLicenseCountdown(); } catch(e) {}
     try { _pushTrialToServer(getDeviceFingerprint(), newExpiry); } catch(e) {}
+    _ghiNhanGiaHan(adjDays, 'mật khẩu quản trị trên app');
     try { autoSync(); } catch(e) {}
     try { checkLicenseOnLoad(); } catch(e) {}
     return;
@@ -11575,6 +11609,7 @@ function _doGiaHanInner() {
   try { localStorage.setItem(_LSK, String(newExpiry2)); } catch(e) {}
   try { localStorage.removeItem('license_is_new'); } catch(e) {}
   if (isExtCode) { try { markExtCodeUsed(pw); } catch(e) {} }
+  _ghiNhanGiaHan(days, isExtCode ? 'mã gia hạn ' + pw : 'mật khẩu gia hạn trên app');
   closeM('modal-gia-han');
   toast('✅ Đã gia hạn thêm ' + days + ' ngày!');
   try { updLicenseCountdown(); } catch(e) {}
