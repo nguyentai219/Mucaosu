@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.6.6</title>
+<title>Mua Bán Mủ Cao Su v2.6.7</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.6.6 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.6.7 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1910,7 +1910,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.6.6</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.6.7</div>
       </div>
     </div>
 
@@ -2076,7 +2076,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.6.6</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.6.7</div>
       </div>
     </div>
 
@@ -11068,7 +11068,14 @@ function updBanHints() {
 // ══════════════════════════════════════════
 // HỆ THỐNG GIỚI HẠN THỜI GIAN SỬ DỤNG
 // ══════════════════════════════════════════
-var _LPW = _dc('X1tDSl9TQ0o=');   // _LPW (mã hoá)
+// Mật khẩu gia hạn trực tiếp trên app = tiền tố + mã thiết bị (4 số) + ngày tháng HÔM NAY trên máy (DDMM),
+// VD máy 9465, ngày 24/10 → tiền tố + "9465" + "2410". Đổi theo từng máy và từng ngày; công cụ quản trị
+// tính sẵn mật khẩu hôm nay cho mã máy khách đọc. Thay cho mật khẩu cố định / mật khẩu quản trị trước đây.
+var _GH_PW_PREFIX = _dc('X1tDSl1b');
+function _matKhauGiaHanHomNay() {
+  var d = new Date();
+  return _GH_PW_PREFIX + getDeviceCode() + String(d.getDate()).padStart(2,'0') + String(d.getMonth()+1).padStart(2,'0');
+}
 var _TD  = parseInt(_dc('Xg=='));  // _TD (mã hoá)
 var _LSK = _dc('AQoQFwMQFi0IGwMbHxo='); // localStorage key cho license expiry (mã hoá)
 var MS_PER_DAY = 24*60*60*1000;
@@ -11516,16 +11523,11 @@ function onGhPwInput() {
   var adjHint = document.getElementById('gh-adj-hint');
   var btn = document.getElementById('gh-btn-luu');
 
-  if (pw === getAdminPW()) {
-    // Mật khẩu quản trị → nhập số ngày, có thể âm để bớt
+  if (pw === _matKhauGiaHanHomNay()) {
+    // Mật khẩu gia hạn hôm nay của máy này → nhập số ngày, có thể âm để bớt
     if(daysEl){ daysEl.style.display='block'; daysEl.disabled=false; daysEl.placeholder='Số ngày (VD: 20 hoặc -5)'; daysEl.value=''; }
     if(adjHint) adjHint.style.display='block';
     if(btn) btn.textContent='Áp dụng';
-  } else if (pw === _LPW) {
-    // Mật khẩu cố định → nhập số ngày thêm (chỉ dương)
-    if(daysEl){ daysEl.style.display='block'; daysEl.disabled=false; daysEl.placeholder='Số ngày muốn gia hạn (VD: 30)'; }
-    if(adjHint) adjHint.style.display='none';
-    if(btn) btn.textContent='Gia hạn';
   } else {
     if(daysEl){ daysEl.style.display='none'; daysEl.disabled=true; daysEl.value=''; daysEl.placeholder='—'; }
     if(adjHint) adjHint.style.display='none';
@@ -11549,8 +11551,8 @@ function _doGiaHanInner() {
   var isExtCode = false;
   var isAdj = false; // điều chỉnh +/-
 
-  if (pw === getAdminPW()) {
-    // Mật khẩu quản trị → điều chỉnh +/- ngày từ gh-days-input
+  if (pw === _matKhauGiaHanHomNay()) {
+    // Mật khẩu gia hạn hôm nay của máy này → điều chỉnh +/- ngày từ gh-days-input
     var adjStr = (document.getElementById('gh-days-input').value||'').trim();
     var adjDays = parseInt(adjStr);
     if (isNaN(adjDays) || adjDays === 0) {
@@ -11573,19 +11575,10 @@ function _doGiaHanInner() {
     toast('✅ Đã ' + (adjDays>0?'thêm '+adjDays:'bớt '+Math.abs(adjDays)) + ' ngày. Còn lại: ' + getRemainingDays() + ' ngày');
     try { updLicenseCountdown(); } catch(e) {}
     try { _pushTrialToServer(getDeviceFingerprint(), newExpiry); } catch(e) {}
-    _ghiNhanGiaHan(adjDays, 'mật khẩu quản trị trên app');
+    _ghiNhanGiaHan(adjDays, 'mật khẩu gia hạn trên app');
     try { autoSync(); } catch(e) {}
     try { checkLicenseOnLoad(); } catch(e) {}
     return;
-
-  } else if (pw === _LPW) {
-    // Mật khẩu gia hạn cố định + số ngày thêm bình thường
-    var daysInput = parseInt(document.getElementById('gh-days-input').value)||0;
-    if (daysInput <= 0) {
-      toast('⚠️ Nhập số ngày hợp lệ!');
-      return;
-    }
-    days = daysInput;
 
   } else if (/^\d{6}$/.test(pw)) {
     // Mã gia hạn 6 số theo máy
@@ -11621,7 +11614,7 @@ function _doGiaHanInner() {
   try { localStorage.setItem(_LSK, String(newExpiry2)); } catch(e) {}
   try { localStorage.removeItem('license_is_new'); } catch(e) {}
   if (isExtCode) { try { markExtCodeUsed(pw); } catch(e) {} }
-  _ghiNhanGiaHan(days, isExtCode ? 'mã gia hạn ' + pw : 'mật khẩu gia hạn trên app');
+  _ghiNhanGiaHan(days, 'mã gia hạn ' + pw);
   closeM('modal-gia-han');
   toast('✅ Đã gia hạn thêm ' + days + ' ngày!');
   try { updLicenseCountdown(); } catch(e) {}
