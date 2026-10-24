@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.6.3</title>
+<title>Mua Bán Mủ Cao Su v2.6.4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.6.3 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.6.4 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1910,7 +1910,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.6.3</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.6.4</div>
       </div>
     </div>
 
@@ -2076,7 +2076,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.6.3</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.6.4</div>
       </div>
     </div>
 
@@ -6486,6 +6486,76 @@ function syncToSupabase_silent() {
 // khoản quản trị mới đọc được toàn bộ — thực thi bằng Row Level Security
 // phía Supabase.
 // ══════════════════════════════════════════
+var _registryNoDeviceNameCol = false;
+// ── Tên thiết bị tự nhận dạng ──
+// Chrome Android ẩn tên máy trong userAgent ("Android 10; K"), nên hỏi thêm qua User-Agent Client Hints
+// (tên model thật, VD "SM-A525F", "Redmi Note 12"), rồi đoán hãng theo tiền tố model. Kèm ghi chú nếu app
+// đang mở trong trình duyệt của Zalo/Facebook (bộ nhớ riêng → là 1 "máy" riêng trên trang quản lý).
+var _deviceNameCache = null;
+function _brandOfModel(m) {
+  var u = (m || '').toUpperCase();
+  if (/^SM-|^GALAXY/.test(u)) return 'Samsung';
+  if (/^(REDMI|POCO|MI |MI\d|XIAOMI|M\d{4}|2\d{3}[0-9A-Z]{3,})/.test(u)) return 'Xiaomi';
+  if (/^CPH|^OPPO/.test(u)) return 'OPPO';
+  if (/^RMX|^REALME/.test(u)) return 'realme';
+  if (/^V\d{4}|^VIVO/.test(u)) return 'vivo';
+  if (/^PIXEL/.test(u)) return 'Google';
+  if (/^NOKIA|^TA-\d/.test(u)) return 'Nokia';
+  if (/^(HUAWEI|[A-Z]{3}-L\d{2})/.test(u)) return 'Huawei';
+  if (/^(INFINIX|X6\d{2})/.test(u)) return 'Infinix';
+  if (/^TECNO/.test(u)) return 'TECNO';
+  return '';
+}
+function _deviceNameCtx() {
+  var ua = navigator.userAgent || '';
+  if (/Zalo/i.test(ua)) return ' · trong Zalo';
+  if (/FBAN|FBAV|FB_IAB|Messenger/i.test(ua)) return ' · trong Facebook';
+  return '';
+}
+function _deviceNameFromUA() {
+  var ua = navigator.userAgent || '', m;
+  if (/iPhone/.test(ua)) { m = ua.match(/OS (\d+)[_\d]*/); return 'iPhone' + (m ? ' · iOS ' + m[1] : ''); }
+  if (/iPad/.test(ua)) { m = ua.match(/OS (\d+)[_\d]*/); return 'iPad' + (m ? ' · iOS ' + m[1] : ''); }
+  if (/Android/.test(ua)) {
+    m = ua.match(/Android [\d.]+; ([^;)]+)/);
+    var model = m ? m[1].replace(/ Build\/.*$/, '').trim() : '';
+    if (model === 'K') model = '';
+    var b = _brandOfModel(model);
+    return ((b && model.toUpperCase().indexOf(b.toUpperCase()) !== 0 ? b + ' ' : '') + (model || 'Điện thoại Android')).trim();
+  }
+  if (/Windows/.test(ua)) return 'Máy tính Windows';
+  if (/Macintosh/.test(ua)) return 'Máy Mac';
+  if (/Linux/.test(ua)) return 'Máy tính Linux';
+  return 'Thiết bị không rõ';
+}
+function getDeviceName() {
+  if (_deviceNameCache === null) _deviceNameCache = _deviceNameFromUA() + _deviceNameCtx();
+  return _deviceNameCache;
+}
+// Hỏi tên model thật (bất đồng bộ) ngay khi mở app; có tên rõ hơn thì gửi lại lên trang quản lý.
+(function(){
+  try {
+    if (!navigator.userAgentData || !navigator.userAgentData.getHighEntropyValues) return;
+    navigator.userAgentData.getHighEntropyValues(['model', 'platformVersion']).then(function(v) {
+      var model = (v && v.model || '').trim();
+      var plat = navigator.userAgentData.platform || '';
+      var ver = (v && v.platformVersion || '').split('.')[0];
+      var name;
+      if (model) {
+        var b = _brandOfModel(model);
+        name = (b && model.toUpperCase().indexOf(b.toUpperCase()) !== 0 ? b + ' ' : '') + model;
+        if (plat === 'Android' && ver) name += ' · Android ' + ver;
+      } else {
+        name = _deviceNameFromUA();
+      }
+      name += _deviceNameCtx();
+      if (name !== getDeviceName()) {
+        _deviceNameCache = name;
+        if (typeof sbClient !== 'undefined' && sbClient) setTimeout(function(){ try { syncClientRegistry(); } catch(e){} }, 3000);
+      }
+    }).catch(function(){});
+  } catch(e) {}
+})();
 function syncClientRegistry() {
   // Nếu verifyLicenseAntiCheat() đang xác minh/áp dụng lệnh admin (đổi hạn
   // dùng từ xa) mà CHƯA XONG, thì lùi lại lệnh đồng bộ này 1 chút rồi thử
@@ -6498,16 +6568,6 @@ function syncClientRegistry() {
   if (!sbClient) { localStorage.setItem('registry_sync_debug', 'Chưa khởi tạo sbClient lúc ' + new Date().toLocaleTimeString('vi-VN')); return; }
   try {
     var used = getUsedExtCodes();
-    // Máy CHƯA KÍCH HOẠT lần nào, chưa đăng nhập tài khoản, chưa dùng mã gia hạn nào → chưa đăng ký lên
-    // trang quản lý. Mỗi lần app mở trong 1 trình duyệt có bộ nhớ trống (trình duyệt trong Zalo, trình duyệt
-    // khác, sau khi xoá dữ liệu Chrome...) đều sinh 1 mã thiết bị mới — trước đây mỗi lần như vậy thêm 1 dòng
-    // "chưa đăng nhập tài khoản / hết hạn" ảo trên trang quản lý. Admin tính mã gia hạn theo mã thiết bị khách
-    // đọc qua điện thoại nên không cần dòng này; máy sẽ tự đăng ký ngay khi được kích hoạt/đăng nhập.
-    if (isNeverActivated() && !sbUser && !used.length) {
-      localStorage.setItem('registry_sync_debug', 'ℹ️ Máy chưa kích hoạt — chưa đăng ký lên trang quản lý (' + new Date().toLocaleTimeString('vi-VN') + ')');
-      if (typeof updRegistryDebugLine === 'function') updRegistryDebugLine();
-      return;
-    }
     var lastCode = used.length ? used[used.length - 1] : null;
     var row = {
       fingerprint: getDeviceFingerprint(),
@@ -6523,7 +6583,20 @@ function syncClientRegistry() {
       updated_at: new Date().toISOString()
     };
     if (sbUser) { row.user_id = sbUser.id; row.email = sbUser.email; }
-    sbClient.from('client_registry').upsert([row], { onConflict: 'fingerprint' }).then(function(res) {
+    // Tên thiết bị (VD "Samsung SM-A525F · Android 13") — trang quản lý dùng làm tên hiển thị khi máy chưa
+    // đăng nhập tài khoản đồng bộ. Cột device_name có thể chưa được tạo trên Supabase: khi đó máy chủ báo
+    // lỗi thiếu cột → gửi lại không kèm tên (để vẫn đồng bộ được hạn dùng) và nhớ lại, không gửi kèm nữa.
+    var _dn = getDeviceName();
+    if (_dn && !_registryNoDeviceNameCol) row.device_name = _dn;
+    function _upsertRegistry(r) { return sbClient.from('client_registry').upsert([r], { onConflict: 'fingerprint' }); }
+    _upsertRegistry(row).then(function(res) {
+      if (res && res.error && row.device_name !== undefined && /device_name/.test(res.error.message || '')) {
+        _registryNoDeviceNameCol = true;
+        delete row.device_name;
+        return _upsertRegistry(row);
+      }
+      return res;
+    }).then(function(res) {
       if (res && res.error) {
         console.error('[client_registry] lỗi đồng bộ:', res.error.message);
         localStorage.setItem('registry_sync_debug', '❌ Lỗi lúc ' + new Date().toLocaleTimeString('vi-VN') + ': ' + res.error.message);
