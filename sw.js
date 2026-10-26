@@ -1,4 +1,4 @@
-const CACHE = 'mu-cao-su-v2.6.8';
+const CACHE = 'mu-cao-su-v2.6.9';
 const FILES = ['/Mucaosu/','/Mucaosu/index.html','/Mucaosu/manifest.json','/Mucaosu/icon-192.png','/Mucaosu/icon-512.png','/Mucaosu/apple-touch-icon.png','/Mucaosu/logo.png','/Mucaosu/splash.png'];
 
 self.addEventListener('install', e => {
@@ -14,10 +14,11 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('activate', e => {
-  // Xóa tất cả cache cũ
+  // Chỉ xoá cache CŨ CỦA APP NÀY (tiền tố 'mu-cao-su-'). Bộ nhớ cache dùng chung cho cả tên miền
+  // nguyentai219.github.io — xoá hết sẽ làm mất bản offline của app khác (VD Quản Lý Heo).
   e.waitUntil(
     caches.keys().then(ks =>
-      Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))
+      Promise.all(ks.filter(k => k.startsWith('mu-cao-su-') && k !== CACHE).map(k => caches.delete(k)))
     )
   );
   self.clients.claim(); // chiếm quyền kiểm soát tất cả tab ngay

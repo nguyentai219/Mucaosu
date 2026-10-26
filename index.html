@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.6.8</title>
+<title>Mua Bán Mủ Cao Su v2.6.9</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.6.8 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.6.9 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1911,7 +1911,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.6.8</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.6.9</div>
       </div>
     </div>
 
@@ -2077,7 +2077,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.6.8</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.6.9</div>
       </div>
     </div>
 
@@ -5867,13 +5867,22 @@ var SB_NO_SYNC_KEYS = ['device_code','gd_token','gd_token_expiry','gd_folder_id'
 // nếu máy chưa từng có khoá đó) VÀ toàn bộ khoá đang thực sự tồn tại trong localStorage của app (trừ
 // danh sách chỉ-riêng-máy-này ở trên) — để không bỏ sót dữ liệu của các tính năng thêm sau này mà lỡ
 // quên khai báo thủ công vào SB_DATA_KEYS.
+// Khoá localStorage của APP KHÁC cùng tên miền nguyentai219.github.io (VD app "Quản Lý Heo" ở /Quanlyheo/):
+// trình duyệt dùng chung 1 localStorage cho mọi trang cùng tên miền, nên phải bỏ qua hẳn — không đẩy lên
+// mucaosu_data, không ghi về máy, không hiện trong danh sách dữ liệu, và dọn khỏi đám mây nếu lỡ đẩy lên.
+function isOtherAppKey(k){ return /^quanlyheo/i.test(k || ''); }
+function _sbCleanOtherAppRows(rows){
+  var keys = (rows || []).map(function(r){ return r.data_key; }).filter(isOtherAppKey);
+  if (keys.length && sbClient && sbUser) sbClient.from('mucaosu_data').delete().eq('user_id', sbUser.id).in('data_key', keys).then(null, function(){});
+  return (rows || []).filter(function(r){ return !isOtherAppKey(r.data_key); });
+}
 function getAllSyncableKeys(){
   var set = {};
   SB_DATA_KEYS.forEach(function(k){ set[k] = true; });
   try {
     for (var i=0;i<localStorage.length;i++){
       var k = localStorage.key(i);
-      if (k && SB_NO_SYNC_KEYS.indexOf(k) === -1) set[k] = true;
+      if (k && SB_NO_SYNC_KEYS.indexOf(k) === -1 && !isOtherAppKey(k)) set[k] = true;
     }
   } catch(e){}
   return Object.keys(set);
@@ -6061,6 +6070,7 @@ function _sbLoadDataTab(){
   sbClient.from('mucaosu_data').select('data_key,data_value').eq('user_id', sbUser.id).then(function(res) {
     if (_sbStorageTab !== 'data') return; // đã chuyển tab trong lúc chờ tải, bỏ qua kết quả trễ
     if (res.error) { content.innerHTML = '<div style="text-align:center;padding:20px 10px;color:var(--red);font-size:13px">❌ Lỗi tải dữ liệu: ' + res.error.message + '</div>'; return; }
+    res.data = _sbCleanOtherAppRows(res.data);
     var rows = res.data || [];
     rows.forEach(function(r) { r._size = JSON.stringify(r.data_value == null ? '' : r.data_value).length; });
     // Ẩn hẳn các mục dữ liệu hệ thống (license/mật khẩu/mã khách hàng) khỏi danh sách hiển thị —
@@ -6425,7 +6435,7 @@ function restoreOrPushOnLogin(opts) {
   if (!sbClient || !sbUser) return;
   sbClient.from('mucaosu_data').select('data_key,data_value').eq('user_id', sbUser.id).then(function(res) {
     if (res.error) { if(!opts.silent) toast('❌ Lỗi kiểm tra dữ liệu đám mây: ' + res.error.message); return; }
-    var rows = res.data || [];
+    var rows = _sbCleanOtherAppRows(res.data);
     if (!rows.length) { if(opts.silent) syncToSupabase_silent(); else syncToSupabase(); return; } // đám mây chưa có gì → chỉ cần đẩy dữ liệu máy lên, không có gì để trộn
     var cloud = {};
     rows.forEach(function(r){ cloud[r.data_key] = r.data_value; });
@@ -6790,7 +6800,7 @@ function restoreFromSupabase(silent) {
     rows.forEach(function(r) {
       // Bỏ qua hạn dùng (nguồn đúng là device_trials theo từng máy — ghi đè từ đám mây sẽ làm mất lệnh
       // "bớt ngày" của admin, hoặc lấy nhầm hạn dùng của máy khác cùng tài khoản) và các khoá riêng máy.
-      if (r.data_key === 'license_expiry' || SB_NO_SYNC_KEYS.indexOf(r.data_key) !== -1) return;
+      if (r.data_key === 'license_expiry' || SB_NO_SYNC_KEYS.indexOf(r.data_key) !== -1 || isOtherAppKey(r.data_key)) return;
       if (r.data_value !== null && r.data_value !== undefined) {
         localStorage.setItem(r.data_key, JSON.stringify(r.data_value));
       }
