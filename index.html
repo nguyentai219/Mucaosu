@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.7.0</title>
+<title>Mua Bán Mủ Cao Su v2.7.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.7.0 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.7.1 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -614,8 +614,14 @@ input[type=date]:focus{border-color:var(--gl)}
         <span onclick="openGoiYBanHomNay()" style="font-size:11.5px;font-weight:700;color:var(--gd);cursor:pointer;white-space:nowrap">💡 Gợi Ý Người Bán Hôm Nay<span id="goiy-badge" style="display:none;min-width:17px;height:17px;line-height:17px;padding:0 4px;margin-left:4px;border-radius:9px;color:#fff;font-size:10px;font-weight:800;text-align:center;vertical-align:1px;box-sizing:border-box"></span></span>
       </div>
       <div id="goiy-mini" onclick="openGoiYBanHomNay()" style="display:none;font-size:10.5px;color:var(--g600);background:var(--g50);border-radius:8px;padding:4px 8px;margin:4px 0 2px;cursor:pointer"></div>
-      <input type="search" id="mua-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('mua')" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="q" onkeydown="tenKey(event,'mua')" onfocus="scrollInputUp(this)">
-      <div class="ac-list" id="mua-ac"></div>
+      <div style="display:flex;gap:6px">
+        <div style="flex:1 1 auto;min-width:0;position:relative">
+          <input type="search" id="mua-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('mua')" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="q" onkeydown="tenKey(event,'mua')" onfocus="scrollInputUp(this)">
+          <div class="ac-list" id="mua-ac"></div>
+        </div>
+        <input type="text" id="mua-phan" class="fi" placeholder="Phần bán" maxlength="30" style="flex:0 0 36%;width:36%;min-width:0" autocomplete="off" autocorrect="off" spellcheck="false" oninput="updPhanSuggest()" onfocus="updPhanSuggest()" onkeydown="nf(event,'mua-kg')">
+      </div>
+      <div id="mua-phan-sg" style="display:none;flex-wrap:wrap;align-items:center;gap:5px;margin-top:5px"></div>
       <div class="kh-info-ticker" id="mua-info-ticker"></div>
     </div>
     <div class="g2" id="mua-kg-row">
@@ -1334,7 +1340,7 @@ input[type=date]:focus{border-color:var(--gl)}
   <div class="modal-box center-box" style="max-width:360px">
     <div style="font-size:32px;text-align:center;margin-bottom:8px">☁️</div>
     <div style="font-size:15px;font-weight:800;text-align:center;color:var(--g800);margin-bottom:10px">Phát hiện Mã khách hàng khác nhau</div>
-    <div id="khid-cf-msg" style="font-size:13px;color:var(--g700);line-height:1.6;margin-bottom:12px"></div>
+    <div id="khid-cf-msg" style="font-size:13px;color:var(--g800);line-height:1.6;margin-bottom:12px"></div>
     <select id="khid-cf-strategy" class="fi" style="margin-bottom:10px">
       <option value="merge" selected>🔀 Trộn dữ liệu trên máy và đám mây làm một</option>
       <option value="cloud">☁️ Đồng bộ dữ liệu trên đám mây, xoá dữ liệu trên máy</option>
@@ -1397,7 +1403,7 @@ input[type=date]:focus{border-color:var(--gl)}
 <div class="modal center" id="modal-bangke-noinfo" style="z-index:910">
   <div class="modal-box center-box" style="max-width:340px">
     <div class="modal-title">⚠️ Chưa có thông tin xuất</div>
-    <div style="font-size:12.5px;color:var(--g700);margin-bottom:14px;line-height:1.5">Bạn chưa điền <b>Thông tin xuất bảng kê</b> (tên doanh nghiệp, mã số thuế, địa chỉ, người phụ trách, đơn giá…). Nếu tiếp tục, các mục này trên bảng kê sẽ để trống.</div>
+    <div style="font-size:12.5px;color:var(--g800);margin-bottom:14px;line-height:1.5">Bạn chưa điền <b>Thông tin xuất bảng kê</b> (tên doanh nghiệp, mã số thuế, địa chỉ, người phụ trách, đơn giá…). Nếu tiếp tục, các mục này trên bảng kê sẽ để trống.</div>
     <button onclick="bkNoInfoDienThem()" style="width:100%;padding:10px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">🏢 Điền thông tin xuất</button>
     <button onclick="bkNoInfoTiepTuc()" style="width:100%;padding:10px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">📄 Tiếp tục xuất (không có thông tin)</button>
     <button class="btn-huy" style="width:100%" onclick="closeM('modal-bangke-noinfo')">Huỷ</button>
@@ -1409,12 +1415,12 @@ input[type=date]:focus{border-color:var(--gl)}
   <div class="modal-box center-box" style="max-width:340px">
     <div class="modal-title">🖨️ Xuất Bảng kê thu mua</div>
     <div style="font-size:11.5px;color:var(--g600);margin-bottom:12px">Gồm khách hàng có giao dịch trong ngày chọn, mỗi khách 1 dòng theo loại mủ (mủ nước tính độ riêng, mủ tạp tính theo kg).</div>
-    <div style="font-size:12px;font-weight:700;color:var(--g700);margin-bottom:4px">Nguồn dữ liệu</div>
+    <div style="font-size:12px;font-weight:700;color:var(--g800);margin-bottom:4px">Nguồn dữ liệu</div>
     <select id="bk-nguon" class="fi" style="margin-bottom:10px" onchange="_bkSaveNguon()">
       <option value="thu_mua">📥 Dữ liệu Thu Mua (giao dịch thật)</option>
       <option value="tinh_toan">⚡ Dữ liệu Tính Toán (đã lưu ở tab Tính Toán)</option>
     </select>
-    <div style="font-size:12px;font-weight:700;color:var(--g700);margin-bottom:4px">Chọn loại mủ</div>
+    <div style="font-size:12px;font-weight:700;color:var(--g800);margin-bottom:4px">Chọn loại mủ</div>
     <select id="bk-loaiMu" class="fi" style="margin-bottom:10px">
       <option value="all">Tất cả loại mủ</option>
       <option value="nuoc">Mủ nước</option>
@@ -1422,7 +1428,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <option value="day">Mủ dây</option>
       <option value="dong">Mủ đông</option>
     </select>
-    <div style="font-size:12px;font-weight:700;color:var(--g700);margin-bottom:4px">Ngày xuất</div>
+    <div style="font-size:12px;font-weight:700;color:var(--g800);margin-bottom:4px">Ngày xuất</div>
     <div class="fi" id="bk-ngayXuat-bar" style="margin-bottom:10px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;text-align:center" onclick="openBkCalDate()">
       <span id="bk-ngayXuat-val" style="flex:1"></span>
       <span>📅</span>
@@ -1435,7 +1441,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <input type="checkbox" id="bk-dienNgayKy" onchange="_bkSaveDienOpts()" style="width:16px;height:16px;flex-shrink:0">
       Điền ngày, tháng, năm ký vào bản kê
     </label>
-    <div style="font-size:12px;font-weight:700;color:var(--g700);margin-bottom:4px">Số bảng kê (không bắt buộc)</div>
+    <div style="font-size:12px;font-weight:700;color:var(--g800);margin-bottom:4px">Số bảng kê (không bắt buộc)</div>
     <input type="text" id="bk-soBangKe" class="fi" placeholder="VD: 07/2026" style="margin-bottom:14px" autocomplete="off">
     <button onclick="openBangKeInfo()" style="width:100%;padding:10px;background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">🏢 Cập nhật thông tin xuất bảng kê</button>
     <button onclick="xuatBangKe()" style="width:100%;padding:10px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px">📄 Xuất bảng kê</button>
@@ -1911,7 +1917,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.7.0</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.7.1</div>
       </div>
     </div>
 
@@ -2077,7 +2083,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.7.0</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.7.1</div>
       </div>
     </div>
 
@@ -2283,7 +2289,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span class="date-hint">Nhấn để đổi ngày</span>
     </div>
     <div id="goi-y-ban-title-count" style="font-size:14.5px;font-weight:800;color:var(--gd);background:var(--g50);border-radius:10px;padding:8px 12px;margin-bottom:8px">Hôm nay dự kiến: 0 khách bán</div>
-    <details style="font-size:11.5px;color:var(--g600);margin-bottom:10px"><summary style="cursor:pointer;font-weight:700">ℹ️ Cách tính &amp; cách dùng</summary><div style="margin-top:4px">Dựa theo chu kỳ cạo mủ của từng khách: <b>D3</b> = cạo 1 ngày nghỉ 2 ngày, <b>D2</b> = cạo 1 ngày nghỉ 1 ngày, <b>D2+D3</b> = khách có 2 phần cạo độc lập (gần như ngày nào cũng có thể bán). Nhấn tên để điền nhanh vào ô "Tên người bán". Nhấn ✏️ để đặt tên hiển thị riêng cho lô cạo của ngày đang xem (không đổi tên thật). Nhấn thẻ D2/D3 để đổi chu kỳ của khách đó (khách chưa chọn chu kỳ thì app <b>tự nhận</b> theo lịch sử bán). <b>🎯 Dự kiến</b> = sản lượng trung bình 3 lần bán gần nhất. Khách đã có ghi chép thu mua trong ngày được đánh dấu <b>✅ Đã bán</b> kèm sản lượng thực tế và chuyển xuống cuối danh sách. Khách lỡ 1 kỳ (VD nghỉ mưa) vẫn được gợi ý với nhãn <b>⏳ Trễ 1 kỳ</b>.</div></details>
+    <details style="font-size:11.5px;color:var(--g600);margin-bottom:10px"><summary style="cursor:pointer;font-weight:700">ℹ️ Cách tính &amp; cách dùng</summary><div style="margin-top:4px">Dựa theo chu kỳ cạo mủ của từng khách: <b>D3</b> = cạo 1 ngày nghỉ 2 ngày, <b>D2</b> = cạo 1 ngày nghỉ 1 ngày, <b>D2+D3</b> = khách có 2 phần cạo độc lập (gần như ngày nào cũng có thể bán). Nhấn tên để điền nhanh vào ô "Tên người bán". Nhấn ✏️ để đặt tên hiển thị riêng cho lô cạo của ngày đang xem (không đổi tên thật). Nhấn thẻ D2/D3 để đổi chu kỳ của khách đó (khách chưa chọn chu kỳ thì app <b>tự nhận</b> theo lịch sử bán). <b>🎯 Dự kiến</b> = sản lượng thật của kỳ trước, tách theo từng <b>phần bán</b> (ghi ở ô "Phần bán" cạnh tên người bán). Khách đã có ghi chép thu mua trong ngày được đánh dấu <b>✅ Đã bán</b> (khách nhiều phần: bán chưa đủ các phần tới hạn thì hiện <b>◐ Còn … phần</b>) kèm sản lượng thực tế và chuyển xuống cuối danh sách. Khách lỡ 1 kỳ (VD nghỉ mưa) vẫn được gợi ý với nhãn <b>⏳ Trễ 1 kỳ</b>.</div></details>
     <div id="goi-y-ban-list"></div>
     <button class="btn-huy" style="width:100%;margin-top:12px" onclick="closeM('modal-goi-y-ban')">Đóng</button>
   </div>
@@ -2595,7 +2601,7 @@ function _fmtGiaoDichNgan(g){
   var loaiTxt = LOAI_LBL[g.loai] || g.loai || '';
   var doPhan = (laMuNuoc && g.do) ? (' x ' + fmtDo(g.do) + ' độ') : '';
   var loaiPhan = laMuNuoc ? '' : (' (' + loaiTxt + ')');
-  return ngayNgan + ' - ' + fmtKg(g.kg) + 'kg' + doPhan + loaiPhan + ' x ' + fmtNum(g.gia) + 'đ = ' + fmtNum(g.tt) + 'đ';
+  return ngayNgan + (g.phan ? ' [' + g.phan + ']' : '') + ' - ' + fmtKg(g.kg) + 'kg' + doPhan + loaiPhan + ' x ' + fmtNum(g.gia) + 'đ = ' + fmtNum(g.tt) + 'đ';
 }
 // Số ngày nguyên giữa 2 mốc 'YYYY-MM-DD' (b - a)
 function _soNgayGiua(a, b){
@@ -2659,15 +2665,33 @@ function _goiyCongDon(list){
   });
   return r;
 }
-// Sản lượng DỰ KIẾN của 1 khách = trung bình mỗi ngày bán của tối đa 3 ngày bán gần nhất trước ngày
-// đang xem (cộng hết các giao dịch trong cùng 1 ngày — khách bán cả mủ nước + mủ chén vẫn tính đúng),
-// tách theo từng loại mủ; mủ nước kèm độ trung bình (bình quân gia quyền theo kg).
-function _goiyUocTinh(kh, ngayTruoc){
-  var ds = ngayTruoc.slice(-3), gop = [];
-  ds.forEach(function(d){ gop = gop.concat(kh.ngay[d]); });
-  var r = _goiyCongDon(gop), n = ds.length || 1, loai = {};
-  Object.keys(r.loai).forEach(function(l){ loai[l] = r.loai[l] / n; });
-  return { kg: r.kg / n, loai: loai, doTB: r.kgNuocCoDo ? r.kgDo / r.kgNuocCoDo : 0, soNgay: ds.length };
+// Sản lượng DỰ KIẾN của 1 khách = số liệu THẬT của KỲ TRƯỚC (không lấy trung bình — khách bán nhiều
+// phần thì mỗi kỳ mỗi khác, trung bình dễ lệch). days = các ngày kỳ trước (cũ → mới): chu kỳ đơn là
+// lần bán gần nhất; D2+D3 là ngày cách 3 ngày (phần D3) và/hoặc cách 2 ngày (phần D2).
+// Tách theo PHẦN BÁN (gd.phan): phần có tên chỉ lấy lần bán GẦN NHẤT của phần đó (tránh cộng trùng khi
+// 1 ngày bán gộp nhiều phần); giao dịch không ghi phần thì cộng chung vào 1 nhóm.
+function _goiyKyTruoc(kh, days){
+  var nhom = {}, thuTu = [];
+  days.forEach(function(d){
+    var trongNgay = {};
+    kh.ngay[d].forEach(function(g){
+      var ph = (g.phan || '').trim(), key = ph ? normTen(ph) : '';
+      (trongNgay[key] || (trongNgay[key] = { phan: ph, list: [] })).list.push(g);
+    });
+    Object.keys(trongNgay).forEach(function(key){
+      if (!nhom[key]) { thuTu.push(key); nhom[key] = { phan: trongNgay[key].phan, list: [], ngay: d }; }
+      if (key) nhom[key] = { phan: trongNgay[key].phan, list: trongNgay[key].list, ngay: d };
+      else { nhom[key].list = nhom[key].list.concat(trongNgay[key].list); nhom[key].ngay = d; }
+    });
+  });
+  var tatCa = [];
+  var phan = thuTu.map(function(key){
+    var n = nhom[key], r = _goiyCongDon(n.list);
+    tatCa = tatCa.concat(n.list);
+    return { phan: n.phan, ngay: n.ngay, kg: r.kg, loai: r.loai, doTB: r.kgNuocCoDo ? r.kgDo / r.kgNuocCoDo : 0 };
+  });
+  var t = _goiyCongDon(tatCa);
+  return { kg: t.kg, loai: t.loai, doTB: t.kgNuocCoDo ? t.kgDo / t.kgNuocCoDo : 0, ngay: days, phan: phan };
 }
 // Trả về mảng khách bán liên quan tới ngày refDate (mặc định hôm nay thật):
 // • due = true: khách được DỰ ĐOÁN bán ngày này theo chu kỳ cạo, kèm daBan = đã có ghi chép thu mua
@@ -2706,15 +2730,29 @@ function buildGoiYBanHomNay(refDate){
       }
     }
     if (!due && !gdHomNay) return;
+    // Ngày "kỳ trước" dùng để dự kiến sản lượng
+    var ngayKy = [];
+    if (due && ck.chuKy === 'D2D3') { if (kh.ngay[lui3]) ngayKy.push(lui3); if (kh.ngay[lui2]) ngayKy.push(lui2); }
+    else if (ngayCuoi) ngayKy.push(ngayCuoi);
+    var uoc = ngayKy.length ? _goiyKyTruoc(kh, ngayKy) : null;
+    // Đã bán đủ chưa: khách bán NHIỀU PHẦN có tên → chỉ coi là "đã bán" khi mọi phần tới hạn đều đã có
+    // ghi chép hôm nay; hôm nay có giao dịch KHÔNG ghi phần thì không phân biệt được → coi như đã bán.
+    var phanTen = (due && uoc) ? uoc.phan.filter(function(p){ return p.phan; }) : [];
+    var daBanPhan = {}, coGdKhongPhan = false;
+    (gdHomNay || []).forEach(function(g){ if (g.phan && g.phan.trim()) daBanPhan[normTen(g.phan)] = true; else coGdKhongPhan = true; });
+    var phanCon = (gdHomNay && coGdKhongPhan) ? [] : phanTen.filter(function(p){ return !daBanPhan[normTen(p.phan)]; });
+    var daBan = !!gdHomNay && (!due || phanCon.length === 0);
+    var uocConLai = daBan ? 0 : (gdHomNay ? phanCon.reduce(function(a,p){ return a + p.kg; }, 0) : (uoc ? uoc.kg : 0));
     var kyTruoc = [];
     for (var i = truoc.length - 1; i >= 0 && kyTruoc.length < 2; i--) {
       kyTruoc = kyTruoc.concat(kh.ngay[truoc[i]].slice().reverse()).slice(0, 2);
     }
     out.push({
       ten: kh.ten, chuKy: ck.chuKy, tuDong: ck.tuDong, phanDue: phanDue, tre: tre,
-      ngayBanCuoi: ngayCuoi, due: due, daBan: !!gdHomNay,
+      ngayBanCuoi: ngayCuoi, due: due, daBan: daBan, banMotPhan: !!gdHomNay && !daBan,
       thucTe: gdHomNay ? _goiyCongDon(gdHomNay) : null,
-      uoc: truoc.length ? _goiyUocTinh(kh, truoc) : null,
+      uoc: uoc, uocConLai: uocConLai, daBanPhan: daBanPhan,
+      phanCon: phanCon.map(function(p){ return p.phan; }),
       kyTruoc: kyTruoc
     });
   });
@@ -2723,15 +2761,16 @@ function buildGoiYBanHomNay(refDate){
 }
 // Tổng hợp số người + sản lượng của danh sách gợi ý (dùng chung cho popup và dòng tóm tắt ngoài tab)
 function tomTatGoiY(list){
-  var t = { du: 0, daBan: 0, conLai: 0, uocTong: 0, uocConLai: 0, daBanKg: 0, ngoai: 0, ngoaiKg: 0, uocLoai: {} };
+  var t = { du: 0, daBan: 0, motPhan: 0, conLai: 0, uocTong: 0, uocConLai: 0, daBanKg: 0, ngoai: 0, ngoaiKg: 0, uocLoai: {} };
   list.forEach(function(x){
     if (x.due) {
       t.du++;
       var u = x.uoc ? x.uoc.kg : 0;
       t.uocTong += u;
       if (x.uoc) Object.keys(x.uoc.loai).forEach(function(l){ t.uocLoai[l] = (t.uocLoai[l] || 0) + x.uoc.loai[l]; });
-      if (x.daBan) { t.daBan++; t.daBanKg += x.thucTe.kg; }
-      else { t.conLai++; t.uocConLai += u; }
+      if (x.thucTe) t.daBanKg += x.thucTe.kg;
+      if (x.daBan) t.daBan++;
+      else { t.conLai++; t.uocConLai += x.uocConLai; if (x.banMotPhan) t.motPhan++; }
     } else if (x.daBan) { t.ngoai++; t.ngoaiKg += x.thucTe.kg; }
   });
   return t;
@@ -2760,20 +2799,35 @@ function _goiyDongHtml(x, i){
   var tagBg = (x.chuKy==='D2') ? '#eff6ff' : (x.chuKy==='D2D3' ? '#fef3c7' : '#f0fdf4');
   var tagColor = (x.chuKy==='D2') ? '#1e40af' : (x.chuKy==='D2D3' ? '#92400e' : '#15803d');
   var tenRieng = getTenHienThi(x.ten, goiyRefDate);
-  var tenGocLine = tenRieng ? '<div style="font-size:10px;color:var(--g500);margin-top:1px">(Tên gốc: ' + escHtml(x.ten) + ')</div>' : '';
+  var tenGocLine = tenRieng ? '<div style="font-size:10px;color:var(--g400);margin-top:1px">(Tên gốc: ' + escHtml(x.ten) + ')</div>' : '';
   var trangThai = x.daBan
     ? '<span style="flex:0 0 auto;font-size:10px;font-weight:800;color:#fff;background:#16a34a;border-radius:6px;padding:2px 6px">✅ Đã bán</span>'
+    : x.banMotPhan
+    ? '<span style="flex:0 0 auto;font-size:10px;font-weight:800;color:#166534;background:#dcfce7;border-radius:6px;padding:2px 6px">◐ Còn ' + x.phanCon.length + ' phần</span>'
     : (x.tre ? '<span style="flex:0 0 auto;font-size:10px;font-weight:800;color:#92400e;background:#fef3c7;border-radius:6px;padding:2px 6px">⏳ Trễ 1 kỳ</span>' : '');
   var lanCuoi = x.ngayBanCuoi
     ? '<div style="font-size:10.5px;color:var(--g600);margin-top:2px">Lần bán gần nhất: ' + fmtDateVN2gy(x.ngayBanCuoi) + ' · ' + nghiText + '</div>'
     : '<div style="font-size:10.5px;color:var(--g600);margin-top:2px">Khách bán lần đầu</div>';
   var uocLine = '';
   if (x.due && x.uoc && x.uoc.kg > 0) {
-    var doTxt = (x.uoc.loai.nuoc > 0 && x.uoc.doTB > 0) ? ' (~' + fmtDo(Math.round(x.uoc.doTB * 10) / 10) + ' độ)' : '';
-    uocLine = '<div style="font-size:11.5px;font-weight:700;color:var(--gd);margin-top:3px">🎯 Dự kiến: ' + _goiyLoaiTxt(x.uoc.loai, true) + doTxt
-      + ' <span style="font-weight:400;font-size:10px;color:var(--g500)">(TB ' + x.uoc.soNgay + ' lần bán gần nhất)</span></div>';
+    var ngayNgan = function(d){ var p = d.split('-'); return p[2] + '/' + p[1]; };
+    var kgPhan = function(p){
+      var doTxt = (p.loai.nuoc > 0 && p.doTB > 0) ? ' (' + fmtDo(Math.round(p.doTB * 10) / 10) + ' độ)' : '';
+      return _goiyLoaiTxt(p.loai, false) + doTxt;
+    };
+    var coTenPhan = x.uoc.phan.some(function(p){ return p.phan; });
+    if (!coTenPhan) {
+      uocLine = '<div style="font-size:11.5px;font-weight:700;color:var(--gd);margin-top:3px">🎯 Dự kiến theo kỳ trước (' + x.uoc.ngay.map(ngayNgan).join(', ') + '): ' + kgPhan(x.uoc) + '</div>';
+    } else {
+      uocLine = '<div style="font-size:11.5px;font-weight:700;color:var(--gd);margin-top:3px">🎯 Dự kiến theo kỳ trước: ' + _kgTron(x.uoc.kg) + ' kg</div>'
+        + x.uoc.phan.map(function(p){
+            var xong = p.phan ? x.daBanPhan[normTen(p.phan)] : false;
+            return '<div style="font-size:11px;color:' + (xong ? '#15803d' : 'var(--g800)') + ';margin-left:10px;line-height:1.5">' + (xong ? '✅' : '🌿') + ' '
+              + escHtml(p.phan || 'Không ghi phần') + ' <span style="color:var(--g400)">(' + ngayNgan(p.ngay) + ')</span>: <b>' + kgPhan(p) + '</b></div>';
+          }).join('');
+    }
   }
-  var thucLine = x.daBan
+  var thucLine = x.thucTe
     ? '<div style="font-size:11.5px;font-weight:700;color:#15803d;margin-top:3px">✅ Đã bán: ' + _goiyLoaiTxt(x.thucTe.loai, false) + ' = ' + fmtNum(x.thucTe.tt) + 'đ</div>'
     : '';
   var kyTruocLine = (!x.daBan && x.kyTruoc.length)
@@ -2797,7 +2851,7 @@ function _goiyDongHtml(x, i){
     + '</div>'
     + '<div style="position:relative;flex:0 0 auto;text-align:center">'
     + '<span onclick="toggleGoiYChuKyDD(this)" style="display:inline-block;font-size:12px;font-weight:800;padding:5px 10px;border-radius:8px;cursor:pointer;background:' + tagBg + ';color:' + tagColor + '">' + tagText + ' ▾</span>'
-    + (x.tuDong ? '<div style="font-size:9px;color:var(--g500);margin-top:2px">tự nhận</div>' : '')
+    + (x.tuDong ? '<div style="font-size:9px;color:var(--g400);margin-top:2px">tự nhận</div>' : '')
     + '<div class="goi-y-chuky-dd" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#fff;border:1px solid var(--g200);border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.15);overflow:hidden;z-index:10;min-width:120px;text-align:left">'
     + ddOpt('D3', '#15803d', 'D3', false)
     + ddOpt('D2', '#1e40af', 'D2', true)
@@ -2824,7 +2878,7 @@ function renderGoiYBanHomNay(){
       + (t.du ? '<div style="height:7px;background:#dcfce7;border-radius:4px;overflow:hidden;margin:7px 0 6px"><div style="height:100%;width:' + pct + '%;background:#16a34a;border-radius:4px"></div></div>'
         + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11.5px;font-weight:700">'
         + '<div style="color:#15803d">✅ Đã bán: ' + t.daBan + '/' + t.du + '<div style="font-weight:600;font-size:10.5px;color:var(--g600)">' + _kgTron(t.daBanKg) + ' kg thực tế</div></div>'
-        + '<div style="color:#b45309;text-align:right">⏳ Chưa bán: ' + t.conLai + '<div style="font-weight:600;font-size:10.5px;color:var(--g600)">~' + _kgTron(t.uocConLai) + ' kg dự kiến</div></div>'
+        + '<div style="color:#b45309;text-align:right">⏳ Chưa bán: ' + t.conLai + (t.motPhan ? ' (◐' + t.motPhan + ')' : '') + '<div style="font-weight:600;font-size:10.5px;color:var(--g600)">~' + _kgTron(t.uocConLai) + ' kg dự kiến</div></div>'
         + '</div>' : '')
       + (t.ngoai ? '<div style="font-size:11px;font-weight:600;color:var(--g600);margin-top:5px">➕ Bán ngoài dự kiến: ' + t.ngoai + ' khách · ' + _kgTron(t.ngoaiKg) + ' kg</div>' : '');
   }
@@ -2867,7 +2921,7 @@ function _goiyCapNhatTomTatTab(t){
     mini.style.display = 'block';
     mini.innerHTML = '<div style="display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap">'
       + '<span>📊 Dự kiến <b>' + t.du + '</b> khách' + (t.uocTong > 0 ? ' · ~<b>' + _kgTron(t.uocTong) + '</b> kg' : '') + '</span>'
-      + '<span><span style="color:#15803d">✅ ' + t.daBan + ' đã bán (' + _kgTron(t.daBanKg) + ' kg)</span>'
+      + '<span><span style="color:#15803d">✅ ' + t.daBan + ' đã bán' + (t.motPhan ? ' · ◐ ' + t.motPhan + ' bán 1 phần' : '') + ' (' + _kgTron(t.daBanKg) + ' kg)</span>'
       + (t.conLai ? ' · <span style="color:#b45309">⏳ còn ' + t.conLai + ' (~' + _kgTron(t.uocConLai) + ' kg)</span>' : '')
       + (t.ngoai ? ' · ➕' + t.ngoai : '') + '</span></div>'
       + (t.du ? '<div style="height:4px;background:#dcfce7;border-radius:3px;overflow:hidden;margin-top:3px"><div style="height:100%;width:' + pct + '%;background:#16a34a"></div></div>' : '');
@@ -2876,11 +2930,58 @@ function _goiyCapNhatTomTatTab(t){
 function updGoiYBadge(){
   try { _goiyCapNhatTomTatTab(tomTatGoiY(buildGoiYBanHomNay(today()))); } catch(e){}
 }
+// ═══ PHẦN BÁN (tab Thu Mua) — tên lô/phần cạo của khách, ghi kèm mỗi giao dịch (gd.phan, không bắt buộc) ═══
+function getPhanVal(){ var el = document.getElementById('mua-phan'); return el ? el.value.trim().replace(/\s+/g, ' ') : ''; }
+// Các phần khách này từng bán, phần bán gần nhất đứng trước
+function getPhanCuaKhach(ten){
+  var k = normTen(ten), m = {};
+  if (!k) return [];
+  getGD('mua').forEach(function(g){
+    if (!g.phan || !g.phan.trim() || normTen(g.ten) !== k) return;
+    var p = normTen(g.phan);
+    if (!m[p] || (g.date || '') >= m[p].ngay) m[p] = { ten: g.phan.trim(), ngay: g.date || '' };
+  });
+  return Object.keys(m).map(function(p){ return m[p]; }).sort(function(a,b){ return b.ngay.localeCompare(a.ngay); }).slice(0, 10);
+}
+var _phanSgList = [];
+// Dãy nút gợi ý tên phần dưới ô tên người bán: phần tới hạn hôm nay mà chưa bán có ⏰ và viền cam
+function updPhanSuggest(){
+  var box = document.getElementById('mua-phan-sg');
+  if (!box) return;
+  var ten = (document.getElementById('mua-ten').value || '').trim();
+  var ds = ten ? getPhanCuaKhach(ten) : [];
+  _phanSgList = ds;
+  if (!ds.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
+  var toiHan = {};
+  if (curDate.mua === today()) {
+    var x = buildGoiYBanHomNay(today()).find(function(r){ return r.due && normTen(r.ten) === normTen(ten); });
+    if (x) x.phanCon.forEach(function(p){ toiHan[normTen(p)] = true; });
+  }
+  var cur = normTen(getPhanVal());
+  box.innerHTML = '<span style="font-size:10.5px;color:var(--g600)">🌿 Phần:</span>' + ds.map(function(p, i){
+    var chon = normTen(p.ten) === cur, th = toiHan[normTen(p.ten)];
+    return '<span onmousedown="event.preventDefault()" onclick="chonPhan(' + i + ')" style="font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:12px;cursor:pointer;'
+      + (chon ? 'background:var(--gd);color:#fff;border:1.5px solid var(--gd)' : 'background:#fff;color:var(--g800);border:1.5px solid ' + (th ? '#f59e0b' : 'var(--g200)'))
+      + '">' + (th && !chon ? '⏰ ' : '') + escHtml(p.ten) + '</span>';
+  }).join('');
+  box.style.display = 'flex';
+}
+function chonPhan(i){
+  var p = _phanSgList[i], el = document.getElementById('mua-phan');
+  if (!p || !el) return;
+  el.value = (normTen(el.value) === normTen(p.ten)) ? '' : p.ten; // bấm lại phần đang chọn → bỏ chọn
+  updPhanSuggest();
+}
 function fmtDateVN2gy(ds){ var p=ds?ds.split('-'):[]; return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:ds||''; }
 function pickGoiYBanTen(i){
   var x = _goiyRows[i]; if (!x) return;
   closeM('modal-goi-y-ban');
-  setTimeout(function(){ pickKH('mua', x.ten); }, 200);
+  setTimeout(function(){
+    pickKH('mua', x.ten);
+    // Đúng 1 phần đang tới hạn mà chưa bán → điền sẵn tên phần (nhiều phần thì bấm chọn ở dãy gợi ý bên dưới)
+    var el = document.getElementById('mua-phan');
+    if (el && x.phanCon.length === 1 && goiyRefDate === today()) { el.value = x.phanCon[0]; updPhanSuggest(); }
+  }, 200);
 }
 function toggleGoiYChuKyDD(el){
   // Đóng mọi dropdown khác đang mở trước khi mở dropdown mới
@@ -3032,7 +3133,7 @@ function renderMuaCal(){
   var today = new Date();
   var todayStr = dstr(today.getFullYear(), today.getMonth(), today.getDate());
   var html = ['CN','T2','T3','T4','T5','T6','T7'].map(function(d){
-    return '<div style="font-size:10px;font-weight:700;color:var(--g500);padding:2px 0">'+d+'</div>';
+    return '<div style="font-size:10px;font-weight:700;color:var(--g400);padding:2px 0">'+d+'</div>';
   }).join('');
   for (var i=0; i<firstDay; i++) html += '<div></div>';
   for (var d=1; d<=daysInMonth; d++){
@@ -3143,7 +3244,7 @@ function renderKhachIdList(){
     if (info.diaChi) infoLines += '<div style="font-size:10.5px;color:var(--g600);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📍 ' + info.diaChi + '</div>';
     return '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;background:var(--g50);border-radius:10px;padding:10px 12px;margin-bottom:6px">'
       + '<div style="min-width:0"><div style="font-weight:700;font-size:13px;color:var(--g800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ten + tag + '</div>'
-      + '<div style="font-size:10.5px;color:var(--g500);font-weight:700;margin-top:3px;letter-spacing:.3px">Mã khách hàng</div>'
+      + '<div style="font-size:10.5px;color:var(--g400);font-weight:700;margin-top:3px;letter-spacing:.3px">Mã khách hàng</div>'
       + '<div style="font-size:16px;font-weight:800;color:var(--gd);letter-spacing:1.5px;margin-top:1px">' + id + '</div>'
       + infoLines + '</div>'
       + '<div style="flex:0 0 auto;display:flex;gap:6px">'
@@ -3893,6 +3994,7 @@ function onTen(tab){
   const v=document.getElementById(tab+'-ten').value.trim();
   const ac=document.getElementById(tab+'-ac');
   updateKhInfoTicker(tab);
+  if(tab==='mua') updPhanSuggest();
   if(!v){ ac.style.display='none'; return; }
   const kh=getKH(tab).filter(k=>k.toLowerCase().includes(v.toLowerCase()));
   if(!kh.length){ ac.style.display='none'; return; }
@@ -3953,6 +4055,7 @@ function pickKH(tab,name){
   document.getElementById(tab+'-ten').value=name;
   document.getElementById(tab+'-ac').style.display='none';
   updateKhInfoTicker(tab);
+  if(tab==='mua') updPhanSuggest();
   if(tab==='ban'){
     var loai=getLoai('ban');
     if(loai) saveLastBuyer(loai, name);
@@ -4024,7 +4127,7 @@ function xgcTraCuu(){
       tienNgay+=parseFloat(gd.tt)||0; tongTien+=parseFloat(gd.tt)||0;
       var guiTxt=gd.guiSo?'<span style="color:#16a34a;font-weight:700">✅</span>':'<span style="color:var(--g400)">○</span>';
       return '<tr>'
-        +'<td style="text-align:left;padding-left:7px">'+LOAI_ICO[gd.loai]+' '+LOAI_LBL_SHORT[gd.loai]+'</td>'
+        +'<td style="text-align:left;padding-left:7px">'+LOAI_ICO[gd.loai]+' '+LOAI_LBL_SHORT[gd.loai]+(gd.phan?'<span style="display:block;font-size:9.5px;color:#b45309;font-weight:700">🌿 '+escHtml(gd.phan)+'</span>':'')+'</td>'
         +'<td>'+fmtKg(kgNet)+((gd.bi&&parseFloat(gd.bi)>0)?'<span style="display:block;font-size:9.5px;color:#e57373;font-weight:700">(-'+fmtKg(gd.bi)+')</span>':'')+'</td>'
         +'<td>'+doTxt+'</td>'
         +'<td>'+fmtNum(gd.gia)+'</td>'
@@ -4166,6 +4269,7 @@ function luuGD(tab){
   const loai=getLoai(tab);
   const doV=parseFloat(document.getElementById(tab+'-do').value)||0;
   const bi=getBiVal(tab);
+  const phan=(tab==='mua')?getPhanVal():'';
   if(!loai){ toast('⚠️ Chọn loại mủ trước!'); return; }
   if(!ten){ toast('⚠️ Nhập tên!'); document.getElementById(tab+'-ten').focus(); return; }
   if(!kg){ toast('⚠️ Nhập số kg!'); document.getElementById(tab+'-kg').focus(); return; }
@@ -4193,10 +4297,12 @@ function luuGD(tab){
 
   // Xây rows chi tiết
   const rows=buildRows(loai,ten,kg,gia,doV,bi);
+  if(phan) rows.splice(1,0,['Phần bán', escHtml(phan)]);
   // Đọc to số tiền NGAY khi bấm nút "Lưu giao dịch" (không chờ xác nhận trong popup) — áp dụng cả 2 tab Mua và Bán
   docTienTuDongSauLuu(tt);
   showDetail('✅','Xác nhận lưu giao dịch',rows,tt,'Lưu',()=>{
     const gd={id:Date.now()+Math.random(), date:curDate[tab], ten, loai, kg, do:doV, bi, gia, tt, guiSo:false, edited:false};
+    if(phan) gd.phan=phan; // tên phần bán (lô/phần cạo) — chỉ tab Thu Mua, không bắt buộc
     const all=getGD(tab); all.push(gd); setGD(tab,all);
     var _anhBlob = _pendingAnh[tab]; // lấy trước khi resetF (bên dưới) xoá mất biến tạm
     toast('✅ Đã lưu!'); resetF(tab); renderTbl(tab, gd.id); updTK(tab); updTK('ban'); if(typeof updSSSummary==='function') updSSSummary(); if(typeof updThangData==='function') updThangData(); autoSync();
@@ -4246,6 +4352,7 @@ function resetF(tab){
   document.getElementById(tab+'-tt-so').textContent='0 ₫';
   document.getElementById(tab+'-tt-chu').textContent='--';
   document.getElementById(tab+'-ac').style.display='none';
+  var _phanEl=document.getElementById(tab+'-phan'); if(_phanEl){ _phanEl.value=''; updPhanSuggest(); }
   _capNhatCompactForm(tab, false);
   updateKhInfoTicker(tab);
   resetAnhPicker(tab);
@@ -4264,6 +4371,7 @@ function editGD(tab,id){
   document.getElementById(tab+'-gia').value=gd.gia?parseInt(gd.gia).toLocaleString('vi-VN'):'';
   document.getElementById(tab+'-ten').value=gd.ten;
   updateKhInfoTicker(tab);
+  if(tab==='mua'){ document.getElementById('mua-phan').value=gd.phan||''; updPhanSuggest(); }
   document.getElementById(tab+'-kg').value=gd.kg;
   document.getElementById(tab+'-do').value=gd.do||'';
   // restore bi vào bi-inline-inp (tất cả loại đều dùng chung 1 input)
@@ -4297,7 +4405,11 @@ function luuSua(tab){
   }
   const all=getGD(tab);
   const idx=all.findIndex(g=>String(g.id)===String(id));
-  if(idx>=0){ all[idx]={...all[idx],ten,loai,kg,do:doV,bi,gia,tt,edited:true}; setGD(tab,all); }
+  if(idx>=0){
+    all[idx]={...all[idx],ten,loai,kg,do:doV,bi,gia,tt,edited:true};
+    if(tab==='mua'){ var _phan=getPhanVal(); if(_phan) all[idx].phan=_phan; else delete all[idx].phan; }
+    setGD(tab,all);
+  }
   var _anhBlob = _pendingAnh[tab], _anhRemoved = _pendingAnhRemoved[tab]; // lấy trước khi huySua (bên dưới) reset mất
   huySua(tab); renderTbl(tab); updTK(tab); updTK('ban'); if(typeof updThangData==='function') updThangData(); toast('✅ Đã lưu thay đổi!'); autoSync();
   playSaveSound();
@@ -4624,7 +4736,7 @@ function renderTbl(tab, newId){
     return '<tr class="'+trCls+'" id="tr-'+tab+'-'+gd.id+'" onclick="onRow(\''+tab+'\',\''+gd.id+'\')" ondblclick="editGD(\''+tab+'\',\''+gd.id+'\')">'
       +'<td class="tc-ten" title="'+gd.ten+'">'
       +'<div class="tc-ten-wrap">'
-      +'<span class="tc-ten-inner" id="tni-'+gd.id+'">'+gd.ten+'</span>'
+      +'<span class="tc-ten-inner" id="tni-'+gd.id+'">'+gd.ten+(gd.phan?' <span style="font-weight:600;color:#b45309">· '+escHtml(gd.phan)+'</span>':'')+'</span>'
       +'<span class="tc-ten-badges">'+editIcon+rankBadge+anhIcon+'</span>'
       +'</div></td>'
       +'<td>'+fmtKg(kgThuc(gd.loai,gd.kg,gd.do,gd.bi||0))+((gd.bi&&parseFloat(gd.bi)>0)?'<span style="font-size:10px;color:#e57373;font-weight:700">('+fmtKg(gd.bi)+')</span>':'')+'</td>'
@@ -5209,7 +5321,7 @@ function renderKH(){
     var maKH = getOrCreateKhachId(k);
     var kEsc = k.replace(/'/g,"\\'").replace(/"/g,'&quot;');
     return '<div class="kh-item">'
-      +'<div class="kh-name">👤 '+k+tags+'<div style="font-size:11px;color:var(--g500);font-weight:700;margin-top:2px;letter-spacing:.5px">Mã KH: <span style="color:var(--gd)">'+maKH+'</span></div></div>'
+      +'<div class="kh-name">👤 '+k+tags+'<div style="font-size:11px;color:var(--g400);font-weight:700;margin-top:2px;letter-spacing:.5px">Mã KH: <span style="color:var(--gd)">'+maKH+'</span></div></div>'
       +'<div class="kh-acts">'
       +'<button class="kh-btn" onclick="copyKhachId(\''+maKH+'\',\''+kEsc+'\')" title="Sao chép mã KH">📋</button>'
       +'<button class="kh-btn e" onclick="editKH('+i+')">✏️</button>'
@@ -6056,7 +6168,7 @@ function _sbStorageTabsHtml(){
 function _sbQuotaBarHtml(totalSize, quotaTotal, quotaLabel){
   var pct = Math.min(100, (totalSize / quotaTotal) * 100);
   return '<div style="padding:0 4px 16px">'
-    + '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--g500);margin-bottom:5px">'
+    + '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--g400);margin-bottom:5px">'
     + '<span>Đã dùng ' + sbFmtSize(totalSize) + '</span>'
     + '<span>Còn lại ' + sbFmtSize(Math.max(0, quotaTotal - totalSize)) + ' / ' + quotaLabel + '</span>'
     + '</div>'
@@ -7251,7 +7363,7 @@ function renderSbDataView() {
   var optsGD = {sumKey:'tt', showTotal:showTotal, groupByDate:groupByDate};
   var optsSU = {sumKey:'tien', showTotal:showTotal, groupByDate:groupByDate};
 
-  var html = '<div style="font-size:11px;color:var(--g500);font-weight:700;margin-bottom:8px">🔎 Đang lọc: ' + _sbFilterLabel() + '</div>';
+  var html = '<div style="font-size:11px;color:var(--g400);font-weight:700;margin-bottom:8px">🔎 Đang lọc: ' + _sbFilterLabel() + '</div>';
   if (showMua) {
     html += '<details open style="margin-bottom:6px;border-bottom:1px solid var(--g100);padding-bottom:6px">'
       + '<summary style="font-weight:700;font-size:13px;color:var(--g800);padding:6px 0;cursor:pointer">📥 Giao dịch Mua — ' + mua.length + ' bản ghi · ' + _fmtVND(tongMua) + 'đ</summary>'
@@ -7288,7 +7400,7 @@ function renderSbDataView() {
     html += '<details open style="margin-bottom:6px;border-top:1px solid var(--g100);padding-top:6px">'
       + '<summary style="font-weight:700;font-size:13px;color:var(--g800);padding:6px 0;cursor:pointer">⏱️ Chấm Công — ' + (_sbViewData.cc||[]).length + ' công nhân</summary>'
       + (ccWorkers.length ? ('<div style="margin:6px 0 10px">' + _sbCcSummaryHtml(ccWorkers) + '</div>') : '')
-      + '<div style="font-size:11px;color:var(--g500);font-weight:700;margin:6px 0 4px">📋 Ghi chép (' + ccGhiChep.length + ' dòng · ' + _fmtVND(ccTongTien) + 'đ)</div>'
+      + '<div style="font-size:11px;color:var(--g400);font-weight:700;margin:6px 0 4px">📋 Ghi chép (' + ccGhiChep.length + ' dòng · ' + _fmtVND(ccTongTien) + 'đ)</div>'
       + _rowsToTableHtml(ccGhiChep, colsCC, {sumKey:'soTien', showTotal:showTotal, groupByDate:groupByDate})
       + '</details>';
   }
@@ -8435,7 +8547,7 @@ function renderSsHistoryList() {
   var ssData = JSON.parse(localStorage.getItem('ss_data') || '{}');
   var dates = Object.keys(ssData).sort().reverse(); // mới nhất trước
   if (!dates.length) {
-    box.innerHTML = '<div style="text-align:center;color:var(--g500);font-size:12.5px;padding:20px 10px">Chưa có lịch sử tính toán nào được lưu. Nhấn "💾 Lưu Sổ Sách" sau khi tính toán để lưu lại.</div>';
+    box.innerHTML = '<div style="text-align:center;color:var(--g400);font-size:12.5px;padding:20px 10px">Chưa có lịch sử tính toán nào được lưu. Nhấn "💾 Lưu Sổ Sách" sau khi tính toán để lưu lại.</div>';
     return;
   }
   var html = '';
