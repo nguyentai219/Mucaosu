@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.7.3</title>
+<title>Mua Bán Mủ Cao Su v2.7.4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.7.3 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.7.4 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1920,7 +1920,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.7.3</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.7.4</div>
       </div>
     </div>
 
@@ -2086,7 +2086,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.7.3</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.7.4</div>
       </div>
     </div>
 
@@ -2342,6 +2342,56 @@ input[type=date]:focus{border-color:var(--gl)}
 </div>
 
 <script>
+// ── Bộ nhớ trình duyệt RIÊNG của app ──────────────────────────────────────────────────────────────
+// Các app trên nguyentai219.github.io (Mủ Cao Su, Lãi Suất, Quản Lý Heo, Khai Thuế...) dùng chung
+// localStorage/sessionStorage của tên miền. Mọi khoá của app này được lưu thật với tiền tố 'mcs_' qua
+// MCS_LS/MCS_SS (cùng cách dùng như localStorage), nên không đè/đọc nhầm khoá trùng tên của app khác
+// (VD trước đây 'setting_wakelock' dùng chung với app Lãi Suất). Tên khoá "logic" trong code, trên
+// Supabase (cột data_key) và Google Drive giữ nguyên như cũ — chỉ tên lưu trên máy có thêm tiền tố.
+var MCS_PREFIX = 'mcs_';
+function _mcsStore(real, P) {
+  function own() { // danh sách khoá (đã bỏ tiền tố) thuộc app này
+    var out = [];
+    for (var i = 0; i < real.length; i++) { var k = real.key(i); if (k && k.indexOf(P) === 0) out.push(k.slice(P.length)); }
+    return out;
+  }
+  return {
+    getItem: function(k) { return real.getItem(P + k); },
+    setItem: function(k, v) { real.setItem(P + k, v); },
+    removeItem: function(k) { real.removeItem(P + k); },
+    key: function(i) { var ks = own(); return i < ks.length ? ks[i] : null; },
+    get length() { return own().length; },
+    clear: function() { own().forEach(function(k) { real.removeItem(P + k); }); }
+  };
+}
+var MCS_LS = _mcsStore(window.localStorage, MCS_PREFIX);
+var MCS_SS = _mcsStore(window.sessionStorage, MCS_PREFIX);
+// Khoá của các app KHÁC cùng tên miền — không chuyển vào kho của app này, không đồng bộ lên Supabase.
+var MCS_OTHER_APP_KEY_RE = /^(quanlyheo|tk2_|kt_|ktai_|ltb_|tokhai-|lai_|ls_hist$|ls_unit$|hoc_|myWords$|xskh|mtdkq_|maytinh_|hui_|caosu_|rubberTasks$|dien_|elec_)/i;
+// Chuyển 1 lần dữ liệu từ khoá cũ (không tiền tố) sang khoá 'mcs_'. Chuyển qua bộ nhớ tạm (đọc → xoá
+// khoá cũ → ghi khoá mới) để không cần thêm dung lượng; ghi lỗi thì trả lại khoá cũ. Khoá 'setting_...'
+// chỉ chép, không xoá (app Lãi Suất bản cũ cũng dùng). Phiên đăng nhập Supabase 'sb-...' cũng chuyển
+// sang đây — app Sổ Khách Hàng và Khai Thuế nay dùng khoá phiên riêng.
+(function _mcsMigrate() {
+  var real = window.localStorage, FLAG = 'mcs:migrated_v1';
+  try {
+    if (real.getItem(FLAG)) return;
+    var keys = [];
+    for (var i = 0; i < real.length; i++) keys.push(real.key(i));
+    keys.forEach(function(k) {
+      if (!k || k.indexOf(MCS_PREFIX) === 0 || k.indexOf('mcs:') === 0 || MCS_OTHER_APP_KEY_RE.test(k)) return;
+      var v = real.getItem(k), nk = MCS_PREFIX + k, keep = /^setting_/.test(k);
+      if (v === null) return;
+      if (real.getItem(nk) !== null) { if (!keep) real.removeItem(k); return; }
+      if (keep) { try { real.setItem(nk, v); } catch (e) {} return; }
+      real.removeItem(k);
+      try { real.setItem(nk, v); } catch (e) { real.setItem(k, v); throw e; }
+    });
+    real.setItem(FLAG, '1');
+  } catch (e) { console.warn('Chuyển dữ liệu sang khoá mcs_ lỗi:', e); }
+})();
+</script>
+<script>
 // Mốc thời gian ngay khi script bắt đầu chạy (≈ lúc trang mở) — dùng để đồng bộ pha animation xoay
 // đồng xu (coinSpin) giữa logo trên header và bản sao bay ra khi bong bóng bảo vệ màn hình hoạt động,
 // tránh bị "nhảy" góc xoay đột ngột (nhìn như khựng lại) mỗi khi hoán đổi qua lại giữa 2 phần tử.
@@ -2371,7 +2421,7 @@ let sgCurKH = null; // tên KH đang xem sổ gửi
 let sgEditId = null; // id record đang sửa trong sổ gửi
 
 // ─── STORAGE ───
-function lsGet(k){ try{ return JSON.parse(localStorage.getItem(k))||[] }catch{ return [] } }
+function lsGet(k){ try{ return JSON.parse(MCS_LS.getItem(k))||[] }catch{ return [] } }
 // Đọc 1 khoá localStorage dạng OBJECT — LƯU Ý: nếu dữ liệu lưu bị SAI KIỂU (VD: mảng [] thay vì
 // object {} — từng xảy ra do lỗi cũ ở _sbRowsPayload()/_finishLoginMerge() đẩy nhầm mảng rỗng lên
 // đám mây rồi ghi đè lại xuống máy), phải coi như KHÔNG có dữ liệu ({}) thay vì trả thẳng giá trị sai
@@ -2379,11 +2429,11 @@ function lsGet(k){ try{ return JSON.parse(localStorage.getItem(k))||[] }catch{ r
 // không chặn ở đây các màn hình đọc field kiểu obj.tenField sẽ luôn ra rỗng một cách khó hiểu.
 function lsGetO(k){
   try{
-    var v = JSON.parse(localStorage.getItem(k));
+    var v = JSON.parse(MCS_LS.getItem(k));
     return (v && typeof v==='object' && !Array.isArray(v)) ? v : {};
   }catch{ return {} }
 }
-function lsSet(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
+function lsSet(k,v){ MCS_LS.setItem(k, JSON.stringify(v)) }
 
 const gdKey = t => 'gd3_'+t;
 const khKey = t => 'kh3_'+t;
@@ -3099,7 +3149,7 @@ document.addEventListener('click', function(e){
 // tránh app "Xem Sổ Khách Hàng" có người dùng mã chữ, người dùng mã số gây rối. Đồng bộ ngay lên
 // Supabase sau khi đổi để app đồng hành đọc được mã mới sớm nhất.
 function migrateKhachIdToNumeric(){
-  if (localStorage.getItem('kh_id_numeric_v1')) return;
+  if (MCS_LS.getItem('kh_id_numeric_v1')) return;
   var map = getKhIds();
   var hasOldStyle = Object.keys(map).some(function(k){ return /[A-Za-z]/.test(map[k]||''); });
   // QUAN TRỌNG: chỉ tạo mã MỚI khi thực sự còn mã kiểu cũ (xen chữ). Nếu toàn bộ mã đã là số (dù
@@ -3108,7 +3158,7 @@ function migrateKhachIdToNumeric(){
   // sinh lại mã mới đè lên mã cũ đang dùng — trước đây có lỗi: điều kiện dừng sớm chỉ áp dụng khi
   // danh sách trống, khiến máy mới đăng nhập (đã có mã số hợp lệ do đồng bộ về) vẫn bị chạy nhánh sinh
   // mã mới ngẫu nhiên đè hết toàn bộ Mã khách hàng đang dùng, làm khách không tra cứu được sổ sách nữa.
-  if (!hasOldStyle) { localStorage.setItem('kh_id_numeric_v1','1'); return; }
+  if (!hasOldStyle) { MCS_LS.setItem('kh_id_numeric_v1','1'); return; }
   var used = {}, newMap = {};
   Object.keys(map).forEach(function(ten){
     var id; do { id = genKhachId(); } while (used[id]);
@@ -3116,7 +3166,7 @@ function migrateKhachIdToNumeric(){
     newMap[ten] = id;
   });
   setKhIds(newMap);
-  localStorage.setItem('kh_id_numeric_v1','1');
+  MCS_LS.setItem('kh_id_numeric_v1','1');
   if (typeof autoSync === 'function') autoSync(); // đẩy mã mới lên Supabase ngay
 }
 // Danh sách tên công nhân duy nhất đang có trong Chấm Công
@@ -3481,8 +3531,8 @@ function migrateKHAll(){
 }
 function getGia(t){ return lsGetO(giaKey(t)) }
 function setGia(t,v){ lsSet(giaKey(t),v) }
-function getLoai(t){ return localStorage.getItem(loaiKey(t)) }
-function setLoai(t,v){ localStorage.setItem(loaiKey(t),v) }
+function getLoai(t){ return MCS_LS.getItem(loaiKey(t)) }
+function setLoai(t,v){ MCS_LS.setItem(loaiKey(t),v) }
 function getSG(){ return lsGet(sgKey()) }
 function setSG(v){ lsSet(sgKey(),v) }
 
@@ -3536,7 +3586,7 @@ function filterGiaSuggest(tab, rawInput){
   if(!box) return;
   var loai = getLoai(tab);
   var ghKey = 'giaHistory3_'+tab+'_'+loai;
-  var ghArr = JSON.parse(localStorage.getItem(ghKey)||'[]');
+  var ghArr = JSON.parse(MCS_LS.getItem(ghKey)||'[]');
   if(!ghArr.length){ box.style.display='none'; return; }
   var inputNum = parseInt(rawInput||'0',10)||0;
   // Lọc: chỉ giữ giá mà chuỗi số của nó bắt đầu bằng rawInput
@@ -3640,26 +3690,26 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   // Khôi phục tab đang dùng
   // Lần đầu mở app → tab mua; reload → giữ tab hiện tại
-  var _savedTab = sessionStorage.getItem('cur_tab') || 'mua';
+  var _savedTab = MCS_SS.getItem('cur_tab') || 'mua';
   switchTab(_savedTab);
 
   // Lấy ngày hiện tại từ hệ thống điện thoại
   var todayKey = today();
 
   // Xoá giá nếu sang ngày mới
-  var savedDay = localStorage.getItem('gia_day');
+  var savedDay = MCS_LS.getItem('gia_day');
   if(savedDay !== todayKey){
-    localStorage.removeItem('gia3_mua');
-    localStorage.removeItem('gia3_ban');
-    localStorage.setItem('gia_day', todayKey);
+    MCS_LS.removeItem('gia3_mua');
+    MCS_LS.removeItem('gia3_ban');
+    MCS_LS.setItem('gia_day', todayKey);
   }
 
   // Tự động quét "Gợi Ý Người Bán Hôm Nay" — CHỈ 1 LẦN vào lần mở app ĐẦU TIÊN trong ngày (dựa theo
   // chu kỳ D2/D3 đã đặt cho từng khách + ngày bán gần nhất của lần thu mua trước đó). Không cần người
   // dùng tự mở popup mới biết trước — báo ngay bằng toast để chủ vựa chủ động chuẩn bị từ sáng sớm.
-  var goiYScanDay = localStorage.getItem('goi_y_ban_scan_day');
+  var goiYScanDay = MCS_LS.getItem('goi_y_ban_scan_day');
   if (goiYScanDay !== todayKey) {
-    localStorage.setItem('goi_y_ban_scan_day', todayKey);
+    MCS_LS.setItem('goi_y_ban_scan_day', todayKey);
     setTimeout(function(){
       try {
         if (typeof buildGoiYBanHomNay !== 'function') return;
@@ -3681,9 +3731,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     var ngayCu = _lastKnownDay;
     _lastKnownDay = d;
     // Xoá giá cũ + đặt lại mốc ngày cho giá, y hệt logic lúc mới mở app
-    localStorage.removeItem('gia3_mua');
-    localStorage.removeItem('gia3_ban');
-    localStorage.setItem('gia_day', d);
+    MCS_LS.removeItem('gia3_mua');
+    MCS_LS.removeItem('gia3_ban');
+    MCS_LS.setItem('gia_day', d);
     // Chỉ tự đẩy ngày giao dịch đang xem sang ngày mới cho tab nào ĐANG ĐỨNG ĐÚNG ở ngày cũ (chưa tự
     // tay đổi sang xem 1 ngày cụ thể khác) — tránh làm xáo trộn nếu người dùng đang cố tình xem lại ngày
     // quá khứ/tương lai khác lúc app tự chuyển sang ngày mới.
@@ -3694,7 +3744,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       }
     });
     // Tự động quét lại Gợi Ý Người Bán cho ngày mới + báo toast, y hệt logic lúc mới mở app
-    localStorage.setItem('goi_y_ban_scan_day', d);
+    MCS_LS.setItem('goi_y_ban_scan_day', d);
     setTimeout(function(){
       try {
         if (typeof buildGoiYBanHomNay !== 'function') return;
@@ -3758,8 +3808,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 // ─── TABS ───
 function switchTab(tab){
   curTab=tab;
-  localStorage.setItem('active_tab', tab);
-  sessionStorage.setItem('cur_tab', tab); // giữ khi reload
+  MCS_LS.setItem('active_tab', tab);
+  MCS_SS.setItem('cur_tab', tab); // giữ khi reload
   document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',
     (i===0&&tab==='mua')||(i===1&&tab==='ban')||(i===2&&tab==='sg')||(i===3&&tab==='ss')));
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
@@ -3779,7 +3829,7 @@ function switchTab(tab){
   }
   if(tab==='ss') {
     // Luôn chọn mủ nước khi mở tab SS (nếu chưa có state lưu)
-    var _st = localStorage.getItem('ss_state');
+    var _st = MCS_LS.getItem('ss_state');
     var _stParsed = _st ? JSON.parse(_st) : null;
     var _targetLoai = (_stParsed && _stParsed.date===curDate['mua'] && _stParsed.loai) ? _stParsed.loai : 'nuoc';
     if(ssLoai !== _targetLoai) setSsLoai(_targetLoai);
@@ -3885,12 +3935,12 @@ function toggleLoai(tab){
   // đóng cái kia
   initGoogleAuth();
   // Xoá giá nếu sang ngày mới
-  var savedDay = localStorage.getItem('gia_day');
+  var savedDay = MCS_LS.getItem('gia_day');
   var todayKey = today();
   if(savedDay !== todayKey){
-    localStorage.removeItem('gia3_mua');
-    localStorage.removeItem('gia3_ban');
-    localStorage.setItem('gia_day', todayKey);
+    MCS_LS.removeItem('gia3_mua');
+    MCS_LS.removeItem('gia3_ban');
+    MCS_LS.setItem('gia_day', todayKey);
   }
   ['mua','ban'].forEach(t=>{ if(t!==tab) closeLoaiDD(t); });
   if(isOpen){ closeLoaiDD(tab); } else {
@@ -3940,7 +3990,7 @@ function showGiaSuggest(tab){
   var box=document.getElementById(tab+'-gia-suggest');
   if(!box||!loai) return;
   var ghKey='giaHistory3_'+tab+'_'+loai;
-  var ghArr=JSON.parse(localStorage.getItem(ghKey)||'[]');
+  var ghArr=JSON.parse(MCS_LS.getItem(ghKey)||'[]');
   if(!ghArr.length){ box.style.display='none'; return; }
   // Khi focus: hiện tất cả, không lọc
   var el=document.getElementById(tab+'-gia');
@@ -4015,16 +4065,16 @@ function setLoaiUI(tab, loai, updateGia){
   }
 }
 function restoreLastBuyer(loai){
-  var lb = JSON.parse(localStorage.getItem('ban_last_buyer')||'{}');
+  var lb = JSON.parse(MCS_LS.getItem('ban_last_buyer')||'{}');
   var tenEl = document.getElementById('ban-ten');
   if(!tenEl) return;
   tenEl.value = lb[loai] || '';
 }
 function saveLastBuyer(loai, ten){
   if(!ten) return;
-  var lb = JSON.parse(localStorage.getItem('ban_last_buyer')||'{}');
+  var lb = JSON.parse(MCS_LS.getItem('ban_last_buyer')||'{}');
   lb[loai] = ten;
-  localStorage.setItem('ban_last_buyer', JSON.stringify(lb));
+  MCS_LS.setItem('ban_last_buyer', JSON.stringify(lb));
 }
 // Khôi phục giá vào ô input khi load (dùng giá đã nhập gần nhất cho loại mủ hiện tại)
 function restoreGia(tab){
@@ -4341,10 +4391,10 @@ function luuGD(tab){
   const giaObj=getGia(tab); giaObj[loai]=gia; setGia(tab,giaObj);
   // Lưu lịch sử giá theo loại mủ (để đề xuất đúng loại)
   var ghKey='giaHistory3_'+tab+'_'+loai;
-  var ghArr=JSON.parse(localStorage.getItem(ghKey)||'[]');
+  var ghArr=JSON.parse(MCS_LS.getItem(ghKey)||'[]');
   if(!ghArr.includes(gia)) ghArr.push(gia);
   ghArr=ghArr.slice(-6); // giữ tối đa 6 mức giá gần nhất
-  localStorage.setItem(ghKey, JSON.stringify(ghArr));
+  MCS_LS.setItem(ghKey, JSON.stringify(ghArr));
   saveKHShared(ten, tab); // Lưu vào danh sách KH chung, gán đúng vai trò theo tab (mua/bán)
 
   // Xây rows chi tiết
@@ -4494,8 +4544,8 @@ function xoaGD(tab){
 // sang giá trị khác chỉ áp dụng cho ảnh tải lên SAU thời điểm đổi, không ảnh hưởng ảnh đã có từ trước.
 // ═══════════════════════════════════════════════════════
 var SB_ANH_BUCKET = 'giao-dich-anh'; // Cần tạo bucket này thủ công trên Supabase Dashboard (xem README)
-function getAnhLuuNgay(){ var v=parseInt(localStorage.getItem('anh_luu_ngay')); return (v>0) ? v : 7; }
-function setAnhLuuNgay(n){ n=parseInt(n)||7; if(n<1) n=1; if(n>30) n=30; localStorage.setItem('anh_luu_ngay', String(n)); }
+function getAnhLuuNgay(){ var v=parseInt(MCS_LS.getItem('anh_luu_ngay')); return (v>0) ? v : 7; }
+function setAnhLuuNgay(n){ n=parseInt(n)||7; if(n<1) n=1; if(n>30) n=30; MCS_LS.setItem('anh_luu_ngay', String(n)); }
 function onSaveAnhLuuNgay(){
   var v = parseInt(document.getElementById('setting-anh-ngay').value);
   if (!v || v < 1) { toast('⚠️ Nhập số ngày hợp lệ (tối thiểu 1)!'); return; }
@@ -5544,7 +5594,7 @@ function scrollInputUp(el) {
 }
 
 // Kiểm tra và refresh token nếu gần hết hạn
-var gdTokenExpiry = parseInt(localStorage.getItem('gd_token_expiry') || '0');
+var gdTokenExpiry = parseInt(MCS_LS.getItem('gd_token_expiry') || '0');
 
 // ── Trạng thái token refresh ──
 var _gdRefreshing = false;      // đang trong quá trình refresh
@@ -5553,8 +5603,8 @@ var _gdAutoRefreshTimer = null; // timer proactive refresh
 var _gdSilentFailed = false;    // đã thất bại silent → không tự popup nữa
 function _setGdFailed(v){
   _gdSilentFailed = v;
-  if(v) localStorage.setItem('gd_silent_failed','1');
-  else localStorage.removeItem('gd_silent_failed');
+  if(v) MCS_LS.setItem('gd_silent_failed','1');
+  else MCS_LS.removeItem('gd_silent_failed');
 }
 
 // ── Khởi tạo token client ──
@@ -5569,8 +5619,8 @@ function _initTokenClient() {
       if (resp && resp.access_token) {
         gdToken = resp.access_token;
         gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000;
-        localStorage.setItem('gd_token', gdToken);
-        localStorage.setItem('gd_token_expiry', String(gdTokenExpiry));
+        MCS_LS.setItem('gd_token', gdToken);
+        MCS_LS.setItem('gd_token_expiry', String(gdTokenExpiry));
       }
     }
   });
@@ -5618,8 +5668,8 @@ function signInGoogleManual() {
       }
       gdToken = resp.access_token;
       gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000;
-      localStorage.setItem('gd_token', gdToken);
-      localStorage.setItem('gd_token_expiry', String(gdTokenExpiry));
+      MCS_LS.setItem('gd_token', gdToken);
+      MCS_LS.setItem('gd_token_expiry', String(gdTokenExpiry));
       _setGdFailed(false);
       _onTokenReceived(resp);
       toast('✅ Đã kết nối lại Google Drive!');
@@ -5634,8 +5684,8 @@ function signInGoogleManual() {
 function _onTokenReceived(resp) {
   gdToken = resp.access_token;
   gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000;
-  localStorage.setItem('gd_token', gdToken);
-  localStorage.setItem('gd_token_expiry', String(gdTokenExpiry));
+  MCS_LS.setItem('gd_token', gdToken);
+  MCS_LS.setItem('gd_token_expiry', String(gdTokenExpiry));
   // Xả hàng đợi callback
   var cbs = _gdRefreshCallbacks.splice(0);
   cbs.forEach(function(item) { if (item.ok) item.ok(); });
@@ -5770,15 +5820,15 @@ function initGoogleAuth() {
   if (typeof google === 'undefined') { setTimeout(initGoogleAuth, 600); return; }
   _initTokenClient();
 
-  var saved = localStorage.getItem('gd_user');
-  var tok   = localStorage.getItem('gd_token');
-  var fid   = localStorage.getItem('gd_folder_id');
+  var saved = MCS_LS.getItem('gd_user');
+  var tok   = MCS_LS.getItem('gd_token');
+  var fid   = MCS_LS.getItem('gd_folder_id');
   if (saved) {
     gdUser = JSON.parse(saved); gdToken = tok; gdFolderId = fid;
     var badUser   = !gdUser || !gdUser.email || gdUser.email === 'undefined';
     var badFolder = !gdFolderId || gdFolderId === 'undefined' || gdFolderId === 'null';
     if (badUser || badFolder) {
-      ['gd_user','gd_token','gd_folder_id','gd_last_sync'].forEach(function(k){ localStorage.removeItem(k); });
+      ['gd_user','gd_token','gd_folder_id','gd_last_sync'].forEach(function(k){ MCS_LS.removeItem(k); });
       gdUser = null; gdToken = null; gdFolderId = null;
       updGDBar();
       setTimeout(function(){ toast('⚠️ Vui lòng đăng nhập lại Google Drive!'); }, 600);
@@ -5786,7 +5836,7 @@ function initGoogleAuth() {
     }
     updGDBar();
     // Đọc lại trạng thái failed từ phiên trước (lưu localStorage)
-    if (localStorage.getItem('gd_silent_failed') === '1') {
+    if (MCS_LS.getItem('gd_silent_failed') === '1') {
       _setGdFailed(true);
       _showReloginBanner();
     } else if (!gdToken || Date.now() >= gdTokenExpiry - 5*60*1000) {
@@ -5801,7 +5851,7 @@ function initGoogleAuth() {
         if (getPendingCount() > 0) doAutoSync();
       }, 800);
     } else {
-      if (localStorage.getItem(_LSK)) incPendingCount();
+      if (MCS_LS.getItem(_LSK)) incPendingCount();
       updGDBarStatus('Chờ kết nối...', 'syncing');
       syncQueue = true;
     }
@@ -5826,8 +5876,8 @@ function signInGoogle() {
       _acctFail.google = false;
       gdToken = resp.access_token;
       gdTokenExpiry = Date.now() + ((resp.expires_in || 3600) - 120) * 1000;
-      localStorage.setItem('gd_token', gdToken);
-      localStorage.setItem('gd_token_expiry', String(gdTokenExpiry));
+      MCS_LS.setItem('gd_token', gdToken);
+      MCS_LS.setItem('gd_token_expiry', String(gdTokenExpiry));
       _setGdFailed(false);
       _scheduleProactiveRefresh();
       if (!gdUser) fetchGoogleUser();
@@ -5846,7 +5896,7 @@ function fetchGoogleUser() {
   }).then(function(info) {
     if (!info.email) throw new Error('Thiếu quyền email/profile');
     gdUser = { name: info.name || info.email, email: info.email, avatar: info.picture || '' };
-    localStorage.setItem('gd_user', JSON.stringify(gdUser));
+    MCS_LS.setItem('gd_user', JSON.stringify(gdUser));
     updGDBar();
     closeM('modal-gd');
     toast('✅ Đăng nhập thành công: ' + gdUser.email);
@@ -5861,7 +5911,7 @@ function fetchGoogleUser() {
 
 function signOutGoogle() {
   gdUser = null; gdToken = null; gdFolderId = null;
-  ['gd_user','gd_token','gd_folder_id','gd_last_sync'].forEach(function(k){ localStorage.removeItem(k); });
+  ['gd_user','gd_token','gd_folder_id','gd_last_sync'].forEach(function(k){ MCS_LS.removeItem(k); });
   updGDBar();
   closeM('modal-gd');
   toast('👋 Đã đăng xuất Google!');
@@ -5908,8 +5958,8 @@ function _gdBarLocalPendingFallback(nm, label) {
 }
 
 // ── Chọn phương án đồng bộ: Google Drive hay Supabase ──
-function getSyncProvider(){ return localStorage.getItem('sync_provider') || ''; }
-function setSyncProvider(v){ localStorage.setItem('sync_provider', v); }
+function getSyncProvider(){ return MCS_LS.getItem('sync_provider') || ''; }
+function setSyncProvider(v){ MCS_LS.setItem('sync_provider', v); }
 
 function openSyncModal() {
   var provider = getSyncProvider();
@@ -5970,7 +6020,7 @@ function openGDModal() {
       + '</div>';
   } else {
     title.textContent = '☁️ Google Drive';
-    var lastSync = localStorage.getItem('gd_last_sync');
+    var lastSync = MCS_LS.getItem('gd_last_sync');
     var lastTxt  = lastSync ? new Date(parseInt(lastSync)).toLocaleString('vi-VN') : 'Chưa sync';
     body.innerHTML =
       '<div style="display:flex;align-items:center;gap:12px;padding:12px 0 14px;border-bottom:1px solid var(--g100);margin-bottom:4px">'
@@ -6034,7 +6084,9 @@ var SB_NO_SYNC_KEYS = ['device_code','gd_token','gd_token_expiry','gd_folder_id'
 // Khoá localStorage của APP KHÁC cùng tên miền nguyentai219.github.io (VD app "Quản Lý Heo" ở /Quanlyheo/):
 // trình duyệt dùng chung 1 localStorage cho mọi trang cùng tên miền, nên phải bỏ qua hẳn — không đẩy lên
 // mucaosu_data, không ghi về máy, không hiện trong danh sách dữ liệu, và dọn khỏi đám mây nếu lỡ đẩy lên.
-function isOtherAppKey(k){ return /^quanlyheo/i.test(k || ''); }
+// Khoá của app khác (từng bị đồng bộ nhầm lên bảng mucaosu_data khi còn dùng chung localStorage) và
+// khoá phiên đăng nhập Supabase 'sb-...' (riêng từng máy) — không đồng bộ, dọn khỏi đám mây.
+function isOtherAppKey(k){ k = k || ''; return MCS_OTHER_APP_KEY_RE.test(k) || /^sb-[a-z0-9]+-auth-token/.test(k); }
 function _sbCleanOtherAppRows(rows){
   var keys = (rows || []).map(function(r){ return r.data_key; }).filter(isOtherAppKey);
   if (keys.length && sbClient && sbUser) sbClient.from('mucaosu_data').delete().eq('user_id', sbUser.id).in('data_key', keys).then(null, function(){});
@@ -6044,8 +6096,8 @@ function getAllSyncableKeys(){
   var set = {};
   SB_DATA_KEYS.forEach(function(k){ set[k] = true; });
   try {
-    for (var i=0;i<localStorage.length;i++){
-      var k = localStorage.key(i);
+    for (var i=0;i<MCS_LS.length;i++){
+      var k = MCS_LS.key(i);
       if (k && SB_NO_SYNC_KEYS.indexOf(k) === -1 && !isOtherAppKey(k)) set[k] = true;
     }
   } catch(e){}
@@ -6054,7 +6106,7 @@ function getAllSyncableKeys(){
 
 function initSupabase() {
   if (typeof window.supabase === 'undefined') { setTimeout(initSupabase, 600); return; }
-  if (!sbClient) sbClient = window.supabase.createClient(SB_URL, SB_ANON_KEY);
+  if (!sbClient) sbClient = window.supabase.createClient(SB_URL, SB_ANON_KEY, { auth: { storage: MCS_LS } }); // phiên lưu ở 'mcs_sb-...', không dùng chung với app khác
   sbClient.auth.getSession().then(function(res) {
     var session = res.data && res.data.session;
     _sbSessionChecked = true;
@@ -6113,7 +6165,7 @@ function openSbModal() {
       + '</div>';
   } else {
     title.textContent = '⚡ Supabase';
-    var lastSync = localStorage.getItem('sb_last_sync');
+    var lastSync = MCS_LS.getItem('sb_last_sync');
     var lastTxt  = lastSync ? new Date(parseInt(lastSync)).toLocaleString('vi-VN') : 'Chưa sync';
     body.innerHTML =
       '<div style="display:flex;align-items:center;gap:12px;padding:12px 0 14px;border-bottom:1px solid var(--g100);margin-bottom:4px">'
@@ -6190,7 +6242,7 @@ function sbFmtSize(bytes) {
 // khoá localStorage bị thiếu (license sẽ tự đối chiếu lại hạn dùng thật qua dấu vân tay thiết bị).
 function _sbResetLocalAfterDelete(k) {
   if (k === 'license_expiry' || k === 'admin_pw' || (typeof THANG_PW_SB_KEY !== 'undefined' && k === THANG_PW_SB_KEY)) {
-    localStorage.removeItem(k);
+    MCS_LS.removeItem(k);
   } else if (k === 'kh_ids' || k === 'kh_role_manual' || k === 'mua_chot_moc' || k === 'ss_data' || k === 'kh_info') {
     lsSet(k, {});
   } else {
@@ -6610,7 +6662,7 @@ function _finishLoginMerge(cloud, opts){
   opts = opts || {};
   var localMua = getGD('mua'), localBan = getGD('ban'), localSg = getSG(), localSu = getSU(), localCc = getCC();
   var localKhIds = getKhIds(), localKhRole = lsGetO('kh_role_manual'), localMuaChot = lsGetO('mua_chot_moc'),
-      localKhHidden = getKhHidden(), localKhInfo = getKhInfo(), localSsData = JSON.parse(localStorage.getItem('ss_data')||'{}'),
+      localKhHidden = getKhHidden(), localKhInfo = getKhInfo(), localSsData = JSON.parse(MCS_LS.getItem('ss_data')||'{}'),
       localBangKe = getBangKeInfo();
   var localErrLog = _getErrorLog();
   var mua = _mergeArrById(cloud.gd3_mua, localMua);
@@ -6691,10 +6743,10 @@ function _finishLoginMerge(cloud, opts){
     // vừa đăng nhập Supabase.
     ['admin_pw','thang_v1','setting_round', THANG_PW_SB_KEY].forEach(function(k){
       if (cloud[k] !== undefined && cloud[k] !== null) {
-        localStorage.setItem(k, typeof cloud[k]==='string' ? cloud[k] : JSON.stringify(cloud[k]));
+        MCS_LS.setItem(k, typeof cloud[k]==='string' ? cloud[k] : JSON.stringify(cloud[k]));
       }
     });
-    if (cloud.kh_id_numeric_v1 || localStorage.getItem('kh_id_numeric_v1')) localStorage.setItem('kh_id_numeric_v1','1');
+    if (cloud.kh_id_numeric_v1 || MCS_LS.getItem('kh_id_numeric_v1')) MCS_LS.setItem('kh_id_numeric_v1','1');
 
     if (!changed) {
       // Không có gì mới từ đám mây — chỉ cần đẩy lặng lẽ (nếu máy có gì chưa đồng bộ), không toast/reload
@@ -6731,7 +6783,7 @@ function _finishLoginMerge(cloud, opts){
 function _sbRowsPayload() {
   var now = new Date().toISOString();
   return getAllSyncableKeys().map(function(k) {
-    var raw = localStorage.getItem(k);
+    var raw = MCS_LS.getItem(k);
     var val;
     if (raw == null) {
       // QUAN TRỌNG: các khoá dạng OBJECT (kh_info, bang_ke_info...) PHẢI mặc định {} khi máy CHƯA
@@ -6768,7 +6820,7 @@ function syncToSupabase() {
     sbSyncing = false;
     if (res.error) { toast('❌ Lỗi đồng bộ: ' + res.error.message); updGDBarStatus('Lỗi đồng bộ (' + getPendingCount() + ')', 'offline'); return; }
     setPendingCount(0);
-    localStorage.setItem('sb_last_sync', String(Date.now()));
+    MCS_LS.setItem('sb_last_sync', String(Date.now()));
     updGDBarStatus('Đã kết nối', 'synced');
     syncClientRegistry();
     toast('✅ Đã đồng bộ lên Supabase!');
@@ -6787,7 +6839,7 @@ function syncToSupabase_silent() {
     sbSyncing = false;
     if (res.error) { updGDBarStatus('Lỗi đồng bộ (' + getPendingCount() + ')', 'offline'); return; }
     setPendingCount(0);
-    localStorage.setItem('sb_last_sync', String(Date.now()));
+    MCS_LS.setItem('sb_last_sync', String(Date.now()));
     updGDBarStatus('Đã kết nối', 'synced');
     syncClientRegistry();
   }).catch(function() {
@@ -6886,8 +6938,8 @@ function syncClientRegistry() {
   // nguyên nhân gây hiện tượng số ngày "tự nhảy lại về giá trị cũ" khi admin
   // vừa Thêm/bớt ngày xong mà máy khách mở app đúng lúc đó.
   if (typeof _antiCheatInFlight !== 'undefined' && _antiCheatInFlight) { setTimeout(syncClientRegistry, 800); return; }
-  localStorage.setItem('registry_sync_debug', 'Đang gọi lúc ' + new Date().toLocaleTimeString('vi-VN') + '...');
-  if (!sbClient) { localStorage.setItem('registry_sync_debug', 'Chưa khởi tạo sbClient lúc ' + new Date().toLocaleTimeString('vi-VN')); return; }
+  MCS_LS.setItem('registry_sync_debug', 'Đang gọi lúc ' + new Date().toLocaleTimeString('vi-VN') + '...');
+  if (!sbClient) { MCS_LS.setItem('registry_sync_debug', 'Chưa khởi tạo sbClient lúc ' + new Date().toLocaleTimeString('vi-VN')); return; }
   try {
     var used = getUsedExtCodes();
     var lastCode = used.length ? used[used.length - 1] : null;
@@ -6935,21 +6987,21 @@ function syncClientRegistry() {
     _upsertBoQuaCotThieu(row, 0).then(function(res) {
       if (res && res.error) {
         console.error('[client_registry] lỗi đồng bộ:', res.error.message);
-        localStorage.setItem('registry_sync_debug', '❌ Lỗi lúc ' + new Date().toLocaleTimeString('vi-VN') + ': ' + res.error.message);
+        MCS_LS.setItem('registry_sync_debug', '❌ Lỗi lúc ' + new Date().toLocaleTimeString('vi-VN') + ': ' + res.error.message);
         logSyncError(res.error.message, 'client_registry upsert trả lỗi');
       } else {
-        localStorage.setItem('registry_sync_debug', '✅ OK lúc ' + new Date().toLocaleTimeString('vi-VN') + ' (fp: ' + row.fingerprint + ')');
+        MCS_LS.setItem('registry_sync_debug', '✅ OK lúc ' + new Date().toLocaleTimeString('vi-VN') + ' (fp: ' + row.fingerprint + ')');
         _lastRegistrySyncAt = new Date();
       }
       if (typeof updRegistryDebugLine === 'function') updRegistryDebugLine();
     }).catch(function(e) {
       console.error('[client_registry] lỗi kết nối:', e && e.message);
-      localStorage.setItem('registry_sync_debug', '❌ Lỗi kết nối lúc ' + new Date().toLocaleTimeString('vi-VN') + ': ' + (e && e.message));
+      MCS_LS.setItem('registry_sync_debug', '❌ Lỗi kết nối lúc ' + new Date().toLocaleTimeString('vi-VN') + ': ' + (e && e.message));
       logSyncError((e && e.message) || 'Lỗi kết nối không rõ', 'client_registry upsert .catch()');
       if (typeof updRegistryDebugLine === 'function') updRegistryDebugLine();
     });
   } catch(e) {
-    localStorage.setItem('registry_sync_debug', '❌ Lỗi JS lúc ' + new Date().toLocaleTimeString('vi-VN') + ': ' + e.message);
+    MCS_LS.setItem('registry_sync_debug', '❌ Lỗi JS lúc ' + new Date().toLocaleTimeString('vi-VN') + ': ' + e.message);
     logSyncError(e.message || 'Lỗi JS không rõ', 'syncClientRegistry try/catch');
   }
 }
@@ -6966,7 +7018,7 @@ function restoreFromSupabase(silent) {
       // "bớt ngày" của admin, hoặc lấy nhầm hạn dùng của máy khác cùng tài khoản) và các khoá riêng máy.
       if (r.data_key === 'license_expiry' || SB_NO_SYNC_KEYS.indexOf(r.data_key) !== -1 || isOtherAppKey(r.data_key)) return;
       if (r.data_value !== null && r.data_value !== undefined) {
-        localStorage.setItem(r.data_key, JSON.stringify(r.data_value));
+        MCS_LS.setItem(r.data_key, JSON.stringify(r.data_value));
       }
     });
     toast('✅ Đã khôi phục dữ liệu từ Supabase!');
@@ -7585,7 +7637,7 @@ function findOrCreateFolder() {
   }).then(function(data) {
     if (data.files && data.files.length > 0 && data.files[0].id) {
       gdFolderId = data.files[0].id;
-      localStorage.setItem('gd_folder_id', gdFolderId);
+      MCS_LS.setItem('gd_folder_id', gdFolderId);
       updGDBar();
       toast('📁 Đã kết nối thư mục MuCaoSuPro!');
       syncLicenseOnConnect();
@@ -7604,7 +7656,7 @@ function createDriveFolder() {
   }).then(function(data) {
     if (!data.id) throw new Error('Không nhận được ID thư mục');
     gdFolderId = data.id;
-    localStorage.setItem('gd_folder_id', gdFolderId);
+    MCS_LS.setItem('gd_folder_id', gdFolderId);
     updGDBar();
     toast('📁 Đã tạo thư mục MuCaoSuPro!');
     syncLicenseOnConnect();
@@ -7639,7 +7691,7 @@ function upsertSheet(fname, sheetsData, doneCb, _retry) {
           // 401 = token hết hạn → thử refresh rồi retry 1 lần
           if (r.status === 401 && !_retry) {
             gdToken = null;
-            localStorage.removeItem('gd_token');
+            MCS_LS.removeItem('gd_token');
             gdSyncing = false;
             ensureValidToken(function() {
               upsertSheet(fname, sheetsData, doneCb, true);
@@ -7681,7 +7733,7 @@ function batchUpdateSheets(sid, sheetsData, doneCb, _retry) {
   }).then(function(r) {
     // 401 ở bước đọc meta → refresh rồi retry toàn bộ
     if (r.status === 401 && !_retry) {
-      gdToken = null; localStorage.removeItem('gd_token');
+      gdToken = null; MCS_LS.removeItem('gd_token');
       ensureValidToken(function() { batchUpdateSheets(sid, sheetsData, doneCb, true); });
       return null;
     }
@@ -7732,7 +7784,7 @@ function batchUpdateSheets(sid, sheetsData, doneCb, _retry) {
       }).then(function(r) {
         // 401 trong bước ghi → refresh và retry
         if (r.status === 401 && !_retry) {
-          gdToken = null; localStorage.removeItem('gd_token');
+          gdToken = null; MCS_LS.removeItem('gd_token');
           ensureValidToken(function() { batchUpdateSheets(sid, sheetsData, doneCb, true); });
           return null;
         }
@@ -7742,7 +7794,7 @@ function batchUpdateSheets(sid, sheetsData, doneCb, _retry) {
         gdSyncing = false;
         syncQueue = false;
         setPendingCount(0);
-        localStorage.setItem('gd_last_sync', Date.now().toString());
+        MCS_LS.setItem('gd_last_sync', Date.now().toString());
         updGDBarStatus('Đã kết nối', 'synced');
       }).catch(function(e) {
         gdSyncing = false;
@@ -7813,7 +7865,7 @@ function syncToDrive() {
   ], function(sid) {
     toast('✅ Đã sao lưu ' + fname + '!');
     gdSyncing = false;
-    localStorage.setItem('gd_last_sync', Date.now().toString());
+    MCS_LS.setItem('gd_last_sync', Date.now().toString());
     updGDBar();
     // 2. Đồng bộ sổ gửi theo từng KH
     syncSoGui();
@@ -8050,7 +8102,7 @@ function restoreFromFile(sid) {
     setGD('mua', parseRows(vrs[0]?vrs[0].values:[]));
     setGD('ban', parseRows(vrs[1]?vrs[1].values:[]));
     ['mua','ban'].forEach(function(t) { renderTbl(t); updTK(t); });
-    localStorage.setItem('gd_last_sync', Date.now().toString());
+    MCS_LS.setItem('gd_last_sync', Date.now().toString());
     toast('✅ Đã khôi phục dữ liệu!');
   }).catch(function(e) { toast('❌ Lỗi khôi phục!'); console.error(e); });
 }
@@ -8115,7 +8167,7 @@ function setSsLoai(loai) {
     });
   } else {
     // Có dữ liệu: thử restore state của loại mủ này nếu có
-    var raw = localStorage.getItem('ss_state');
+    var raw = MCS_LS.getItem('ss_state');
     var st = raw ? JSON.parse(raw) : null;
     if (st && st.loai === loai && st.date === curDate['mua'] && st.result) {
       // Restore kết quả đã tính
@@ -8183,7 +8235,7 @@ function updSSSummary() {
   });
   var doTBstr = dos.length ? ' · Độ TB: ' + fmtDo(dos.reduce(function(a,b){return a+b;},0)/dos.length) : '';
   var savedInfo = '';
-  var ssData = JSON.parse(localStorage.getItem('ss_data') || '{}');
+  var ssData = JSON.parse(MCS_LS.getItem('ss_data') || '{}');
   if (ssData[_ssDate] && ssData[_ssDate].some(function(e){ return e.loai===ssLoai; })) {
     savedInfo = ' · <span style="color:#7c3aed;font-weight:700">✅ Đã lưu sổ</span>';
   }
@@ -8192,7 +8244,7 @@ function updSSSummary() {
   // Cập nhật placeholder gợi ý cho từng ô input
   // Gợi ý giá từ lịch sử tab mua đúng loại mủ
   var ghKey2='giaHistory3_mua_'+ssLoai;
-  var ghArr2=JSON.parse(localStorage.getItem(ghKey2)||'[]');
+  var ghArr2=JSON.parse(MCS_LS.getItem(ghKey2)||'[]');
   var giaTB = list[list.length-1].gia || 0;
   var giaHint2 = ghArr2.length ? ghArr2[ghArr2.length-1] : giaTB;
   var doTBval = dos.length > 0 ? dos.reduce(function(a,b){return a+b;},0)/dos.length : 0;
@@ -8328,7 +8380,7 @@ function tinhToanSS() {
       date: curDate['mua'],
       savedAt: Date.now()
     };
-    localStorage.setItem('ss_state', JSON.stringify(_ssState));
+    MCS_LS.setItem('ss_state', JSON.stringify(_ssState));
   } catch(e) { console.error('SS save error:', e); }
   renderSSResult(list, newKgs, newDos, newTiens, gia, totalNewKg, avgNewDo, totalNewTien, isNuoc);
   luuSoSachTuDong(); // tự động lưu vào lịch sử tính toán ngay sau khi tính xong — thay thế kết quả cùng ngày/loại mủ trước đó nếu có
@@ -8345,7 +8397,7 @@ function luuSoSachTuDong() {
   var totalTien = r.newTiens.reduce(function(a,b){return a+b;},0);
   var dateStr = getSsDate(); // đúng ngày đang chọn ở Tính Toán, không phải ngày tab Thu Mua
 
-  var ssData = JSON.parse(localStorage.getItem('ss_data') || '{}');
+  var ssData = JSON.parse(MCS_LS.getItem('ss_data') || '{}');
   if (!ssData[dateStr]) ssData[dateStr] = [];
   ssData[dateStr] = ssData[dateStr].filter(function(e){ return e.loai !== ssLoai; });
   ssData[dateStr].push({
@@ -8357,7 +8409,7 @@ function luuSoSachTuDong() {
     totalTien: totalTien,
     savedAt: Date.now()
   });
-  localStorage.setItem('ss_data', JSON.stringify(ssData));
+  MCS_LS.setItem('ss_data', JSON.stringify(ssData));
   playSaveSound();
   autoSync(); // đồng bộ lịch sử tính toán lên Supabase/Drive ngay
   var savedEntry = ssData[dateStr].find(function(e){ return e.loai === ssLoai; });
@@ -8535,7 +8587,7 @@ function huySSResult() {
 // Restore SS state khi vào tab SS hoặc reload
 function restoreSsState(forDate) {
   try {
-    var raw = localStorage.getItem('ss_state');
+    var raw = MCS_LS.getItem('ss_state');
     if (!raw) return false;
     var st = JSON.parse(raw);
     var checkDate = forDate || curDate['mua'];
@@ -8584,7 +8636,7 @@ function restoreSsState(forDate) {
 function renderSsHistoryBtn() {
   var btn = document.getElementById('ss-history-btn');
   if (!btn) return;
-  var ssData = JSON.parse(localStorage.getItem('ss_data') || '{}');
+  var ssData = JSON.parse(MCS_LS.getItem('ss_data') || '{}');
   var count = 0;
   Object.keys(ssData).forEach(function(d){ count += (ssData[d]||[]).length; });
   btn.textContent = count > 0 ? ('📜 Lịch sử tính toán đã lưu (' + count + ')') : '📜 Lịch sử tính toán đã lưu';
@@ -8596,7 +8648,7 @@ function openLichSuSS() {
 function renderSsHistoryList() {
   var box = document.getElementById('ss-history-list');
   if (!box) return;
-  var ssData = JSON.parse(localStorage.getItem('ss_data') || '{}');
+  var ssData = JSON.parse(MCS_LS.getItem('ss_data') || '{}');
   var dates = Object.keys(ssData).sort().reverse(); // mới nhất trước
   if (!dates.length) {
     box.innerHTML = '<div style="text-align:center;color:var(--g400);font-size:12.5px;padding:20px 10px">Chưa có lịch sử tính toán nào được lưu. Nhấn "💾 Lưu Sổ Sách" sau khi tính toán để lưu lại.</div>';
@@ -8619,7 +8671,7 @@ function renderSsHistoryList() {
 }
 // Tải lại 1 mục lịch sử đã lưu vào khung nhập liệu + khung kết quả để xem lại
 function xemLichSuSS(dateStr, loai) {
-  var ssData = JSON.parse(localStorage.getItem('ss_data') || '{}');
+  var ssData = JSON.parse(MCS_LS.getItem('ss_data') || '{}');
   var arr = ssData[dateStr] || [];
   var entry = arr.find(function(e){ return e.loai === loai; });
   if (!entry) { toast('⚠️ Không tìm thấy dữ liệu!'); return; }
@@ -8645,7 +8697,7 @@ function xemLichSuSS(dateStr, loai) {
 function xoaGhiChepSS() {
   if(guardLicense()) return;
   var dateStr = getSsDate(); // đúng ngày đang chọn ở Tính Toán, không phải ngày tab Thu Mua
-  var ssData = JSON.parse(localStorage.getItem('ss_data') || '{}');
+  var ssData = JSON.parse(MCS_LS.getItem('ss_data') || '{}');
   var arr = ssData[dateStr] || [];
   if (!arr.some(function(e){ return e.loai === ssLoai; })) { toast('⚠️ Chưa có lịch sử nào được lưu cho ngày/loại mủ này!'); return; }
   showDetail('🗑️', 'Xoá ghi chép lịch sử tính toán?', [
@@ -8654,7 +8706,7 @@ function xoaGhiChepSS() {
   ], null, 'Xoá', function() {
     ssData[dateStr] = arr.filter(function(e){ return e.loai !== ssLoai; });
     if (!ssData[dateStr].length) delete ssData[dateStr];
-    localStorage.setItem('ss_data', JSON.stringify(ssData));
+    MCS_LS.setItem('ss_data', JSON.stringify(ssData));
     renderSsHistoryBtn();
     toastDeleted('🗑️ Đã xoá ghi chép!');
     autoSync();
@@ -8667,7 +8719,7 @@ function tinhLaiSS() {
   showDetail('🔄', 'Tính Lại?', info, null, 'Tính lại', function() {
     document.getElementById('ss-result').style.display = 'none';
     window._ssResult = null;
-    localStorage.removeItem('ss_state'); // xoá state đã lưu
+    MCS_LS.removeItem('ss_state'); // xoá state đã lưu
     document.getElementById('ss-gia').value = '';
     document.getElementById('ss-kg-target').value = '';
     document.getElementById('ss-do-target').value = '';
@@ -8745,7 +8797,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Khôi phục SS data khi chọn ngày
 function loadSSSaved(dateStr) {
-  var ssData = JSON.parse(localStorage.getItem('ss_data') || '{}');
+  var ssData = JSON.parse(MCS_LS.getItem('ss_data') || '{}');
   return ssData[dateStr] || null;
 }
 
@@ -8832,11 +8884,11 @@ if ('speechSynthesis' in window) {
 // CÀI ĐẶT
 // ══════════════════════════════════════════
 function getSetting(key, def) {
-  var v = localStorage.getItem('setting_' + key);
+  var v = MCS_LS.getItem('setting_' + key);
   return v === null ? def : v === 'true';
 }
 function saveSetting(key, val) {
-  localStorage.setItem('setting_' + key, val);
+  MCS_LS.setItem('setting_' + key, val);
   if (key === 'round') {
     // Tính lại thành tiền hiện tại
     ['mua','ban'].forEach(function(t){ calc(t); });
@@ -9334,10 +9386,10 @@ function stopBubbleSaver(){
 var ERROR_LOG_KEY = 'app_error_log_v1';
 var ERROR_LOG_MAX = 30;
 function _getErrorLog(){
-  try { return JSON.parse(localStorage.getItem(ERROR_LOG_KEY) || '[]'); } catch(e) { return []; }
+  try { return JSON.parse(MCS_LS.getItem(ERROR_LOG_KEY) || '[]'); } catch(e) { return []; }
 }
 function _saveErrorLog(list){
-  try { localStorage.setItem(ERROR_LOG_KEY, JSON.stringify(list.slice(-ERROR_LOG_MAX))); } catch(e) {}
+  try { MCS_LS.setItem(ERROR_LOG_KEY, JSON.stringify(list.slice(-ERROR_LOG_MAX))); } catch(e) {}
 }
 function _pad2(n){ return String(n).padStart(2,'0'); }
 function _genErrorCode(type){
@@ -9416,7 +9468,7 @@ var ERROR_FIX_SUGGESTIONS = {
 function _updateErrorLastCheckLine(){
   var el = document.getElementById('error-last-check-line');
   if (!el) return;
-  var ts = localStorage.getItem('error_last_check_time');
+  var ts = MCS_LS.getItem('error_last_check_time');
   el.textContent = ts ? ('🕐 Kiểm tra lần cuối: ' + _fmtCheckTime(ts)) : '🕐 Chưa kiểm tra lần nào';
 }
 // 4 bước kiểm tra lỗi hệ thống — dùng CHUNG cho cả bản thủ công (nút "🔍 Kiểm tra lỗi ngay") lẫn bản
@@ -9426,9 +9478,9 @@ function _getErrorCheckSteps(){
     function(){ // 1) localStorage đọc/ghi
       var testKey = '__manual_health_test__';
       try {
-        localStorage.setItem(testKey, '1');
-        var ok = localStorage.getItem(testKey) === '1';
-        localStorage.removeItem(testKey);
+        MCS_LS.setItem(testKey, '1');
+        var ok = MCS_LS.getItem(testKey) === '1';
+        MCS_LS.removeItem(testKey);
         return ok ? {ok:true} : {ok:false, type:'STORAGE', msg:'localStorage đọc/ghi không khớp'};
       } catch(e) { return {ok:false, type:'STORAGE', msg:e.message || 'Không ghi được localStorage'}; }
     },
@@ -9450,7 +9502,7 @@ function runManualErrorCheck(){
   var wrap = document.getElementById('error-check-progress-wrap');
   if (wrap) wrap.style.display = 'block';
   _runProgressSteps('error-check-progress-bar', _getErrorCheckSteps(), function(results){
-    localStorage.setItem('error_last_check_time', String(Date.now()));
+    MCS_LS.setItem('error_last_check_time', String(Date.now()));
     _updateErrorLastCheckLine();
     var fails = results.filter(function(r){ return r && r.ok === false; });
     setTimeout(function(){
@@ -9479,7 +9531,7 @@ function runManualErrorCheck(){
 // kỳ chứ không phải đứng yên chờ họ tự bấm nút.
 function runAutoErrorCheck(){
   _runProgressSteps('__no_progress_bar_for_auto_check__', _getErrorCheckSteps(), function(results){
-    localStorage.setItem('error_last_check_time', String(Date.now()));
+    MCS_LS.setItem('error_last_check_time', String(Date.now()));
     _updateErrorLastCheckLine();
     var fails = results.filter(function(r){ return r && r.ok === false; });
     if (fails.length) {
@@ -9494,7 +9546,7 @@ function runAutoErrorCheck(){
 function _updateSyncLastCheckLine(){
   var el = document.getElementById('sync-last-check-line');
   if (!el) return;
-  var ts = localStorage.getItem('sync_last_manual_check_time');
+  var ts = MCS_LS.getItem('sync_last_manual_check_time');
   el.textContent = ts ? ('🕐 Kiểm tra lần cuối: ' + _fmtCheckTime(ts)) : '🕐 Chưa kiểm tra lần nào';
 }
 // Bản TỰ ĐỘNG của kiểm tra đồng bộ — chạy ngầm im lặng (không progress bar/toast), gọi thẳng
@@ -9505,7 +9557,7 @@ function runAutoSyncCheck(){
   if (!sbClient) return; // chưa khởi tạo xong Supabase thì chưa có gì để kiểm tra
   syncClientRegistry();
   setTimeout(function(){
-    localStorage.setItem('sync_last_manual_check_time', String(Date.now()));
+    MCS_LS.setItem('sync_last_manual_check_time', String(Date.now()));
     _updateSyncLastCheckLine();
   }, 1200);
 }
@@ -9523,9 +9575,9 @@ function runManualSyncCheck(){
   setTimeout(function(){
     clearInterval(timer);
     if (bar) bar.style.width = '100%';
-    localStorage.setItem('sync_last_manual_check_time', String(Date.now()));
+    MCS_LS.setItem('sync_last_manual_check_time', String(Date.now()));
     _updateSyncLastCheckLine();
-    var msg = localStorage.getItem('registry_sync_debug') || '';
+    var msg = MCS_LS.getItem('registry_sync_debug') || '';
     setTimeout(function(){
       if (wrap) wrap.style.display = 'none';
       if (msg.indexOf('❌') > -1) {
@@ -9647,10 +9699,10 @@ function openSettings() {
 var SYNC_LOG_KEY = 'app_sync_log_v1';
 var SYNC_LOG_MAX = 30;
 function _getSyncLog(){
-  try { return JSON.parse(localStorage.getItem(SYNC_LOG_KEY) || '[]'); } catch(e) { return []; }
+  try { return JSON.parse(MCS_LS.getItem(SYNC_LOG_KEY) || '[]'); } catch(e) { return []; }
 }
 function _saveSyncLog(list){
-  try { localStorage.setItem(SYNC_LOG_KEY, JSON.stringify(list.slice(-SYNC_LOG_MAX))); } catch(e) {}
+  try { MCS_LS.setItem(SYNC_LOG_KEY, JSON.stringify(list.slice(-SYNC_LOG_MAX))); } catch(e) {}
 }
 function logSyncError(message, detail){
   try {
@@ -9726,7 +9778,7 @@ function _copySyncCode(code){
 function updRegistryDebugLine() {
   var el = document.getElementById('registry-debug-line');
   if (!el) return;
-  var msg = localStorage.getItem('registry_sync_debug') || 'Chưa từng chạy — có thể máy chưa cập nhật bản mới nhất, hoặc chưa có mạng.';
+  var msg = MCS_LS.getItem('registry_sync_debug') || 'Chưa từng chạy — có thể máy chưa cập nhật bản mới nhất, hoặc chưa có mạng.';
   el.innerHTML = msg;
   _updateSyncLastCheckLine();
 }
@@ -9792,7 +9844,7 @@ function _bkSaveNguon(){
 function _bkGetNguonNho(){
   var v = getBangKeInfo().nguonXuat;
   if (v === 'thu_mua' || v === 'tinh_toan') return v;
-  try { v = JSON.parse(localStorage.getItem('bk_nguon')); } catch(e){ v = ''; } // khoá cũ (v2.5.8, chỉ trên máy)
+  try { v = JSON.parse(MCS_LS.getItem('bk_nguon')); } catch(e){ v = ''; } // khoá cũ (v2.5.8, chỉ trên máy)
   return (v === 'thu_mua' || v === 'tinh_toan') ? v : '';
 }
 function openBangKeExport(defaultNguon){
@@ -9814,7 +9866,7 @@ function _bkDatesWithData(){
   var nguon = (document.getElementById('bk-nguon')||{}).value || 'thu_mua';
   var set = {};
   if (nguon === 'tinh_toan') {
-    var ssData = JSON.parse(localStorage.getItem('ss_data') || '{}');
+    var ssData = JSON.parse(MCS_LS.getItem('ss_data') || '{}');
     Object.keys(ssData).forEach(function(d){ if ((ssData[d]||[]).length) set[d]=true; });
   } else {
     getGD('mua').forEach(function(r){ if (r.date) set[r.date]=true; });
@@ -9904,7 +9956,7 @@ function xuatBangKe(boQuaThongTin){
   if (nguon === 'tinh_toan') {
     // Nguồn: dữ liệu đã LƯU ở tab Tính Toán (khoá ss_data) của đúng ngày đã chọn — mỗi người trong
     // mỗi lần lưu là 1 dòng riêng, lấy nguyên kg/do/tien đã phân bổ, không cộng dồn nhiều lần lưu.
-    var ssData = JSON.parse(localStorage.getItem('ss_data') || '{}');
+    var ssData = JSON.parse(MCS_LS.getItem('ss_data') || '{}');
     (ssData[ngay]||[]).forEach(function(entry){
       var loai = entry.loai || 'nuoc';
       if (loaiMuLoc !== 'all' && loai !== loaiMuLoc) return;
@@ -10321,8 +10373,8 @@ function fmtNumRound(n) {
 // ══════════════════════════════════════════
 var syncQueue = false; // có pending sync không
 
-function getPendingCount(){ return parseInt(localStorage.getItem('pending_sync_count')||'0')||0; }
-function setPendingCount(n){ localStorage.setItem('pending_sync_count', String(Math.max(0,n))); }
+function getPendingCount(){ return parseInt(MCS_LS.getItem('pending_sync_count')||'0')||0; }
+function setPendingCount(n){ MCS_LS.setItem('pending_sync_count', String(Math.max(0,n))); }
 function incPendingCount(){ setPendingCount(getPendingCount()+1); }
 
 var _lastSyncAt = null;
@@ -10430,8 +10482,8 @@ var _acctResultShown = false;    // đã hiện kết quả đăng nhập lên t
 var _acctShownAt = 0;            // mốc thời gian lần hiện gần nhất (để thời tiết không chen ngang ngay)
 function _acctLastEmail(prov, setTo){
   try {
-    var o = JSON.parse(localStorage.getItem('acct_last_email') || '{}') || {};
-    if (setTo) { o[prov] = setTo; localStorage.setItem('acct_last_email', JSON.stringify(o)); return setTo; }
+    var o = JSON.parse(MCS_LS.getItem('acct_last_email') || '{}') || {};
+    if (setTo) { o[prov] = setTo; MCS_LS.setItem('acct_last_email', JSON.stringify(o)); return setTo; }
     return o[prov] || '';
   } catch(e){ return setTo || ''; }
 }
@@ -10729,7 +10781,7 @@ function _notifyBuildSlides(){
   // không bao giờ báo "thành công" dựa trên phỏng đoán, chỉ khi dữ liệu mới nhất đã thực sự đẩy lên VÀ
   // ghi thành công lên máy chủ. Có lỗi thì báo lỗi rõ ràng.
   try {
-    var syncMsg = localStorage.getItem('registry_sync_debug') || '';
+    var syncMsg = MCS_LS.getItem('registry_sync_debug') || '';
     if (syncMsg.indexOf('❌') !== -1) {
       slides.push({ icon:'☁️', text: 'Lỗi đồng bộ máy: ' + syncMsg.replace(/^❌\s*/, '').slice(0,200), cls:'offline' });
     } else if (_lastRegistrySyncAt) {
@@ -11010,7 +11062,7 @@ function syncToDrive_silent() {
   function fullBackupRows(){
     var hdr=['Khoá dữ liệu','Giá trị (JSON)'];
     return [hdr].concat(getAllSyncableKeys().sort().map(function(k){
-      var raw = localStorage.getItem(k);
+      var raw = MCS_LS.getItem(k);
       return [k, raw==null?'':raw];
     }));
   }
@@ -11027,7 +11079,7 @@ function syncToDrive_silent() {
     gdSyncing = false;
     syncQueue = false;
     setPendingCount(0);
-    localStorage.setItem('gd_last_sync', Date.now().toString());
+    MCS_LS.setItem('gd_last_sync', Date.now().toString());
     updGDBarStatus('Đã kết nối', 'synced');
     // Đồng bộ file riêng từng KH (thư mục Gửi Ứng / Đã Chốt Sổ)
     syncSoGui();
@@ -11041,9 +11093,9 @@ function syncToDrive_silent() {
 // ══════════════════════════════════════════
 function getLicenseBackupRows() {
   return [['Key','Value'],
-    ['license_expiry', localStorage.getItem(_LSK)||''],
+    ['license_expiry', MCS_LS.getItem(_LSK)||''],
     ['device_code', getDeviceCode()],
-    ['used_ext_codes', localStorage.getItem('used_ext_codes')||'[]'],
+    ['used_ext_codes', MCS_LS.getItem('used_ext_codes')||'[]'],
     ['savedAt', String(Date.now())]
   ];
 }
@@ -11079,22 +11131,22 @@ function restoreLicenseFromDrive(cb) {
 // - Nếu máy đã có -> đẩy lên Drive để backup/cập nhật
 function syncLicenseOnConnect() {
   if (!gdToken || !gdFolderId) return;
-  var localExpiry = localStorage.getItem(_LSK);
+  var localExpiry = MCS_LS.getItem(_LSK);
   if (!localExpiry) {
     restoreLicenseFromDrive(function(data){
       if (data && data[_LSK]) {
-        localStorage.setItem(_LSK, data[_LSK]);
-        if(data.device_code) localStorage.setItem('device_code', data.device_code);
-        if(data.used_ext_codes) localStorage.setItem('used_ext_codes', data.used_ext_codes);
-        localStorage.removeItem('license_is_new');
+        MCS_LS.setItem(_LSK, data[_LSK]);
+        if(data.device_code) MCS_LS.setItem('device_code', data.device_code);
+        if(data.used_ext_codes) MCS_LS.setItem('used_ext_codes', data.used_ext_codes);
+        MCS_LS.removeItem('license_is_new');
         updLicenseCountdown();
         toast('☁️ Đã khôi phục thông tin bản quyền từ Drive!');
       } else {
-        syncLicenseToDrive(function(){ localStorage.removeItem('license_is_new'); });
+        syncLicenseToDrive(function(){ MCS_LS.removeItem('license_is_new'); });
       }
     });
   } else {
-    syncLicenseToDrive(function(){ localStorage.removeItem('license_is_new'); });
+    syncLicenseToDrive(function(){ MCS_LS.removeItem('license_is_new'); });
   }
 }
 
@@ -11152,12 +11204,12 @@ function _dc(s){ try{ var b=atob(s),r=''; for(var i=0;i<b.length;i++) r+=String.
 
 var RESET_PW_DEFAULT = _dc('X1BHR1tU');         // mật khẩu quản lý giao dịch mặc định
 var ADMIN_PW_DEFAULT = _dc('X1tDSl9TQ0o=');     // mật khẩu quản trị mặc định
-function getThangPW(){ var v=localStorage.getItem(_dc('GQsSHAo8AwU=')); return v||RESET_PW_DEFAULT; }
-function setThangPW(p){ localStorage.setItem(_dc('GQsSHAo8AwU='),p); }
+function getThangPW(){ var v=MCS_LS.getItem(_dc('GQsSHAo8AwU=')); return v||RESET_PW_DEFAULT; }
+function setThangPW(p){ MCS_LS.setItem(_dc('GQsSHAo8AwU='),p); }
 var THANG_PW_SB_KEY = _dc('GQsSHAo8AwU='); // = 'thang_pw' — đồng bộ để app "Xem Sổ Khách Hàng" xác thực trước khi mở Cài đặt
 if (SB_DATA_KEYS.indexOf(THANG_PW_SB_KEY) === -1) SB_DATA_KEYS.push(THANG_PW_SB_KEY);
-function getAdminPW(){ var v=localStorage.getItem(_dc('DAceGwM8AwU=')); return v||ADMIN_PW_DEFAULT; }
-function setAdminPW(p){ localStorage.setItem(_dc('DAceGwM8AwU='),p); }
+function getAdminPW(){ var v=MCS_LS.getItem(_dc('DAceGwM8AwU=')); return v||ADMIN_PW_DEFAULT; }
+function setAdminPW(p){ MCS_LS.setItem(_dc('DAceGwM8AwU='),p); }
 // Kiểm tra mật khẩu hợp lệ cho mọi thao tác quản lý giao dịch
 // Chấp nhận: mật khẩu quản lý giao dịch HOẶC mật khẩu quản trị (quyền cao nhất)
 function checkManagePW(pw){
@@ -11165,8 +11217,8 @@ function checkManagePW(pw){
 }
 var THANG_KEY = 'thang_v1';
 
-function getThangData(){ try{ return JSON.parse(localStorage.getItem(THANG_KEY))||[]; }catch{ return []; } }
-function setThangData(v){ localStorage.setItem(THANG_KEY, JSON.stringify(v)); }
+function getThangData(){ try{ return JSON.parse(MCS_LS.getItem(THANG_KEY))||[]; }catch{ return []; } }
+function setThangData(v){ MCS_LS.setItem(THANG_KEY, JSON.stringify(v)); }
 
 // Gọi sau mỗi lần lưu/sửa giao dịch để cập nhật thống kê tháng
 function updThangData(){
@@ -11380,7 +11432,7 @@ function updBanHints() {
   var doTBval = dos.length ? dos.reduce(function(a,b){return a+b;})/dos.length : 0;
   // Gợi ý giá từ lịch sử đúng loại mủ (tab ban)
   var ghKey='giaHistory3_ban_'+loai;
-  var ghArr=JSON.parse(localStorage.getItem(ghKey)||'[]');
+  var ghArr=JSON.parse(MCS_LS.getItem(ghKey)||'[]');
   var giaHint=ghArr.length ? fmtNum(ghArr[ghArr.length-1]) : (giaLast>0 ? fmtNum(giaLast) : NO_DATA);
   if(giaEl && !giaEl.value) giaEl.placeholder = giaHint;
   if(kgEl  && !kgEl.value)  kgEl.placeholder  = totalKg>0 ? fmtKg(totalKg)  : NO_DATA;
@@ -11403,14 +11455,14 @@ var _LSK = _dc('AQoQFwMQFi0IGwMbHxo='); // localStorage key cho license expiry (
 var MS_PER_DAY = 24*60*60*1000;
 
 function getLicenseExpiry() {
-  var v = localStorage.getItem(_LSK);
+  var v = MCS_LS.getItem(_LSK);
   if (!v) {
     // Lần đầu chạy: KHÔNG cấp ngày dùng thử miễn phí nào — khoá ngay từ đầu, bắt buộc gia hạn mới dùng được
     var now = new Date();
     var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     var expiry = startOfToday.getTime();
-    localStorage.setItem(_LSK, String(expiry));
-    localStorage.setItem('license_is_new', '1');
+    MCS_LS.setItem(_LSK, String(expiry));
+    MCS_LS.setItem('license_is_new', '1');
     return expiry;
   }
   return parseInt(v);
@@ -11518,7 +11570,7 @@ function verifyLicenseAntiCheat() {
   sbClient.from('device_trials').select('fingerprint,license_expiry,admin_override_expiry,admin_override_at,pw_reset_at').in('fingerprint', fp === legacyFp ? [fp] : [fp, legacyFp]).then(function(res) {
     if (res.error) { _verifyDone(); syncClientRegistry(); return; } // lỗi mạng/bảng chưa có -> bỏ qua, không chặn người dùng
     // Đọc hạn dùng trên máy NGAY LÚC CÓ KẾT QUẢ (không phải lúc bắt đầu gọi) để luôn là giá trị mới nhất
-    var localExpiry = parseInt(localStorage.getItem(_LSK) || '0');
+    var localExpiry = parseInt(MCS_LS.getItem(_LSK) || '0');
     var all = res.data || [];
     var rows = all.filter(function(r){ return r.fingerprint === fp; });
     var migrateFrom = null;
@@ -11538,7 +11590,7 @@ function verifyLicenseAntiCheat() {
       // Chỉ áp dụng 1 LẦN cho mỗi lệnh của admin (so sánh mốc thời gian đã áp dụng
       // gần nhất) để không chặn các lượt gia hạn hợp lệ sau đó của khách.
       if (row.admin_override_at && (row.admin_override_expiry !== null && row.admin_override_expiry !== undefined)) {
-        var lastApplied = localStorage.getItem('admin_override_applied_at') || '';
+        var lastApplied = MCS_LS.getItem('admin_override_applied_at') || '';
         if (row.admin_override_at !== lastApplied) {
           var ovExpiry = parseInt(row.admin_override_expiry) || 0;
           // Hạn trên máy chủ đã LỚN HƠN giá trị lệnh admin → lệnh này đã được áp dụng từ trước rồi khách mới
@@ -11550,13 +11602,13 @@ function verifyLicenseAntiCheat() {
             var _baseLocal = localExpiry > _ovStart.getTime() ? localExpiry : _ovStart.getTime();
             _ghiNhanGiaHan(Math.round((ovExpiry - _baseLocal) / MS_PER_DAY), 'lệnh từ trang quản lý');
           }
-          localStorage.setItem('admin_override_applied_at', row.admin_override_at);
+          MCS_LS.setItem('admin_override_applied_at', row.admin_override_at);
         }
       }
 
       if (finalExpiry !== localExpiry) {
-        localStorage.setItem(_LSK, String(finalExpiry));
-        localStorage.removeItem('license_is_new');
+        MCS_LS.setItem(_LSK, String(finalExpiry));
+        MCS_LS.removeItem('license_is_new');
         updLicenseCountdown();
         if (isLicenseExpired()) applyLicenseLock(); else applyLicenseUnlock();
       }
@@ -11574,10 +11626,10 @@ function verifyLicenseAntiCheat() {
       // khẩu cũ) → khi máy phát hiện lệnh mới (khác mốc đã áp dụng gần nhất),
       // tự đổi mật khẩu về mặc định và báo cho người dùng biết.
       if (row.pw_reset_at) {
-        var lastPwReset = localStorage.getItem('pw_reset_applied_at') || '';
+        var lastPwReset = MCS_LS.getItem('pw_reset_applied_at') || '';
         if (row.pw_reset_at !== lastPwReset) {
           try { setThangPW(RESET_PW_DEFAULT); } catch(e) {}
-          localStorage.setItem('pw_reset_applied_at', row.pw_reset_at);
+          MCS_LS.setItem('pw_reset_applied_at', row.pw_reset_at);
           try { toast('🔐 Mật khẩu quản lý giao dịch đã được đặt lại về mặc định'); } catch(e) {}
         }
       }
@@ -11590,7 +11642,7 @@ function verifyLicenseAntiCheat() {
   }).catch(function(e) {
     _verifyDone();
     // Báo rõ lý do thay vì im lặng, và tự thử lại sau — tránh kẹt mãi ở "Chưa từng chạy"
-    localStorage.setItem('registry_sync_debug', '❌ Lỗi kết nối lúc ' + new Date().toLocaleTimeString('vi-VN') + ' (' + (e && e.message ? e.message : 'không rõ') + ') — sẽ tự thử lại');
+    MCS_LS.setItem('registry_sync_debug', '❌ Lỗi kết nối lúc ' + new Date().toLocaleTimeString('vi-VN') + ' (' + (e && e.message ? e.message : 'không rõ') + ') — sẽ tự thử lại');
     logSyncError((e && e.message) || 'Lỗi kết nối không rõ', 'verifyLicenseAntiCheat .catch() (device_trials select)');
     if (typeof updRegistryDebugLine === 'function') updRegistryDebugLine();
     setTimeout(verifyLicenseAntiCheat, 20000);
@@ -11599,7 +11651,7 @@ function verifyLicenseAntiCheat() {
 
 // Máy chưa từng kích hoạt lần nào (mới cài, chưa nhập mã lần nào)
 function isNeverActivated() {
-  return localStorage.getItem('license_is_new') === '1';
+  return MCS_LS.getItem('license_is_new') === '1';
 }
 
 function onLockBannerClick() {
@@ -11761,10 +11813,10 @@ var EXT_SECRET = 'MuCaoSuTai0987656701-K7xQ2026Pro';
 
 // Mã thiết bị: 4 số ngẫu nhiên, sinh 1 lần khi cài, không đổi
 function getDeviceCode() {
-  var dc = localStorage.getItem('device_code');
+  var dc = MCS_LS.getItem('device_code');
   if (!dc) {
     dc = String(Math.floor(1000 + Math.random()*9000));
-    localStorage.setItem('device_code', dc);
+    MCS_LS.setItem('device_code', dc);
   }
   return dc;
 }
@@ -11811,17 +11863,17 @@ function decodeExtCode(deviceCode, code) {
 // được gia hạn lúc nào, bao nhiêu ngày, bằng cách nào.
 function _ghiNhanGiaHan(days, cach) {
   try {
-    localStorage.setItem('last_ext_info', JSON.stringify({ at: new Date().toISOString(), days: days, cach: cach }));
+    MCS_LS.setItem('last_ext_info', JSON.stringify({ at: new Date().toISOString(), days: days, cach: cach }));
   } catch(e) {}
   try { setTimeout(syncClientRegistry, 1500); } catch(e) {}
 }
 function _getLastExtInfo() {
-  try { return JSON.parse(localStorage.getItem('last_ext_info') || 'null'); } catch(e) { return null; }
+  try { return JSON.parse(MCS_LS.getItem('last_ext_info') || 'null'); } catch(e) { return null; }
 }
 
 // Danh sách mã gia hạn đã dùng (chống dùng lại)
 function getUsedExtCodes() {
-  try { return JSON.parse(localStorage.getItem('used_ext_codes')||'[]'); }
+  try { return JSON.parse(MCS_LS.getItem('used_ext_codes')||'[]'); }
   catch(e){ return []; }
 }
 function markExtCodeUsed(code) {
@@ -11829,7 +11881,7 @@ function markExtCodeUsed(code) {
   if (used.indexOf(code) === -1) {
     used.push(code);
     if (used.length > 200) used = used.slice(used.length-200);
-    localStorage.setItem('used_ext_codes', JSON.stringify(used));
+    MCS_LS.setItem('used_ext_codes', JSON.stringify(used));
   }
 }
 function isExtCodeUsed(code) {
@@ -11891,8 +11943,8 @@ function _doGiaHanInner() {
       toast('⚠️ Không thể đặt ngày hết hạn trước hôm nay!');
       return;
     }
-    try { localStorage.setItem(_LSK, String(newExpiry)); } catch(e) {}
-    try { localStorage.removeItem('license_is_new'); } catch(e) {}
+    try { MCS_LS.setItem(_LSK, String(newExpiry)); } catch(e) {}
+    try { MCS_LS.removeItem('license_is_new'); } catch(e) {}
     closeM('modal-gia-han');
     toast('✅ Đã ' + (adjDays>0?'thêm '+adjDays:'bớt '+Math.abs(adjDays)) + ' ngày. Còn lại: ' + getRemainingDays() + ' ngày');
     try { updLicenseCountdown(); } catch(e) {}
@@ -11933,8 +11985,8 @@ function _doGiaHanInner() {
   var baseDateObj = new Date(rawBase);
   var baseDay = new Date(baseDateObj.getFullYear(), baseDateObj.getMonth(), baseDateObj.getDate()).getTime();
   var newExpiry2 = baseDay + days * MS_PER_DAY;
-  try { localStorage.setItem(_LSK, String(newExpiry2)); } catch(e) {}
-  try { localStorage.removeItem('license_is_new'); } catch(e) {}
+  try { MCS_LS.setItem(_LSK, String(newExpiry2)); } catch(e) {}
+  try { MCS_LS.removeItem('license_is_new'); } catch(e) {}
   if (isExtCode) { try { markExtCodeUsed(pw); } catch(e) {} }
   _ghiNhanGiaHan(days, 'mã gia hạn ' + pw);
   closeM('modal-gia-han');
@@ -13551,7 +13603,7 @@ function onSsDateChange(newDate) {
   document.getElementById('ss-tien-target').value = '';
   document.getElementById('ss-result').style.display = 'none';
   window._ssResult = null;
-  localStorage.removeItem('ss_state');
+  MCS_LS.removeItem('ss_state');
   if (typeof updSSSummary === 'function') updSSSummary();
 }
 
