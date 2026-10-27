@@ -29,6 +29,9 @@ tuyệt đối không được dùng chung cơ sở dữ liệu**, tránh chồn
   của chính app (Mủ Cao Su: `mu-cao-su-`), chỉ xử lý request trong đường dẫn của app.
 - **Google Drive/đồng bộ khác**: thư mục, tên file sao lưu riêng cho từng app.
 - Trước khi thêm khoá lưu trữ, bảng, thư mục đồng bộ mới: kiểm tra không trùng với app khác.
+- Mủ Cao Su: trong `index.html` **không dùng `localStorage`/`sessionStorage` trực tiếp** — dùng `MCS_LS`/`MCS_SS`
+  (cùng cách dùng, tự thêm tiền tố `mcs_` khi lưu trên máy). Tên khoá logic (cũng là `data_key` trên Supabase)
+  giữ không tiền tố. Khoá của app khác liệt kê ở `MCS_OTHER_APP_KEY_RE` — thêm app mới thì bổ sung vào đây.
 
 ## Đánh số phiên bản
 
