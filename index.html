@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.7.2</title>
+<title>Mua Bán Mủ Cao Su v2.7.3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.7.2 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.7.3 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1920,7 +1920,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.7.2</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.7.3</div>
       </div>
     </div>
 
@@ -2086,7 +2086,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.7.2</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.7.3</div>
       </div>
     </div>
 
@@ -2989,7 +2989,7 @@ function getPhanCuaKhach(ten){
   return Object.keys(m).map(function(p){ return m[p]; }).sort(function(a,b){ return b.ngay.localeCompare(a.ngay); }).slice(0, 10);
 }
 var _phanSgList = [];
-// Dãy nút gợi ý tên phần dưới ô tên người bán: phần tới hạn hôm nay mà chưa bán có ⏰ và viền cam
+// Dãy nút gợi ý tên phần dưới ô tên người bán: phần tới hạn hôm nay mà chưa bán được tô nền xanh nhạt và xếp đầu
 function updPhanSuggest(){
   var box = document.getElementById('mua-phan-sg');
   if (!box) return;
@@ -3002,12 +3002,17 @@ function updPhanSuggest(){
     var x = buildGoiYBanHomNay(today()).find(function(r){ return r.due && normTen(r.ten) === normTen(ten); });
     if (x) x.phanCon.forEach(function(p){ toiHan[normTen(p)] = true; });
   }
+  // Phần dự kiến bán hôm nay (theo Gợi Ý Người Bán) đứng trước và tô nền xanh nhạt
+  ds = ds.filter(function(p){ return toiHan[normTen(p.ten)]; }).concat(ds.filter(function(p){ return !toiHan[normTen(p.ten)]; }));
+  _phanSgList = ds;
   var cur = normTen(getPhanVal());
-  box.innerHTML = '<span style="font-size:10.5px;color:var(--g600)">🌿 Phần:</span>' + ds.map(function(p, i){
+  box.innerHTML = '<span style="font-size:10.5px;font-weight:700;color:var(--g600)">🌿 Tên Phần Bán:</span>' + ds.map(function(p, i){
     var chon = normTen(p.ten) === cur, th = toiHan[normTen(p.ten)];
-    return '<span onmousedown="event.preventDefault()" onclick="chonPhan(' + i + ')" style="font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:12px;cursor:pointer;'
-      + (chon ? 'background:var(--gd);color:#fff;border:1.5px solid var(--gd)' : 'background:#fff;color:var(--g800);border:1.5px solid ' + (th ? '#f59e0b' : 'var(--g200)'))
-      + '">' + (th && !chon ? '⏰ ' : '') + escHtml(p.ten) + '</span>';
+    return '<span onmousedown="event.preventDefault()" onclick="chonPhan(' + i + ')"' + (th ? ' title="Dự kiến bán hôm nay"' : '') + ' style="font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:12px;cursor:pointer;'
+      + (chon ? 'background:var(--gd);color:#fff;border:1.5px solid var(--gd)'
+         : th ? 'background:#dcfce7;color:#166534;border:1.5px solid #86efac'
+         : 'background:#fff;color:var(--g800);border:1.5px solid var(--g200)')
+      + '">' + escHtml(p.ten) + '</span>';
   }).join('');
   box.style.display = 'flex';
 }
