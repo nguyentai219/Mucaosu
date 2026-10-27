@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.7.1</title>
+<title>Mua Bán Mủ Cao Su v2.7.2</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.7.1 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.7.2 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -611,7 +611,10 @@ input[type=date]:focus{border-color:var(--gl)}
     <div class="fr">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
         <label class="fl" style="margin-bottom:0">Tên người bán</label>
-        <span onclick="openGoiYBanHomNay()" style="font-size:11.5px;font-weight:700;color:var(--gd);cursor:pointer;white-space:nowrap">💡 Gợi Ý Người Bán Hôm Nay<span id="goiy-badge" style="display:none;min-width:17px;height:17px;line-height:17px;padding:0 4px;margin-left:4px;border-radius:9px;color:#fff;font-size:10px;font-weight:800;text-align:center;vertical-align:1px;box-sizing:border-box"></span></span>
+        <span style="display:flex;align-items:center;gap:6px;white-space:nowrap">
+          <span onclick="openGoiYBanHomNay()" style="font-size:11.5px;font-weight:700;color:var(--gd);cursor:pointer">Gợi Ý Người Bán Hôm Nay<span id="goiy-badge" style="display:none;min-width:17px;height:17px;line-height:17px;padding:0 4px;margin-left:4px;border-radius:9px;color:#fff;font-size:10px;font-weight:800;text-align:center;vertical-align:1px;box-sizing:border-box"></span></span>
+          <button type="button" id="goiy-toggle" onclick="toggleGoiYMini()" title="Hiện/ẩn tóm tắt gợi ý" style="flex:0 0 auto;width:34px;height:26px;border:1.5px solid var(--gd);border-radius:8px;background:var(--gb);color:var(--gd);font-size:13px;font-weight:800;line-height:1;cursor:pointer;padding:0">▼</button>
+        </span>
       </div>
       <div id="goiy-mini" onclick="openGoiYBanHomNay()" style="display:none;font-size:10.5px;color:var(--g600);background:var(--g50);border-radius:8px;padding:4px 8px;margin:4px 0 2px;cursor:pointer"></div>
       <div style="display:flex;gap:6px">
@@ -619,7 +622,7 @@ input[type=date]:focus{border-color:var(--gl)}
           <input type="search" id="mua-ten" class="fi" placeholder="Nhập tên..." oninput="onTen('mua')" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="q" onkeydown="tenKey(event,'mua')" onfocus="scrollInputUp(this)">
           <div class="ac-list" id="mua-ac"></div>
         </div>
-        <input type="text" id="mua-phan" class="fi" placeholder="Phần bán" maxlength="30" style="flex:0 0 36%;width:36%;min-width:0" autocomplete="off" autocorrect="off" spellcheck="false" oninput="updPhanSuggest()" onfocus="updPhanSuggest()" onkeydown="nf(event,'mua-kg')">
+        <input type="text" id="mua-phan" class="fi" placeholder="Tên Phần Bán" maxlength="30" style="flex:0 0 36%;width:36%;min-width:0" autocomplete="off" autocorrect="off" spellcheck="false" oninput="updPhanSuggest()" onfocus="updPhanSuggest()" onkeydown="nf(event,'mua-kg')">
       </div>
       <div id="mua-phan-sg" style="display:none;flex-wrap:wrap;align-items:center;gap:5px;margin-top:5px"></div>
       <div class="kh-info-ticker" id="mua-info-ticker"></div>
@@ -1917,7 +1920,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.7.1</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.7.2</div>
       </div>
     </div>
 
@@ -2083,7 +2086,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.7.1</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.7.2</div>
       </div>
     </div>
 
@@ -2656,10 +2659,14 @@ function _goiyChuKyCuaKhach(ten, dates){
 }
 // Cộng dồn kg theo loại mủ của 1 danh sách giao dịch: { kg, tt, loai: {nuoc: kg, ...}, kgDo, kgNuocCoDo }
 function _goiyCongDon(list){
-  var r = { kg: 0, tt: 0, loai: {}, kgDo: 0, kgNuocCoDo: 0 };
+  var r = { kg: 0, tt: 0, loai: {}, kgDo: 0, kgNuocCoDo: 0, ttNuoc: 0, kgDoNet: 0 };
   list.forEach(function(g){
     var kg = parseFloat(g.kg) || 0, l = g.loai || 'nuoc';
     r.kg += kg; r.tt += parseFloat(g.tt) || 0;
+    if (l === 'nuoc') { // tiền mủ nước: tiền thật kỳ đó + (kg − bì) × độ để tính lại theo giá hôm nay
+      r.ttNuoc += parseFloat(g.tt) || 0;
+      r.kgDoNet += Math.max(0, kg - (parseFloat(g.bi) || 0)) * (parseFloat(g.do) || 0);
+    }
     r.loai[l] = (r.loai[l] || 0) + kg;
     if (l === 'nuoc' && parseFloat(g.do) > 0) { r.kgDo += kg * parseFloat(g.do); r.kgNuocCoDo += kg; }
   });
@@ -2688,10 +2695,10 @@ function _goiyKyTruoc(kh, days){
   var phan = thuTu.map(function(key){
     var n = nhom[key], r = _goiyCongDon(n.list);
     tatCa = tatCa.concat(n.list);
-    return { phan: n.phan, ngay: n.ngay, kg: r.kg, loai: r.loai, doTB: r.kgNuocCoDo ? r.kgDo / r.kgNuocCoDo : 0 };
+    return { phan: n.phan, ngay: n.ngay, kg: r.kg, loai: r.loai, doTB: r.kgNuocCoDo ? r.kgDo / r.kgNuocCoDo : 0, ttNuoc: r.ttNuoc, kgDoNet: r.kgDoNet };
   });
   var t = _goiyCongDon(tatCa);
-  return { kg: t.kg, loai: t.loai, doTB: t.kgNuocCoDo ? t.kgDo / t.kgNuocCoDo : 0, ngay: days, phan: phan };
+  return { kg: t.kg, loai: t.loai, doTB: t.kgNuocCoDo ? t.kgDo / t.kgNuocCoDo : 0, ngay: days, phan: phan, ttNuoc: t.ttNuoc, kgDoNet: t.kgDoNet };
 }
 // Trả về mảng khách bán liên quan tới ngày refDate (mặc định hôm nay thật):
 // • due = true: khách được DỰ ĐOÁN bán ngày này theo chu kỳ cạo, kèm daBan = đã có ghi chép thu mua
@@ -2708,6 +2715,14 @@ function buildGoiYBanHomNay(refDate){
   var refStr = refDate || today();
   var idx = _goiyIndex();
   var lui2 = _luiNgay(refStr, 2), lui3 = _luiNgay(refStr, 3);
+  // Tiền mủ nước dự kiến: có giá mủ nước HÔM NAY trên form → (kg − bì) × độ kỳ trước × giá hôm nay;
+  // chưa nhập giá (hoặc đang xem ngày khác) → lấy đúng số tiền mủ nước thật của kỳ trước
+  var giaNuoc = 0;
+  if (refStr === today()) {
+    try { if (getLoai('mua') === 'nuoc') giaNuoc = parseFloat(getGiaVal('mua')) || 0; } catch(e){}
+    if (!giaNuoc) giaNuoc = parseFloat(getGia('mua').nuoc) || 0;
+  }
+  var tienNuoc = function(o){ return o ? (giaNuoc ? o.kgDoNet * giaNuoc : o.ttNuoc) : 0; };
   var out = [];
   Object.keys(idx).forEach(function(k){
     var kh = idx[k];
@@ -2743,6 +2758,8 @@ function buildGoiYBanHomNay(refDate){
     var phanCon = (gdHomNay && coGdKhongPhan) ? [] : phanTen.filter(function(p){ return !daBanPhan[normTen(p.phan)]; });
     var daBan = !!gdHomNay && (!due || phanCon.length === 0);
     var uocConLai = daBan ? 0 : (gdHomNay ? phanCon.reduce(function(a,p){ return a + p.kg; }, 0) : (uoc ? uoc.kg : 0));
+    var uocTienNuoc = tienNuoc(uoc);
+    var uocTienNuocConLai = daBan ? 0 : (gdHomNay ? phanCon.reduce(function(a,p){ return a + tienNuoc(p); }, 0) : uocTienNuoc);
     var kyTruoc = [];
     for (var i = truoc.length - 1; i >= 0 && kyTruoc.length < 2; i--) {
       kyTruoc = kyTruoc.concat(kh.ngay[truoc[i]].slice().reverse()).slice(0, 2);
@@ -2752,6 +2769,7 @@ function buildGoiYBanHomNay(refDate){
       ngayBanCuoi: ngayCuoi, due: due, daBan: daBan, banMotPhan: !!gdHomNay && !daBan,
       thucTe: gdHomNay ? _goiyCongDon(gdHomNay) : null,
       uoc: uoc, uocConLai: uocConLai, daBanPhan: daBanPhan,
+      uocTienNuoc: uocTienNuoc, uocTienNuocConLai: uocTienNuocConLai, theoGiaHomNay: !!giaNuoc,
       phanCon: phanCon.map(function(p){ return p.phan; }),
       kyTruoc: kyTruoc
     });
@@ -2761,12 +2779,14 @@ function buildGoiYBanHomNay(refDate){
 }
 // Tổng hợp số người + sản lượng của danh sách gợi ý (dùng chung cho popup và dòng tóm tắt ngoài tab)
 function tomTatGoiY(list){
-  var t = { du: 0, daBan: 0, motPhan: 0, conLai: 0, uocTong: 0, uocConLai: 0, daBanKg: 0, ngoai: 0, ngoaiKg: 0, uocLoai: {} };
+  var t = { du: 0, daBan: 0, motPhan: 0, conLai: 0, tienNuoc: 0, tienNuocConLai: 0, theoGiaHomNay: false, uocTong: 0, uocConLai: 0, daBanKg: 0, ngoai: 0, ngoaiKg: 0, uocLoai: {} };
   list.forEach(function(x){
     if (x.due) {
       t.du++;
       var u = x.uoc ? x.uoc.kg : 0;
       t.uocTong += u;
+      t.tienNuoc += x.uocTienNuoc; t.tienNuocConLai += x.uocTienNuocConLai;
+      if (x.theoGiaHomNay) t.theoGiaHomNay = true;
       if (x.uoc) Object.keys(x.uoc.loai).forEach(function(l){ t.uocLoai[l] = (t.uocLoai[l] || 0) + x.uoc.loai[l]; });
       if (x.thucTe) t.daBanKg += x.thucTe.kg;
       if (x.daBan) t.daBan++;
@@ -2775,6 +2795,7 @@ function tomTatGoiY(list){
   });
   return t;
 }
+function _tienTron(n){ return fmtNum(Math.round((n || 0) / 1000) * 1000); }
 function _kgTron(n){ return fmtKg(Math.round((n || 0) * 10) / 10); }
 // "~45 kg 💧 · ~8 kg 🥣" — chỉ liệt kê loại mủ có sản lượng
 function _goiyLoaiTxt(loaiMap, xapXi){
@@ -2816,10 +2837,11 @@ function _goiyDongHtml(x, i){
       return _goiyLoaiTxt(p.loai, false) + doTxt;
     };
     var coTenPhan = x.uoc.phan.some(function(p){ return p.phan; });
+    var tienLine = x.uocTienNuoc > 0 ? ' <span style="color:#0e7490">· 💧 ≈ ' + _tienTron(x.uocTienNuoc) + 'đ</span>' : '';
     if (!coTenPhan) {
-      uocLine = '<div style="font-size:11.5px;font-weight:700;color:var(--gd);margin-top:3px">🎯 Dự kiến theo kỳ trước (' + x.uoc.ngay.map(ngayNgan).join(', ') + '): ' + kgPhan(x.uoc) + '</div>';
+      uocLine = '<div style="font-size:11.5px;font-weight:700;color:var(--gd);margin-top:3px">🎯 Dự kiến theo kỳ trước (' + x.uoc.ngay.map(ngayNgan).join(', ') + '): ' + kgPhan(x.uoc) + tienLine + '</div>';
     } else {
-      uocLine = '<div style="font-size:11.5px;font-weight:700;color:var(--gd);margin-top:3px">🎯 Dự kiến theo kỳ trước: ' + _kgTron(x.uoc.kg) + ' kg</div>'
+      uocLine = '<div style="font-size:11.5px;font-weight:700;color:var(--gd);margin-top:3px">🎯 Dự kiến theo kỳ trước: ' + _kgTron(x.uoc.kg) + ' kg' + tienLine + '</div>'
         + x.uoc.phan.map(function(p){
             var xong = p.phan ? x.daBanPhan[normTen(p.phan)] : false;
             return '<div style="font-size:11px;color:' + (xong ? '#15803d' : 'var(--g800)') + ';margin-left:10px;line-height:1.5">' + (xong ? '✅' : '🌿') + ' '
@@ -2874,6 +2896,7 @@ function renderGoiYBanHomNay(){
     var pct = t.du ? Math.round(t.daBan * 100 / t.du) : 0;
     var loaiTxt = _goiyLoaiTxt(t.uocLoai, true);
     titleCount.innerHTML = '<div>' + tieuDeNgay + ' dự kiến: ' + t.du + ' khách bán' + (t.uocTong > 0 ? ' · ~' + _kgTron(t.uocTong) + ' kg' : '') + '</div>'
+      + (t.tienNuoc > 0 ? '<div style="font-size:12px;font-weight:700;color:#0e7490;margin-top:2px">💧 Tiền mủ nước dự kiến: ~' + _tienTron(t.tienNuoc) + 'đ <span style="font-weight:400;font-size:10.5px;color:var(--g600)">(' + (t.theoGiaHomNay ? 'theo giá mủ nước hôm nay' : 'theo giá kỳ trước') + ')</span></div>' : '')
       + (loaiTxt && Object.keys(t.uocLoai).length > 1 ? '<div style="font-size:11px;font-weight:600;color:var(--g600);margin-top:2px">' + loaiTxt + '</div>' : '')
       + (t.du ? '<div style="height:7px;background:#dcfce7;border-radius:4px;overflow:hidden;margin:7px 0 6px"><div style="height:100%;width:' + pct + '%;background:#16a34a;border-radius:4px"></div></div>'
         + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11.5px;font-weight:700">'
@@ -2900,7 +2923,7 @@ function renderGoiYBanHomNay(){
   }
   box.innerHTML = html;
 }
-// Dòng tóm tắt + số nhỏ "còn bao nhiêu người chưa bán" cạnh nút 💡 trên tab Thu Mua — luôn tính theo
+// Dòng tóm tắt + số nhỏ "còn bao nhiêu người chưa bán" cạnh chữ Gợi Ý Người Bán Hôm Nay trên tab Thu Mua — luôn tính theo
 // HÔM NAY THẬT (không theo ngày đang chọn trên form/popup), tự làm mới mỗi khi dữ liệu Thu Mua đổi
 // (lưu/sửa/xoá/đồng bộ — qua updTK('mua')), khi sang ngày mới và khi mở lại app.
 function _goiyCapNhatTomTatTab(t){
@@ -2916,16 +2939,38 @@ function _goiyCapNhatTomTatTab(t){
     }
   }
   if (mini) {
-    if (!t.du && !t.ngoai) { mini.style.display = 'none'; return; }
+    mini.dataset.coDuLieu = (t.du || t.ngoai) ? '1' : '';
+    _goiyApMini();
+    if (!t.du && !t.ngoai) return;
     var pct = t.du ? Math.round(t.daBan * 100 / t.du) : 0;
-    mini.style.display = 'block';
     mini.innerHTML = '<div style="display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap">'
-      + '<span>📊 Dự kiến <b>' + t.du + '</b> khách' + (t.uocTong > 0 ? ' · ~<b>' + _kgTron(t.uocTong) + '</b> kg' : '') + '</span>'
+      + '<span>📊 Dự kiến <b>' + t.du + '</b> khách' + (t.uocTong > 0 ? ' · ~<b>' + _kgTron(t.uocTong) + '</b> kg' : '')
+      + (t.tienNuoc > 0 ? ' · <span style="color:#0e7490">💧 ~<b>' + _tienTron(t.tienNuoc) + '</b>đ</span>' : '') + '</span>'
       + '<span><span style="color:#15803d">✅ ' + t.daBan + ' đã bán' + (t.motPhan ? ' · ◐ ' + t.motPhan + ' bán 1 phần' : '') + ' (' + _kgTron(t.daBanKg) + ' kg)</span>'
       + (t.conLai ? ' · <span style="color:#b45309">⏳ còn ' + t.conLai + ' (~' + _kgTron(t.uocConLai) + ' kg)</span>' : '')
       + (t.ngoai ? ' · ➕' + t.ngoai : '') + '</span></div>'
       + (t.du ? '<div style="height:4px;background:#dcfce7;border-radius:3px;overflow:hidden;margin-top:3px"><div style="height:100%;width:' + pct + '%;background:#16a34a"></div></div>' : '');
   }
+}
+// Dòng tóm tắt chỉ hiện 10 giây (khi mở app, hoặc khi bấm nút ▼) rồi tự ẩn cho gọn
+var _goiyMiniMo = false, _goiyMiniTimer = null;
+function _goiyApMini(){
+  var mini = document.getElementById('goiy-mini'), btn = document.getElementById('goiy-toggle');
+  var hien = _goiyMiniMo && mini && mini.dataset.coDuLieu === '1';
+  if (mini) mini.style.display = hien ? 'block' : 'none';
+  if (btn) btn.textContent = hien ? '▲' : '▼';
+}
+function hienGoiYMini(){
+  _goiyMiniMo = true;
+  clearTimeout(_goiyMiniTimer);
+  _goiyMiniTimer = setTimeout(function(){ _goiyMiniMo = false; _goiyApMini(); }, 10000);
+  updGoiYBadge();
+}
+function toggleGoiYMini(){
+  if (_goiyMiniMo) { _goiyMiniMo = false; clearTimeout(_goiyMiniTimer); _goiyApMini(); return; }
+  hienGoiYMini();
+  var mini = document.getElementById('goiy-mini');
+  if (!mini || mini.dataset.coDuLieu !== '1') toast('Hôm nay chưa có khách nào dự kiến bán mủ');
 }
 function updGoiYBadge(){
   try { _goiyCapNhatTomTatTab(tomTatGoiY(buildGoiYBanHomNay(today()))); } catch(e){}
@@ -3477,6 +3522,7 @@ function onGia(el, tab){
   var fmt = raw ? parseInt(raw,10).toLocaleString('vi-VN') : '';
   el.value = fmt;
   calc(tab);
+  if(tab==='mua' && typeof updGoiYBadge==='function') updGoiYBadge(); // tiền mủ nước dự kiến tính theo giá vừa nhập
   // Lọc đề xuất theo giá đang nhập
   filterGiaSuggest(tab, raw);
 }
@@ -3672,6 +3718,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     renderTbl(t);
     updTK(t);
   });
+  hienGoiYMini(); // mở app: hiện dòng tóm tắt Gợi Ý Người Bán 10 giây rồi tự ẩn
 
   // Init thống kê tháng
   if(typeof updThangData==='function') setTimeout(updThangData, 200);
