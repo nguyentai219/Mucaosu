@@ -16,6 +16,20 @@ PWA ghi chép mua bán mủ cao su, chạy trên GitHub Pages tại `/Mucaosu/`.
 4. **Hỏi người dùng còn muốn chỉnh sửa gì nữa không.**
 5. Trả lời người dùng bằng tiếng Việt.
 
+## Tách biệt dữ liệu giữa các dự án (bắt buộc, áp dụng cho mọi dự án code/văn bản)
+
+Người dùng có thể dùng chung 1 tài khoản GitHub/Supabase cho nhiều dự án, nhưng **các dự án không liên quan
+tuyệt đối không được dùng chung cơ sở dữ liệu**, tránh chồng lấn làm hỏng dữ liệu app và dữ liệu đồng bộ:
+
+- **Supabase**: mỗi dự án dùng project/bảng/bucket riêng. Không đọc/ghi bảng của dự án khác; khi dùng
+  chung 1 project thì bảng, hàm, bucket phải có tiền tố riêng của app.
+- **Trình duyệt**: các app trên `nguyentai219.github.io` (Mủ Cao Su, Lãi Suất, Quản Lý Heo...) dùng chung
+  localStorage/IndexedDB/Cache Storage của tên miền. Khoá lưu trữ phải có tiền tố riêng của app
+  (không dùng khoá chung chung kiểu `setting_...` cho app mới). Service Worker chỉ được xoá/đọc cache có tiền tố
+  của chính app (Mủ Cao Su: `mu-cao-su-`), chỉ xử lý request trong đường dẫn của app.
+- **Google Drive/đồng bộ khác**: thư mục, tên file sao lưu riêng cho từng app.
+- Trước khi thêm khoá lưu trữ, bảng, thư mục đồng bộ mới: kiểm tra không trùng với app khác.
+
 ## Đánh số phiên bản
 
 Theo quy tắc `Z.X.Y` ghi ở đầu `README.md`. Mỗi lần cập nhật tăng đúng 1 bước và đổi ở đủ các vị trí:
