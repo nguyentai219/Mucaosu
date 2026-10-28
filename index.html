@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.7.4</title>
+<title>Mua Bán Mủ Cao Su v2.7.5</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.7.4 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.7.5 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1920,7 +1920,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.7.4</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.7.5</div>
       </div>
     </div>
 
@@ -1999,9 +1999,9 @@ input[type=date]:focus{border-color:var(--gl)}
       <div style="font-size:13px;font-weight:800;color:#047857;margin-bottom:8px">👥 QUẢN LÝ KHÁCH HÀNG &amp; MÃ KHÁCH HÀNG</div>
       <div style="font-size:12px;color:var(--g800);line-height:1.7">
         • Nhấn icon <b>👥</b> ở đầu trang để mở danh sách khách hàng<br>
-        • Mỗi khách hàng có 1 <b>Mã khách hàng</b> cố định gồm <b>5 chữ số</b> (VD: 04821) — đưa mã này cho khách để họ tự tra cứu sổ sách trong app <b>"Xem Sổ Khách Hàng"</b><br>
+        • Mỗi khách hàng có 1 <b>Mã khách hàng</b> cố định gồm <b>5 chữ số</b> (VD: 04821) và 1 <b>Mật khẩu xem sổ</b> 6 số — đưa cả 2 cho khách để họ tự xem sổ trong app <b>"Sổ Khách Hàng"</b> (không cần đăng nhập Supabase trên máy khách). Nhấn <b>🔄 Đổi</b> để cấp mật khẩu mới khi khách làm lộ/quên<br>
         • Nhãn vai trò tự động theo đúng giao dịch thật, không cần tự gán: <b>🌾 Khách bán</b> (có giao dịch ở tab Thu Mua), <b>🚛 Khách mua</b> (có giao dịch ở tab Bán Ra), <b>👷 Công nhân</b> (có trong Chấm Công) — khách có cả 2 loại giao dịch sẽ lên đủ cả 2 nhãn<br>
-        • Nhấn <b>📋 Sao chép</b> để copy nhanh mã, gửi cho khách qua Zalo/tin nhắn<br>
+        • Nhấn <b>📋 Sao chép</b> để copy nhanh Mã KH + mật khẩu, gửi cho khách qua Zalo/tin nhắn<br>
         • Nhấn <b>➕ Thêm khách hàng mới</b> để đăng ký trước 1 khách chưa có giao dịch nào (tick sẵn vai trò nếu biết)<br>
         • Nhấn nút <b>✏️</b> cạnh mỗi khách để đổi tên hoặc xoá — công nhân đang có trong Chấm Công sẽ khoá ô đổi tên (đổi tên công nhân phải làm trong mục Chấm Công để không lệch dữ liệu)<br>
         • Nhấn <b>🔒 Chốt theo khách hàng</b> để chọn mốc ngày chốt riêng cho từng khách — app "Xem Sổ Khách Hàng" chỉ hiện Thu Mua phát sinh SAU mốc chốt đó (dùng khi đã thanh toán xong, không muốn khách thấy lẫn giao dịch cũ)
@@ -2086,7 +2086,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.7.4</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.7.5</div>
       </div>
     </div>
 
@@ -2170,7 +2170,7 @@ input[type=date]:focus{border-color:var(--gl)}
   <div class="modal-box">
     <div class="modal-handle"></div>
     <div class="modal-title">📇 Danh Sách và Mã Khách Hàng</div>
-    <div style="font-size:11.5px;color:var(--g600);margin-bottom:10px">Đưa Mã KH này cho khách hàng để họ nhập vào app <b>"Xem Sổ Khách Hàng"</b> và tự xem sổ sách thu mua/gửi/ứng của riêng mình.</div>
+    <div style="font-size:11.5px;color:var(--g600);margin-bottom:10px">Đưa <b>Mã KH + Mật khẩu xem sổ</b> cho khách hàng để họ nhập vào app <b>"Sổ Khách Hàng"</b> và tự xem sổ thu mua/gửi/ứng của riêng mình — không cần đăng nhập Supabase trên máy khách.<br>🔑 <b>Chế độ quản trị</b> (xem tất cả khách): tài khoản = <b id="khid-admin-email">email Supabase của bạn</b>, mật khẩu = <b>mật khẩu quản trị</b> của app này.</div>
 
     <div style="background:var(--g50);border-radius:10px;padding:10px 12px;margin-bottom:12px">
       <button onclick="openThemKhachHang()" style="width:100%;padding:10px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">➕ Thêm khách hàng mới</button>
@@ -2536,6 +2536,28 @@ function toastDeleted(baseMsg){
 // Lưu riêng (không đổi cấu trúc kh3_all) để không ảnh hưởng autocomplete hiện có.
 // Cấu trúc: { "Tên khách hàng": "ABCDE" }
 const KH_IDS_KEY = 'kh_ids';
+// Mật khẩu xem sổ (6 số) của từng khách cho app "Sổ Khách Hàng" — khoá theo MÃ KH (không theo tên, nên đổi
+// tên khách vẫn giữ nguyên mật khẩu). Đồng bộ lên Supabase (khoá 'kh_pw'); máy chủ Supabase kiểm tra Mã KH +
+// mật khẩu rồi chỉ trả đúng sổ của khách đó (hàm xem_so_khach) — máy khách không cần đăng nhập Supabase.
+const KH_PW_KEY = 'kh_pw';
+function getKhPws(){ return lsGetO(KH_PW_KEY); }
+function setKhPws(v){ lsSet(KH_PW_KEY, v); }
+function _taoMkKhach(){ var s=''; for (var i=0;i<6;i++) s += Math.floor(Math.random()*10); return s; }
+var _khPwVuaTao = false;
+function getOrCreateKhachPw(id){
+  if (!id) return '';
+  var m = getKhPws();
+  if (m[id]) return String(m[id]);
+  m[id] = _taoMkKhach(); setKhPws(m); _khPwVuaTao = true;
+  return m[id];
+}
+function doiMkKhach(id, ten){
+  if (!confirm('Đổi mật khẩu xem sổ của ' + ten + '?\nMật khẩu cũ sẽ không dùng được nữa — nhớ gửi mật khẩu mới cho khách.')) return;
+  var m = getKhPws(); m[id] = _taoMkKhach(); setKhPws(m);
+  renderKhachIdList();
+  toast('🔑 Mật khẩu mới của ' + ten + ': ' + m[id]);
+  autoSync();
+}
 function getKhIds(){ return lsGetO(KH_IDS_KEY); }
 function setKhIds(v){ lsSet(KH_IDS_KEY, v); }
 function genKhachId(){
@@ -3306,6 +3328,7 @@ function openHuyChotMua(){
   openM('modal-chot-so');
 }
 function renderKhachIdList(){
+  try { var _ae = document.getElementById('khid-admin-email'); if (_ae && typeof sbUser !== 'undefined' && sbUser && sbUser.email) _ae.textContent = sbUser.email; } catch(e){}
   rebuildKHRoleLists(); // luôn tính lại đúng vai trò theo giao dịch thật trước khi hiển thị
   var box = document.getElementById('khid-list');
   if (!box) return;
@@ -3330,6 +3353,7 @@ function renderKhachIdList(){
   box.innerHTML = all.map(function(x){
     var ten = x.ten;
     var id = getOrCreateKhachId(ten);
+    var mk = getOrCreateKhachPw(id);
     var tenEsc = ten.replace(/"/g,'&quot;');
     var laKhachBan = muaNames.some(function(n){ return normTen(n)===normTen(ten); }); // có trong kh3_mua = bán mủ CHO vựa
     var laKhachMua = banNames.some(function(n){ return normTen(n)===normTen(ten); }); // có trong kh3_ban = mua mủ TỪ vựa
@@ -3346,12 +3370,17 @@ function renderKhachIdList(){
       + '<div style="min-width:0"><div style="font-weight:700;font-size:13px;color:var(--g800);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ten + tag + '</div>'
       + '<div style="font-size:10.5px;color:var(--g400);font-weight:700;margin-top:3px;letter-spacing:.3px">Mã khách hàng</div>'
       + '<div style="font-size:16px;font-weight:800;color:var(--gd);letter-spacing:1.5px;margin-top:1px">' + id + '</div>'
+      + '<div style="font-size:10.5px;color:var(--g400);font-weight:700;margin-top:4px;letter-spacing:.3px">Mật khẩu xem sổ</div>'
+      + '<div style="display:flex;align-items:center;gap:6px;margin-top:1px"><span style="font-size:16px;font-weight:800;color:#b45309;letter-spacing:1.5px">' + mk + '</span>'
+      + '<button onclick="doiMkKhach(&quot;' + id + '&quot;,&quot;' + tenEsc + '&quot;)" style="background:none;border:1px solid var(--gp);border-radius:6px;padding:2px 7px;font-size:10.5px;color:var(--gd);cursor:pointer">🔄 Đổi</button></div>'
       + infoLines + '</div>'
       + '<div style="flex:0 0 auto;display:flex;gap:6px">'
-      + '<button onclick="copyKhachId(&quot;' + id + '&quot;,&quot;' + tenEsc + '&quot;)" style="background:var(--gd);color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer">📋 Sao chép</button>'
+      + '<button onclick="copyKhachId(&quot;' + id + '&quot;,&quot;' + tenEsc + '&quot;,&quot;' + mk + '&quot;)" style="background:var(--gd);color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer">📋 Sao chép</button>'
       + '<button onclick="openEditKhachId(&quot;' + tenEsc + '&quot;)" title="Sửa" style="background:var(--gb);color:var(--gd);border:1.5px solid var(--gp);border-radius:8px;padding:8px 10px;font-size:13px;cursor:pointer">✏️</button>'
       + '</div></div>';
   }).join('');
+  // Vừa cấp mật khẩu cho khách chưa có → đồng bộ lên Supabase để khách dùng được ngay
+  if (_khPwVuaTao) { _khPwVuaTao = false; try { autoSync(); } catch(e){} }
 }
 function openThemKhachHang(){
   document.getElementById('khid-add-ten').value = '';
@@ -3389,11 +3418,14 @@ function themKhachId(){
   playSaveSound();
   autoSync();
 }
-function copyKhachId(id, ten){
+function copyKhachId(id, ten, mk){
+  // Có mật khẩu (danh sách 👥) → sao chép cả Mã KH + mật khẩu để gửi khách qua Zalo/tin nhắn 1 lần là đủ
+  var txt = mk ? ('Sổ Khách Hàng của ' + ten + '\nMã khách hàng: ' + id + '\nMật khẩu: ' + mk) : id;
+  var bao = mk ? ('📋 Đã sao chép Mã KH + mật khẩu của ' + ten) : ('📋 Đã sao chép mã "' + id + '" của ' + ten);
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(id).then(function(){ toast('📋 Đã sao chép mã "' + id + '" của ' + ten); }).catch(function(){ toast('Mã KH của ' + ten + ': ' + id); });
+    navigator.clipboard.writeText(txt).then(function(){ toast(bao); }).catch(function(){ toast('Mã KH của ' + ten + ': ' + id + (mk ? ' — MK: ' + mk : '')); });
   } else {
-    toast('Mã KH của ' + ten + ': ' + id);
+    toast('Mã KH của ' + ten + ': ' + id + (mk ? ' — MK: ' + mk : ''));
   }
 }
 // ── Thông báo sau khi lưu THÀNH CÔNG 1 giao dịch (Mua/Bán/Sổ Gửi/Ứng tiền) với tên khách hàng TỰ
@@ -6065,7 +6097,7 @@ var SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 var sbClient = null;
 var sbUser = null;
 var sbSyncing = false;
-var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','kh_ids','kh_role_manual','sg3','su_data','cc_data','thang_v1','setting_round','license_expiry','admin_pw','mua_chot_moc','ss_data','kh_id_numeric_v1','kh_hidden','kh_info','bang_ke_info'];
+var SB_DATA_KEYS = ['gd3_mua','gd3_ban','kh3_mua','kh3_ban','kh3_all','kh_ids','kh_role_manual','sg3','su_data','cc_data','thang_v1','setting_round','license_expiry','admin_pw','mua_chot_moc','ss_data','kh_id_numeric_v1','kh_hidden','kh_info','bang_ke_info','kh_pw'];
 // Các khoá localStorage CHỈ thuộc về riêng máy này (thiết bị/phiên đăng nhập/trạng thái giao diện tạm),
 // KHÔNG đồng bộ lên Supabase/Drive vì đồng bộ sẽ gây rối (VD: token Google Drive của máy A không dùng
 // được cho máy B). Bất kỳ khoá localStorage nào KHÁC ngoài danh sách này đều được coi là dữ liệu nghiệp
@@ -6218,7 +6250,7 @@ var SB_STORAGE_LABELS = {
   su_data: '💵 Ứng tiền', cc_data: '⏱️ Chấm Công', thang_v1: '👷 Danh sách công nhân chấm công',
   kh_ids: '🆔 Mã khách hàng', kh_role_manual: '👥 Vai trò khách nhập tay',
   kh3_mua: '🌾 Khách bán (tự tính)', kh3_ban: '🚛 Khách mua (tự tính)', kh3_all: '📇 Danh sách tất cả khách (tự tính)',
-  kh_hidden: '🙈 Khách hàng đã ẩn', kh_info: '📞 Liên hệ khách hàng', bang_ke_info: '🧾 Thông tin xuất bảng kê',
+  kh_hidden: '🙈 Khách hàng đã ẩn', kh_info: '📞 Liên hệ khách hàng', bang_ke_info: '🧾 Thông tin xuất bảng kê', kh_pw: '🔑 Mật khẩu xem sổ của khách',
   mua_chot_moc: '🔒 Mốc chốt Thu Mua', ss_data: '📊 Dữ liệu Tính Toán', setting_round: '⚙️ Cài đặt làm tròn',
   license_expiry: '🔑 Hạn dùng license', admin_pw: '🔑 Mật khẩu quản trị', kh_id_numeric_v1: '🔧 Cờ nâng cấp mã số'
 };
@@ -6243,7 +6275,7 @@ function sbFmtSize(bytes) {
 function _sbResetLocalAfterDelete(k) {
   if (k === 'license_expiry' || k === 'admin_pw' || (typeof THANG_PW_SB_KEY !== 'undefined' && k === THANG_PW_SB_KEY)) {
     MCS_LS.removeItem(k);
-  } else if (k === 'kh_ids' || k === 'kh_role_manual' || k === 'mua_chot_moc' || k === 'ss_data' || k === 'kh_info') {
+  } else if (k === 'kh_ids' || k === 'kh_role_manual' || k === 'mua_chot_moc' || k === 'ss_data' || k === 'kh_info' || k === 'kh_pw') {
     lsSet(k, {});
   } else {
     lsSet(k, []);
@@ -6663,7 +6695,7 @@ function _finishLoginMerge(cloud, opts){
   var localMua = getGD('mua'), localBan = getGD('ban'), localSg = getSG(), localSu = getSU(), localCc = getCC();
   var localKhIds = getKhIds(), localKhRole = lsGetO('kh_role_manual'), localMuaChot = lsGetO('mua_chot_moc'),
       localKhHidden = getKhHidden(), localKhInfo = getKhInfo(), localSsData = JSON.parse(MCS_LS.getItem('ss_data')||'{}'),
-      localBangKe = getBangKeInfo();
+      localBangKe = getBangKeInfo(), localKhPw = getKhPws();
   var localErrLog = _getErrorLog();
   var mua = _mergeArrById(cloud.gd3_mua, localMua);
   var ban = _mergeArrById(cloud.gd3_ban, localBan);
@@ -6698,6 +6730,7 @@ function _finishLoginMerge(cloud, opts){
     var finalMuaChot = _mergeObjUnionCloudWins(cloud.mua_chot_moc, localMuaChot);
     var finalKhHidden = _mergeArrStrUnion(cloud.kh_hidden, localKhHidden);
     var finalKhInfo = _mergeObjUnionCloudWins(cloud.kh_info, localKhInfo);
+    var finalKhPw = _mergeObjUnionCloudWins(cloud.kh_pw, localKhPw); // mật khẩu xem sổ: đám mây thắng nếu khác (đã gửi cho khách)
     var finalSsData = _mergeObjUnionCloudWins(cloud.ss_data, localSsData);
     // "Thông tin xuất bảng kê": TRỘN an toàn thay vì ghi đè thẳng như trước (xem lỗi đã sửa ở
     // _sbRowsPayload — nếu đám mây lỡ còn giá trị SAI KIỂU (VD: mảng [] do lỗi cũ) thì _isPlainObj
@@ -6713,7 +6746,7 @@ function _finishLoginMerge(cloud, opts){
       || finalKhHidden.length!==localKhHidden.length
       || _objDiffers(khFinalMap, localKhIds) || _objDiffers(finalKhRole, localKhRole)
       || _objDiffers(finalMuaChot, localMuaChot) || _objDiffers(finalKhInfo, localKhInfo)
-      || _objDiffers(finalSsData, localSsData) || _objDiffers(finalBangKe, localBangKe);
+      || _objDiffers(finalSsData, localSsData) || _objDiffers(finalBangKe, localBangKe) || _objDiffers(finalKhPw, localKhPw);
 
     setGD('mua', finalMua); setGD('ban', finalBan); setSG(finalSg); setSU(finalSu); setCC(finalCc);
     setKhIds(khFinalMap);
@@ -6721,6 +6754,7 @@ function _finishLoginMerge(cloud, opts){
     lsSet('mua_chot_moc', finalMuaChot);
     lsSet('kh_hidden', finalKhHidden);
     lsSet('kh_info', finalKhInfo);
+    setKhPws(finalKhPw);
     lsSet('ss_data', finalSsData);
     setBangKeInfo(finalBangKe);
     // Nhật ký lỗi hệ thống: lưu bản đã trộn NGAY (không đợi điều kiện "changed" bên dưới, vì đây chỉ
@@ -6792,7 +6826,7 @@ function _sbRowsPayload() {
       // và ghi đè mất dữ liệu THẬT đang có sẵn — đây chính là nguyên nhân từng gây mất "Thông tin
       // xuất bảng kê" đã lưu trước đó. Bổ sung khoá object mới sau này PHẢI khai báo default {} ở đây.
       val = (k === 'license_expiry') ? null
-        : (k === 'kh_ids' || k === 'kh_role_manual' || k === 'mua_chot_moc' || k === 'ss_data' || k === 'kh_info' || k === 'bang_ke_info') ? {}
+        : (k === 'kh_ids' || k === 'kh_role_manual' || k === 'mua_chot_moc' || k === 'ss_data' || k === 'kh_info' || k === 'bang_ke_info' || k === 'kh_pw') ? {}
         : (k === 'admin_pw') ? '28082008'
         : (k === THANG_PW_SB_KEY) ? RESET_PW_DEFAULT
         : (k === 'kh_id_numeric_v1') ? null // cờ 1 lần — để trống (falsy) khi chưa có, KHÔNG được là [] (truthy sai)
@@ -6802,7 +6836,7 @@ function _sbRowsPayload() {
       // Chốt chặn cuối: nếu khoá này BẮT BUỘC là object (VD: kh_info, bang_ke_info) mà giá trị đang
       // lưu cục bộ lỡ SAI KIỂU (VD: mảng [] sót lại từ lỗi cũ nói trên) thì coi như KHÔNG có dữ liệu —
       // đẩy {} lên thay vì đẩy tiếp giá trị sai kiểu đó, để không tiếp tục lan truyền lỗi lên đám mây.
-      if ((k === 'kh_info' || k === 'bang_ke_info' || k === 'kh_ids' || k === 'kh_role_manual' || k === 'mua_chot_moc' || k === 'ss_data')
+      if ((k === 'kh_info' || k === 'bang_ke_info' || k === 'kh_ids' || k === 'kh_role_manual' || k === 'mua_chot_moc' || k === 'ss_data' || k === 'kh_pw')
           && !(val && typeof val === 'object' && !Array.isArray(val))) {
         val = {};
       }
