@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.7.6</title>
+<title>Mua Bán Mủ Cao Su v2.7.7</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.7.6 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.7.7 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1935,7 +1935,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.7.6</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.7.7</div>
       </div>
     </div>
 
@@ -2101,7 +2101,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.7.6</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.7.7</div>
       </div>
     </div>
 
@@ -2948,7 +2948,7 @@ function _goiyDongHtml(x, i){
       uocLine = '<div style="font-size:11.5px;font-weight:700;color:var(--gd);margin-top:3px">🎯 Dự kiến theo kỳ trước: ' + _kgTron(x.uoc.kg) + ' kg' + tienLine + '</div>'
         + x.uoc.phan.map(function(p){
             var xong = p.phan ? x.daBanPhan[normTen(p.phan)] : false;
-            return '<div style="font-size:11px;color:' + (xong ? '#15803d' : 'var(--g800)') + ';margin-left:10px;line-height:1.5">' + (xong ? '✅' : '🌿') + ' '
+            return '<div style="font-size:11px;color:' + (xong ? '#15803d' : 'var(--g800)') + ';margin-left:10px;line-height:1.5">' + (xong ? '✅' : '📍') + ' '
               + escHtml(p.phan || 'Không ghi phần') + ' <span style="color:var(--g400)">(' + ngayNgan(p.ngay) + ')</span>: <b>' + kgPhan(p) + '</b></div>';
           }).join('');
     }
@@ -3110,7 +3110,7 @@ function updPhanSuggest(){
   ds = ds.filter(function(p){ return toiHan[normTen(p.ten)]; }).concat(ds.filter(function(p){ return !toiHan[normTen(p.ten)]; }));
   _phanSgList = ds;
   var cur = normTen(getPhanVal());
-  box.innerHTML = '<span style="font-size:10.5px;font-weight:700;color:var(--g600)">🌿 Tên Phần Bán:</span>' + ds.map(function(p, i){
+  box.innerHTML = '<span style="font-size:10.5px;font-weight:700;color:var(--g600)">📍 Tên Phần Bán:</span>' + ds.map(function(p, i){
     var chon = normTen(p.ten) === cur, th = toiHan[normTen(p.ten)];
     return '<span onmousedown="event.preventDefault()" onclick="chonPhan(' + i + ')"' + (th ? ' title="Dự kiến bán hôm nay"' : '') + ' style="font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:12px;cursor:pointer;'
       + (chon ? 'background:var(--gd);color:#fff;border:1.5px solid var(--gd)'
@@ -4293,7 +4293,7 @@ function xgcTraCuu(){
       tienNgay+=parseFloat(gd.tt)||0; tongTien+=parseFloat(gd.tt)||0;
       var guiTxt=gd.guiSo?'<span style="color:#16a34a;font-weight:700">✅</span>':'<span style="color:var(--g400)">○</span>';
       return '<tr>'
-        +'<td style="text-align:left;padding-left:7px">'+LOAI_ICO[gd.loai]+' '+LOAI_LBL_SHORT[gd.loai]+(gd.phan?'<span style="display:block;font-size:9.5px;color:#b45309;font-weight:700">🌿 '+escHtml(gd.phan)+'</span>':'')+'</td>'
+        +'<td style="text-align:left;padding-left:7px">'+LOAI_ICO[gd.loai]+' '+LOAI_LBL_SHORT[gd.loai]+(gd.phan?'<span style="display:block;font-size:9.5px;color:#b45309;font-weight:700">📍 '+escHtml(gd.phan)+'</span>':'')+'</td>'
         +'<td>'+fmtKg(kgNet)+((gd.bi&&parseFloat(gd.bi)>0)?'<span style="display:block;font-size:9.5px;color:#e57373;font-weight:700">(-'+fmtKg(gd.bi)+')</span>':'')+'</td>'
         +'<td>'+doTxt+'</td>'
         +'<td>'+fmtNum(gd.gia)+'</td>'
