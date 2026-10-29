@@ -17,6 +17,7 @@ Số phiên bản theo dạng **`Z.X.Y`**:
 
 | Phiên bản | Ngày | Thay đổi |
 |-----------|------|----------|
+| **v2.7.9** | 2026-10-29 | 🧘 **Không còn giật màn hình lúc mới mở app**: (1) dữ liệu mới đồng bộ về từ thiết bị khác giờ được **vẽ lại tại chỗ** (bảng Thu Mua/Bán, thống kê, Sổ Gửi, Chấm Công, danh sách khách...) thay vì tải lại cả trang. (2) Có **bản app mới** → chỉ tải lại khi **người dùng rảnh** (không đang gõ ô nào, không mở popup, 8 giây không thao tác); trước khi tải lại lưu tạm chữ đang nhập dở + vị trí cuộn rồi điền lại sau khi tải xong. |
 | **v2.7.8** | 2026-10-29 | ✏️ Dãy nút gợi ý dưới ô tên người bán đổi nhãn "Tên Phần Bán:" thành **"Chọn nhanh tên phần bán:"** (tránh trùng với ô nhập "Tên Phần Bán" ngay phía trên). |
 | **v2.7.7** | 2026-10-29 | 📍 **Tên Phần Bán dùng biểu tượng định vị 📍** (thay 🌿) ở popup Gợi Ý Người Bán Hôm Nay, dãy gợi ý tên phần dưới ô tên người bán và bảng chi tiết thu mua — dễ hình dung là vị trí lô/phần cạo. |
 | **v2.7.6** | 2026-10-28 | 🔑 **Đổi mật khẩu xem sổ của khách: popup riêng của app, bắt buộc nhập mật khẩu giao dịch** (thay hộp xác nhận mặc định của trình duyệt), tránh bấm nhầm/người khác cầm máy tự đổi. |
