@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.7.8</title>
+<title>Mua Bán Mủ Cao Su v2.7.9</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.7.8 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.7.9 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1935,7 +1935,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.7.8</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.7.9</div>
       </div>
     </div>
 
@@ -2101,7 +2101,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.7.8</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.7.9</div>
       </div>
     </div>
 
@@ -6825,7 +6825,8 @@ function _finishLoginMerge(cloud, opts){
       toast('✅ Đã trộn dữ liệu máy với đám mây!');
     }
     syncToSupabase();
-    setTimeout(function(){ location.reload(); }, 1200);
+    // Vẽ lại ngay tại chỗ (không tải lại cả trang) → không giật màn hình, không mất chữ đang gõ
+    _lamMoiGiaoDienNgam();
   }
 
   if (khMerge.conflicts.length && !opts.silent) {
@@ -13714,6 +13715,71 @@ document.addEventListener('focusin', function(e){
   _mmSet(false);
 });
 
+// ─── LÀM MỚI GIAO DIỆN NGẦM / TẢI LẠI TRANG KHI RẢNH ───
+// Dữ liệu mới đồng bộ về (từ thiết bị khác) → vẽ lại các phần đang hiện ngay tại chỗ, KHÔNG tải lại cả
+// trang (trước đây tải lại trang khoảng 3 giây sau khi mở app → giật màn hình, mất chữ đang gõ dở).
+function _lamMoiGiaoDienNgam(){
+  var viec = [
+    function(){ rebuildKHRoleLists(); },
+    function(){ renderTbl('mua'); }, function(){ updTK('mua'); },
+    function(){ renderTbl('ban'); }, function(){ updTK('ban'); },
+    function(){ updThangData(); },
+    function(){ if (curTab === 'sg') { renderSgTabContent(); renderCcList(); } },
+    function(){ updLicenseCountdown(); },
+    function(){ var m = document.getElementById('modal-khach-id'); if (m && m.classList.contains('show')) renderKhachIdList(); },
+    function(){ if (typeof updBanHints === 'function') updBanHints(); }
+  ];
+  var loi = 0;
+  viec.forEach(function(f){ try { f(); } catch(e){ loi++; } });
+  if (loi) taiLaiKhiRanh(); // phần nào vẽ lại không được thì để dành tải lại trang lúc người dùng rảnh
+}
+// Tải lại trang (khi có bản app mới, hoặc dữ liệu không vẽ lại tại chỗ được) — CHỈ lúc người dùng RẢNH:
+// không đang gõ ô nào, không mở popup nào, và đã 8 giây không chạm/gõ/cuộn. Trước khi tải lại, lưu tạm chữ
+// đang nhập dở + vị trí cuộn rồi điền lại sau khi tải xong, nên kể cả lỡ tải lại cũng không mất gì.
+var _lanThaoTacCuoi = Date.now();
+['pointerdown','touchstart','keydown','input','scroll','wheel'].forEach(function(ev){
+  document.addEventListener(ev, function(){ _lanThaoTacCuoi = Date.now(); }, { passive: true, capture: true });
+});
+function _dangRanh(){
+  if (document.visibilityState === 'hidden') return true; // app đang ẩn: tải lại không ai thấy
+  var ae = document.activeElement;
+  if (ae && (/^(INPUT|SELECT|TEXTAREA)$/.test(ae.tagName) || ae.isContentEditable)) return false;
+  if (document.querySelector('.modal.show')) return false;
+  return Date.now() - _lanThaoTacCuoi > 8000;
+}
+var _choTaiLai = false;
+function taiLaiKhiRanh(){
+  if (_choTaiLai) return;
+  _choTaiLai = true;
+  (function thu(){
+    if (!_dangRanh()) { setTimeout(thu, 1500); return; }
+    try {
+      var v = {};
+      document.querySelectorAll('input[id], textarea[id]').forEach(function(el){
+        if (/^(password|file|checkbox|radio|hidden|date|button|submit)$/i.test(el.type || '')) return;
+        if (el.value && el.offsetParent !== null) v[el.id] = el.value;
+      });
+      MCS_SS.setItem('nhap_tam', JSON.stringify({ y: window.scrollY || 0, v: v }));
+    } catch(e){}
+    location.reload();
+  })();
+}
+// Sau khi tải lại: điền lại chữ đang nhập dở (chỉ vào ô đang trống) + về đúng vị trí cuộn cũ
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    try {
+      var t = JSON.parse(MCS_SS.getItem('nhap_tam') || 'null');
+      MCS_SS.removeItem('nhap_tam');
+      if (!t) return;
+      Object.keys(t.v || {}).forEach(function(id){
+        var el = document.getElementById(id);
+        if (el && !el.value) { el.value = t.v[id]; try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch(e){} }
+      });
+      if (t.y) window.scrollTo(0, t.y);
+    } catch(e){}
+  }, 600);
+});
+
 // ─── SERVICE WORKER ───
 if ('serviceWorker' in navigator) {
   var _swUpdReloaded = false;
@@ -13723,7 +13789,7 @@ if ('serviceWorker' in navigator) {
   function _swAutoReload(){
     if (_swUpdReloaded || !_swHadController) return;
     _swUpdReloaded = true;
-    location.reload(); // tự động tải lại ngay khi có bản mới, không cần chờ nhấn thông báo
+    taiLaiKhiRanh(); // có bản mới → tải lại lúc người dùng rảnh (không cắt ngang lúc đang nhập liệu)
   }
   navigator.serviceWorker.register('sw.js').then(function(reg){
     // Chủ động kiểm tra bản mới mỗi khi mở lại app (kể cả từ nền, không cần chờ trình duyệt tự kiểm tra)
