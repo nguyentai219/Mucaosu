@@ -17,6 +17,7 @@ Số phiên bản theo dạng **`Z.X.Y`**:
 
 | Phiên bản | Ngày | Thay đổi |
 |-----------|------|----------|
+| **v2.7.8** | 2026-10-29 | ✏️ Dãy nút gợi ý dưới ô tên người bán đổi nhãn "Tên Phần Bán:" thành **"Chọn nhanh tên phần bán:"** (tránh trùng với ô nhập "Tên Phần Bán" ngay phía trên). |
 | **v2.7.7** | 2026-10-29 | 📍 **Tên Phần Bán dùng biểu tượng định vị 📍** (thay 🌿) ở popup Gợi Ý Người Bán Hôm Nay, dãy gợi ý tên phần dưới ô tên người bán và bảng chi tiết thu mua — dễ hình dung là vị trí lô/phần cạo. |
 | **v2.7.6** | 2026-10-28 | 🔑 **Đổi mật khẩu xem sổ của khách: popup riêng của app, bắt buộc nhập mật khẩu giao dịch** (thay hộp xác nhận mặc định của trình duyệt), tránh bấm nhầm/người khác cầm máy tự đổi. |
 | **v2.7.5** | 2026-10-28 | 🔑 **Mật khẩu xem sổ cho từng khách** (dùng cho app Sổ Khách Hàng v1.32 — khách xem sổ bằng Mã KH + mật khẩu, không cần đăng nhập Supabase): màn 👥 hiện thêm **Mật khẩu xem sổ** 6 số (tự cấp khi mở danh sách, khoá theo Mã KH nên đổi tên khách vẫn giữ), nút **🔄 Đổi** cấp mật khẩu mới, nút 📋 Sao chép lấy cả Mã KH + mật khẩu. Đồng bộ lên Supabase (khoá `kh_pw`, trộn an toàn khi đăng nhập như `kh_info`). Màn 👥 ghi rõ tài khoản quản trị Sổ Khách Hàng = email Supabase của vựa + mật khẩu quản trị. |
