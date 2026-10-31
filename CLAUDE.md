@@ -35,7 +35,9 @@ tuyệt đối không được dùng chung cơ sở dữ liệu**, tránh chồn
 
 ## Đánh số phiên bản
 
-Theo quy tắc `Z.X.Y` ghi ở đầu `README.md`. Mỗi lần cập nhật tăng đúng 1 bước và đổi ở đủ các vị trí:
+Theo quy tắc `Z.X.Y` ghi ở đầu `README.md`. Mỗi lần cập nhật tăng đúng 1 bước và đổi ở đủ các vị trí.
+X và Y mỗi số chỉ 1 chữ số (0–9), **không bao giờ dùng `2.7.10`**: `2.7.9` → **`2.8.0`**; `2.9.9` → **`3.1.0`**
+(X quay về 1, Y về 0). Các vị trí cần đổi:
 
 - `index.html`: `<title>`, `logo-ver`, 2 dòng phiên bản trong màn "Hướng dẫn sử dụng".
 - `sw.js`: hằng `CACHE` — bắt buộc đổi, vì app trên điện thoại chỉ tự cập nhật khi `sw.js` thay đổi.
