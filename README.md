@@ -9,6 +9,7 @@ Số phiên bản theo dạng **`Z.X.Y`**:
 - Số hàng cuối cùng bên phải (**Y**) tăng đúng **1 đơn vị** mỗi lần cập nhật, chạy từ **0 → 9**.
 - Hết 9 thì **X** (số hàng chục/ở giữa) tăng lên 1, **Y** quay lại **0**.
 - Khi **X.Y đạt tối đa `9.9`** thì tăng **Z** (số đầu tiên) lên 1, đồng thời **X quay lại 1** (không phải 0) và **Y quay lại 0**.
+- **Mỗi số X, Y chỉ có 1 chữ số — không bao giờ có số kiểu `2.7.10`**: sau `2.7.9` là **`2.8.0`**, sau `2.9.9` là **`3.1.0`**.
 - Ví dụ thứ tự: `1.8.0` → `1.8.1` → ... → `1.8.9` → `1.9.0` → `1.9.1` → ... → `1.9.9` → `2.1.0` → `2.1.1` → ... → `2.1.9` → `2.2.0` → ...
 - Mỗi lần cập nhật chỉ tăng đúng 1 bước theo đúng thứ tự trên, áp dụng ở **4 vị trí**: `<title>` + `logo-ver` + 2 dòng hiển thị trong màn "Hướng dẫn sử dụng" (trong `index.html`), và `CACHE` trong `sw.js` — sau khi đổi, luôn `grep` số cũ để chắc chắn không sót vị trí nào. **⚠️ Không còn cập nhật `description` trong `manifest.json` nữa** (đã bỏ số phiên bản ra khỏi description kể từ v2.3.9 để tránh Chrome/Android hiện popup "Xem lại bản cập nhật biểu tượng" mỗi lần cập nhật).
 - Các ghi chú phiên bản cũ hơn (hệ `v7.x`–`v11.14`, rồi hệ chữ-số `1.<chữ><số>` như `1.a1`...`1.b5`) còn sót lại trong code/bảng lịch sử bên dưới chỉ là mốc lịch sử, không quy đổi ngược.
