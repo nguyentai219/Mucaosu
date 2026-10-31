@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.7.9</title>
+<title>Mua Bán Mủ Cao Su v2.8.0</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -46,7 +46,7 @@
 .bk-card.tt{border-color:#c4b5fd}
 .bk-card.tt .bk-card-hd{background:#ede9fe;color:#5b21b6}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g800);min-height:100vh;max-width:480px;margin:0 auto;overflow-x:hidden;scroll-behavior:smooth}
+body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g800);max-width:480px;margin:0 auto;overflow-x:hidden;scroll-behavior:smooth}
 
 /* HEADER */
 .hdr{background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;position:sticky;top:0;z-index:100;box-shadow:var(--s2)}
@@ -552,7 +552,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.7.9 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.8.0 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1188,7 +1188,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 4px;border-bottom:1px solid var(--g100)">
         <div>
           <div style="font-size:14px;font-weight:700;color:var(--g800)">📋 Ẩn nút Lưu khi chưa nhập dữ liệu</div>
-          <div style="font-size:11px;color:var(--g400);margin-top:2px">Tự ẩn ô thành tiền + nút Lưu/Huỷ ở tab Mua, Bán khi chưa gõ gì vào ô kg/độ, đỡ chật màn hình. Vừa gõ là hiện lại ngay</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:2px">Tự ẩn ô thành tiền + nút Lưu/Huỷ ở tab Mua, Bán khi chưa gõ gì vào ô kg/độ, đỡ chật màn hình. Vừa gõ là hiện lại ngay. Ngày chưa có giao dịch nào thì luôn hiện</div>
         </div>
         <label class="toggle-sw">
           <input type="checkbox" id="setting-compactForm" onchange="saveSetting('compactForm',this.checked);if(typeof calc==='function'){calc('mua');calc('ban');}">
@@ -1935,7 +1935,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.7.9</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.8.0</div>
       </div>
     </div>
 
@@ -2101,7 +2101,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.7.9</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.8.0</div>
       </div>
     </div>
 
@@ -4373,26 +4373,31 @@ function calc(tab){
   // hiện ngay nút Lưu/Huỷ + ô thành tiền (dù gõ dở chưa tính ra được thành tiền), để người dùng luôn
   // có đường thoát bấm "Huỷ" xoá trắng form đang nhập dở
   var daNhapKgHoacDo = kg.trim()!=='' || doV.trim()!=='';
-  _capNhatCompactForm(tab, tDisplay>0 || daNhapKgHoacDo);
+  _cfShow[tab] = tDisplay>0 || daNhapKgHoacDo;
+  _capNhatCompactForm(tab, _cfShow[tab]);
 }
+var _cfShow = { mua: false, ban: false }; // trạng thái "đã nhập dữ liệu" gần nhất của form (để áp lại khi bảng giao dịch đổi)
 // Ẩn/hiện gộp: ô "Thành tiền" + hàng nút Lưu/Huỷ ở tab Mua, Bán — chỉ áp dụng khi setting 'compactForm'
 // đang BẬT (mặc định TẮT). Khi TẮT, luôn hiển thị đầy đủ như trước giờ (không đụng tới display).
 // show=true: đã nhập đủ dữ liệu để tính ra thành tiền → hiện đầy đủ cả 3 mục.
 // show=false: chưa đủ dữ liệu → ẩn cả 3 mục để tiết kiệm không gian xem chi tiết bên dưới.
+// Ngày đang xem CHƯA có giao dịch nào → luôn hiện (dù có ẩn thì bên dưới cũng chỉ là khoảng trống, không có
+// dữ liệu gì để xem); có từ 1 giao dịch trở lên mới làm theo cài đặt.
+// Đang SỬA giao dịch: hàng nút "Huỷ/Lưu giao dịch" (thêm mới) LUÔN ẩn — chỉ còn hàng "Huỷ/Lưu thay đổi/Xoá"
+// (trước v2.8.0, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
+// "Lưu giao dịch" sẽ thêm 1 giao dịch MỚI thay vì sửa).
 function _capNhatCompactForm(tab, show){
   if (tab!=='mua' && tab!=='ban') return;
   var ttBox = document.getElementById(tab+'-tt-box');
   var btnRow = document.getElementById(tab+'-btns');
-  if (!getSetting('compactForm', true)) {
-    // Tính năng đang TẮT: đảm bảo luôn hiển thị đầy đủ (phòng trường hợp vừa tắt setting lúc đang ẩn)
-    if (ttBox) ttBox.style.display = '';
-    if (btnRow) btnRow.style.display = '';
-    return;
-  }
+  var editRow = document.getElementById(tab+'-edit-btns');
+  var dangSua = !!editId[tab];
+  var coGD = false;
+  try { coGD = getGDDate(tab, curDate[tab]).length > 0; } catch(e){}
+  if (dangSua || !coGD || !getSetting('compactForm', true)) show = true;
   if (ttBox) ttBox.style.display = show ? '' : 'none';
-  // Đang ở chế độ SỬA giao dịch thì có hàng nút riêng (mua-edit-btns/ban-edit-btns) đảm nhiệm, không
-  // đụng tới hàng nút "Lưu giao dịch/Huỷ" của chế độ thêm mới (vốn đã ẩn sẵn khi đang sửa)
-  if (btnRow && !editId[tab]) btnRow.style.display = show ? '' : 'none';
+  if (btnRow) btnRow.style.display = (show && !dangSua) ? '' : 'none';
+  if (editRow) editRow.style.display = dangSua ? 'flex' : 'none';
 }
 
 // ─── POPUP CHI TIET ───
@@ -4519,6 +4524,7 @@ function resetF(tab){
   document.getElementById(tab+'-tt-chu').textContent='--';
   document.getElementById(tab+'-ac').style.display='none';
   var _phanEl=document.getElementById(tab+'-phan'); if(_phanEl){ _phanEl.value=''; updPhanSuggest(); }
+  _cfShow[tab] = false;
   _capNhatCompactForm(tab, false);
   updateKhInfoTicker(tab);
   resetAnhPicker(tab);
@@ -4549,8 +4555,7 @@ function editGD(tab,id){
     document.getElementById(tab+'-anh-preview-wrap').style.display='block';
     toggleAnhPicker(tab, true); // mở sẵn khối ảnh để người dùng thấy ngay ảnh đã đính kèm
   }
-  document.getElementById(tab+'-btns').style.display='none';
-  document.getElementById(tab+'-edit-btns').style.display='flex';
+  _capNhatCompactForm(tab, true); // chế độ sửa: chỉ hiện hàng Huỷ / Lưu thay đổi / Xoá
   document.getElementById(tab+'-fc').scrollIntoView({behavior:'smooth'});
 }
 function luuSua(tab){
@@ -4584,9 +4589,7 @@ function luuSua(tab){
 }
 function huySua(tab){
   editId[tab]=null;
-  document.getElementById(tab+'-btns').style.display='flex';
-  document.getElementById(tab+'-edit-btns').style.display='none';
-  resetF(tab);
+  resetF(tab); // resetF → _capNhatCompactForm: ẩn hàng nút sửa, hiện lại hàng nút thêm mới theo quy tắc
 }
 function xoaGD(tab){
   if(guardLicense()) return;
@@ -4838,6 +4841,7 @@ function renderTbl(tab, newId){
     if(oldTr) oldTr.classList.remove('tr-new-keep');
   }
   if(newId) _lastNewId[tab] = String(newId);
+  _capNhatCompactForm(tab, _cfShow[tab]); // số giao dịch trong ngày đổi → áp lại quy tắc ẩn/hiện ô thành tiền + nút
   const listAsc=getGDDate(tab,curDate[tab]);
   const tbl=document.getElementById(tab+'-tbl');
   const nd=document.getElementById(tab+'-nodata');
@@ -13714,6 +13718,37 @@ document.addEventListener('focusin', function(e){
   if (body.contains(t)) return;
   _mmSet(false);
 });
+
+// ─── KHÔNG CHO KÉO CUỘN XUỐNG KHOẢNG TRỐNG ───
+// Nội dung đã vừa màn hình (bên dưới chỉ còn khoảng trắng) thì không cho kéo cuộn trang lên nữa; nội dung dài
+// hơn màn hình thì chỉ cuộn tới hết nội dung. Bỏ qua lúc đang gõ (bàn phím mở cần đẩy ô nhập lên) và lúc mở
+// popup; đóng bàn phím xong thì tự kéo về đúng chỗ.
+function _mcsDaySoCuon(){
+  var bottom = 0, sy = window.scrollY || 0;
+  var kids = document.body.children;
+  for (var i = 0; i < kids.length; i++) {
+    var el = kids[i];
+    if (!el.offsetHeight) continue;
+    var cs = getComputedStyle(el);
+    if (cs.position === 'fixed' || cs.display === 'none') continue;
+    bottom = Math.max(bottom, el.getBoundingClientRect().bottom + sy + (parseFloat(cs.marginBottom) || 0));
+  }
+  return Math.max(0, Math.ceil(bottom - window.innerHeight));
+}
+function _mcsGioiHanCuon(){
+  var ae = document.activeElement;
+  if (ae && (/^(INPUT|SELECT|TEXTAREA)$/.test(ae.tagName) || ae.isContentEditable)) return;
+  if (document.querySelector('.modal.show')) return;
+  var max = _mcsDaySoCuon();
+  if ((window.scrollY || 0) > max + 1) window.scrollTo({ top: max, behavior: 'instant' });
+}
+(function(){
+  var cho = false;
+  function hen(){ if (cho) return; cho = true; requestAnimationFrame(function(){ cho = false; _mcsGioiHanCuon(); }); }
+  window.addEventListener('scroll', hen, { passive: true });
+  window.addEventListener('resize', hen);
+  document.addEventListener('focusout', function(){ setTimeout(hen, 400); });
+})();
 
 // ─── LÀM MỚI GIAO DIỆN NGẦM / TẢI LẠI TRANG KHI RẢNH ───
 // Dữ liệu mới đồng bộ về (từ thiết bị khác) → vẽ lại các phần đang hiện ngay tại chỗ, KHÔNG tải lại cả
