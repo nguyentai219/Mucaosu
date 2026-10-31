@@ -18,6 +18,7 @@ Số phiên bản theo dạng **`Z.X.Y`**:
 
 | Phiên bản | Ngày | Thay đổi |
 |-----------|------|----------|
+| **v2.8.1** | 2026-10-31 | 🎨 Tab Thu Mua: chữ mờ trong ô **"Nhập tên..."** và **"Tên Phần Bán"** đổi sang **màu xanh** giống ô Số kg, Độ cho đồng bộ. |
 | **v2.8.0** | 2026-10-31 | 🧹 **Ô Thành tiền + nút Lưu/Huỷ gọn hơn, sửa lỗi trùng nút**: (1) **Sửa lỗi** lúc nhấp đúp sửa giao dịch mà gõ lại số liệu thì hiện **cả 2 hàng nút** ("Huỷ / Lưu giao dịch" lẫn "Huỷ / Lưu thay đổi / Xoá") — bấm nhầm "Lưu giao dịch" sẽ thêm 1 giao dịch mới; nay lúc sửa chỉ còn hàng Huỷ / Lưu thay đổi / Xoá. (2) Ngày **chưa có giao dịch nào** thì ô Thành tiền + nút Huỷ/Lưu **luôn hiện** (bất kể cài đặt "Ẩn nút Lưu khi chưa nhập dữ liệu"); có giao dịch đầu tiên rồi mới làm theo cài đặt. (3) Nội dung đã vừa màn hình (bên dưới chỉ còn khoảng trắng) thì **không kéo cuộn trang lên được nữa**; nội dung dài thì chỉ cuộn tới hết nội dung. |
 | **v2.7.9** | 2026-10-29 | 🧘 **Không còn giật màn hình lúc mới mở app**: (1) dữ liệu mới đồng bộ về từ thiết bị khác giờ được **vẽ lại tại chỗ** (bảng Thu Mua/Bán, thống kê, Sổ Gửi, Chấm Công, danh sách khách...) thay vì tải lại cả trang. (2) Có **bản app mới** → chỉ tải lại khi **người dùng rảnh** (không đang gõ ô nào, không mở popup, 8 giây không thao tác); trước khi tải lại lưu tạm chữ đang nhập dở + vị trí cuộn rồi điền lại sau khi tải xong. |
 | **v2.7.8** | 2026-10-29 | ✏️ Dãy nút gợi ý dưới ô tên người bán đổi nhãn "Tên Phần Bán:" thành **"Chọn nhanh tên phần bán:"** (tránh trùng với ô nhập "Tên Phần Bán" ngay phía trên). |

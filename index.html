@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.8.0</title>
+<title>Mua Bán Mủ Cao Su v2.8.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -390,6 +390,8 @@ input[type=date]:focus{border-color:var(--gl)}
 .tra-stamp{ display:inline-block; font-size:9px; font-weight:800; padding:1px 6px; border-radius:8px; background:#d1fae5; color:#065f46; border:1px solid #6ee7b7; margin-left:5px; vertical-align:middle; }
 /* Tab Mua: kg, độ placeholder màu xanh nhạt bình thường (cùng màu form) */
 .fi-num::placeholder{font-size:14px;color:var(--gp);opacity:.7;font-weight:400}
+/* Tab Mua: chữ mờ "Nhập tên..." + "Tên Phần Bán" cùng màu xanh với ô kg, độ */
+#mua-ten::placeholder,#mua-phan::placeholder{color:var(--gp);opacity:.7;font-weight:400}
 /* Tab Bán: kg, độ có class ban-hint → màu cam mờ giống ô giá */
 .fi-num.ban-hint::placeholder{font-size:14px;color:var(--ad);opacity:.55;font-style:italic;font-weight:600}
 /* Trừ bì tab Mua: chữ "có thể bỏ trống" màu xanh nhạt */
@@ -552,7 +554,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.8.0 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.8.1 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1935,7 +1937,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.8.0</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.8.1</div>
       </div>
     </div>
 
@@ -2101,7 +2103,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.8.0</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.8.1</div>
       </div>
     </div>
 
@@ -4384,7 +4386,7 @@ var _cfShow = { mua: false, ban: false }; // trạng thái "đã nhập dữ li�
 // Ngày đang xem CHƯA có giao dịch nào → luôn hiện (dù có ẩn thì bên dưới cũng chỉ là khoảng trống, không có
 // dữ liệu gì để xem); có từ 1 giao dịch trở lên mới làm theo cài đặt.
 // Đang SỬA giao dịch: hàng nút "Huỷ/Lưu giao dịch" (thêm mới) LUÔN ẩn — chỉ còn hàng "Huỷ/Lưu thay đổi/Xoá"
-// (trước v2.8.0, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
+// (trước v2.8.1, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
 // "Lưu giao dịch" sẽ thêm 1 giao dịch MỚI thay vì sửa).
 function _capNhatCompactForm(tab, show){
   if (tab!=='mua' && tab!=='ban') return;
