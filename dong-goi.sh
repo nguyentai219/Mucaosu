@@ -13,6 +13,7 @@ TMP=$(mktemp -d); D="$TMP/$NAME"; mkdir -p "$D"
 git fetch -q origin main
 git archive --format=tar --prefix=Mucaosu/ origin/main | tar -x -C "$D"
 cp "$D/Mucaosu/android-twa/release/MuCaoSu.apk" "$D/$NAME-Android.apk"
+[ -f "$D/Mucaosu/android-xepbai/release/XepBaiNhen.apk" ] && cp "$D/Mucaosu/android-xepbai/release/XepBaiNhen.apk" "$D/Game-XepBaiNhen.apk"
 PAGES=../nguyentai219.github.io
 if [ -d "$PAGES/.git" ]; then
   git -C "$PAGES" pull -q --ff-only || true
@@ -27,6 +28,7 @@ Mủ Cao Su $VER — gói đầy đủ (lấy từ nhánh main trên GitHub)
 $NAME-Android.apk        File cài app Android (mở app web trong Chrome, tự cập nhật theo web)
 Mucaosu/                 Toàn bộ repo app web (index.html, sw.js, manifest.json, ảnh...) + mã nguồn APK
 nguyentai219.github.io/  Repo chứa .well-known/assetlinks.json (để APK ẩn thanh địa chỉ)
+Game-XepBaiNhen.apk      Game Xếp Bài Nhện (APK riêng, chơi không cần mạng)
 khoa-ky/                 (nếu có) Khoá ký APK + mật khẩu — GIỮ KỸ, KHÔNG CHIA SẺ. Mất khoá thì
                          APK mới không cài đè được bản cũ.
 TXT

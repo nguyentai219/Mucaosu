@@ -14,6 +14,14 @@ Số phiên bản theo dạng **`Z.X.Y`**:
 - Mỗi lần cập nhật chỉ tăng đúng 1 bước theo đúng thứ tự trên, áp dụng ở **4 vị trí**: `<title>` + `logo-ver` + 2 dòng hiển thị trong màn "Hướng dẫn sử dụng" (trong `index.html`), và `CACHE` trong `sw.js` — sau khi đổi, luôn `grep` số cũ để chắc chắn không sót vị trí nào. **⚠️ Không còn cập nhật `description` trong `manifest.json` nữa** (đã bỏ số phiên bản ra khỏi description kể từ v2.3.9 để tránh Chrome/Android hiện popup "Xem lại bản cập nhật biểu tượng" mỗi lần cập nhật).
 - Các ghi chú phiên bản cũ hơn (hệ `v7.x`–`v11.14`, rồi hệ chữ-số `1.<chữ><số>` như `1.a1`...`1.b5`) còn sót lại trong code/bảng lịch sử bên dưới chỉ là mốc lịch sử, không quy đổi ngược.
 
+## 🕷️ Game APK riêng: Xếp Bài Nhện
+
+APK game độc lập (không cần mạng), mã nguồn ở `android-xepbai/` — tải: `android-xepbai/release/XepBaiNhen.apk`.
+
+| Phiên bản game | Ngày | Thay đổi |
+|---|---|---|
+| **1.0** | 2026-11-02 | Bản đầu: Spider Solitaire luật cổ điển 1/2/4 chất; lá bài vẽ SVG đủ chấm như bài thật, J/Q/K hình người; lật bài 3D, chia bài bay từ xấp, thu dãy lấp lánh + "+100", pháo giấy khi thắng; chạm tự đi / kéo thả, Gợi ý, Hoàn nguyên không giới hạn; âm thanh, rung; 4 mặt sau lá bài, 4 màu bàn; thống kê theo độ khó (ván, thắng, %, điểm cao, nhanh nhất, chuỗi thắng); nhớ ván dở và hỏi chơi tiếp; nút Quay lại hỏi trước khi thoát; toàn màn hình, xoay ngang/dọc. APK 124 KB. |
+
 ## 📋 Lịch sử phiên bản
 
 | Phiên bản | Ngày | Thay đổi |
