@@ -20,12 +20,14 @@ APK game độc lập (không cần mạng), mã nguồn ở `android-xepbai/` �
 
 | Phiên bản game | Ngày | Thay đổi |
 |---|---|---|
+| **1.1** | 2026-11-02 | 🤴 Lá J, Q, K vẽ lại theo kiểu bài thật: **1 người lớn đứng thẳng** (không lật 2 đầu), chiếm gần hết lá cho dễ nhìn trên lá nhỏ — K vua đội vương miện, râu, cầm quyền trượng; Q hoàng hậu tóc dài, vương miện nhỏ, cầm hoa; J chàng bồi mũ lông vũ, cầm giáo; áo choàng viền vàng, chất bài ở ngực. Bỏ chữ góc dưới (ngược) của lá hình. |
 | **1.0** | 2026-11-02 | Bản đầu: Spider Solitaire luật cổ điển 1/2/4 chất; lá bài vẽ SVG đủ chấm như bài thật, J/Q/K hình người; lật bài 3D, chia bài bay từ xấp, thu dãy lấp lánh + "+100", pháo giấy khi thắng; chạm tự đi / kéo thả, Gợi ý, Hoàn nguyên không giới hạn; âm thanh, rung; 4 mặt sau lá bài, 4 màu bàn; thống kê theo độ khó (ván, thắng, %, điểm cao, nhanh nhất, chuỗi thắng); nhớ ván dở và hỏi chơi tiếp; nút Quay lại hỏi trước khi thoát; toàn màn hình, xoay ngang/dọc. APK 124 KB. |
 
 ## 📋 Lịch sử phiên bản
 
 | Phiên bản | Ngày | Thay đổi |
 |-----------|------|----------|
+| **v2.9.0** | 2026-11-02 | 🤴 **Xếp Bài Nhện: lá J, Q, K vẽ 1 người lớn đứng thẳng** theo kiểu bài thật (không còn 2 nửa lật ngược nhau khó nhìn trên lá nhỏ): vua đội vương miện + râu + quyền trượng, hoàng hậu tóc dài cầm hoa, chàng bồi mũ lông vũ cầm giáo, áo choàng viền vàng có chất bài ở ngực. Cùng kiểu với game APK Xếp Bài Nhện 1.1. |
 | **v2.8.9** | 2026-11-01 | 🎮 (1) **Mở game bằng cách nhấp nhanh 2 lần** vào tên App (trước là 3 lần); dòng nhắc trên thanh thông báo đa nhiệm đổi theo. (2) Các câu hỏi xác nhận trong game (**Chia ván mới**, **đổi số chất** ở Xếp Bài Nhện, **Xoá kỷ lục** ở Giọt Mủ) nay là **popup riêng của app** có nút Huỷ / Đồng ý — thay cho hộp thoại mặc định của trình duyệt (hiện dòng "nguyentai219.github.io cho biết" trông như thông báo lạ). |
 | **v2.8.8** | 2026-11-01 | 🔁 **Sửa lỗi thanh thông báo đa nhiệm lặp thông báo bộ nhớ đám mây 2–3 lần liên tiếp**: vòng xoay trước đây chọn thông báo kế tiếp theo số thứ tự, trong khi danh sách đổi liên tục (thời tiết tải xong được chèn lên đầu, dòng "đang cập nhật thời tiết" biến mất, thông báo tài khoản xuất hiện/biến mất) → thông báo bị dời chỗ và hiện lại; lúc mở app còn bị 2 chỗ (kết nối xong + đăng nhập xong) cùng hiện lại thông báo đám mây. Nay mỗi thông báo có tên loại riêng, vòng xoay đi tiếp theo loại đang hiện, không bao giờ hiện 1 loại 2 lần liền; đang hiện thông báo đám mây thì không hiện lại khi đăng nhập xong. |
 | **v2.8.7** | 2026-11-01 | ▶️ **Xếp Bài Nhện nhớ ván đang chơi dở**: thoát game hoặc tắt hẳn app rồi mở lại game, nếu còn ván dở (đã đi ít nhất 1 nước, chưa thắng) sẽ hiện bảng **"Bạn có ván đang chơi dở"** kèm số chất, số dãy đã thu, điểm, thời gian, số nước — chọn **▶️ Chơi tiếp ván cũ** hoặc **🔄 Chơi ván mới**. Đồng hồ dừng trong lúc chờ chọn. Ván được lưu sau mỗi nước đi, khi ẩn app và khi đóng trang. |

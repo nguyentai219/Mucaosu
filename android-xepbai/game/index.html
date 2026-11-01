@@ -184,37 +184,60 @@ function suitColor(s){ return isRed(s) ? '#c8102e' : '#16213a'; }
 function suitG(s, x, y, size, rot){
   return '<g transform="translate(' + x + ' ' + y + ')' + (rot ? ' rotate(180)' : '') + ' scale(' + (size / 100) + ') translate(-50 -50)" fill="' + suitColor(s) + '">' + SUIT_PATH[s] + '</g>';
 }
-// Hình người J Q K (nửa trên; nửa dưới lật 180°)
-function faceArt(r, s){
-  var red = isRed(s), col = red ? '#b71c1c' : '#1f3a68', acc = red ? '#1f3a68' : '#b71c1c';
-  var gold = '#e8a800', skin = '#f7d3ae', hair = r === 13 ? '#8d5a2b' : r === 12 ? '#5d3a1a' : '#3e2a14', h = '';
-  if (r === 12) h += '<path d="M20.2 12Q20 5.8 25 6.3Q30 5.8 29.8 12L31 21Q28 19 29 13.5Q25 9 21 13.5Q22 19 19 21Z" fill="' + hair + '"/>';
-  h += '<path d="M8 28L13 19Q25 15 37 19L42 28Z" fill="' + col + '"/>' +
-       '<path d="M10.5 26.5L14 20.3M39.5 26.5L36 20.3" stroke="' + gold + '" stroke-width=".8"/>' +
-       '<path d="M25 18.5V28M18 20.5L16.5 28M32 20.5L33.5 28" stroke="' + acc + '" stroke-width="1.3"/>' +
-       '<path d="M20 23h2M28 23h2M20 25.5h2M28 25.5h2" stroke="' + gold + '" stroke-width=".9"/>' +
-       '<path d="M13 19Q25 15 37 19" stroke="' + gold + '" stroke-width="1.6" fill="none"/>' +
-       '<ellipse cx="25" cy="18.4" rx="5.2" ry="1.7" fill="#fff" stroke="' + gold + '" stroke-width=".6"/>' +
-       '<circle cx="25" cy="12.5" r="4.6" fill="' + skin + '" stroke="#a0704a" stroke-width=".4"/>' +
-       '<circle cx="23.3" cy="12" r=".55" fill="#2a2a2a"/><circle cx="26.7" cy="12" r=".55" fill="#2a2a2a"/>' +
-       '<circle cx="22.6" cy="13.6" r=".7" fill="#f2a0a0" opacity=".6"/><circle cx="27.4" cy="13.6" r=".7" fill="#f2a0a0" opacity=".6"/>' +
-       '<path d="M23.8 14.6Q25 15.4 26.2 14.6" stroke="#a33" stroke-width=".5" fill="none"/>';
-  if (r === 13){
-    h += '<path d="M20.6 13Q21 18.5 25 18.6Q29 18.5 29.4 13Q27.5 15.8 25 15.8Q22.5 15.8 20.6 13Z" fill="#b07a3c"/>' +
-         '<path d="M20 8.6V3.8L22.5 6.2L25 3L27.5 6.2L30 3.8V8.6Z" fill="' + gold + '" stroke="#9a6a00" stroke-width=".4"/>' +
-         '<circle cx="25" cy="7" r=".8" fill="' + acc + '"/><circle cx="21.5" cy="7.6" r=".45" fill="#fff"/><circle cx="28.5" cy="7.6" r=".45" fill="#fff"/>' +
-         '<path d="M37 10.5L34.5 27" stroke="' + gold + '" stroke-width="1.2"/><circle cx="37.2" cy="9.6" r="1.5" fill="' + gold + '"/><circle cx="37.2" cy="9.6" r=".6" fill="' + acc + '"/>';
-  } else if (r === 12){
-    h += '<path d="M20.4 11.6Q21 7.4 25 7.6Q29 7.4 29.6 11.6Q27 9.6 25 9.8Q23 9.6 20.4 11.6Z" fill="' + hair + '"/>' +
-         '<path d="M21.5 7.8L22.5 4.8L24 6.5L25 4L26 6.5L27.5 4.8L28.5 7.8Z" fill="' + gold + '" stroke="#9a6a00" stroke-width=".4"/>' +
-         '<path d="M12.5 26L14.8 14" stroke="#2e7d32" stroke-width="1"/><path d="M13.6 20q-2.5-1-3 1q2 .6 3-1z" fill="#43a047"/>' +
-         '<circle cx="15" cy="12.6" r="2.4" fill="' + acc + '"/><circle cx="15" cy="12.6" r=".9" fill="' + gold + '"/>';
-  } else {
-    h += '<path d="M20.4 12Q20 8.2 25 8.4Q30 8.2 29.6 12Q27 10 25 10.2Q23 10 20.4 12Z" fill="' + hair + '"/>' +
-         '<path d="M28.6 6Q34 .8 37.5 4Q33.5 3.6 29.8 7.4Z" fill="' + gold + '"/>' +
-         '<path d="M20.6 8.6Q21 4.2 25 4.2Q29 4.2 29.4 8.6Z" fill="' + acc + '"/>' +
-         '<ellipse cx="25" cy="8.6" rx="6.4" ry="1.3" fill="' + acc + '"/>' +
-         '<path d="M13.4 7L15.4 27" stroke="#8a8a8a" stroke-width="1"/><path d="M12.4 7.8L13 3.2L14.8 7.4Z" fill="#b0b0b0"/>';
+// Hình người J Q K: 1 người lớn đứng thẳng (không lật 2 đầu) cho dễ nhìn trên lá bài nhỏ. Toạ độ riêng 100 × 130,
+// tâm người ở x = 50. emb: biểu tượng chất vẽ sẵn ở ngực (toạ độ 50, 104).
+function portrait(r, s, emb){
+  var red = s === 1 || s === 2, col = red ? '#b71c1c' : '#1f3a68', col2 = red ? '#7f1010' : '#142847', acc = red ? '#1f3a68' : '#b71c1c';
+  var gold = '#e8a800', gd = '#9a6a00', skin = '#f7d3ae', sk2 = '#e9b78f', hair = r === 13 ? '#9a6a3a' : r === 12 ? '#5d3a1a' : '#3e2a14', h = '';
+  // phía sau người
+  if (r === 12) h += '<path d="M30 48Q28 24 50 24Q72 24 70 48L74 92Q62 86 64 60Q50 40 36 60Q38 86 26 92Z" fill="' + hair + '"/>';
+  if (r === 11) h += '<path d="M16 30L20 128" stroke="#8d6e63" stroke-width="2.6"/><path d="M16 30L12 15L21 22Z" fill="#b0bec5" stroke="#78909c" stroke-width=".6"/><path d="M15.5 33Q7 35 8 45Q12 40 17 40Z" fill="#b0bec5" stroke="#78909c" stroke-width=".6"/>';
+  // cổ + áo choàng
+  h += '<rect x="44" y="62" width="12" height="16" fill="' + sk2 + '"/>' +
+       '<path d="M2 132L8 88Q14 76 32 74L50 80L68 74Q86 76 92 88L98 132Z" fill="' + col + '"/>' +
+       '<path d="M32 74L50 80L68 74L65 132H35Z" fill="' + col2 + '" opacity=".55"/>' +
+       '<rect x="45" y="80" width="10" height="52" fill="' + gold + '"/><path d="M45 88h10M45 96h10M45 112h10M45 120h10" stroke="' + gd + '" stroke-width="1"/>' +
+       '<path d="M8 88Q14 76 32 74M92 88Q86 76 68 74" stroke="' + gold + '" stroke-width="3" fill="none"/>' +
+       '<circle cx="21" cy="100" r="3" fill="' + gold + '"/><circle cx="79" cy="100" r="3" fill="' + gold + '"/><circle cx="17" cy="117" r="3" fill="' + gold + '"/><circle cx="83" cy="117" r="3" fill="' + gold + '"/>' +
+       '<path d="M24 108l4 4-4 4-4-4zM76 108l4 4-4 4-4-4z" fill="' + acc + '"/>';
+  // cổ áo
+  if (r === 13) h += '<path d="M27 76Q50 93 73 76L71 85Q50 99 29 85Z" fill="#fff" stroke="#bbb" stroke-width=".6"/><circle cx="37" cy="85" r="1.3" fill="#222"/><circle cx="50" cy="90" r="1.3" fill="#222"/><circle cx="63" cy="85" r="1.3" fill="#222"/>';
+  else if (r === 12) h += '<path d="M33 76Q50 89 67 76Q50 95 33 76Z" fill="#fff" stroke="' + gold + '" stroke-width="1"/><circle cx="50" cy="87" r="2.6" fill="' + acc + '" stroke="' + gold + '" stroke-width="1"/>';
+  else h += '<path d="M31 76L50 86L69 76L65 83L50 93L35 83Z" fill="#fff" stroke="#bbb" stroke-width=".6"/>';
+  h += '<circle cx="50" cy="104" r="7.5" fill="#fff8e1" stroke="' + gold + '" stroke-width="1.5"/>' + emb;
+  // tai + mặt
+  h += '<ellipse cx="34.5" cy="54" rx="2.6" ry="4.2" fill="' + sk2 + '"/><ellipse cx="65.5" cy="54" rx="2.6" ry="4.2" fill="' + sk2 + '"/>' +
+       '<ellipse cx="50" cy="52" rx="16" ry="18" fill="' + skin + '" stroke="#b07a52" stroke-width=".8"/>' +
+       '<path d="M39 44q4-2.5 8 0M53 44q4-2.5 8 0" stroke="' + (r === 13 ? '#7a5230' : hair) + '" stroke-width="1.6" fill="none" stroke-linecap="round"/>' +
+       '<ellipse cx="43" cy="49.5" rx="2.6" ry="3" fill="#fff"/><ellipse cx="57" cy="49.5" rx="2.6" ry="3" fill="#fff"/>' +
+       '<circle cx="43.4" cy="50" r="1.7" fill="#3b2a1a"/><circle cx="57.4" cy="50" r="1.7" fill="#3b2a1a"/><circle cx="44" cy="49.3" r=".55" fill="#fff"/><circle cx="58" cy="49.3" r=".55" fill="#fff"/>' +
+       '<path d="M50 51v7l-2.5 1.2" stroke="#b07a52" stroke-width="1.1" fill="none" stroke-linecap="round"/>' +
+       '<circle cx="39" cy="58" r="3" fill="#f08a8a" opacity=".35"/><circle cx="61" cy="58" r="3" fill="#f08a8a" opacity=".35"/>';
+  if (r === 13){ // Vua: râu, ria, vương miện, quyền trượng
+    h += '<path d="M34 50Q33 62 38 70Q44 80 50 80Q56 80 62 70Q67 62 66 50Q64 60 58 62Q50 66 42 62Q36 60 34 50Z" fill="' + hair + '"/>' +
+         '<path d="M41.5 61q4.5-3.4 8.5 0q4-3.4 8.5 0q-4 3.2-8.5 1.2q-4.5 2-8.5-1.2z" fill="' + hair + '" stroke="#6d4520" stroke-width=".5"/>' +
+         '<path d="M46 66q4 2 8 0" stroke="#5a2a10" stroke-width="1.2" fill="none" stroke-linecap="round"/>' +
+         '<path d="M33 45q-2 8 1 14l2-12zM67 45q2 8-1 14l-2-12z" fill="' + hair + '"/>' +
+         '<path d="M30 38L28 18L37 28L44 13L50 26L56 13L63 28L72 18L70 38Z" fill="' + gold + '" stroke="' + gd + '" stroke-width="1.2" stroke-linejoin="round"/>' +
+         '<rect x="30" y="32" width="40" height="7" rx="1.5" fill="' + gold + '" stroke="' + gd + '" stroke-width="1"/>' +
+         '<circle cx="39" cy="35.5" r="2" fill="' + acc + '"/><circle cx="50" cy="35.5" r="2.2" fill="#fff"/><circle cx="61" cy="35.5" r="2" fill="' + acc + '"/>' +
+         '<circle cx="28" cy="18" r="2" fill="' + gold + '"/><circle cx="44" cy="13" r="2" fill="' + gold + '"/><circle cx="56" cy="13" r="2" fill="' + gold + '"/><circle cx="72" cy="18" r="2" fill="' + gold + '"/>' +
+         '<path d="M84 62L79 130" stroke="' + gold + '" stroke-width="3"/><circle cx="84.5" cy="57" r="5" fill="' + gold + '" stroke="' + gd + '" stroke-width="1"/><path d="M84.5 46v6M81.5 49h6" stroke="' + gd + '" stroke-width="1.6"/>';
+  } else if (r === 12){ // Hoàng hậu: tóc dài, vương miện nhỏ, môi đỏ, hoa tai, cầm hoa
+    h += '<path d="M34 47Q34 30 50 30Q66 30 66 47Q60 36 50 37Q40 36 34 47Z" fill="' + hair + '"/>' +
+         '<path d="M45.5 63q4.5 3 9 0q-4.5 1.6-9 0z" fill="#c62828"/>' +
+         '<path d="M40.5 46.5l-1.5-1.5M59.5 46.5l1.5-1.5" stroke="#3b2a1a" stroke-width=".8"/>' +
+         '<circle cx="34.5" cy="61" r="1.8" fill="' + gold + '"/><circle cx="65.5" cy="61" r="1.8" fill="' + gold + '"/>' +
+         '<path d="M35 36L38 25L44 31L50 21L56 31L62 25L65 36Z" fill="' + gold + '" stroke="' + gd + '" stroke-width="1.1" stroke-linejoin="round"/>' +
+         '<circle cx="50" cy="31" r="2" fill="' + acc + '"/>' +
+         '<path d="M80 130L82 84" stroke="#2e7d32" stroke-width="2"/><path d="M81 104q-8-4-10 2q6 2 10-2zM81.5 96q8-4 10 2q-6 2-10-2z" fill="#43a047"/>' +
+         '<g fill="' + acc + '"><circle cx="82" cy="74" r="3.4"/><circle cx="86.5" cy="78" r="3.4"/><circle cx="84.5" cy="83.5" r="3.4"/><circle cx="79.5" cy="83.5" r="3.4"/><circle cx="77.5" cy="78" r="3.4"/></g><circle cx="82" cy="79" r="2.6" fill="' + gold + '"/>';
+  } else { // Bồi (J): tóc ngắn, mũ nồi lông vũ, cầm giáo
+    h += '<path d="M34 50Q32 32 50 32Q68 32 66 50Q64 40 58 39Q50 37 42 39Q36 40 34 50Z" fill="' + hair + '"/>' +
+         '<path d="M45 63q5 3 10 0" stroke="#a33" stroke-width="1.3" fill="none" stroke-linecap="round"/>' +
+         '<path d="M64 27Q80 6 93 12Q81 14 68 31Z" fill="' + gold + '" stroke="' + gd + '" stroke-width=".8"/><path d="M67 28Q79 14 90 12" stroke="' + gd + '" stroke-width=".7" fill="none"/>' +
+         '<path d="M29 39Q29 21 52 21Q73 21 73 36Q60 31 48 32Q37 33 29 39Z" fill="' + acc + '"/>' +
+         '<path d="M29 39Q50 30 73 36" stroke="' + gold + '" stroke-width="2.6" fill="none"/><circle cx="52" cy="21.5" r="2.2" fill="' + gold + '"/>';
   }
   return h;
 }
@@ -235,7 +258,7 @@ function cardFace(r, s){
   b += '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#f3efe4"/></linearGradient></defs>';
   b += '<rect x="1" y="1" width="198" height="278" rx="16" fill="url(#g)" stroke="#b9b1a0" stroke-width="2"/>';
   var corner = '<text x="10" y="56" font-family="Georgia,\'Times New Roman\',serif" font-weight="700" font-size="' + (r === 10 ? 50 : 60) + '" fill="' + c + '" letter-spacing="' + (r === 10 ? -5 : 0) + '">' + RANKS[r] + '</text>' + suitG(s, 168, 30, 40);
-  b += corner + '<g transform="rotate(180 100 140)">' + corner + '</g>';
+  b += corner + (r > 10 ? '' : '<g transform="rotate(180 100 140)">' + corner + '</g>'); // lá hình: không vẽ góc ngược phía dưới (đè lên hình người)
   if (r === 1){
     b += suitG(s, 100, 146, s === 0 ? 118 : 96);
     if (s === 0) b += '<circle cx="100" cy="146" r="66" fill="none" stroke="#16213a" stroke-width="1.5" stroke-dasharray="3 5" opacity=".5"/>';
@@ -244,11 +267,8 @@ function cardFace(r, s){
     var sz = r >= 9 ? 36 : 40;
     pts.forEach(function(p){ var x = x0 + (x1 - x0) * p[0], y = y0 + (y1 - y0) * p[1]; b += suitG(s, x, y, sz, p[1] > .5); });
   } else {
-    var fc = isRed(s) ? '#b71c1c' : '#1f3a68';
-    b += '<rect x="32" y="66" width="136" height="150" rx="6" fill="#fff8e1" stroke="' + fc + '" stroke-width="2"/>' +
-         '<rect x="37" y="71" width="126" height="140" rx="4" fill="none" stroke="#e8a800" stroke-width="1.2"/>' +
-         '<g transform="translate(37 71) scale(2.52 2.5)"><g>' + faceArt(r, s) + '</g><g transform="rotate(180 25 28)">' + faceArt(r, s) + '</g>' +
-         '<path d="M0 28H50" stroke="' + fc + '" stroke-width=".5"/></g>' + suitG(s, 48, 84, 16) + suitG(s, 152, 198, 16, true);
+    b += '<clipPath id="cp"><rect x="2" y="2" width="196" height="276" rx="15"/></clipPath>' +
+         '<g clip-path="url(#cp)"><g transform="translate(12.5 49) scale(1.75)">' + portrait(r, s, suitG(s, 50, 104, 9)) + '</g></g>';
   }
   return (_faceCache[k] = svgUrl('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280">' + b + '</svg>'));
 }
