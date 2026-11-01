@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.8.4</title>
+<title>Mua Bán Mủ Cao Su v2.8.5</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -65,6 +65,49 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g
 #gmp-canvas{display:block;width:100%;height:100%}
 .gmp-btn{position:absolute;top:calc(10px + env(safe-area-inset-top));width:42px;height:42px;border-radius:50%;border:2px solid rgba(255,255,255,.9);background:rgba(27,67,50,.55);color:#fff;font-size:19px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1}
 body.gmp-open{overflow:hidden}
+/* Game ẩn Xếp Bài Nhện + danh sách game */
+#game-menu{display:none;position:fixed;inset:0;z-index:6500;background:rgba(10,30,20,.55);align-items:center;justify-content:center;padding:20px}
+.gm-box{width:100%;max-width:340px;background:#fffaf0;border:3px solid #2d6a4f;border-radius:18px;padding:16px;font-family:'Be Vietnam Pro',sans-serif;color:#1b4332;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.gm-ttl{font-size:17px;font-weight:800;text-align:center;margin-bottom:12px}
+.gm-item{display:flex;align-items:center;gap:12px;width:100%;padding:12px;margin-bottom:10px;border-radius:14px;border:2px solid #b7d3c2;background:#fff;font-family:inherit;text-align:left;cursor:pointer}
+.gm-item:active{background:#e8f5ee}
+.gm-ico{font-size:34px;line-height:1}
+.gm-name{font-size:15px;font-weight:800;color:#1b4332}
+.gm-desc{font-size:12px;color:#52796f;margin-top:2px}
+.gm-close{width:100%;padding:10px;border-radius:12px;border:1.5px solid #b7d3c2;background:#fff;font-family:inherit;font-size:14px;font-weight:700;color:#2d6a4f;cursor:pointer}
+#sol-overlay{display:none;position:fixed;inset:0;z-index:6000;max-width:480px;margin:0 auto;flex-direction:column;background:radial-gradient(ellipse at 50% 30%,#2f7d4a,#1d5a33 70%,#174a2a);color:#fff;font-family:'Be Vietnam Pro',sans-serif;-webkit-user-select:none;user-select:none;touch-action:none}
+.sol-top{display:flex;align-items:center;justify-content:space-between;padding:calc(8px + env(safe-area-inset-top)) 10px 6px;gap:6px}
+.sol-ib{width:42px;height:42px;border-radius:50%;border:none;background:rgba(0,0,0,.25);color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}
+.sol-stat{flex:1;text-align:center}
+.sol-stat small{display:block;font-size:11px;font-weight:700;color:#ffd166;letter-spacing:.3px}
+.sol-stat b{font-size:19px;font-weight:800}
+#sol-board{position:relative;flex:1;overflow:hidden}
+.sol-c{position:absolute;box-sizing:border-box;background:#fff;border:1px solid #9aa79f;border-radius:calc(var(--cw)*.12);box-shadow:0 1px 2px rgba(0,0,0,.35);color:#1d2b3a;overflow:hidden;transition:left .18s ease,top .18s ease}
+.sol-c.red{color:#c62828}
+.sol-c.face{background:linear-gradient(#fffdf2,#fff3cf)}
+.sol-r{position:absolute;left:calc(var(--cw)*.06);top:0;font-size:calc(var(--cw)*.42);font-weight:800;line-height:1.1;letter-spacing:-1px}
+.sol-s{position:absolute;right:calc(var(--cw)*.06);top:calc(var(--cw)*.04);font-size:calc(var(--cw)*.3);line-height:1}
+.sol-b{position:absolute;left:0;right:0;bottom:calc(var(--cw)*.08);text-align:center;font-size:calc(var(--cw)*.62);line-height:1}
+.sol-c.down{background:repeating-linear-gradient(45deg,#2d6a4f 0 4px,#40916c 4px 8px);border:2px solid #fff}
+.sol-c.down>span{display:none}
+.sol-c.sol-notr{transition:none!important}
+.sol-c.sol-drag{box-shadow:0 6px 14px rgba(0,0,0,.45)}
+.sol-c.sol-gone{transition:left .25s ease,top .25s ease,opacity .25s;opacity:0}
+.sol-slot{position:absolute;box-sizing:border-box;border:2px dashed rgba(255,255,255,.28);border-radius:6px}
+#sol-stock,#sol-done{position:absolute}
+#sol-stock{cursor:pointer;z-index:5}
+.sol-hl{animation:solHl 1s ease}
+@keyframes solHl{0%,100%{box-shadow:0 1px 2px rgba(0,0,0,.35)}30%,70%{box-shadow:0 0 0 3px #ffd166,0 0 12px #ffd166}}
+.sol-shake{animation:solSh .3s}
+@keyframes solSh{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.sol-bot{display:flex;justify-content:space-around;padding:8px 6px calc(10px + env(safe-area-inset-bottom));background:rgba(0,0,0,.18)}
+.sol-bb{display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:none;color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;min-width:80px}
+.sol-bb span{width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;font-size:24px}
+#sol-toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;padding:9px 14px;border-radius:14px;font-size:13px;font-weight:600;opacity:0;transition:opacity .25s;pointer-events:none;z-index:2000;width:max-content;max-width:88%;text-align:center}
+#sol-toast.show{opacity:1}
+#sol-set,#sol-win{display:none;position:absolute;inset:0;z-index:3000;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:20px}
+#sol-win .gmp-set-box{text-align:center}
+.sol-win-info{font-size:14px;line-height:1.7;margin:6px 0 4px}
 #gmp-set{display:none;position:absolute;inset:0;z-index:2;background:rgba(10,30,20,.45);align-items:center;justify-content:center;padding:20px}
 .gmp-set-box{width:100%;max-width:330px;background:#fffaf0;border:3px solid #2d6a4f;border-radius:18px;padding:16px 16px 14px;box-shadow:0 10px 30px rgba(0,0,0,.3);font-family:'Be Vietnam Pro',sans-serif;color:#1b4332}
 .gmp-set-ttl{font-size:17px;font-weight:800;text-align:center;margin-bottom:10px}
@@ -573,7 +616,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.8.4 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.8.5 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1956,7 +1999,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.8.4</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.8.5</div>
       </div>
     </div>
 
@@ -2122,7 +2165,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.8.4</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.8.5</div>
       </div>
     </div>
 
@@ -4405,7 +4448,7 @@ var _cfShow = { mua: false, ban: false }; // trạng thái "đã nhập dữ li�
 // Ngày đang xem CHƯA có giao dịch nào → luôn hiện (dù có ẩn thì bên dưới cũng chỉ là khoảng trống, không có
 // dữ liệu gì để xem); có từ 1 giao dịch trở lên mới làm theo cài đặt.
 // Đang SỬA giao dịch: hàng nút "Huỷ/Lưu giao dịch" (thêm mới) LUÔN ẩn — chỉ còn hàng "Huỷ/Lưu thay đổi/Xoá"
-// (trước v2.8.4, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
+// (trước v2.8.5, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
 // "Lưu giao dịch" sẽ thêm 1 giao dịch MỚI thay vì sửa).
 function _capNhatCompactForm(tab, show){
   if (tab!=='mua' && tab!=='ban') return;
@@ -6166,7 +6209,8 @@ var SB_NO_SYNC_KEYS = ['device_code','gd_token','gd_token_expiry','gd_folder_id'
   // đồng bộ sang máy khác cùng tài khoản sẽ làm máy đó áp dụng lại lệnh cũ (mất ngày gia hạn hợp lệ,
   // hoặc tự đặt lại mật khẩu giao dịch về mặc định).
   'admin_override_applied_at','pw_reset_applied_at','registry_sync_debug','last_ext_info',
-  'gmp_best','gmp_best_de','gmp_best_kho','gmp_sound','gmp_cfg']; // kỷ lục + cài đặt game ẩn Giọt Mủ Phiêu Lưu: riêng từng máy
+  'gmp_best','gmp_best_de','gmp_best_kho','gmp_sound','gmp_cfg', // kỷ lục + cài đặt game ẩn Giọt Mủ Phiêu Lưu: riêng từng máy
+  'sol_cfg','sol_save','sol_stat']; // game ẩn Xếp Bài Nhện: cài đặt, ván đang chơi dở, thống kê — riêng từng máy
 // Danh sách khoá THỰC SỰ sẽ đồng bộ mỗi lần: hợp của SB_DATA_KEYS (đảm bảo có giá trị mặc định hợp lý
 // nếu máy chưa từng có khoá đó) VÀ toàn bộ khoá đang thực sự tồn tại trong localStorage của app (trừ
 // danh sách chỉ-riêng-máy-này ở trên) — để không bỏ sót dữ liệu của các tính năng thêm sau này mà lỡ
@@ -14124,19 +14168,394 @@ var GMP = (function(){
   document.addEventListener('keydown', onKey);
   window.addEventListener('resize', function(){ if (isOpen()){ resize(); if (st === 'ready') reset(); } });
   document.addEventListener('visibilitychange', function(){ if (document.hidden && isOpen() && st === 'play'){ paused = true; last = 0; } });
-  // Chạm nhanh 3 lần vào tên app (mỗi lần cách nhau dưới 0,5 giây) → mở game
+  // Chạm nhanh 3 lần vào tên app (mỗi lần cách nhau dưới 0,5 giây) → mở danh sách game (GAME_MENU)
   (function(){
     var n = 0, tm = 0;
     document.addEventListener('click', function(e){
       var el = e.target && e.target.closest && e.target.closest('.logo-txt');
       if (!el) return;
       n++; clearTimeout(tm);
-      if (n >= 3){ n = 0; open(); return; }
+      if (n >= 3){ n = 0; if (typeof GAME_MENU !== 'undefined') GAME_MENU.open(); else open(); return; }
       tm = setTimeout(function(){ n = 0; }, 500);
     });
   })();
   return { open: open, close: close, isOpen: isOpen, openSet: openSet, closeSet: closeSet, toggleCfg: toggleCfg, setDiff: setDiff, resetBest: resetBest };
 })();
+
+// ─── GAME ẨN "XẾP BÀI NHỆN" (Spider Solitaire, luật cổ điển) ───
+// 10 cột, chia sẵn 54 lá (4 cột đầu 6 lá, 6 cột sau 5 lá), 50 lá còn lại chia thêm 5 lần (mỗi lần 10 lá, chỉ
+// chia khi không còn cột trống). Xếp giảm dần K → A; chỉ kéo cả dãy khi các lá cùng chất. Đủ dãy K → A cùng chất
+// thì thu lên góc trái; thu đủ 8 dãy là thắng. Điểm: bắt đầu 500, mỗi nước −1, mỗi dãy hoàn thành +100.
+// Chơi 1 chất (mặc định) / 2 chất / 4 chất. Lá bài vẽ bằng HTML/CSS (không dùng ảnh) cho nhẹ app.
+// Lưu trên máy (không đồng bộ — nằm trong SB_NO_SYNC_KEYS): 'sol_cfg' (cài đặt), 'sol_save' (ván đang chơi dở),
+// 'sol_stat' (số ván thắng + điểm cao theo số chất).
+var SOL = (function(){
+  var SUITS = ['♠', '♥', '♦', '♣'], RANKS = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+  var ov, board, cols, stock, done, score, moves, elapsed, startAt, hist, mode = 1, cfg = { sound: true, suits: 1 };
+  var els = {}, cw = 36, ch = 50, gap = 3, pad = 3, topY = 0, colY = 0, timerT = 0, drag = null, hintI = 0, won = false, am = null;
+  function lsGet(k, d){ try { var v = MCS_LS.getItem(k); return v == null ? d : v; } catch(e){ return d; } }
+  function lsSet(k, v){ try { MCS_LS.setItem(k, v); } catch(e){} }
+  function $(id){ return document.getElementById(id); }
+  function beep(f, dur, type, vol, delay){
+    if (!cfg.sound) return;
+    setTimeout(function(){
+      try {
+        if (!am) am = new (window.AudioContext || window.webkitAudioContext)();
+        if (am.state === 'suspended') am.resume();
+        var o = am.createOscillator(), g = am.createGain(), t = am.currentTime;
+        o.type = type || 'triangle'; o.frequency.setValueAtTime(f, t);
+        g.gain.setValueAtTime(vol || 0.08, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+        o.connect(g); g.connect(am.destination); o.start(t); o.stop(t + dur + 0.02);
+      } catch(e){}
+    }, delay || 0);
+  }
+  function sndPlace(){ beep(420, 0.06, 'triangle', 0.09); }
+  function sndBad(){ beep(160, 0.12, 'sawtooth', 0.05); }
+  function sndDeal(){ for (var i = 0; i < 5; i++) beep(300 + i * 40, 0.04, 'triangle', 0.05, i * 35); }
+  function sndDone(){ [523, 659, 784, 1047].forEach(function(f, i){ beep(f, 0.14, 'sine', 0.09, i * 90); }); }
+
+  // ── Trạng thái ván ──
+  function newGame(suits){
+    mode = suits || cfg.suits || 1;
+    var deck = [], id = 0;
+    for (var d = 0; d < 8; d++){
+      var s = mode === 1 ? 0 : mode === 2 ? (d % 2) : (d % 4);
+      for (var r = 1; r <= 13; r++) deck.push({ id: id++, s: s, r: r, up: false });
+    }
+    for (var i = deck.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)), t = deck[i]; deck[i] = deck[j]; deck[j] = t; }
+    cols = []; for (var c = 0; c < 10; c++) cols.push([]);
+    for (var k = 0; k < 54; k++) cols[k % 10].push(deck[k]);
+    cols.forEach(function(col){ col[col.length - 1].up = true; });
+    stock = deck.slice(54); done = []; score = 500; moves = 0; elapsed = 0; startAt = 0; hist = []; won = false; hintI = 0;
+    buildEls(); render(true); save(); updStats();
+  }
+  function snap(){ return JSON.stringify({ cols: cols, stock: stock, done: done, score: score }); }
+  function pushHist(){ hist.push(snap()); if (hist.length > 300) hist.shift(); }
+  function save(){
+    try { lsSet('sol_save', JSON.stringify({ mode: mode, cols: cols, stock: stock, done: done, score: score, moves: moves, elapsed: curElapsed(), won: won })); } catch(e){}
+  }
+  function load(){
+    try {
+      var g = JSON.parse(lsGet('sol_save', 'null'));
+      if (!g || !g.cols || g.cols.length !== 10 || g.won) return false;
+      mode = g.mode || 1; cols = g.cols; stock = g.stock || []; done = g.done || []; score = g.score; moves = g.moves || 0;
+      elapsed = g.elapsed || 0; startAt = 0; hist = []; won = false; hintI = 0;
+      return true;
+    } catch(e){ return false; }
+  }
+  function curElapsed(){ return elapsed + (startAt ? (Date.now() - startAt) : 0); }
+  function startClock(){ if (!startAt && !won) startAt = Date.now(); }
+  function stopClock(){ if (startAt){ elapsed += Date.now() - startAt; startAt = 0; } }
+  function fmtT(ms){ var s = Math.floor(ms / 1000); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+  function updStats(){
+    var a = $('sol-score'), b = $('sol-time'), c = $('sol-moves');
+    if (a) a.textContent = score; if (b) b.textContent = fmtT(curElapsed()); if (c) c.textContent = moves;
+  }
+
+  // ── Luật ──
+  function canPick(col, idx){
+    if (idx < 0 || idx >= col.length || !col[idx].up) return false;
+    for (var i = idx; i < col.length - 1; i++){
+      if (col[i + 1].s !== col[i].s || col[i + 1].r !== col[i].r - 1) return false;
+    }
+    return true;
+  }
+  function canDrop(card, dest){ var top = dest[dest.length - 1]; return !top || top.r === card.r + 1; }
+  function flipTop(col){ var t = col[col.length - 1]; if (t && !t.up){ t.up = true; } }
+  function checkDone(ci){
+    var col = cols[ci], n = col.length;
+    if (n < 13) return false;
+    var s = col[n - 1].s;
+    for (var i = 0; i < 13; i++){ var c = col[n - 1 - i]; if (!c.up || c.s !== s || c.r !== i + 1) return false; }
+    var run = col.splice(n - 13, 13);
+    done.push(s); score += 100; flipTop(col); sndDone();
+    run.forEach(function(c){ var e = els[c.id]; if (e) e.classList.add('sol-gone'); });
+    return true;
+  }
+  function doMove(from, idx, to){
+    pushHist();
+    var seq = cols[from].splice(idx);
+    cols[to] = cols[to].concat(seq);
+    flipTop(cols[from]);
+    score--; moves++; startClock();
+    checkDone(to);
+    sndPlace(); after();
+  }
+  function deal(){
+    if (won) return;
+    if (!stock.length){ toastS('Đã chia hết bài'); sndBad(); return; }
+    for (var i = 0; i < 10; i++) if (!cols[i].length){ toastS('Phải lấp hết cột trống trước khi chia bài'); sndBad(); flashSlot(i); return; }
+    pushHist();
+    for (var c = 0; c < 10; c++){ var card = stock.pop(); card.up = true; cols[c].push(card); }
+    score--; moves++; startClock();
+    for (var k = 0; k < 10; k++) checkDone(k);
+    sndDeal(); after();
+  }
+  function undo(){
+    if (won || !hist.length){ sndBad(); return; }
+    var g = JSON.parse(hist.pop());
+    cols = g.cols; stock = g.stock; done = g.done; score = g.score - 1; moves++;
+    Object.keys(els).forEach(function(id){ els[id].classList.remove('sol-gone'); });
+    sndPlace(); after();
+  }
+  function after(){
+    hintI = 0; render(); updStats();
+    if (done.length === 8 && !won) win();
+    save();
+  }
+  function win(){
+    won = true; stopClock();
+    var st = stats(), k = 's' + mode;
+    st[k] = st[k] || { w: 0, b: 0 }; st[k].w++; var rec = score > st[k].b; if (rec) st[k].b = score;
+    lsSet('sol_stat', JSON.stringify(st));
+    setTimeout(function(){
+      $('sol-win-info').innerHTML = 'Điểm: <b>' + score + '</b>' + (rec ? ' 🏆 Điểm cao mới!' : '') + '<br>Thời gian: <b>' + fmtT(curElapsed()) + '</b> · Nước đi: <b>' + moves + '</b>';
+      $('sol-win').style.display = 'flex';
+      [523, 659, 784, 1047, 784, 1047].forEach(function(f, i){ beep(f, 0.18, 'sine', 0.09, i * 120); });
+    }, 400);
+  }
+  function stats(){ try { return JSON.parse(lsGet('sol_stat', '{}')) || {}; } catch(e){ return {}; } }
+
+  // ── Chạm: tự đi tới chỗ hợp lý nhất ──
+  function autoMove(from, idx){
+    var card = cols[from][idx], best = -1, bestP = 0;
+    for (var k = 1; k <= 10; k++){
+      var to = (from + k) % 10; if (to === from) continue;
+      var dest = cols[to], top = dest[dest.length - 1], p = 0;
+      if (!top){ if (idx > 0) p = 1; }
+      else if (top.r === card.r + 1) p = top.s === card.s ? 3 : 2;
+      if (p > bestP){ bestP = p; best = to; }
+    }
+    if (best < 0){ shake(from, idx); sndBad(); return; }
+    doMove(from, idx, best);
+  }
+  // ── Gợi ý ──
+  function allHints(){
+    var list = [];
+    for (var f = 0; f < 10; f++){
+      var col = cols[f];
+      for (var i = col.length - 1; i >= 0 && canPick(col, i); i--){
+        var card = col[i], below = col[i - 1];
+        var linked = below && below.up && below.s === card.s && below.r === card.r + 1; // đang nằm đúng dãy cùng chất
+        for (var t = 0; t < 10; t++){
+          if (t === f) continue;
+          var dest = cols[t], top = dest[dest.length - 1], p = 0;
+          if (!top){ if (i > 0 && !linked) p = 1; }
+          else if (top.r === card.r + 1){
+            if (top.s === card.s) p = linked ? 0 : 5;
+            else if (!linked) p = (below && !below.up) || !below ? 3 : (below && below.up && below.r !== card.r + 1 ? 2 : 0);
+          }
+          if (p) list.push({ f: f, i: i, t: t, p: p });
+        }
+      }
+    }
+    list.sort(function(a, b){ return b.p - a.p; });
+    return list;
+  }
+  function hint(){
+    if (won) return;
+    var list = allHints();
+    if (!list.length){
+      if (stock.length){ toastS('Hết nước đi — chạm xấp bài góc phải để chia thêm'); var st = $('sol-stock'); if (st){ st.classList.remove('sol-hl'); void st.offsetWidth; st.classList.add('sol-hl'); } }
+      else toastS('Không còn nước đi nào — thử Hoàn nguyên hoặc Ván mới');
+      sndBad(); return;
+    }
+    var h = list[hintI % list.length]; hintI++;
+    var hl = cols[h.f].slice(h.i).map(function(c){ return els[c.id]; });
+    var dt = cols[h.t][cols[h.t].length - 1];
+    if (dt) hl.push(els[dt.id]); else { var sl = $('sol-slot-' + h.t); if (sl) hl.push(sl); }
+    hl.forEach(function(e){ if (!e) return; e.classList.remove('sol-hl'); void e.offsetWidth; e.classList.add('sol-hl'); });
+    beep(880, 0.08, 'sine', 0.06);
+  }
+  function shake(ci, idx){
+    cols[ci].slice(idx).forEach(function(c){ var e = els[c.id]; if (!e) return; e.classList.remove('sol-shake'); void e.offsetWidth; e.classList.add('sol-shake'); });
+  }
+  function flashSlot(i){ var e = $('sol-slot-' + i); if (e){ e.classList.remove('sol-hl'); void e.offsetWidth; e.classList.add('sol-hl'); } }
+  function toastS(m){ var t = $('sol-toast'); if (!t) return; t.textContent = m; t.classList.add('show'); clearTimeout(t._tm); t._tm = setTimeout(function(){ t.classList.remove('show'); }, 2200); }
+
+  // ── Vẽ ──
+  function layout(){
+    var W = board.clientWidth;
+    cw = Math.floor((W - pad * 2 - gap * 9) / 10); ch = Math.round(cw * 1.42);
+    ov.style.setProperty('--cw', cw + 'px');
+    topY = 6; colY = topY + ch + 10;
+  }
+  function colX(i){ return pad + i * (cw + gap); }
+  function buildEls(){
+    board.querySelectorAll('.sol-c').forEach(function(e){ e.remove(); });
+    els = {};
+    var all = [];
+    cols.forEach(function(c){ all = all.concat(c); }); all = all.concat(stock);
+    all.forEach(function(c){
+      var e = document.createElement('div');
+      e.className = 'sol-c' + ((c.s === 1 || c.s === 2) ? ' red' : '') + (c.r > 10 ? ' face' : '');
+      e.innerHTML = '<span class="sol-r">' + RANKS[c.r] + '</span><span class="sol-s">' + SUITS[c.s] + '</span><span class="sol-b">' + SUITS[c.s] + '</span>';
+      e.dataset.id = c.id; e._shown = false;
+      board.appendChild(e); els[c.id] = e;
+    });
+  }
+  function stockPos(){ return { x: board.clientWidth - pad - cw, y: topY }; }
+  function render(first){
+    layout();
+    var H = board.clientHeight, avail = H - colY - 6, sp = stockPos(), inCol = {};
+    for (var i = 0; i < 10; i++){
+      var sl = $('sol-slot-' + i);
+      if (sl){ sl.style.left = colX(i) + 'px'; sl.style.top = colY + 'px'; sl.style.width = cw + 'px'; sl.style.height = ch + 'px'; }
+      var col = cols[i], nd = 0, nu = 0;
+      col.forEach(function(c){ if (c.up) nu++; else nd++; });
+      var dStep = ch * 0.14, uStep = ch * 0.3;
+      var need = nd * dStep + Math.max(0, nu - 1) * uStep;
+      var maxH = avail - ch;
+      if (need > maxH && need > 0){ var k = maxH / need; dStep *= k; uStep *= k; }
+      var y = colY;
+      for (var j = 0; j < col.length; j++){
+        var c = col[j], e = els[c.id]; inCol[c.id] = 1;
+        if (!e) continue;
+        e.classList.toggle('down', !c.up);
+        e.style.width = cw + 'px'; e.style.height = ch + 'px'; e.style.zIndex = 10 + j;
+        if (!e._shown){
+          e._shown = true; e.classList.remove('sol-gone');
+          e.classList.add('sol-notr'); e.style.left = sp.x + 'px'; e.style.top = sp.y + 'px'; e.style.display = '';
+          void e.offsetWidth; e.classList.remove('sol-notr');
+          if (!first) e.style.transitionDelay = (i * 25) + 'ms';
+        } else e.style.transitionDelay = '';
+        e.style.display = '';
+        e.style.left = colX(i) + 'px'; e.style.top = y + 'px';
+        y += c.up ? uStep : dStep;
+      }
+    }
+    // lá chưa chia (trong xấp) và lá đã thu: ẩn đi (xấp bài + dãy đã thu vẽ riêng)
+    Object.keys(els).forEach(function(id){
+      if (inCol[id]) return;
+      var e = els[id];
+      if (e.classList.contains('sol-gone') && e.style.display !== 'none'){
+        e.style.zIndex = 500; e.style.left = pad + 'px'; e.style.top = topY + 'px';
+        setTimeout(function(){ if (e.classList.contains('sol-gone')) { e.style.display = 'none'; e._shown = false; } }, 260);
+      } else if (!e.classList.contains('sol-gone')){ e.style.display = 'none'; e._shown = false; }
+    });
+    // xấp bài còn chia được (góc phải)
+    var stk = $('sol-stock'), nDeal = Math.ceil(stock.length / 10), sh = '';
+    for (var d = 0; d < nDeal; d++) sh += '<div class="sol-c down" style="position:absolute;left:' + (-d * cw * 0.28) + 'px;top:0;width:' + cw + 'px;height:' + ch + 'px"></div>';
+    stk.innerHTML = sh; stk.style.left = sp.x + 'px'; stk.style.top = topY + 'px'; stk.style.width = cw + 'px'; stk.style.height = ch + 'px';
+    stk.style.visibility = nDeal ? 'visible' : 'hidden';
+    // các dãy đã thu (góc trái): hiện lá K
+    var fd = $('sol-done'), fh = '';
+    done.forEach(function(s, k){
+      fh += '<div class="sol-c' + ((s === 1 || s === 2) ? ' red' : '') + ' face" style="position:absolute;left:' + (k * cw * 0.32) + 'px;top:0;width:' + cw + 'px;height:' + ch + 'px"><span class="sol-r">K</span><span class="sol-s">' + SUITS[s] + '</span><span class="sol-b">' + SUITS[s] + '</span></div>';
+    });
+    fd.innerHTML = fh; fd.style.left = pad + 'px'; fd.style.top = topY + 'px';
+  }
+
+  // ── Kéo thả + chạm ──
+  function findCard(id){
+    for (var i = 0; i < 10; i++) for (var j = 0; j < cols[i].length; j++) if (cols[i][j].id === id) return { c: i, i: j };
+    return null;
+  }
+  function onDown(e){
+    if (won) return;
+    var t = e.target.closest && e.target.closest('.sol-c[data-id]');
+    if (!t) return;
+    var loc = findCard(+t.dataset.id); if (!loc) return;
+    e.preventDefault();
+    var ok = canPick(cols[loc.c], loc.i);
+    var list = ok ? cols[loc.c].slice(loc.i).map(function(c){ return els[c.id]; }) : [];
+    drag = { c: loc.c, i: loc.i, ok: ok, x0: e.clientX, y0: e.clientY, moved: false, list: list, pid: e.pointerId };
+    try { board.setPointerCapture(e.pointerId); } catch(err){}
+  }
+  function onMove(e){
+    if (!drag || !drag.ok) return;
+    var dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+    if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 8) return;
+    if (!drag.moved){
+      drag.moved = true;
+      drag.list.forEach(function(el, k){ el.classList.add('sol-notr', 'sol-drag'); el.style.zIndex = 1000 + k; el._x = parseFloat(el.style.left); el._y = parseFloat(el.style.top); });
+    }
+    drag.list.forEach(function(el){ el.style.left = (el._x + dx) + 'px'; el.style.top = (el._y + dy) + 'px'; });
+  }
+  function onUp(e){
+    if (!drag) return;
+    var d = drag; drag = null;
+    if (!d.moved){
+      if (!d.ok){ shake(d.c, d.i); sndBad(); return; }
+      autoMove(d.c, d.i); return;
+    }
+    d.list.forEach(function(el){ void el.offsetWidth; el.classList.remove('sol-notr', 'sol-drag'); });
+    // thả vào cột có tâm gần điểm giữa lá đầu dãy nhất
+    var first = d.list[0], cx = parseFloat(first.style.left) + cw / 2, to = -1, bd = 1e9;
+    for (var i = 0; i < 10; i++){ var dd = Math.abs(colX(i) + cw / 2 - cx); if (dd < bd){ bd = dd; to = i; } }
+    if (to >= 0 && to !== d.c && bd < cw * 1.2 && canDrop(cols[d.c][d.i], cols[to])) doMove(d.c, d.i, to);
+    else { if (to !== d.c) sndBad(); render(); }
+  }
+
+  // ── Mở / đóng / cài đặt ──
+  function open(){
+    ov = $('sol-overlay'); board = $('sol-board'); if (!ov || !board) return;
+    try { var c = JSON.parse(lsGet('sol_cfg', 'null')); if (c) { cfg.sound = c.sound !== false; cfg.suits = [1, 2, 4].indexOf(c.suits) >= 0 ? c.suits : 1; } } catch(e){}
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    ov.style.display = 'flex'; document.body.classList.add('gmp-open');
+    if (!ov._bound){
+      ov._bound = 1;
+      board.addEventListener('pointerdown', onDown);
+      board.addEventListener('pointermove', onMove);
+      board.addEventListener('pointerup', onUp);
+      board.addEventListener('pointercancel', function(){ if (drag){ drag.list.forEach(function(el){ el.classList.remove('sol-notr', 'sol-drag'); }); drag = null; render(); } });
+      $('sol-stock').addEventListener('click', deal);
+      window.addEventListener('resize', function(){ if (isOpen()) render(true); });
+      document.addEventListener('visibilitychange', function(){ if (isOpen()){ if (document.hidden) { stopClock(); save(); } else if (moves && !won) startClock(); } });
+    }
+    $('sol-win').style.display = 'none'; closeSet();
+    var slots = '';
+    for (var i = 0; i < 10; i++) slots += '<div class="sol-slot" id="sol-slot-' + i + '"></div>';
+    board.querySelectorAll('.sol-slot').forEach(function(e){ e.remove(); });
+    board.insertAdjacentHTML('afterbegin', slots);
+    if (load()){ buildEls(); render(true); if (moves) startClock(); }
+    else newGame(cfg.suits);
+    updStats();
+    clearInterval(timerT); timerT = setInterval(updStats, 1000);
+  }
+  function close(){
+    if (!ov) return;
+    stopClock(); save(); clearInterval(timerT);
+    ov.style.display = 'none'; document.body.classList.remove('gmp-open');
+  }
+  function isOpen(){ return !!(ov && ov.style.display !== 'none' && ov.style.display !== ''); }
+  function saveCfg(){ lsSet('sol_cfg', JSON.stringify(cfg)); }
+  function renderSet(){
+    var p = $('sol-set'); if (!p) return;
+    p.querySelector('[data-k="sound"]').classList.toggle('on', !!cfg.sound);
+    p.querySelectorAll('[data-suits]').forEach(function(b){ b.classList.toggle('on', +b.getAttribute('data-suits') === cfg.suits); });
+    var st = stats(), txt = [1, 2, 4].map(function(n){ var s = st['s' + n] || { w: 0, b: 0 }; return n + ' chất: thắng ' + s.w + ' ván' + (s.b ? ', điểm cao ' + s.b : ''); }).join('<br>');
+    $('sol-set-stat').innerHTML = txt;
+  }
+  function openSet(){ stopClock(); renderSet(); $('sol-set').style.display = 'flex'; }
+  function closeSet(){ var p = $('sol-set'); if (p) p.style.display = 'none'; if (isOpen() && moves && !won) startClock(); }
+  function toggleSound(){ cfg.sound = !cfg.sound; saveCfg(); renderSet(); sndPlace(); }
+  function setSuits(n){
+    if (n === cfg.suits) return;
+    if (moves && !won && !confirm('Đổi số chất sẽ bắt đầu ván mới, bỏ ván đang chơi?')) return;
+    cfg.suits = n; saveCfg(); newGame(n); renderSet(); closeSet();
+  }
+  function newGameAsk(){
+    if (moves && !won && !confirm('Bỏ ván đang chơi và chia ván mới?')) return;
+    $('sol-win').style.display = 'none'; closeSet(); newGame(cfg.suits); sndDeal();
+  }
+  document.addEventListener('keydown', function(e){
+    if (!isOpen()) return;
+    if (e.key === 'Escape'){ if ($('sol-set').style.display === 'flex') closeSet(); else close(); }
+    else if ((e.ctrlKey || e.metaKey) && e.key === 'z'){ e.preventDefault(); undo(); }
+  });
+  return { open: open, close: close, isOpen: isOpen, deal: deal, undo: undo, hint: hint, newGame: newGameAsk,
+           openSet: openSet, closeSet: closeSet, toggleSound: toggleSound, setSuits: setSuits,
+           _st: function(){ return { cols: cols, stock: stock, done: done, score: score, moves: moves }; }, _move: doMove, _hints: allHints };
+})();
+
+// ─── DANH SÁCH GAME (chạm nhanh 3 lần vào tên app) ───
+var GAME_MENU = {
+  open: function(){ var m = document.getElementById('game-menu'); if (m) m.style.display = 'flex'; },
+  close: function(){ var m = document.getElementById('game-menu'); if (m) m.style.display = 'none'; },
+  play: function(g){ GAME_MENU.close(); if (g === 'sol') SOL.open(); else GMP.open(); },
+  isOpen: function(){ var m = document.getElementById('game-menu'); return !!(m && m.style.display === 'flex'); }
+};
 
 // ─── KHÔNG CHO KÉO CUỘN XUỐNG KHOẢNG TRỐNG ───
 // Nội dung đã vừa màn hình (bên dưới chỉ còn khoảng trắng) thì không cho kéo cuộn trang lên nữa; nội dung dài
@@ -14200,6 +14619,8 @@ function _dangRanh(){
   if (ae && (/^(INPUT|SELECT|TEXTAREA)$/.test(ae.tagName) || ae.isContentEditable)) return false;
   if (document.querySelector('.modal.show')) return false;
   if (typeof GMP !== 'undefined' && GMP.isOpen()) return false; // đang chơi game ẩn
+  if (typeof SOL !== 'undefined' && SOL.isOpen()) return false;
+  if (typeof GAME_MENU !== 'undefined' && GAME_MENU.isOpen()) return false;
   return Date.now() - _lanThaoTacCuoi > 8000;
 }
 var _choTaiLai = false;
@@ -14320,6 +14741,56 @@ if ('serviceWorker' in navigator) {
     </div>
   </div>
   <button class="gmp-btn" style="right:12px" onclick="GMP.close()" title="Thoát game">✕</button>
+</div>
+<!-- DANH SÁCH GAME ẨN (chạm nhanh 3 lần vào tên app) -->
+<div id="game-menu" onclick="if(event.target===this)GAME_MENU.close()">
+  <div class="gm-box">
+    <div class="gm-ttl">🎮 Giải trí đôi chút nhé!</div>
+    <button class="gm-item" onclick="GAME_MENU.play('gmp')"><span class="gm-ico">👼</span><span><div class="gm-name">Giọt Mủ Phiêu Lưu</div><div class="gm-desc">Chạm để bay qua khe giữa các thân cây cao su</div></span></button>
+    <button class="gm-item" onclick="GAME_MENU.play('sol')"><span class="gm-ico">🕷️</span><span><div class="gm-name">Xếp Bài Nhện</div><div class="gm-desc">Xếp bài cổ điển: xếp đủ dãy K → A cùng chất</div></span></button>
+    <button class="gm-close" onclick="GAME_MENU.close()">Đóng</button>
+  </div>
+</div>
+<!-- GAME ẨN: Xếp Bài Nhện -->
+<div id="sol-overlay">
+  <div class="sol-top">
+    <button class="sol-ib" onclick="SOL.close()" title="Thoát game">✕</button>
+    <div class="sol-stat"><small>ĐIỂM SỐ</small><b id="sol-score">500</b></div>
+    <div class="sol-stat"><small>THỜI GIAN</small><b id="sol-time">00:00</b></div>
+    <div class="sol-stat"><small>NƯỚC</small><b id="sol-moves">0</b></div>
+    <button class="sol-ib" onclick="SOL.openSet()" title="Cài đặt trò chơi">⚙️</button>
+  </div>
+  <div id="sol-board"><div id="sol-done"></div><div id="sol-stock" title="Chia thêm bài"></div></div>
+  <div class="sol-bot">
+    <button class="sol-bb" onclick="SOL.newGame()"><span>🔄</span>Ván mới</button>
+    <button class="sol-bb" onclick="SOL.hint()"><span>💡</span>Gợi ý</button>
+    <button class="sol-bb" onclick="SOL.undo()"><span>↩️</span>Hoàn nguyên</button>
+  </div>
+  <div id="sol-toast"></div>
+  <div id="sol-set" onclick="if(event.target===this)SOL.closeSet()">
+    <div class="gmp-set-box">
+      <div class="gmp-set-ttl">⚙️ Cài đặt Xếp Bài Nhện</div>
+      <div class="gmp-set-row" onclick="SOL.toggleSound()"><span>🔊 Âm thanh</span><span class="gmp-sw" data-k="sound"></span></div>
+      <div class="gmp-set-lbl">♠️ Số chất (độ khó)</div>
+      <div class="gmp-seg">
+        <button data-suits="1" onclick="SOL.setSuits(1)">1 chất ♠</button>
+        <button data-suits="2" onclick="SOL.setSuits(2)">2 chất</button>
+        <button data-suits="4" onclick="SOL.setSuits(4)">4 chất</button>
+      </div>
+      <div class="gmp-set-lbl">🏆 Thống kê</div>
+      <div class="gmp-set-best" id="sol-set-stat"></div>
+      <button class="gmp-set-del" style="color:#2d6a4f;border-color:#b7d3c2;background:#fff" onclick="SOL.newGame()">🔄 Chia ván mới</button>
+      <button class="gmp-set-ok" onclick="SOL.closeSet()">Xong</button>
+    </div>
+  </div>
+  <div id="sol-win">
+    <div class="gmp-set-box">
+      <div class="gmp-set-ttl">🎉 Thắng rồi!</div>
+      <div class="sol-win-info" id="sol-win-info"></div>
+      <button class="gmp-set-ok" onclick="SOL.newGame()">🔄 Chơi ván mới</button>
+      <button class="gmp-set-del" style="color:#2d6a4f;border-color:#b7d3c2;background:#fff" onclick="SOL.close()">Về app</button>
+    </div>
+  </div>
 </div>
 </body>
 </html>
