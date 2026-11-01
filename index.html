@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.8.1</title>
+<title>Mua Bán Mủ Cao Su v2.8.2</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -59,7 +59,12 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g
 @keyframes coinSpin{ 0%{transform:rotateY(0deg)} 100%{transform:rotateY(360deg)} }
 @keyframes bubbleTextPulse{ 0%,100%{opacity:.35} 50%{opacity:.85} }
 .logo-ico img{ animation:coinSpin 3.2s linear infinite; backface-visibility:visible }
-.logo-txt{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.logo-txt{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+/* Game ẩn Giọt Mủ Phiêu Lưu (chạm 3 lần vào tên app) */
+#gmp-overlay{display:none;position:fixed;inset:0;z-index:6000;background:#bfe9ff;touch-action:none;-webkit-user-select:none;user-select:none;max-width:480px;margin:0 auto}
+#gmp-canvas{display:block;width:100%;height:100%}
+.gmp-btn{position:absolute;top:calc(10px + env(safe-area-inset-top));width:42px;height:42px;border-radius:50%;border:2px solid rgba(255,255,255,.9);background:rgba(27,67,50,.55);color:#fff;font-size:19px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1}
+body.gmp-open{overflow:hidden}
 .logo-ver{font-size:9px;opacity:.6}
 .hdr-acts{display:flex;gap:5px;flex-shrink:0;margin-top:2px}
 .ico-btn{width:26px;height:26px;background:rgba(255,255,255,.15);border:none;border-radius:8px;color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;flex-shrink:0}
@@ -554,7 +559,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.8.1 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.8.2 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1937,7 +1942,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.8.1</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.8.2</div>
       </div>
     </div>
 
@@ -2103,7 +2108,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.8.1</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.8.2</div>
       </div>
     </div>
 
@@ -4386,7 +4391,7 @@ var _cfShow = { mua: false, ban: false }; // trạng thái "đã nhập dữ li�
 // Ngày đang xem CHƯA có giao dịch nào → luôn hiện (dù có ẩn thì bên dưới cũng chỉ là khoảng trống, không có
 // dữ liệu gì để xem); có từ 1 giao dịch trở lên mới làm theo cài đặt.
 // Đang SỬA giao dịch: hàng nút "Huỷ/Lưu giao dịch" (thêm mới) LUÔN ẩn — chỉ còn hàng "Huỷ/Lưu thay đổi/Xoá"
-// (trước v2.8.1, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
+// (trước v2.8.2, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
 // "Lưu giao dịch" sẽ thêm 1 giao dịch MỚI thay vì sửa).
 function _capNhatCompactForm(tab, show){
   if (tab!=='mua' && tab!=='ban') return;
@@ -6146,7 +6151,8 @@ var SB_NO_SYNC_KEYS = ['device_code','gd_token','gd_token_expiry','gd_folder_id'
   // Mốc "đã áp dụng lệnh admin" và nhật ký kỹ thuật là của RIÊNG từng máy (khoá theo vân tay thiết bị):
   // đồng bộ sang máy khác cùng tài khoản sẽ làm máy đó áp dụng lại lệnh cũ (mất ngày gia hạn hợp lệ,
   // hoặc tự đặt lại mật khẩu giao dịch về mặc định).
-  'admin_override_applied_at','pw_reset_applied_at','registry_sync_debug','last_ext_info'];
+  'admin_override_applied_at','pw_reset_applied_at','registry_sync_debug','last_ext_info',
+  'gmp_best','gmp_sound']; // kỷ lục + âm thanh game ẩn Giọt Mủ Phiêu Lưu: riêng từng máy
 // Danh sách khoá THỰC SỰ sẽ đồng bộ mỗi lần: hợp của SB_DATA_KEYS (đảm bảo có giá trị mặc định hợp lý
 // nếu máy chưa từng có khoá đó) VÀ toàn bộ khoá đang thực sự tồn tại trong localStorage của app (trừ
 // danh sách chỉ-riêng-máy-này ở trên) — để không bỏ sót dữ liệu của các tính năng thêm sau này mà lỡ
@@ -13721,6 +13727,303 @@ document.addEventListener('focusin', function(e){
   _mmSet(false);
 });
 
+// ─── GAME ẨN "GIỌT MỦ PHIÊU LƯU" ───
+// Mở: chạm nhanh 3 lần vào tên app ở đầu trang. Chạm màn hình → giọt mủ nảy lên; bay qua khe giữa 2 thân cây
+// cao su được 1 điểm; chạm thân cây hoặc mặt đất là thua. Kỷ lục + bật/tắt âm thanh chỉ lưu trên máy này
+// (khoá 'gmp_best', 'gmp_sound' — nằm trong SB_NO_SYNC_KEYS, không đồng bộ lên Supabase).
+var GMP = (function(){
+  var ov, cv, ctx, W = 0, H = 0, S = 1, dpr = 1, raf = 0, last = 0;
+  var st = 'ready', drop, trees, groundX = 0, hillX = 0, score = 0, best = 0, overAt = 0, flash = 0, tSky = 0;
+  var am = null, soundOn = true;
+  function lsGet(k, d){ try { var v = MCS_LS.getItem(k); return v == null ? d : v; } catch(e){ return d; } }
+  function lsSet(k, v){ try { MCS_LS.setItem(k, String(v)); } catch(e){} }
+
+  function beep(f1, f2, dur, type, vol){
+    if (!soundOn) return;
+    try {
+      if (!am) am = new (window.AudioContext || window.webkitAudioContext)();
+      if (am.state === 'suspended') am.resume();
+      var o = am.createOscillator(), g = am.createGain(), t = am.currentTime;
+      o.type = type || 'sine';
+      o.frequency.setValueAtTime(f1, t); o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+      g.gain.setValueAtTime(vol || 0.15, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.connect(g); g.connect(am.destination); o.start(t); o.stop(t + dur + 0.02);
+    } catch(e){}
+  }
+  var sndFlap  = function(){ beep(520, 880, 0.09, 'sine', 0.12); };
+  var sndPoint = function(){ beep(988, 988, 0.07, 'square', 0.06); setTimeout(function(){ beep(1319, 1319, 0.12, 'square', 0.06); }, 70); };
+  var sndHit   = function(){ beep(300, 60, 0.35, 'sawtooth', 0.16); };
+
+  function groundH(){ return Math.round(90 * S); }
+  function gap(){ return 158 * S; }
+  function treeW(){ return 66 * S; }
+  function spacing(){ return 215 * S; }
+  function speed(){ return 150 * S; }
+
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 3);
+    W = ov.clientWidth; H = ov.clientHeight;
+    S = Math.max(0.6, Math.min(H / 640, W / 360 * 1.15));
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    cv.style.width = W + 'px'; cv.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function reset(){
+    st = 'ready'; score = 0; flash = 0;
+    drop = { x: W * 0.3, y: (H - groundH()) * 0.45, vy: 0, r: 15 * S, rot: 0 };
+    trees = [];
+  }
+  function addTree(x){
+    var top = 70 * S, bottom = H - groundH() - 70 * S - gap();
+    var y = top + Math.random() * Math.max(10, bottom - top);
+    trees.push({ x: x, gy: y, passed: false, seed: Math.random() });
+  }
+  function flap(){
+    if (st === 'ready'){ st = 'play'; addTree(W + 40 * S); }
+    if (st === 'play'){ drop.vy = -430 * S; sndFlap(); return; }
+    if (st === 'over' && Date.now() - overAt > 600) reset();
+  }
+  function die(){
+    if (st !== 'play') return;
+    st = 'over'; overAt = Date.now(); flash = 1; sndHit();
+    if (score > best){ best = score; lsSet('gmp_best', best); }
+    if (navigator.vibrate) try { navigator.vibrate(60); } catch(e){}
+  }
+
+  function update(dt){
+    tSky += dt;
+    var gH = groundH();
+    if (st !== 'over'){ groundX = (groundX + speed() * dt) % (24 * S); hillX += speed() * 0.25 * dt; }
+    if (st === 'ready'){ drop.y = (H - gH) * 0.45 + Math.sin(tSky * 4) * 8 * S; drop.rot = 0; return; }
+    drop.vy += 1450 * S * dt;
+    drop.y += drop.vy * dt;
+    drop.rot = Math.max(-0.45, Math.min(1.3, drop.vy / (600 * S)));
+    if (drop.y + drop.r >= H - gH){ drop.y = H - gH - drop.r; drop.vy = 0; die(); }
+    if (drop.y - drop.r < 0){ drop.y = drop.r; drop.vy = 0; }
+    if (st !== 'play') return;
+    var tw = treeW();
+    for (var i = 0; i < trees.length; i++){
+      var t = trees[i];
+      t.x -= speed() * dt;
+      if (!t.passed && t.x + tw < drop.x - drop.r){ t.passed = true; score++; sndPoint(); }
+      var r = drop.r * 0.82;
+      if (drop.x + r > t.x && drop.x - r < t.x + tw && (drop.y - r < t.gy || drop.y + r > t.gy + gap())) die();
+    }
+    if (trees.length && trees[0].x < -tw - 10) trees.shift();
+    var lastT = trees[trees.length - 1];
+    if (!lastT || lastT.x < W - spacing()) addTree((lastT ? lastT.x : W) + spacing());
+  }
+
+  // ── Vẽ ──
+  function sky(){
+    var k = Math.min(1, score / 40); // càng nhiều điểm trời càng ngả chiều
+    var g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, mix('#bfe9ff', '#ffb38a', k));
+    g.addColorStop(1, mix('#eafbe7', '#ffe3b3', k));
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    // mặt trời
+    ctx.fillStyle = mix('#fff6c4', '#ff9a5a', k);
+    ctx.beginPath(); ctx.arc(W * 0.8, H * (0.16 + 0.12 * k), 26 * S, 0, 7); ctx.fill();
+    // đồi + hàng cao su xa (thị sai)
+    var gH = groundH(), base = H - gH;
+    ctx.fillStyle = mix('#a7d8a0', '#c9a96e', k * 0.5);
+    for (var i = -1; i < W / (120 * S) + 2; i++){
+      var x = i * 120 * S - (hillX % (120 * S));
+      ctx.beginPath(); ctx.ellipse(x, base, 90 * S, 46 * S, 0, Math.PI, 0); ctx.fill();
+    }
+    ctx.fillStyle = mix('#5fa868', '#8a7a4a', k * 0.5);
+    var step = 34 * S, off = (hillX * 1.6) % step;
+    for (var j = -1; j < W / step + 2; j++){
+      var tx = j * step - off, th = (26 + ((j * 7919) % 5 + 5) % 5 * 4) * S;
+      ctx.fillRect(tx - 2 * S, base - th, 4 * S, th);
+      ctx.beginPath(); ctx.ellipse(tx, base - th, 13 * S, 10 * S, 0, 0, 7); ctx.fill();
+    }
+  }
+  function mix(a, b, k){
+    var pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+    var r = (pa >> 16) + (((pb >> 16) - (pa >> 16)) * k), g = ((pa >> 8) & 255) + ((((pb >> 8) & 255) - ((pa >> 8) & 255)) * k), bl = (pa & 255) + (((pb & 255) - (pa & 255)) * k);
+    return 'rgb(' + (r | 0) + ',' + (g | 0) + ',' + (bl | 0) + ')';
+  }
+  function trunk(x, y, w, h, fromTop, seed){
+    if (h <= 0) return;
+    var g = ctx.createLinearGradient(x, 0, x + w, 0);
+    g.addColorStop(0, '#6b5a4a'); g.addColorStop(0.35, '#a08c76'); g.addColorStop(0.7, '#8a7560'); g.addColorStop(1, '#5a4a3c');
+    ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+    // vân vỏ cây
+    ctx.strokeStyle = 'rgba(60,45,35,.35)'; ctx.lineWidth = 1.2 * S;
+    for (var i = 0; i < 3; i++){ var vx = x + w * (0.22 + i * 0.27); ctx.beginPath(); ctx.moveTo(vx, y); ctx.lineTo(vx + 2 * S, y + h); ctx.stroke(); }
+    // vết cạo xiên + dòng mủ trắng gần miệng khe
+    var endY = fromTop ? y + h : y;
+    var dir = fromTop ? -1 : 1;
+    ctx.lineWidth = 3 * S;
+    for (var c = 0; c < 4; c++){
+      var cy = endY + dir * (30 + c * 16) * S;
+      if ((fromTop && cy < y) || (!fromTop && cy > y + h)) break;
+      ctx.strokeStyle = c === 0 ? '#f7f3e8' : 'rgba(240,232,210,.75)';
+      ctx.beginPath(); ctx.moveTo(x + 4 * S, cy - 10 * S); ctx.lineTo(x + w - 4 * S, cy + 6 * S); ctx.stroke();
+    }
+    // vành gỗ ở đầu thân (miệng khe)
+    var capH = 16 * S, capY = fromTop ? y + h - capH : y;
+    ctx.fillStyle = '#4e3f32'; ctx.fillRect(x - 5 * S, capY, w + 10 * S, capH);
+    ctx.fillStyle = '#c9b48f'; ctx.fillRect(x - 5 * S, fromTop ? capY + capH - 4 * S : capY, w + 10 * S, 4 * S);
+    // chén hứng mủ treo trên thân dưới
+    if (!fromTop){
+      var cx = x + w * 0.5, cyy = y + 62 * S;
+      if (cyy + 12 * S < y + h){
+        ctx.fillStyle = '#e9e4da'; ctx.beginPath(); ctx.moveTo(cx - 11 * S, cyy); ctx.lineTo(cx + 11 * S, cyy); ctx.lineTo(cx + 7 * S, cyy + 11 * S); ctx.lineTo(cx - 7 * S, cyy + 11 * S); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(cx - 10 * S, cyy, 20 * S, 3 * S);
+      }
+    }
+    // tán lá phía trên cùng (thân trên)
+    if (fromTop && seed > 0.5){
+      ctx.fillStyle = 'rgba(46,125,70,.9)';
+      ctx.beginPath(); ctx.ellipse(x + w / 2, y + 6 * S, w * 0.9, 22 * S, 0, 0, 7); ctx.fill();
+    }
+  }
+  function ground(){
+    var gH = groundH(), y = H - gH;
+    ctx.fillStyle = '#8b5e3c'; ctx.fillRect(0, y, W, gH);
+    ctx.fillStyle = '#4caf50'; ctx.fillRect(0, y, W, 14 * S);
+    ctx.fillStyle = '#2e7d32'; ctx.fillRect(0, y + 14 * S, W, 3 * S);
+    ctx.fillStyle = '#7a5032';
+    var step = 24 * S;
+    for (var i = -1; i < W / step + 2; i++){
+      var x = i * step - groundX;
+      ctx.beginPath(); ctx.moveTo(x, y + gH); ctx.lineTo(x + 12 * S, y + 22 * S); ctx.lineTo(x + 18 * S, y + 22 * S); ctx.lineTo(x + 6 * S, y + gH); ctx.fill();
+    }
+    // lá rụng
+    ctx.fillStyle = '#d4a017';
+    for (var k = 0; k < W / (60 * S) + 2; k++){
+      var lx = k * 60 * S - (groundX * 2.5 % (60 * S));
+      ctx.beginPath(); ctx.ellipse(lx, y + 7 * S, 5 * S, 2.5 * S, 0.5, 0, 7); ctx.fill();
+    }
+  }
+  function drawDrop(){
+    var d = drop, r = d.r;
+    ctx.save(); ctx.translate(d.x, d.y); ctx.rotate(d.rot);
+    // bóng đổ
+    ctx.fillStyle = 'rgba(0,0,0,.12)'; ctx.beginPath(); ctx.ellipse(2 * S, 4 * S, r, r * 0.95, 0, 0, 7); ctx.fill();
+    // thân giọt mủ (đầu nhọn quay về phía sau)
+    var g = ctx.createRadialGradient(-r * 0.3, -r * 0.35, r * 0.2, 0, 0, r * 1.4);
+    g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#e7e1cf');
+    ctx.fillStyle = g; ctx.strokeStyle = '#b9ae90'; ctx.lineWidth = 1.5 * S;
+    ctx.beginPath();
+    ctx.moveTo(-r * 2.0, -r * 0.05);
+    ctx.quadraticCurveTo(-r * 0.9, -r * 0.95, 0, -r);
+    ctx.arc(0, 0, r, -Math.PI / 2, Math.PI / 2);
+    ctx.quadraticCurveTo(-r * 0.9, r * 0.95, -r * 2.0, -r * 0.05);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    // má hồng
+    ctx.fillStyle = 'rgba(255,140,140,.45)'; ctx.beginPath(); ctx.ellipse(r * 0.25, r * 0.45, r * 0.22, r * 0.13, 0, 0, 7); ctx.fill();
+    // mắt
+    var dead = st === 'over';
+    ctx.fillStyle = '#fff'; ctx.strokeStyle = '#333'; ctx.lineWidth = 1.2 * S;
+    ctx.beginPath(); ctx.arc(r * 0.45, -r * 0.2, r * 0.36, 0, 7); ctx.fill(); ctx.stroke();
+    if (dead){
+      ctx.beginPath(); ctx.moveTo(r * 0.28, -r * 0.37); ctx.lineTo(r * 0.62, -r * 0.03); ctx.moveTo(r * 0.62, -r * 0.37); ctx.lineTo(r * 0.28, -r * 0.03); ctx.stroke();
+    } else {
+      ctx.fillStyle = '#222'; ctx.beginPath(); ctx.arc(r * 0.55, -r * 0.18, r * 0.16, 0, 7); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(r * 0.6, -r * 0.24, r * 0.06, 0, 7); ctx.fill();
+    }
+    // miệng
+    ctx.strokeStyle = '#7a4a2a'; ctx.lineWidth = 1.6 * S;
+    ctx.beginPath();
+    if (dead) { ctx.arc(r * 0.55, r * 0.5, r * 0.15, Math.PI * 1.1, Math.PI * 1.9); }
+    else { ctx.arc(r * 0.55, r * 0.28, r * 0.17, 0.2, Math.PI - 0.2); }
+    ctx.stroke();
+    ctx.restore();
+  }
+  function txt(s, x, y, size, fill, stroke, align){
+    ctx.font = '800 ' + Math.round(size * S) + "px 'Be Vietnam Pro',sans-serif";
+    ctx.textAlign = align || 'center'; ctx.textBaseline = 'middle';
+    if (stroke){ ctx.lineWidth = Math.max(3, size * S / 6); ctx.strokeStyle = stroke; ctx.lineJoin = 'round'; ctx.strokeText(s, x, y); }
+    ctx.fillStyle = fill; ctx.fillText(s, x, y);
+  }
+  function rrect(x, y, w, h, r){ ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+  function draw(){
+    sky();
+    var tw = treeW(), gp = gap(), gH = groundH();
+    for (var i = 0; i < trees.length; i++){
+      var t = trees[i];
+      trunk(t.x, 0, tw, t.gy, true, t.seed);
+      trunk(t.x, t.gy + gp, tw, H - gH - (t.gy + gp), false, t.seed);
+    }
+    ground();
+    drawDrop();
+    if (st === 'play' || st === 'over') txt(String(score), W / 2, 70 * S, 46, '#fff', '#1b4332');
+    if (st === 'ready'){
+      txt('Giọt Mủ Phiêu Lưu', W / 2, H * 0.2, 30, '#fff', '#1b4332');
+      txt('Chạm màn hình để bay lên', W / 2, H * 0.6, 17, '#1b4332', 'rgba(255,255,255,.85)');
+      txt('Bay qua khe giữa các thân cây cao su', W / 2, H * 0.6 + 28 * S, 13, '#1b4332', 'rgba(255,255,255,.85)');
+      if (best) txt('Kỷ lục: ' + best, W / 2, H * 0.6 + 58 * S, 15, '#b45309', 'rgba(255,255,255,.85)');
+    }
+    if (st === 'over'){
+      var pw = Math.min(W - 40, 280 * S), ph = 190 * S, px = (W - pw) / 2, py = H * 0.28;
+      txt('Hết lượt!', W / 2, py - 34 * S, 32, '#fff', '#7f1d1d');
+      ctx.fillStyle = '#fffaf0'; ctx.strokeStyle = '#2d6a4f'; ctx.lineWidth = 3 * S;
+      rrect(px, py, pw, ph, 16 * S); ctx.fill(); ctx.stroke();
+      txt('Điểm', px + pw * 0.3, py + 34 * S, 15, '#52796f');
+      txt(String(score), px + pw * 0.3, py + 74 * S, 36, '#1b4332');
+      txt('Kỷ lục', px + pw * 0.7, py + 34 * S, 15, '#52796f');
+      txt(String(best), px + pw * 0.7, py + 74 * S, 36, '#b45309');
+      if (score && score >= best) txt('🎉 Kỷ lục mới!', W / 2, py + 116 * S, 15, '#b45309');
+      if (Date.now() - overAt > 600) txt('Chạm để chơi lại', W / 2, py + 158 * S, 16, '#2d6a4f');
+    }
+    if (flash > 0){ ctx.fillStyle = 'rgba(255,255,255,' + flash + ')'; ctx.fillRect(0, 0, W, H); }
+  }
+  function loop(ts){
+    if (!ov || ov.style.display === 'none') return;
+    var dt = last ? Math.min(0.033, (ts - last) / 1000) : 0; last = ts;
+    update(dt); if (flash > 0) flash = Math.max(0, flash - dt * 3);
+    draw();
+    raf = requestAnimationFrame(loop);
+  }
+  function onDown(e){
+    if (e.target && e.target.closest && e.target.closest('.gmp-btn')) return;
+    e.preventDefault(); flap();
+  }
+  function onKey(e){
+    if (!ov || ov.style.display === 'none') return;
+    if (e.code === 'Space' || e.key === ' ' || e.key === 'ArrowUp'){ e.preventDefault(); flap(); }
+    else if (e.key === 'Escape') close();
+  }
+  function updSoundBtn(){ var b = document.getElementById('gmp-sound'); if (b) b.textContent = soundOn ? '🔊' : '🔇'; }
+  function open(){
+    ov = document.getElementById('gmp-overlay'); cv = document.getElementById('gmp-canvas');
+    if (!ov || !cv) return;
+    ctx = cv.getContext('2d');
+    if (!ov._gmpBound){ ov._gmpBound = 1; ov.addEventListener('pointerdown', onDown); }
+    best = parseInt(lsGet('gmp_best', '0'), 10) || 0;
+    soundOn = lsGet('gmp_sound', '1') !== '0'; updSoundBtn();
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    ov.style.display = 'block'; document.body.classList.add('gmp-open');
+    resize(); reset(); last = 0;
+    cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
+  }
+  function close(){
+    if (!ov) return;
+    ov.style.display = 'none'; document.body.classList.remove('gmp-open');
+    cancelAnimationFrame(raf);
+  }
+  function toggleSound(){ soundOn = !soundOn; lsSet('gmp_sound', soundOn ? '1' : '0'); updSoundBtn(); if (soundOn) sndFlap(); }
+  function isOpen(){ return !!(ov && ov.style.display !== 'none'); }
+  document.addEventListener('keydown', onKey);
+  window.addEventListener('resize', function(){ if (isOpen()){ resize(); if (st === 'ready') reset(); } });
+  document.addEventListener('visibilitychange', function(){ if (document.hidden && isOpen() && st === 'play') last = 0; });
+  // Chạm nhanh 3 lần vào tên app (mỗi lần cách nhau dưới 0,5 giây) → mở game
+  (function(){
+    var n = 0, tm = 0;
+    document.addEventListener('click', function(e){
+      var el = e.target && e.target.closest && e.target.closest('.logo-txt');
+      if (!el) return;
+      n++; clearTimeout(tm);
+      if (n >= 3){ n = 0; open(); return; }
+      tm = setTimeout(function(){ n = 0; }, 500);
+    });
+  })();
+  return { open: open, close: close, toggleSound: toggleSound, isOpen: isOpen };
+})();
+
 // ─── KHÔNG CHO KÉO CUỘN XUỐNG KHOẢNG TRỐNG ───
 // Nội dung đã vừa màn hình (bên dưới chỉ còn khoảng trắng) thì không cho kéo cuộn trang lên nữa; nội dung dài
 // hơn màn hình thì chỉ cuộn tới hết nội dung. Bỏ qua lúc đang gõ (bàn phím mở cần đẩy ô nhập lên) và lúc mở
@@ -13782,6 +14085,7 @@ function _dangRanh(){
   var ae = document.activeElement;
   if (ae && (/^(INPUT|SELECT|TEXTAREA)$/.test(ae.tagName) || ae.isContentEditable)) return false;
   if (document.querySelector('.modal.show')) return false;
+  if (typeof GMP !== 'undefined' && GMP.isOpen()) return false; // đang chơi game ẩn
   return Date.now() - _lanThaoTacCuoi > 8000;
 }
 var _choTaiLai = false;
@@ -13878,6 +14182,12 @@ if ('serviceWorker' in navigator) {
     <img id="bubble-logo-img" src="logo.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%;animation:coinSpin 3.2s linear infinite;backface-visibility:visible" alt="">
   </div>
   <div style="position:absolute;bottom:36px;left:0;right:0;text-align:center;color:rgba(255,255,255,.55);font-size:12.5px;font-family:'Be Vietnam Pro',sans-serif;pointer-events:none;animation:bubbleTextPulse 2.4s ease-in-out infinite">Chạm màn hình để tiếp tục</div>
+</div>
+<!-- GAME ẨN: Giọt Mủ Phiêu Lưu (chạm nhanh 3 lần vào tên app) -->
+<div id="gmp-overlay">
+  <canvas id="gmp-canvas"></canvas>
+  <button class="gmp-btn" id="gmp-sound" style="left:12px" onclick="GMP.toggleSound()" title="Bật/tắt âm thanh">🔊</button>
+  <button class="gmp-btn" style="right:12px" onclick="GMP.close()" title="Thoát game">✕</button>
 </div>
 </body>
 </html>
