@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.8.8</title>
+<title>Mua Bán Mủ Cao Su v2.8.9</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -59,13 +59,14 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g
 @keyframes coinSpin{ 0%{transform:rotateY(0deg)} 100%{transform:rotateY(360deg)} }
 @keyframes bubbleTextPulse{ 0%,100%{opacity:.35} 50%{opacity:.85} }
 .logo-ico img{ animation:coinSpin 3.2s linear infinite; backface-visibility:visible }
-.logo-txt{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
-/* Game ẩn Giọt Mủ Phiêu Lưu (chạm 3 lần vào tên app) */
+.logo-txt{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer}
+/* Game ẩn Giọt Mủ Phiêu Lưu (nhấp 2 lần vào tên app) */
 #gmp-overlay{display:none;position:fixed;inset:0;z-index:6000;background:#bfe9ff;touch-action:none;-webkit-user-select:none;user-select:none;max-width:480px;margin:0 auto}
 #gmp-canvas{display:block;width:100%;height:100%}
 .gmp-btn{position:absolute;top:calc(10px + env(safe-area-inset-top));width:42px;height:42px;border-radius:50%;border:2px solid rgba(255,255,255,.9);background:rgba(27,67,50,.55);color:#fff;font-size:19px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1}
 body.gmp-open{overflow:hidden}
 /* Game ẩn Xếp Bài Nhện + danh sách game */
+#game-cfm{display:none;position:fixed;inset:0;z-index:7000;background:rgba(10,30,20,.5);align-items:center;justify-content:center;padding:20px}
 #game-menu{display:none;position:fixed;inset:0;z-index:6500;background:rgba(10,30,20,.55);align-items:center;justify-content:center;padding:20px}
 .gm-box{width:100%;max-width:340px;background:#fffaf0;border:3px solid #2d6a4f;border-radius:18px;padding:16px;font-family:'Be Vietnam Pro',sans-serif;color:#1b4332;box-shadow:0 10px 30px rgba(0,0,0,.3)}
 .gm-ttl{font-size:17px;font-weight:800;text-align:center;margin-bottom:12px}
@@ -618,7 +619,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.8.8 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.8.9 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2001,7 +2002,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.8.8</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.8.9</div>
       </div>
     </div>
 
@@ -2167,7 +2168,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.8.8</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.8.9</div>
       </div>
     </div>
 
@@ -4450,7 +4451,7 @@ var _cfShow = { mua: false, ban: false }; // trạng thái "đã nhập dữ li�
 // Ngày đang xem CHƯA có giao dịch nào → luôn hiện (dù có ẩn thì bên dưới cũng chỉ là khoảng trống, không có
 // dữ liệu gì để xem); có từ 1 giao dịch trở lên mới làm theo cài đặt.
 // Đang SỬA giao dịch: hàng nút "Huỷ/Lưu giao dịch" (thêm mới) LUÔN ẩn — chỉ còn hàng "Huỷ/Lưu thay đổi/Xoá"
-// (trước v2.8.8, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
+// (trước v2.8.9, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
 // "Lưu giao dịch" sẽ thêm 1 giao dịch MỚI thay vì sửa).
 function _capNhatCompactForm(tab, show){
   if (tab!=='mua' && tab!=='ban') return;
@@ -10951,7 +10952,7 @@ function _notifyBuildSlides(){
   } catch(e) {}
   slides.push({ id:'lucky', icon:'🍀', text: LUCKY_WISHES[new Date().getDate() % LUCKY_WISHES.length], cls:'synced' });
   slides.push({ id:'proverb', icon:'📜', text: _pickRandom(MUA_BAN_PROVERBS), cls:'synced' });
-  slides.push({ id:'game', icon:'🎮', text: 'Nhấp nhanh 3 lần vào tên App để mở game giải trí đôi chút nhé!', cls:'synced' }); // game ẩn (GMP)
+  slides.push({ id:'game', icon:'🎮', text: 'Nhấp nhanh 2 lần vào tên App để mở game giải trí đôi chút nhé!', cls:'synced' }); // game ẩn (GMP)
   // Thời tiết tại vị trí định vị của thiết bị. Nếu ĐÃ CÓ dữ liệu kịp lúc xây danh sách này (dưới 15 phút
   // — với lịch làm mới mỗi 5 phút/thử lại mỗi 10 giây khi lỗi thì dữ liệu hầu như không bao giờ cũ hơn
   // vậy, quá cũ thì thà không hiện còn hơn hiện sai lệch) → đưa lên vị trí ĐẦU TIÊN (ưu tiên cao nhất,
@@ -13802,7 +13803,7 @@ document.addEventListener('focusin', function(e){
 });
 
 // ─── GAME ẨN "GIỌT MỦ PHIÊU LƯU" ───
-// Mở: chạm nhanh 3 lần vào tên app ở đầu trang. Chạm màn hình → giọt mủ thiên thần vỗ cánh bay lên; bay qua khe
+// Mở: nhấp nhanh 2 lần vào tên app ở đầu trang. Chạm màn hình → giọt mủ thiên thần vỗ cánh bay lên; bay qua khe
 // giữa 2 thân cây cao su được 1 điểm; chạm thân cây hoặc mặt đất là thua. Nút ⚙️: âm thanh, rung, độ khó,
 // tăng tốc dần, xoá kỷ lục. Kỷ lục (riêng từng độ khó) + cài đặt chỉ lưu trên máy này (khoá 'gmp_best',
 // 'gmp_best_de', 'gmp_best_kho', 'gmp_cfg', 'gmp_sound' — nằm trong SB_NO_SYNC_KEYS, không đồng bộ lên Supabase).
@@ -14159,9 +14160,10 @@ var GMP = (function(){
     renderSet();
   }
   function resetBest(){
-    if (!confirm('Xoá kỷ lục của cả 3 độ khó?')) return;
-    ['gmp_best', 'gmp_best_de', 'gmp_best_kho'].forEach(function(k){ try { MCS_LS.removeItem(k); } catch(e){} });
-    best = 0; renderSet();
+    GAME_CFM.ask('🗑️ Xoá kỷ lục?', 'Xoá kỷ lục của cả 3 độ khó Dễ, Thường, Khó. Không khôi phục lại được.', 'Xoá kỷ lục', function(){
+      ['gmp_best', 'gmp_best_de', 'gmp_best_kho'].forEach(function(k){ try { MCS_LS.removeItem(k); } catch(e){} });
+      best = 0; renderSet();
+    });
   }
   function open(){
     ov = document.getElementById('gmp-overlay'); cv = document.getElementById('gmp-canvas');
@@ -14183,14 +14185,14 @@ var GMP = (function(){
   document.addEventListener('keydown', onKey);
   window.addEventListener('resize', function(){ if (isOpen()){ resize(); if (st === 'ready') reset(); } });
   document.addEventListener('visibilitychange', function(){ if (document.hidden && isOpen() && st === 'play'){ paused = true; last = 0; } });
-  // Chạm nhanh 3 lần vào tên app (mỗi lần cách nhau dưới 0,5 giây) → mở danh sách game (GAME_MENU)
+  // Nhấp nhanh 2 lần vào tên app (cách nhau dưới 0,5 giây) → mở danh sách game (GAME_MENU)
   (function(){
     var n = 0, tm = 0;
     document.addEventListener('click', function(e){
       var el = e.target && e.target.closest && e.target.closest('.logo-txt');
       if (!el) return;
       n++; clearTimeout(tm);
-      if (n >= 3){ n = 0; if (typeof GAME_MENU !== 'undefined') GAME_MENU.open(); else open(); return; }
+      if (n >= 2){ n = 0; if (typeof GAME_MENU !== 'undefined') GAME_MENU.open(); else open(); return; }
       tm = setTimeout(function(){ n = 0; }, 500);
     });
   })();
@@ -14605,16 +14607,18 @@ var SOL = (function(){
   function toggleSound(){ cfg.sound = !cfg.sound; saveCfg(); renderSet(); sndPlace(); }
   function setSuits(n){
     if (n === cfg.suits) return;
-    if (moves && !won && !confirm('Đổi số chất sẽ bắt đầu ván mới, bỏ ván đang chơi?')) return;
-    cfg.suits = n; saveCfg(); newGame(n); renderSet(); closeSet();
+    var lam = function(){ cfg.suits = n; saveCfg(); newGame(n); renderSet(); closeSet(); };
+    if (moves && !won) GAME_CFM.ask('♠️ Đổi sang ' + n + ' chất?', 'Đổi số chất sẽ chia ván mới, ván đang chơi sẽ bị bỏ.', 'Chia ván mới', lam);
+    else lam();
   }
   function newGameAsk(){
-    if (moves && !won && !confirm('Bỏ ván đang chơi và chia ván mới?')) return;
-    $('sol-win').style.display = 'none'; closeSet(); newGame(cfg.suits); sndDeal();
+    var lam = function(){ $('sol-win').style.display = 'none'; closeSet(); newGame(cfg.suits); sndDeal(); };
+    if (moves && !won) GAME_CFM.ask('🔄 Chia ván mới?', 'Ván đang chơi sẽ bị bỏ. Bạn chắc chắn muốn chơi ván mới?', 'Chơi ván mới', lam);
+    else lam();
   }
   document.addEventListener('keydown', function(e){
     if (!isOpen()) return;
-    if (e.key === 'Escape'){ if ($('sol-set').style.display === 'flex') closeSet(); else close(); }
+    if (e.key === 'Escape'){ if (GAME_CFM.isOpen()) GAME_CFM.done(false); else if ($('sol-set').style.display === 'flex') closeSet(); else close(); }
     else if ((e.ctrlKey || e.metaKey) && e.key === 'z'){ e.preventDefault(); undo(); }
   });
   return { open: open, close: close, isOpen: isOpen, deal: deal, resumeChoice: resumeChoice, undo: undo, hint: hint, newGame: newGameAsk,
@@ -14622,7 +14626,26 @@ var SOL = (function(){
            _st: function(){ return { cols: cols, stock: stock, done: done, score: score, moves: moves }; }, _move: doMove, _hints: allHints };
 })();
 
-// ─── DANH SÁCH GAME (chạm nhanh 3 lần vào tên app) ───
+// ─── POPUP XÁC NHẬN TRONG GAME (thay hộp thoại confirm() của trình duyệt — vốn hiện dòng
+// "nguyentai219.github.io cho biết" trông như thông báo lạ) ───
+var GAME_CFM = {
+  _ok: null,
+  ask: function(title, msg, okLabel, onOk){
+    var m = document.getElementById('game-cfm'); if (!m){ if (onOk) onOk(); return; }
+    document.getElementById('game-cfm-ttl').textContent = title;
+    document.getElementById('game-cfm-msg').textContent = msg || '';
+    document.getElementById('game-cfm-ok').textContent = okLabel || 'Đồng ý';
+    GAME_CFM._ok = onOk || null; m.style.display = 'flex';
+  },
+  done: function(yes){
+    var m = document.getElementById('game-cfm'); if (m) m.style.display = 'none';
+    var f = GAME_CFM._ok; GAME_CFM._ok = null;
+    if (yes && f) f();
+  },
+  isOpen: function(){ var m = document.getElementById('game-cfm'); return !!(m && m.style.display === 'flex'); }
+};
+
+// ─── DANH SÁCH GAME (nhấp nhanh 2 lần vào tên app) ───
 var GAME_MENU = {
   open: function(){ var m = document.getElementById('game-menu'); if (m) m.style.display = 'flex'; },
   close: function(){ var m = document.getElementById('game-menu'); if (m) m.style.display = 'none'; },
@@ -14791,7 +14814,7 @@ if ('serviceWorker' in navigator) {
   </div>
   <div style="position:absolute;bottom:36px;left:0;right:0;text-align:center;color:rgba(255,255,255,.55);font-size:12.5px;font-family:'Be Vietnam Pro',sans-serif;pointer-events:none;animation:bubbleTextPulse 2.4s ease-in-out infinite">Chạm màn hình để tiếp tục</div>
 </div>
-<!-- GAME ẨN: Giọt Mủ Phiêu Lưu (chạm nhanh 3 lần vào tên app) -->
+<!-- GAME ẨN: Giọt Mủ Phiêu Lưu (nhấp nhanh 2 lần vào tên app) -->
 <div id="gmp-overlay">
   <canvas id="gmp-canvas"></canvas>
   <button class="gmp-btn" style="left:12px" onclick="GMP.openSet()" title="Cài đặt trò chơi">⚙️</button>
@@ -14815,7 +14838,18 @@ if ('serviceWorker' in navigator) {
   </div>
   <button class="gmp-btn" style="right:12px" onclick="GMP.close()" title="Thoát game">✕</button>
 </div>
-<!-- DANH SÁCH GAME ẨN (chạm nhanh 3 lần vào tên app) -->
+<!-- POPUP XÁC NHẬN TRONG GAME -->
+<div id="game-cfm" onclick="if(event.target===this)GAME_CFM.done(false)">
+  <div class="gmp-set-box" style="text-align:center">
+    <div class="gmp-set-ttl" id="game-cfm-ttl"></div>
+    <div class="sol-win-info" id="game-cfm-msg"></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="gmp-set-del" style="margin-top:0;flex:1;color:#2d6a4f;border-color:#b7d3c2;background:#fff;padding:11px" onclick="GAME_CFM.done(false)">Huỷ</button>
+      <button class="gmp-set-ok" style="margin-top:0;flex:1.4" id="game-cfm-ok" onclick="GAME_CFM.done(true)">Đồng ý</button>
+    </div>
+  </div>
+</div>
+<!-- DANH SÁCH GAME ẨN (nhấp nhanh 2 lần vào tên app) -->
 <div id="game-menu" onclick="if(event.target===this)GAME_MENU.close()">
   <div class="gm-box">
     <div class="gm-ttl">🎮 Giải trí đôi chút nhé!</div>
