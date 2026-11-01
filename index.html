@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.8.7</title>
+<title>Mua Bán Mủ Cao Su v2.8.8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -618,7 +618,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.8.7 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.8.8 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2001,7 +2001,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.8.7</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.8.8</div>
       </div>
     </div>
 
@@ -2167,7 +2167,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.8.7</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.8.8</div>
       </div>
     </div>
 
@@ -4450,7 +4450,7 @@ var _cfShow = { mua: false, ban: false }; // trạng thái "đã nhập dữ li�
 // Ngày đang xem CHƯA có giao dịch nào → luôn hiện (dù có ẩn thì bên dưới cũng chỉ là khoảng trống, không có
 // dữ liệu gì để xem); có từ 1 giao dịch trở lên mới làm theo cài đặt.
 // Đang SỬA giao dịch: hàng nút "Huỷ/Lưu giao dịch" (thêm mới) LUÔN ẩn — chỉ còn hàng "Huỷ/Lưu thay đổi/Xoá"
-// (trước v2.8.7, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
+// (trước v2.8.8, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
 // "Lưu giao dịch" sẽ thêm 1 giao dịch MỚI thay vì sửa).
 function _capNhatCompactForm(tab, show){
   if (tab!=='mua' && tab!=='ban') return;
@@ -10659,14 +10659,15 @@ function _acctNotifyResult(force){
       var ss = _notifyBuildSlides(), ci = 0;
       for (var i = 0; i < ss.length; i++) { if (ss[i].text === _gdBarConnStatus.msg) { ci = i; break; } }
       _notifySlideIdx = ci;
-      _notifyShowContent('☁️', _gdBarConnStatus.msg, _gdBarConnStatus.cls);
+      if (_notifyCurId === 'cloud') return; // đang hiện đúng thông báo bộ nhớ đám mây rồi → không hiện lại lần nữa
+      _notifyShowContent('☁️', _gdBarConnStatus.msg, _gdBarConnStatus.cls, 'cloud');
       return;
     }
     if (sl.cls === 'syncing') return;
     if (_acctResultShown && !force) return;
     _acctResultShown = true; _acctShownAt = Date.now();
     _notifySlideIdx = 0; // slide tài khoản luôn ở vị trí 0 → lần xoay kế tiếp sang vị trí 1
-    _notifyShowContent(sl.icon, sl.text, sl.cls);
+    _notifyShowContent(sl.icon, sl.text, sl.cls, 'acct');
   } catch(e){}
 }
 var _notifySlideIdx = -1; // -1 để lần _notifyTick() ĐẦU TIÊN tăng lên đúng 0 (trước đây để 0 khiến lần
@@ -10804,7 +10805,7 @@ function _fetchWeather(){
             // vị trí để lần xoay kế tiếp sang thông báo SAU thời tiết (không hiện lại thời tiết lần nữa).
             var _hasAcct = false; try { _hasAcct = !!_acctSlide(); } catch(e){}
             _notifySlideIdx = _hasAcct ? 1 : 0;
-            _notifyShowContent(_weatherIcon(_weatherCache.code), _buildWeatherText(_weatherCache), 'synced');
+            _notifyShowContent(_weatherIcon(_weatherCache.code), _buildWeatherText(_weatherCache), 'synced', 'weather');
           }
         }
         setTimeout(_fetchWeather, 5*60000); // thành công → làm mới lại sau 5 phút
@@ -10894,21 +10895,21 @@ function _chayDaysOfMonth(d){
 }
 function _notifyBuildSlides(){
   var slides = [];
-  slides.push({ icon:'☁️', text: _gdBarConnStatus.msg, cls: _gdBarConnStatus.cls });
+  slides.push({ id:'cloud', icon:'☁️', text: _gdBarConnStatus.msg, cls: _gdBarConnStatus.cls });
   try {
     var now = new Date();
     var lun = solar2Lunar(now.getDate(), now.getMonth()+1, now.getFullYear());
-    slides.push({ icon: _moonPhaseIcon(lun.day), text: 'Âm lịch: ngày ' + lun.day + (lun.leap ? ' (nhuận)' : '') + ' tháng ' + lun.month + ' năm ' + lun.year, cls:'synced' });
+    slides.push({ id:'lunar', icon: _moonPhaseIcon(lun.day), text: 'Âm lịch: ngày ' + lun.day + (lun.leap ? ' (nhuận)' : '') + ' tháng ' + lun.month + ' năm ' + lun.year, cls:'synced' });
     var chayDays = _chayDaysOfMonth(now);
     if (chayDays.indexOf(lun.day) !== -1) {
-      slides.push({ icon:'🙏', text: '🙏 Hôm nay ngày ' + lun.day + ' âm lịch — ngày ăn chay, nhắc quý khách lưu ý!', cls:'offline' });
+      slides.push({ id:'chay', icon:'🙏', text: '🙏 Hôm nay ngày ' + lun.day + ' âm lịch — ngày ăn chay, nhắc quý khách lưu ý!', cls:'offline' });
     } else {
       // Báo trước 1 ngày: nếu NGÀY MAI rơi đúng ngày chay thì nhắc trước ngay từ hôm nay
       var tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate() + 1);
       var lunT = solar2Lunar(tomorrow.getDate(), tomorrow.getMonth()+1, tomorrow.getFullYear());
       var chayDaysT = (lunT.month === lun.month && lunT.year === lun.year) ? chayDays : _chayDaysOfMonth(tomorrow);
       if (chayDaysT.indexOf(lunT.day) !== -1) {
-        slides.push({ icon:'🙏', text: '🙏 Ngày mai (' + lunT.day + ' âm lịch) là ngày ăn chay — quý khách lưu ý chuẩn bị trước!', cls:'offline' });
+        slides.push({ id:'chay', icon:'🙏', text: '🙏 Ngày mai (' + lunT.day + ' âm lịch) là ngày ăn chay — quý khách lưu ý chuẩn bị trước!', cls:'offline' });
       }
     }
   } catch(e) { /* lỗi tính âm lịch thì bỏ qua slide này, không ảnh hưởng các slide khác */ }
@@ -10922,11 +10923,11 @@ function _notifyBuildSlides(){
   try {
     var syncMsg = MCS_LS.getItem('registry_sync_debug') || '';
     if (syncMsg.indexOf('❌') !== -1) {
-      slides.push({ icon:'☁️', text: 'Lỗi đồng bộ máy: ' + syncMsg.replace(/^❌\s*/, '').slice(0,200), cls:'offline' });
+      slides.push({ id:'registry', icon:'☁️', text: 'Lỗi đồng bộ máy: ' + syncMsg.replace(/^❌\s*/, '').slice(0,200), cls:'offline' });
     } else if (_lastRegistrySyncAt) {
       var rd = _lastRegistrySyncAt;
       var rTimeStr = rd.toLocaleTimeString('vi-VN') + ' ngày ' + String(rd.getDate()).padStart(2,'0') + '/' + String(rd.getMonth()+1).padStart(2,'0');
-      slides.push({ icon:'☁️', text: 'Đã kết nối Máy Chủ - đã cập nhật dữ liệu lúc: ' + rTimeStr, cls:'synced' });
+      slides.push({ id:'registry', icon:'☁️', text: 'Đã kết nối Máy Chủ - đã cập nhật dữ liệu lúc: ' + rTimeStr, cls:'synced' });
     }
   } catch(e) {}
   // Tình trạng hoạt động hệ thống — LUÔN hiện 1 trong 2, tách riêng "lỗi hệ thống" (từ đợt tự kiểm tra
@@ -10942,15 +10943,15 @@ function _notifyBuildSlides(){
       if (sysErr && otherErr) break;
     }
     if (sysErr) {
-      slides.push({ icon:'🩺', text: 'Lỗi hệ thống: ' + sysErr.message.slice(0,200), cls:'offline' });
+      slides.push({ id:'sys', icon:'🩺', text: 'Lỗi hệ thống: ' + sysErr.message.slice(0,200), cls:'offline' });
     } else {
-      slides.push({ icon:'🩺', text: 'Tự động kiểm tra hệ thống KHÔNG phát hiện lỗi', cls:'synced' });
+      slides.push({ id:'sys', icon:'🩺', text: 'Tự động kiểm tra hệ thống KHÔNG phát hiện lỗi', cls:'synced' });
     }
-    if (otherErr) slides.push({ icon:'⚠️', text: 'Lỗi khác: ' + otherErr.message.slice(0,200), cls:'offline' });
+    if (otherErr) slides.push({ id:'err', icon:'⚠️', text: 'Lỗi khác: ' + otherErr.message.slice(0,200), cls:'offline' });
   } catch(e) {}
-  slides.push({ icon:'🍀', text: LUCKY_WISHES[new Date().getDate() % LUCKY_WISHES.length], cls:'synced' });
-  slides.push({ icon:'📜', text: _pickRandom(MUA_BAN_PROVERBS), cls:'synced' });
-  slides.push({ icon:'🎮', text: 'Nhấp nhanh 3 lần vào tên App để mở game giải trí đôi chút nhé!', cls:'synced' }); // game ẩn (GMP)
+  slides.push({ id:'lucky', icon:'🍀', text: LUCKY_WISHES[new Date().getDate() % LUCKY_WISHES.length], cls:'synced' });
+  slides.push({ id:'proverb', icon:'📜', text: _pickRandom(MUA_BAN_PROVERBS), cls:'synced' });
+  slides.push({ id:'game', icon:'🎮', text: 'Nhấp nhanh 3 lần vào tên App để mở game giải trí đôi chút nhé!', cls:'synced' }); // game ẩn (GMP)
   // Thời tiết tại vị trí định vị của thiết bị. Nếu ĐÃ CÓ dữ liệu kịp lúc xây danh sách này (dưới 15 phút
   // — với lịch làm mới mỗi 5 phút/thử lại mỗi 10 giây khi lỗi thì dữ liệu hầu như không bao giờ cũ hơn
   // vậy, quá cũ thì thà không hiện còn hơn hiện sai lệch) → đưa lên vị trí ĐẦU TIÊN (ưu tiên cao nhất,
@@ -10959,12 +10960,12 @@ function _notifyBuildSlides(){
   // vẫn chạy ngầm bình thường (tự thử lại mỗi 10 giây), hễ có dữ liệu sẽ NGẮT NGANG hiện ngay lập tức
   // lên vị trí đầu (xem đoạn _weatherFirstReady trong _fetchWeather), không cần đợi tới lượt xoay tự nhiên.
   if (_weatherCache && (Date.now() - _weatherCache.fetchedAt) < 15*60000) {
-    slides.unshift({ icon: _weatherIcon(_weatherCache.code), text: _buildWeatherText(_weatherCache), cls:'synced' });
+    slides.unshift({ id:'weather', icon: _weatherIcon(_weatherCache.code), text: _buildWeatherText(_weatherCache), cls:'synced' });
   } else {
-    slides.splice(2, 0, { icon:'🌡️', text: 'Đang cập nhật dữ liệu thời tiết...', cls:'synced' });
+    slides.splice(2, 0, { id:'weather', icon:'🌡️', text: 'Đang cập nhật dữ liệu thời tiết...', cls:'synced' });
   }
   // Thông báo tài khoản đồng bộ: ƯU TIÊN CAO NHẤT, luôn đứng đầu vòng xoay (trên cả thời tiết)
-  try { var _as = _acctSlide(); if (_as) slides.unshift(_as); } catch(e){}
+  try { var _as = _acctSlide(); if (_as) { _as.id = 'acct'; slides.unshift(_as); } } catch(e){}
   return slides;
 }
 // Hiện 1 nội dung lên thanh — DÙNG CHUNG cho cả vòng xoay tự động (_notifyTick) LẪN việc ghi trực tiếp
@@ -10979,7 +10980,13 @@ function _notifyBuildSlides(){
 // giây — tổng thời gian hiện 1 slide dài tối đa không quá 30 giây. Mỗi lần đổi nội dung đều có hiệu
 // ứng cuốn chiếu từ dưới lên trên, đồng bộ với hiệu ứng đã dùng ở khung thông tin khách hàng (khTickerIn).
 var _notifyTimer = null;
-function _notifyShowContent(icon, text, cls){
+// _notifyCurId: loại thông báo ĐANG hiện ('cloud', 'weather', 'acct'...). Vòng xoay tìm thông báo kế tiếp theo
+// LOẠI (không theo số thứ tự) vì danh sách thay đổi liên tục (thời tiết tải xong được chèn lên đầu, dòng "đang
+// cập nhật thời tiết" biến mất, thông báo tài khoản xuất hiện/biến mất...) — trước v2.8.8 tính theo số thứ tự
+// nên thông báo bộ nhớ đám mây có lúc bị hiện lại 2–3 lần liên tiếp.
+var _notifyCurId = null, _notifyStartOver = false;
+function _notifyShowContent(icon, text, cls, id){
+  _notifyCurId = id || (text === _gdBarConnStatus.msg ? 'cloud' : null);
   var ico = document.getElementById('gd-bar-ico');
   var nm = document.getElementById('gd-bar-name');
   var clip = nm ? nm.parentElement : null;
@@ -11018,9 +11025,15 @@ function _notifyTick(){
   try {
     var slides = _notifyBuildSlides();
     if (!slides.length) return;
-    _notifySlideIdx = (_notifySlideIdx + 1) % slides.length;
-    var s = slides[_notifySlideIdx];
-    _notifyShowContent(s.icon, s.text, s.cls);
+    var n = slides.length, cur = -1;
+    if (_notifyCurId) for (var i = 0; i < n; i++) if (slides[i].id === _notifyCurId) { cur = i; break; }
+    var start = _notifyStartOver ? -1 : (cur >= 0 ? cur : _notifySlideIdx);
+    _notifyStartOver = false;
+    var nx = (start + 1 + n) % n;
+    if (n > 1 && slides[nx].id && slides[nx].id === _notifyCurId) nx = (nx + 1) % n; // không hiện 1 loại 2 lần liền
+    _notifySlideIdx = nx;
+    var s = slides[nx];
+    _notifyShowContent(s.icon, s.text, s.cls, s.id);
   } catch(e) {
     // Bất kỳ lỗi bất ngờ nào ở đây (dữ liệu hỏng, phần tử DOM chưa sẵn sàng...) tuyệt đối KHÔNG được để
     // làm "chết đứng" cả vòng xoay mãi mãi — luôn tự đặt lịch thử lại sau 10 giây để tự phục hồi.
@@ -11037,7 +11050,7 @@ _notifyTimer = setTimeout(_notifyTick, 10000); // xoay sang slide đầu tiên s
 // thời làm cho thời tiết hiện lên đầu tiên đúng như yêu cầu "lúc mở app, lúc ẩn app lâu rồi mở lại".
 function _notifyForceRefreshNow(){
   if (_notifyTimer) { clearTimeout(_notifyTimer); _notifyTimer = null; }
-  _notifySlideIdx = -1;
+  _notifySlideIdx = -1; _notifyStartOver = true; // bắt đầu lại từ đầu vòng (vẫn bỏ qua nếu trùng loại đang hiện)
   _notifyTick();
 }
 document.addEventListener('visibilitychange', function(){
@@ -11104,9 +11117,9 @@ function updGDBarStatus(msg, cls) {
       // Mở app: thông báo TÀI KHOẢN ĐỒNG BỘ hiện đầu tiên (đang đăng nhập → kết quả sẽ tự thay ngay khi có)
       _notifySlideIdx = 0; _acctShownAt = Date.now();
       if (_as0.cls !== 'syncing') _acctResultShown = true;
-      _notifyShowContent(_as0.icon, _as0.text, _as0.cls);
+      _notifyShowContent(_as0.icon, _as0.text, _as0.cls, 'acct');
     } else if (typeof _notifyShowContent === 'function') {
-      _notifyShowContent('☁️', out, cls);
+      _notifyShowContent('☁️', out, cls, 'cloud');
     } else {
       nm.textContent = out;
       nm.className = 'gd-name gd-name-' + cls;
