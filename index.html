@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.8.2</title>
+<title>Mua Bán Mủ Cao Su v2.8.3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -65,6 +65,20 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g
 #gmp-canvas{display:block;width:100%;height:100%}
 .gmp-btn{position:absolute;top:calc(10px + env(safe-area-inset-top));width:42px;height:42px;border-radius:50%;border:2px solid rgba(255,255,255,.9);background:rgba(27,67,50,.55);color:#fff;font-size:19px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1}
 body.gmp-open{overflow:hidden}
+#gmp-set{display:none;position:absolute;inset:0;z-index:2;background:rgba(10,30,20,.45);align-items:center;justify-content:center;padding:20px}
+.gmp-set-box{width:100%;max-width:330px;background:#fffaf0;border:3px solid #2d6a4f;border-radius:18px;padding:16px 16px 14px;box-shadow:0 10px 30px rgba(0,0,0,.3);font-family:'Be Vietnam Pro',sans-serif;color:#1b4332}
+.gmp-set-ttl{font-size:17px;font-weight:800;text-align:center;margin-bottom:10px}
+.gmp-set-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 2px;border-bottom:1px solid #e3eadf;font-size:14px;font-weight:700;cursor:pointer}
+.gmp-sw{flex:0 0 auto;width:46px;height:26px;border-radius:13px;background:#c8d3cc;position:relative;transition:background .2s}
+.gmp-sw::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s}
+.gmp-sw.on{background:#40916c}.gmp-sw.on::after{left:23px}
+.gmp-set-lbl{font-size:13px;font-weight:800;margin:12px 0 6px}
+.gmp-seg{display:flex;gap:6px}
+.gmp-seg button{flex:1;padding:9px 0;border-radius:10px;border:2px solid #b7d3c2;background:#fff;font-family:inherit;font-size:13.5px;font-weight:800;color:#2d6a4f;cursor:pointer}
+.gmp-seg button.on{background:#2d6a4f;border-color:#2d6a4f;color:#fff}
+.gmp-set-best{font-size:13px;font-weight:600;color:#b45309}
+.gmp-set-del{margin-top:10px;width:100%;padding:9px;border-radius:10px;border:1.5px solid #f3b4b4;background:#fff5f5;color:#b91c1c;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.gmp-set-ok{margin-top:8px;width:100%;padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,#1b4332,#40916c);color:#fff;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer}
 .logo-ver{font-size:9px;opacity:.6}
 .hdr-acts{display:flex;gap:5px;flex-shrink:0;margin-top:2px}
 .ico-btn{width:26px;height:26px;background:rgba(255,255,255,.15);border:none;border-radius:8px;color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;flex-shrink:0}
@@ -559,7 +573,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.8.2 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.8.3 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1942,7 +1956,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.8.2</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.8.3</div>
       </div>
     </div>
 
@@ -2108,7 +2122,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.8.2</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.8.3</div>
       </div>
     </div>
 
@@ -4391,7 +4405,7 @@ var _cfShow = { mua: false, ban: false }; // trạng thái "đã nhập dữ li�
 // Ngày đang xem CHƯA có giao dịch nào → luôn hiện (dù có ẩn thì bên dưới cũng chỉ là khoảng trống, không có
 // dữ liệu gì để xem); có từ 1 giao dịch trở lên mới làm theo cài đặt.
 // Đang SỬA giao dịch: hàng nút "Huỷ/Lưu giao dịch" (thêm mới) LUÔN ẩn — chỉ còn hàng "Huỷ/Lưu thay đổi/Xoá"
-// (trước v2.8.2, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
+// (trước v2.8.3, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
 // "Lưu giao dịch" sẽ thêm 1 giao dịch MỚI thay vì sửa).
 function _capNhatCompactForm(tab, show){
   if (tab!=='mua' && tab!=='ban') return;
@@ -6152,7 +6166,7 @@ var SB_NO_SYNC_KEYS = ['device_code','gd_token','gd_token_expiry','gd_folder_id'
   // đồng bộ sang máy khác cùng tài khoản sẽ làm máy đó áp dụng lại lệnh cũ (mất ngày gia hạn hợp lệ,
   // hoặc tự đặt lại mật khẩu giao dịch về mặc định).
   'admin_override_applied_at','pw_reset_applied_at','registry_sync_debug','last_ext_info',
-  'gmp_best','gmp_sound']; // kỷ lục + âm thanh game ẩn Giọt Mủ Phiêu Lưu: riêng từng máy
+  'gmp_best','gmp_best_de','gmp_best_kho','gmp_sound','gmp_cfg']; // kỷ lục + cài đặt game ẩn Giọt Mủ Phiêu Lưu: riêng từng máy
 // Danh sách khoá THỰC SỰ sẽ đồng bộ mỗi lần: hợp của SB_DATA_KEYS (đảm bảo có giá trị mặc định hợp lý
 // nếu máy chưa từng có khoá đó) VÀ toàn bộ khoá đang thực sự tồn tại trong localStorage của app (trừ
 // danh sách chỉ-riêng-máy-này ở trên) — để không bỏ sót dữ liệu của các tính năng thêm sau này mà lỡ
@@ -13728,13 +13742,28 @@ document.addEventListener('focusin', function(e){
 });
 
 // ─── GAME ẨN "GIỌT MỦ PHIÊU LƯU" ───
-// Mở: chạm nhanh 3 lần vào tên app ở đầu trang. Chạm màn hình → giọt mủ nảy lên; bay qua khe giữa 2 thân cây
-// cao su được 1 điểm; chạm thân cây hoặc mặt đất là thua. Kỷ lục + bật/tắt âm thanh chỉ lưu trên máy này
-// (khoá 'gmp_best', 'gmp_sound' — nằm trong SB_NO_SYNC_KEYS, không đồng bộ lên Supabase).
+// Mở: chạm nhanh 3 lần vào tên app ở đầu trang. Chạm màn hình → giọt mủ thiên thần vỗ cánh bay lên; bay qua khe
+// giữa 2 thân cây cao su được 1 điểm; chạm thân cây hoặc mặt đất là thua. Nút ⚙️: âm thanh, rung, độ khó,
+// tăng tốc dần, xoá kỷ lục. Kỷ lục (riêng từng độ khó) + cài đặt chỉ lưu trên máy này (khoá 'gmp_best',
+// 'gmp_best_de', 'gmp_best_kho', 'gmp_cfg', 'gmp_sound' — nằm trong SB_NO_SYNC_KEYS, không đồng bộ lên Supabase).
 var GMP = (function(){
   var ov, cv, ctx, W = 0, H = 0, S = 1, dpr = 1, raf = 0, last = 0;
   var st = 'ready', drop, trees, groundX = 0, hillX = 0, score = 0, best = 0, overAt = 0, flash = 0, tSky = 0;
-  var am = null, soundOn = true;
+  var am = null, soundOn = true, paused = false, wingPh = 0, flapT = 0;
+  // Cài đặt game: sound (âm thanh), vib (rung), diff ('de' | 'thuong' | 'kho'), accel (tăng tốc dần)
+  var cfg = { sound: true, vib: true, diff: 'thuong', accel: false };
+  var DIFF = { de: { gap: 188, spd: 128, ten: 'Dễ' }, thuong: { gap: 158, spd: 150, ten: 'Thường' }, kho: { gap: 136, spd: 178, ten: 'Khó' } };
+  function bestKey(){ return cfg.diff === 'thuong' ? 'gmp_best' : 'gmp_best_' + cfg.diff; }
+  function loadCfg(){
+    var c = null;
+    try { c = JSON.parse(lsGet('gmp_cfg', 'null')); } catch(e){}
+    if (c && typeof c === 'object') { for (var k in cfg) if (k in c) cfg[k] = c[k]; }
+    else cfg.sound = lsGet('gmp_sound', '1') !== '0'; // bản v2.8.2 chỉ lưu bật/tắt âm thanh ở 'gmp_sound'
+    if (!DIFF[cfg.diff]) cfg.diff = 'thuong';
+    soundOn = !!cfg.sound;
+  }
+  function saveCfg(){ lsSet('gmp_cfg', JSON.stringify(cfg)); soundOn = !!cfg.sound; }
+  function vib(ms){ if (cfg.vib && navigator.vibrate) try { navigator.vibrate(ms); } catch(e){} }
   function lsGet(k, d){ try { var v = MCS_LS.getItem(k); return v == null ? d : v; } catch(e){ return d; } }
   function lsSet(k, v){ try { MCS_LS.setItem(k, String(v)); } catch(e){} }
 
@@ -13755,10 +13784,10 @@ var GMP = (function(){
   var sndHit   = function(){ beep(300, 60, 0.35, 'sawtooth', 0.16); };
 
   function groundH(){ return Math.round(90 * S); }
-  function gap(){ return 158 * S; }
+  function gap(){ return DIFF[cfg.diff].gap * S; }
   function treeW(){ return 66 * S; }
   function spacing(){ return 215 * S; }
-  function speed(){ return 150 * S; }
+  function speed(){ return DIFF[cfg.diff].spd * S * (cfg.accel && st === 'play' ? 1 + Math.min(0.45, score * 0.015) : 1); }
 
   function resize(){
     dpr = Math.min(window.devicePixelRatio || 1, 3);
@@ -13769,8 +13798,9 @@ var GMP = (function(){
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
   function reset(){
-    st = 'ready'; score = 0; flash = 0;
-    drop = { x: W * 0.3, y: (H - groundH()) * 0.45, vy: 0, r: 15 * S, rot: 0 };
+    st = 'ready'; score = 0; flash = 0; paused = false;
+    best = parseInt(lsGet(bestKey(), '0'), 10) || 0;
+    drop = { x: W * 0.3, y: (H - groundH()) * 0.45, vy: 0, r: 17 * S, rot: 0 };
     trees = [];
   }
   function addTree(x){
@@ -13779,19 +13809,22 @@ var GMP = (function(){
     trees.push({ x: x, gy: y, passed: false, seed: Math.random() });
   }
   function flap(){
+    if (paused){ paused = false; last = 0; }
     if (st === 'ready'){ st = 'play'; addTree(W + 40 * S); }
-    if (st === 'play'){ drop.vy = -430 * S; sndFlap(); return; }
+    if (st === 'play'){ drop.vy = -430 * S; flapT = 0.28; sndFlap(); return; }
     if (st === 'over' && Date.now() - overAt > 600) reset();
   }
   function die(){
     if (st !== 'play') return;
     st = 'over'; overAt = Date.now(); flash = 1; sndHit();
-    if (score > best){ best = score; lsSet('gmp_best', best); }
-    if (navigator.vibrate) try { navigator.vibrate(60); } catch(e){}
+    if (score > best){ best = score; lsSet(bestKey(), best); }
+    vib(80);
   }
 
   function update(dt){
     tSky += dt;
+    // cánh: vỗ nhanh ngay sau khi chạm, lúc chờ vỗ nhẹ, đang rơi thì xoè cánh lượn
+    if (st !== 'over'){ wingPh += dt * (flapT > 0 ? 34 : (st === 'ready' ? 9 : 5)); if (flapT > 0) flapT -= dt; }
     var gH = groundH();
     if (st !== 'over'){ groundX = (groundX + speed() * dt) % (24 * S); hillX += speed() * 0.25 * dt; }
     if (st === 'ready'){ drop.y = (H - gH) * 0.45 + Math.sin(tSky * 4) * 8 * S; drop.rot = 0; return; }
@@ -13805,8 +13838,8 @@ var GMP = (function(){
     for (var i = 0; i < trees.length; i++){
       var t = trees[i];
       t.x -= speed() * dt;
-      if (!t.passed && t.x + tw < drop.x - drop.r){ t.passed = true; score++; sndPoint(); }
-      var r = drop.r * 0.82;
+      if (!t.passed && t.x + tw < drop.x - drop.r){ t.passed = true; score++; sndPoint(); vib(15); }
+      var r = drop.r * 0.78; // chỉ tính va chạm theo thân, không tính cánh/hào quang
       if (drop.x + r > t.x && drop.x - r < t.x + tw && (drop.y - r < t.gy || drop.y + r > t.gy + gap())) die();
     }
     if (trees.length && trees[0].x < -tw - 10) trees.shift();
@@ -13898,39 +13931,83 @@ var GMP = (function(){
       ctx.beginPath(); ctx.ellipse(lx, y + 7 * S, 5 * S, 2.5 * S, 0.5, 0, 7); ctx.fill();
     }
   }
+  function wing(ax, ay, ang, k, near){
+    var r = drop.r;
+    ctx.save(); ctx.translate(ax, ay); ctx.rotate(ang); ctx.scale(k, k);
+    var g = ctx.createLinearGradient(0, 0, -1.9 * r, -1.3 * r);
+    g.addColorStop(0, near ? '#ffffff' : '#eef4ff'); g.addColorStop(1, near ? '#dfeaff' : '#c9d8f2');
+    ctx.fillStyle = g; ctx.strokeStyle = near ? '#9fb3d9' : '#8ea2c8'; ctx.lineWidth = 1.4 * S; ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(-0.15 * r, -1.25 * r, -1.35 * r, -1.75 * r, -2.0 * r, -1.2 * r);
+    ctx.quadraticCurveTo(-1.95 * r, -0.85 * r, -1.62 * r, -0.78 * r);
+    ctx.quadraticCurveTo(-1.62 * r, -0.42 * r, -1.22 * r, -0.4 * r);
+    ctx.quadraticCurveTo(-1.15 * r, -0.08 * r, -0.78 * r, -0.08 * r);
+    ctx.quadraticCurveTo(-0.55 * r, 0.22 * r, 0, 0);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    // đường lông vũ
+    ctx.strokeStyle = 'rgba(140,160,205,.55)'; ctx.lineWidth = 1 * S;
+    ctx.beginPath();
+    ctx.moveTo(-0.25 * r, -0.2 * r); ctx.quadraticCurveTo(-0.9 * r, -0.75 * r, -1.62 * r, -0.78 * r);
+    ctx.moveTo(-0.2 * r, -0.1 * r); ctx.quadraticCurveTo(-0.7 * r, -0.35 * r, -1.22 * r, -0.4 * r);
+    ctx.stroke();
+    ctx.restore();
+  }
   function drawDrop(){
-    var d = drop, r = d.r;
+    var d = drop, r = d.r, dead = st === 'over';
+    var flapA = dead ? 0.5 : Math.sin(wingPh) * (flapT > 0 ? 0.75 : 0.35);
     ctx.save(); ctx.translate(d.x, d.y); ctx.rotate(d.rot);
-    // bóng đổ
-    ctx.fillStyle = 'rgba(0,0,0,.12)'; ctx.beginPath(); ctx.ellipse(2 * S, 4 * S, r, r * 0.95, 0, 0, 7); ctx.fill();
+    // ánh sáng thiên thần quanh người
+    var glow = ctx.createRadialGradient(0, 0, r * 0.5, 0, 0, r * 2.6);
+    glow.addColorStop(0, 'rgba(255,248,200,.45)'); glow.addColorStop(1, 'rgba(255,248,200,0)');
+    ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(0, 0, r * 2.6, 0, 7); ctx.fill();
+    // cánh phía xa (sau thân)
+    wing(-r * 0.15, -r * 0.55, -0.15 + flapA * 0.9, 1.0, false);
     // thân giọt mủ (đầu nhọn quay về phía sau)
     var g = ctx.createRadialGradient(-r * 0.3, -r * 0.35, r * 0.2, 0, 0, r * 1.4);
-    g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#e7e1cf');
-    ctx.fillStyle = g; ctx.strokeStyle = '#b9ae90'; ctx.lineWidth = 1.5 * S;
+    g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#efe9da');
+    ctx.fillStyle = g; ctx.strokeStyle = '#c9bea3'; ctx.lineWidth = 1.5 * S;
     ctx.beginPath();
-    ctx.moveTo(-r * 2.0, -r * 0.05);
+    ctx.moveTo(-r * 1.9, -r * 0.05);
     ctx.quadraticCurveTo(-r * 0.9, -r * 0.95, 0, -r);
     ctx.arc(0, 0, r, -Math.PI / 2, Math.PI / 2);
-    ctx.quadraticCurveTo(-r * 0.9, r * 0.95, -r * 2.0, -r * 0.05);
+    ctx.quadraticCurveTo(-r * 0.9, r * 0.95, -r * 1.9, -r * 0.05);
     ctx.closePath(); ctx.fill(); ctx.stroke();
+    // bóng sáng trên thân
+    ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.beginPath(); ctx.ellipse(-r * 0.35, -r * 0.55, r * 0.28, r * 0.12, -0.3, 0, 7); ctx.fill();
     // má hồng
-    ctx.fillStyle = 'rgba(255,140,140,.45)'; ctx.beginPath(); ctx.ellipse(r * 0.25, r * 0.45, r * 0.22, r * 0.13, 0, 0, 7); ctx.fill();
-    // mắt
-    var dead = st === 'over';
-    ctx.fillStyle = '#fff'; ctx.strokeStyle = '#333'; ctx.lineWidth = 1.2 * S;
-    ctx.beginPath(); ctx.arc(r * 0.45, -r * 0.2, r * 0.36, 0, 7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,130,150,.5)'; ctx.beginPath(); ctx.ellipse(r * 0.22, r * 0.42, r * 0.2, r * 0.12, 0, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(r * 0.86, r * 0.36, r * 0.1, r * 0.1, 0, 0, 7); ctx.fill();
+    // mắt to tròn long lanh
     if (dead){
-      ctx.beginPath(); ctx.moveTo(r * 0.28, -r * 0.37); ctx.lineTo(r * 0.62, -r * 0.03); ctx.moveTo(r * 0.62, -r * 0.37); ctx.lineTo(r * 0.28, -r * 0.03); ctx.stroke();
+      ctx.strokeStyle = '#333'; ctx.lineWidth = 1.8 * S;
+      ctx.beginPath(); ctx.moveTo(r * 0.3, -r * 0.32); ctx.lineTo(r * 0.66, r * 0.02); ctx.moveTo(r * 0.66, -r * 0.32); ctx.lineTo(r * 0.3, r * 0.02); ctx.stroke();
     } else {
-      ctx.fillStyle = '#222'; ctx.beginPath(); ctx.arc(r * 0.55, -r * 0.18, r * 0.16, 0, 7); ctx.fill();
-      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(r * 0.6, -r * 0.24, r * 0.06, 0, 7); ctx.fill();
+      ctx.fillStyle = '#2b2440'; ctx.beginPath(); ctx.ellipse(r * 0.5, -r * 0.14, r * 0.25, r * 0.31, 0, 0, 7); ctx.fill();
+      ctx.fillStyle = '#6b5bd6'; ctx.beginPath(); ctx.ellipse(r * 0.52, -r * 0.04, r * 0.15, r * 0.16, 0, 0, 7); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(r * 0.58, -r * 0.26, r * 0.1, 0, 7); ctx.fill();
+      ctx.beginPath(); ctx.arc(r * 0.42, -r * 0.02, r * 0.05, 0, 7); ctx.fill();
+      // lông mi
+      ctx.strokeStyle = '#2b2440'; ctx.lineWidth = 1.4 * S;
+      ctx.beginPath(); ctx.moveTo(r * 0.66, -r * 0.38); ctx.lineTo(r * 0.8, -r * 0.5); ctx.stroke();
     }
     // miệng
-    ctx.strokeStyle = '#7a4a2a'; ctx.lineWidth = 1.6 * S;
+    ctx.strokeStyle = '#a0522d'; ctx.lineWidth = 1.6 * S;
     ctx.beginPath();
-    if (dead) { ctx.arc(r * 0.55, r * 0.5, r * 0.15, Math.PI * 1.1, Math.PI * 1.9); }
-    else { ctx.arc(r * 0.55, r * 0.28, r * 0.17, 0.2, Math.PI - 0.2); }
+    if (dead) ctx.arc(r * 0.62, r * 0.55, r * 0.14, Math.PI * 1.15, Math.PI * 1.85);
+    else ctx.arc(r * 0.62, r * 0.3, r * 0.14, 0.25, Math.PI - 0.25);
     ctx.stroke();
+    // cánh phía gần (trước thân)
+    wing(-r * 0.4, -r * 0.35, 0.05 + flapA, 1.2, true);
+    // vòng hào quang vàng
+    var hy = -r * 1.42 + (dead ? 0 : Math.sin(tSky * 3) * r * 0.06);
+    ctx.save();
+    ctx.shadowColor = 'rgba(255,215,0,.9)'; ctx.shadowBlur = 8 * S;
+    ctx.strokeStyle = dead ? '#c9b25a' : '#ffd23f'; ctx.lineWidth = 3.2 * S;
+    ctx.beginPath(); ctx.ellipse(r * 0.1, hy, r * 0.62, r * 0.2, dead ? 0.35 : -0.08, 0, 7); ctx.stroke();
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(255,255,255,.8)'; ctx.lineWidth = 1 * S;
+    ctx.beginPath(); ctx.ellipse(r * 0.1, hy - 0.5 * S, r * 0.62, r * 0.2, dead ? 0.35 : -0.08, Math.PI * 1.1, Math.PI * 1.6); ctx.stroke();
     ctx.restore();
   }
   function txt(s, x, y, size, fill, stroke, align){
@@ -13955,7 +14032,7 @@ var GMP = (function(){
       txt('Giọt Mủ Phiêu Lưu', W / 2, H * 0.2, 30, '#fff', '#1b4332');
       txt('Chạm màn hình để bay lên', W / 2, H * 0.6, 17, '#1b4332', 'rgba(255,255,255,.85)');
       txt('Bay qua khe giữa các thân cây cao su', W / 2, H * 0.6 + 28 * S, 13, '#1b4332', 'rgba(255,255,255,.85)');
-      if (best) txt('Kỷ lục: ' + best, W / 2, H * 0.6 + 58 * S, 15, '#b45309', 'rgba(255,255,255,.85)');
+      txt('Độ khó: ' + DIFF[cfg.diff].ten + (best ? '  ·  Kỷ lục: ' + best : ''), W / 2, H * 0.6 + 58 * S, 15, '#b45309', 'rgba(255,255,255,.85)');
     }
     if (st === 'over'){
       var pw = Math.min(W - 40, 280 * S), ph = 190 * S, px = (W - pw) / 2, py = H * 0.28;
@@ -13969,32 +14046,69 @@ var GMP = (function(){
       if (score && score >= best) txt('🎉 Kỷ lục mới!', W / 2, py + 116 * S, 15, '#b45309');
       if (Date.now() - overAt > 600) txt('Chạm để chơi lại', W / 2, py + 158 * S, 16, '#2d6a4f');
     }
+    if (paused && st === 'play'){
+      ctx.fillStyle = 'rgba(27,67,50,.35)'; ctx.fillRect(0, 0, W, H);
+      txt('Tạm dừng', W / 2, H * 0.4, 32, '#fff', '#1b4332');
+      txt('Chạm để chơi tiếp', W / 2, H * 0.4 + 40 * S, 17, '#fff', '#1b4332');
+    }
     if (flash > 0){ ctx.fillStyle = 'rgba(255,255,255,' + flash + ')'; ctx.fillRect(0, 0, W, H); }
   }
   function loop(ts){
     if (!ov || ov.style.display === 'none') return;
     var dt = last ? Math.min(0.033, (ts - last) / 1000) : 0; last = ts;
-    update(dt); if (flash > 0) flash = Math.max(0, flash - dt * 3);
+    if (!paused) update(dt); if (flash > 0) flash = Math.max(0, flash - dt * 3);
     draw();
     raf = requestAnimationFrame(loop);
   }
   function onDown(e){
-    if (e.target && e.target.closest && e.target.closest('.gmp-btn')) return;
+    if (e.target && e.target.closest && e.target.closest('.gmp-btn, #gmp-set')) return;
     e.preventDefault(); flap();
   }
   function onKey(e){
     if (!ov || ov.style.display === 'none') return;
-    if (e.code === 'Space' || e.key === ' ' || e.key === 'ArrowUp'){ e.preventDefault(); flap(); }
-    else if (e.key === 'Escape') close();
+    if ((e.code === 'Space' || e.key === ' ' || e.key === 'ArrowUp') && !setOpen()){ e.preventDefault(); flap(); }
+    else if (e.key === 'Escape'){ if (setOpen()) closeSet(); else close(); }
   }
-  function updSoundBtn(){ var b = document.getElementById('gmp-sound'); if (b) b.textContent = soundOn ? '🔊' : '🔇'; }
+  // ── Bảng cài đặt ⚙️ ──
+  function setOpen(){ var p = document.getElementById('gmp-set'); return !!(p && p.style.display !== 'none' && p.style.display !== ''); }
+  function renderSet(){
+    var p = document.getElementById('gmp-set'); if (!p) return;
+    function sw(k){ var el = p.querySelector('[data-k="' + k + '"]'); if (el) el.classList.toggle('on', !!cfg[k]); }
+    sw('sound'); sw('vib'); sw('accel');
+    p.querySelectorAll('[data-diff]').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-diff') === cfg.diff); });
+    var bl = document.getElementById('gmp-set-best');
+    if (bl) bl.textContent = 'Dễ: ' + (parseInt(lsGet('gmp_best_de', '0'), 10) || 0) + ' · Thường: ' + (parseInt(lsGet('gmp_best', '0'), 10) || 0) + ' · Khó: ' + (parseInt(lsGet('gmp_best_kho', '0'), 10) || 0);
+  }
+  function openSet(){
+    var p = document.getElementById('gmp-set'); if (!p) return;
+    if (st === 'play') paused = true;
+    renderSet(); p.style.display = 'flex';
+  }
+  function closeSet(){
+    var p = document.getElementById('gmp-set'); if (p) p.style.display = 'none';
+  }
+  function toggleCfg(k){
+    cfg[k] = !cfg[k]; saveCfg(); renderSet();
+    if (k === 'sound' && cfg.sound) sndPoint();
+    if (k === 'vib' && cfg.vib) vib(40);
+  }
+  function setDiff(d){
+    if (!DIFF[d] || d === cfg.diff) return;
+    cfg.diff = d; saveCfg();
+    reset(); // đổi độ khó → bắt đầu ván mới với kỷ lục của độ khó đó
+    renderSet();
+  }
+  function resetBest(){
+    if (!confirm('Xoá kỷ lục của cả 3 độ khó?')) return;
+    ['gmp_best', 'gmp_best_de', 'gmp_best_kho'].forEach(function(k){ try { MCS_LS.removeItem(k); } catch(e){} });
+    best = 0; renderSet();
+  }
   function open(){
     ov = document.getElementById('gmp-overlay'); cv = document.getElementById('gmp-canvas');
     if (!ov || !cv) return;
     ctx = cv.getContext('2d');
     if (!ov._gmpBound){ ov._gmpBound = 1; ov.addEventListener('pointerdown', onDown); }
-    best = parseInt(lsGet('gmp_best', '0'), 10) || 0;
-    soundOn = lsGet('gmp_sound', '1') !== '0'; updSoundBtn();
+    loadCfg(); closeSet();
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     ov.style.display = 'block'; document.body.classList.add('gmp-open');
     resize(); reset(); last = 0;
@@ -14002,14 +14116,13 @@ var GMP = (function(){
   }
   function close(){
     if (!ov) return;
-    ov.style.display = 'none'; document.body.classList.remove('gmp-open');
+    closeSet(); ov.style.display = 'none'; document.body.classList.remove('gmp-open');
     cancelAnimationFrame(raf);
   }
-  function toggleSound(){ soundOn = !soundOn; lsSet('gmp_sound', soundOn ? '1' : '0'); updSoundBtn(); if (soundOn) sndFlap(); }
   function isOpen(){ return !!(ov && ov.style.display !== 'none'); }
   document.addEventListener('keydown', onKey);
   window.addEventListener('resize', function(){ if (isOpen()){ resize(); if (st === 'ready') reset(); } });
-  document.addEventListener('visibilitychange', function(){ if (document.hidden && isOpen() && st === 'play') last = 0; });
+  document.addEventListener('visibilitychange', function(){ if (document.hidden && isOpen() && st === 'play'){ paused = true; last = 0; } });
   // Chạm nhanh 3 lần vào tên app (mỗi lần cách nhau dưới 0,5 giây) → mở game
   (function(){
     var n = 0, tm = 0;
@@ -14021,7 +14134,7 @@ var GMP = (function(){
       tm = setTimeout(function(){ n = 0; }, 500);
     });
   })();
-  return { open: open, close: close, toggleSound: toggleSound, isOpen: isOpen };
+  return { open: open, close: close, isOpen: isOpen, openSet: openSet, closeSet: closeSet, toggleCfg: toggleCfg, setDiff: setDiff, resetBest: resetBest };
 })();
 
 // ─── KHÔNG CHO KÉO CUỘN XUỐNG KHOẢNG TRỐNG ───
@@ -14186,7 +14299,25 @@ if ('serviceWorker' in navigator) {
 <!-- GAME ẨN: Giọt Mủ Phiêu Lưu (chạm nhanh 3 lần vào tên app) -->
 <div id="gmp-overlay">
   <canvas id="gmp-canvas"></canvas>
-  <button class="gmp-btn" id="gmp-sound" style="left:12px" onclick="GMP.toggleSound()" title="Bật/tắt âm thanh">🔊</button>
+  <button class="gmp-btn" style="left:12px" onclick="GMP.openSet()" title="Cài đặt trò chơi">⚙️</button>
+  <div id="gmp-set" onclick="if(event.target===this)GMP.closeSet()">
+    <div class="gmp-set-box">
+      <div class="gmp-set-ttl">⚙️ Cài đặt trò chơi</div>
+      <div class="gmp-set-row" onclick="GMP.toggleCfg('sound')"><span>🔊 Âm thanh</span><span class="gmp-sw" data-k="sound"></span></div>
+      <div class="gmp-set-row" onclick="GMP.toggleCfg('vib')"><span>📳 Rung khi ghi điểm / va chạm</span><span class="gmp-sw" data-k="vib"></span></div>
+      <div class="gmp-set-row" onclick="GMP.toggleCfg('accel')"><span>⚡ Tăng tốc dần theo điểm</span><span class="gmp-sw" data-k="accel"></span></div>
+      <div class="gmp-set-lbl">🎯 Độ khó</div>
+      <div class="gmp-seg">
+        <button data-diff="de" onclick="GMP.setDiff('de')">Dễ</button>
+        <button data-diff="thuong" onclick="GMP.setDiff('thuong')">Thường</button>
+        <button data-diff="kho" onclick="GMP.setDiff('kho')">Khó</button>
+      </div>
+      <div class="gmp-set-lbl">🏆 Kỷ lục</div>
+      <div class="gmp-set-best" id="gmp-set-best"></div>
+      <button class="gmp-set-del" onclick="GMP.resetBest()">🗑️ Xoá kỷ lục</button>
+      <button class="gmp-set-ok" onclick="GMP.closeSet()">Xong</button>
+    </div>
+  </div>
   <button class="gmp-btn" style="right:12px" onclick="GMP.close()" title="Thoát game">✕</button>
 </div>
 </body>
