@@ -62,3 +62,12 @@ cũng tải được ở `https://nguyentai219.github.io/Mucaosu/android-twa/rel
 bao giờ đưa khoá vào repo), nếu không APK mới không cài đè được và Chrome sẽ hiện lại thanh địa chỉ.
 File xác minh `assetlinks.json` nằm ở repo `nguyentai219/nguyentai219.github.io` (thư mục `.well-known/`,
 cần file `.nojekyll`).
+
+## Game APK riêng "Xếp Bài Nhện"
+
+Thư mục `android-xepbai/`: APK game độc lập (WebView chạy `game/index.html` đóng gói sẵn, không cần mạng),
+gói `io.github.nguyentai219.xepbainhen`. Sửa game ở `game/index.html` (khoá lưu trữ tiền tố `xbn_`), tăng
+`versionCode`/`versionName` trong `android-xepbai/AndroidManifest.xml`, build bằng `android-xepbai/build.sh` (ký
+bằng `mucaosu.keystore`), APK ra `android-xepbai/release/XepBaiNhen.apk` (tải được ở
+`https://nguyentai219.github.io/Mucaosu/android-xepbai/release/XepBaiNhen.apk`). Không liên quan bản web — sửa game
+APK không cần tăng số phiên bản của app Mủ Cao Su.
