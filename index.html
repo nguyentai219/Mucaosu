@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.8.5</title>
+<title>Mua Bán Mủ Cao Su v2.8.6</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -88,6 +88,8 @@ body.gmp-open{overflow:hidden}
 .sol-r{position:absolute;left:calc(var(--cw)*.06);top:0;font-size:calc(var(--cw)*.42);font-weight:800;line-height:1.1;letter-spacing:-1px}
 .sol-s{position:absolute;right:calc(var(--cw)*.06);top:calc(var(--cw)*.04);font-size:calc(var(--cw)*.3);line-height:1}
 .sol-b{position:absolute;left:0;right:0;bottom:calc(var(--cw)*.08);text-align:center;font-size:calc(var(--cw)*.62);line-height:1}
+.sol-f{position:absolute;left:calc(var(--cw)*.05);right:calc(var(--cw)*.05);top:calc(var(--cw)*.46);bottom:calc(var(--cw)*.05)}
+.sol-f svg{display:block;width:100%;height:100%}
 .sol-c.down{background:repeating-linear-gradient(45deg,#2d6a4f 0 4px,#40916c 4px 8px);border:2px solid #fff}
 .sol-c.down>span{display:none}
 .sol-c.sol-notr{transition:none!important}
@@ -616,7 +618,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.8.5 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.8.6 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -1999,7 +2001,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.8.5</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.8.6</div>
       </div>
     </div>
 
@@ -2165,7 +2167,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.8.5</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.8.6</div>
       </div>
     </div>
 
@@ -4448,7 +4450,7 @@ var _cfShow = { mua: false, ban: false }; // trạng thái "đã nhập dữ li�
 // Ngày đang xem CHƯA có giao dịch nào → luôn hiện (dù có ẩn thì bên dưới cũng chỉ là khoảng trống, không có
 // dữ liệu gì để xem); có từ 1 giao dịch trở lên mới làm theo cài đặt.
 // Đang SỬA giao dịch: hàng nút "Huỷ/Lưu giao dịch" (thêm mới) LUÔN ẩn — chỉ còn hàng "Huỷ/Lưu thay đổi/Xoá"
-// (trước v2.8.5, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
+// (trước v2.8.6, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
 // "Lưu giao dịch" sẽ thêm 1 giao dịch MỚI thay vì sửa).
 function _capNhatCompactForm(tab, show){
   if (tab!=='mua' && tab!=='ban') return;
@@ -14186,7 +14188,7 @@ var GMP = (function(){
 // 10 cột, chia sẵn 54 lá (4 cột đầu 6 lá, 6 cột sau 5 lá), 50 lá còn lại chia thêm 5 lần (mỗi lần 10 lá, chỉ
 // chia khi không còn cột trống). Xếp giảm dần K → A; chỉ kéo cả dãy khi các lá cùng chất. Đủ dãy K → A cùng chất
 // thì thu lên góc trái; thu đủ 8 dãy là thắng. Điểm: bắt đầu 500, mỗi nước −1, mỗi dãy hoàn thành +100.
-// Chơi 1 chất (mặc định) / 2 chất / 4 chất. Lá bài vẽ bằng HTML/CSS (không dùng ảnh) cho nhẹ app.
+// Chơi 1 chất (mặc định) / 2 chất / 4 chất. Lá bài vẽ bằng HTML/CSS, hình J Q K vẽ bằng SVG (không dùng ảnh) cho nhẹ app.
 // Lưu trên máy (không đồng bộ — nằm trong SB_NO_SYNC_KEYS): 'sol_cfg' (cài đặt), 'sol_save' (ván đang chơi dở),
 // 'sol_stat' (số ván thắng + điểm cao theo số chất).
 var SOL = (function(){
@@ -14373,6 +14375,47 @@ var SOL = (function(){
   function flashSlot(i){ var e = $('sol-slot-' + i); if (e){ e.classList.remove('sol-hl'); void e.offsetWidth; e.classList.add('sol-hl'); } }
   function toastS(m){ var t = $('sol-toast'); if (!t) return; t.textContent = m; t.classList.add('show'); clearTimeout(t._tm); t._tm = setTimeout(function(){ t.classList.remove('show'); }, 2200); }
 
+  // ── Hình J, Q, K kiểu bài thật, vẽ bằng SVG (không dùng ảnh): nửa trên vẽ người, nửa dưới lật 180° đối xứng.
+  //    Áo theo màu chất (♠♣ xanh đen, ♥♦ đỏ), điểm vàng. Tạo 1 lần cho mỗi cặp (lá, chất) rồi dùng lại.
+  var _faceCache = {};
+  function faceSvg(r, s){
+    var key = r + '_' + s; if (_faceCache[key]) return _faceCache[key];
+    var red = s === 1 || s === 2, col = red ? '#c62828' : '#1f3a68', acc = red ? '#1f3a68' : '#c62828';
+    var gold = '#e8a800', skin = '#f5cfa6', hair = r === 13 ? '#8d5a2b' : r === 12 ? '#5d3a1a' : '#3e2a14', h = '';
+    if (r === 12) h += '<path d="M20.2 12Q20 5.8 25 6.3Q30 5.8 29.8 12L31 21Q28 19 29 13.5Q25 9 21 13.5Q22 19 19 21Z" fill="' + hair + '"/>';
+    h += '<path d="M9 28L13 19Q25 15 37 19L41 28Z" fill="' + col + '"/>' +
+         '<path d="M25 18.5V28M18 20.5L16.5 28M32 20.5L33.5 28" stroke="' + acc + '" stroke-width="1.3"/>' +
+         '<path d="M13 19Q25 15 37 19" stroke="' + gold + '" stroke-width="1.6" fill="none"/>' +
+         '<ellipse cx="25" cy="18.4" rx="5" ry="1.6" fill="#fff" stroke="' + gold + '" stroke-width=".6"/>' +
+         '<circle cx="25" cy="12.5" r="4.6" fill="' + skin + '" stroke="#a0704a" stroke-width=".4"/>' +
+         '<circle cx="23.3" cy="12" r=".55" fill="#333"/><circle cx="26.7" cy="12" r=".55" fill="#333"/>' +
+         '<path d="M23.8 14.6Q25 15.4 26.2 14.6" stroke="#a33" stroke-width=".5" fill="none"/>';
+    if (r === 13){ // Vua: râu, vương miện, quyền trượng
+      h += '<path d="M20.6 13Q21 18.5 25 18.6Q29 18.5 29.4 13Q27.5 15.8 25 15.8Q22.5 15.8 20.6 13Z" fill="#b07a3c"/>' +
+           '<path d="M20 8.6V3.8L22.5 6.2L25 3L27.5 6.2L30 3.8V8.6Z" fill="' + gold + '" stroke="#9a6a00" stroke-width=".4"/>' +
+           '<circle cx="25" cy="7" r=".8" fill="' + acc + '"/>' +
+           '<path d="M37 10.5L34.5 27" stroke="' + gold + '" stroke-width="1.2"/><circle cx="37.2" cy="9.6" r="1.4" fill="' + gold + '"/>';
+    } else if (r === 12){ // Hoàng hậu: tóc dài, vương miện nhỏ, cầm hoa
+      h += '<path d="M20.4 11.6Q21 7.4 25 7.6Q29 7.4 29.6 11.6Q27 9.6 25 9.8Q23 9.6 20.4 11.6Z" fill="' + hair + '"/>' +
+           '<path d="M21.5 7.8L22.5 4.8L24 6.5L25 4L26 6.5L27.5 4.8L28.5 7.8Z" fill="' + gold + '" stroke="#9a6a00" stroke-width=".4"/>' +
+           '<path d="M12.5 26L14.8 14" stroke="#2e7d32" stroke-width="1"/>' +
+           '<circle cx="15" cy="12.6" r="2.2" fill="' + acc + '"/><circle cx="15" cy="12.6" r=".8" fill="' + gold + '"/>';
+    } else { // Bồi (J): tóc ngắn, mũ có lông vũ, cây giáo
+      h += '<path d="M20.4 12Q20 8.2 25 8.4Q30 8.2 29.6 12Q27 10 25 10.2Q23 10 20.4 12Z" fill="' + hair + '"/>' +
+           '<path d="M28.6 6Q34 .8 37.5 4Q33.5 3.6 29.8 7.4Z" fill="' + gold + '"/>' +
+           '<path d="M20.6 8.6Q21 4.2 25 4.2Q29 4.2 29.4 8.6Z" fill="' + acc + '"/>' +
+           '<ellipse cx="25" cy="8.6" rx="6.4" ry="1.3" fill="' + acc + '"/>' +
+           '<path d="M13.4 7L15.4 27" stroke="#8a8a8a" stroke-width="1"/><path d="M12.6 7.6L13.2 3.6L14.6 7.2Z" fill="#9e9e9e"/>';
+    }
+    h += '<text x="5" y="9.5" font-size="7" fill="' + col + '">' + SUITS[s] + '</text>';
+    return (_faceCache[key] = '<svg viewBox="0 0 50 56"><rect x="2" y="2" width="46" height="52" rx="2" fill="#fff7dc" stroke="' + col + '" stroke-width=".8"/>' +
+      '<g>' + h + '</g><g transform="rotate(180 25 28)">' + h + '</g>' +
+      '<path d="M2 28H48" stroke="' + col + '" stroke-width=".6"/></svg>');
+  }
+  function cardInner(r, s){
+    return '<span class="sol-r">' + RANKS[r] + '</span><span class="sol-s">' + SUITS[s] + '</span>' +
+      (r > 10 ? '<span class="sol-f">' + faceSvg(r, s) + '</span>' : '<span class="sol-b">' + SUITS[s] + '</span>');
+  }
   // ── Vẽ ──
   function layout(){
     var W = board.clientWidth;
@@ -14389,7 +14432,7 @@ var SOL = (function(){
     all.forEach(function(c){
       var e = document.createElement('div');
       e.className = 'sol-c' + ((c.s === 1 || c.s === 2) ? ' red' : '') + (c.r > 10 ? ' face' : '');
-      e.innerHTML = '<span class="sol-r">' + RANKS[c.r] + '</span><span class="sol-s">' + SUITS[c.s] + '</span><span class="sol-b">' + SUITS[c.s] + '</span>';
+      e.innerHTML = cardInner(c.r, c.s);
       e.dataset.id = c.id; e._shown = false;
       board.appendChild(e); els[c.id] = e;
     });
@@ -14441,7 +14484,7 @@ var SOL = (function(){
     // các dãy đã thu (góc trái): hiện lá K
     var fd = $('sol-done'), fh = '';
     done.forEach(function(s, k){
-      fh += '<div class="sol-c' + ((s === 1 || s === 2) ? ' red' : '') + ' face" style="position:absolute;left:' + (k * cw * 0.32) + 'px;top:0;width:' + cw + 'px;height:' + ch + 'px"><span class="sol-r">K</span><span class="sol-s">' + SUITS[s] + '</span><span class="sol-b">' + SUITS[s] + '</span></div>';
+      fh += '<div class="sol-c' + ((s === 1 || s === 2) ? ' red' : '') + ' face" style="position:absolute;left:' + (k * cw * 0.32) + 'px;top:0;width:' + cw + 'px;height:' + ch + 'px">' + cardInner(13, s) + '</div>';
     });
     fd.innerHTML = fh; fd.style.left = pad + 'px'; fd.style.top = topY + 'px';
   }
