@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.9.0</title>
+<title>Mua Bán Mủ Cao Su v2.9.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -83,10 +83,14 @@ body.gmp-open{overflow:hidden}
 .sol-stat small{display:block;font-size:11px;font-weight:700;color:#ffd166;letter-spacing:.3px}
 .sol-stat b{font-size:19px;font-weight:800}
 #sol-board{position:relative;flex:1;overflow:hidden}
-.sol-c{position:absolute;box-sizing:border-box;background:#fff;border:1px solid #9aa79f;border-radius:calc(var(--cw)*.12);box-shadow:0 1px 2px rgba(0,0,0,.35);color:#1d2b3a;overflow:hidden;transition:left .18s ease,top .18s ease}
-.sol-c.red{color:#c62828}
+.sol-c{position:absolute;box-sizing:border-box;background:#fff;border:1px solid #9aa79f;border-radius:calc(var(--cw)*.12);box-shadow:0 1px 2px rgba(0,0,0,.35);color:#0b0b0f;overflow:hidden;transition:left .18s ease,top .18s ease}
+.sol-c.red{color:#d0021b}
+.sol-spk{position:absolute;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;pointer-events:none;z-index:2500;box-shadow:0 0 6px #ffd166;animation:solSpk .75s ease-out forwards}
+@keyframes solSpk{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+.sol-pop{position:absolute;z-index:2600;transform:translateX(-50%);font-weight:900;font-size:24px;color:#ffd166;text-shadow:0 2px 0 #7a4b00,0 0 10px rgba(255,209,102,.8);pointer-events:none;animation:solPop 1.3s ease-out forwards}
+@keyframes solPop{0%{opacity:0;transform:translate(-50%,0) scale(.5)}20%{opacity:1;transform:translate(-50%,-12px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-60px)}}
 .sol-c.face{background:linear-gradient(#fffdf2,#fff3cf)}
-.sol-r{position:absolute;left:calc(var(--cw)*.06);top:0;font-size:calc(var(--cw)*.42);font-weight:800;line-height:1.1;letter-spacing:-1px}
+.sol-r{position:absolute;left:calc(var(--cw)*.05);top:0;font-size:calc(var(--cw)*.5);font-weight:900;line-height:1.05;letter-spacing:-1.5px;font-family:Roboto,'Arial Black',Arial,sans-serif}
 .sol-s{position:absolute;right:calc(var(--cw)*.06);top:calc(var(--cw)*.04);font-size:calc(var(--cw)*.3);line-height:1}
 .sol-b{position:absolute;left:0;right:0;bottom:calc(var(--cw)*.08);text-align:center;font-size:calc(var(--cw)*.62);line-height:1}
 .sol-f{position:absolute;left:calc(var(--cw)*.05);right:calc(var(--cw)*.05);top:calc(var(--cw)*.46);bottom:calc(var(--cw)*.05)}
@@ -620,7 +624,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.9.0 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.9.1 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2003,7 +2007,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.9.0</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.9.1</div>
       </div>
     </div>
 
@@ -2169,7 +2173,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.9.0</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.9.1</div>
       </div>
     </div>
 
@@ -4452,7 +4456,7 @@ var _cfShow = { mua: false, ban: false }; // trạng thái "đã nhập dữ li�
 // Ngày đang xem CHƯA có giao dịch nào → luôn hiện (dù có ẩn thì bên dưới cũng chỉ là khoảng trống, không có
 // dữ liệu gì để xem); có từ 1 giao dịch trở lên mới làm theo cài đặt.
 // Đang SỬA giao dịch: hàng nút "Huỷ/Lưu giao dịch" (thêm mới) LUÔN ẩn — chỉ còn hàng "Huỷ/Lưu thay đổi/Xoá"
-// (trước v2.9.0, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
+// (trước v2.9.1, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
 // "Lưu giao dịch" sẽ thêm 1 giao dịch MỚI thay vì sửa).
 function _capNhatCompactForm(tab, show){
   if (tab!=='mua' && tab!=='ban') return;
@@ -14214,23 +14218,118 @@ var SOL = (function(){
   function lsGet(k, d){ try { var v = MCS_LS.getItem(k); return v == null ? d : v; } catch(e){ return d; } }
   function lsSet(k, v){ try { MCS_LS.setItem(k, v); } catch(e){} }
   function $(id){ return document.getElementById(id); }
-  function beep(f, dur, type, vol, delay){
-    if (!cfg.sound) return;
-    setTimeout(function(){
+  // ── Âm thanh (tổng hợp, không dùng file): tiếng bài thật "tách", "xòe" khi chia, chuông có vang, nhạc chiến thắng
+  //    ngắn khi thu đủ dãy; tất cả qua bộ nén âm cho không chói ──
+  var OUT = null, VERB = null, NB = null;
+  function ac(){
+    if (!am){
       try {
-        if (!am) am = new (window.AudioContext || window.webkitAudioContext)();
-        if (am.state === 'suspended') am.resume();
-        var o = am.createOscillator(), g = am.createGain(), t = am.currentTime;
-        o.type = type || 'triangle'; o.frequency.setValueAtTime(f, t);
-        g.gain.setValueAtTime(vol || 0.08, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-        o.connect(g); g.connect(am.destination); o.start(t); o.stop(t + dur + 0.02);
-      } catch(e){}
-    }, delay || 0);
+        am = new (window.AudioContext || window.webkitAudioContext)();
+        var comp = am.createDynamicsCompressor(); comp.threshold.value = -18; comp.ratio.value = 4; comp.connect(am.destination);
+        OUT = am.createGain(); OUT.gain.value = 0.9; OUT.connect(comp);
+        var len = Math.floor(am.sampleRate * 1.6), ir = am.createBuffer(2, len, am.sampleRate);
+        for (var ch2 = 0; ch2 < 2; ch2++){ var d = ir.getChannelData(ch2); for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3); }
+        var conv = am.createConvolver(); conv.buffer = ir; VERB = am.createGain(); VERB.gain.value = 0.28; VERB.connect(conv); conv.connect(comp);
+        NB = am.createBuffer(1, am.sampleRate * 0.5, am.sampleRate); var nd = NB.getChannelData(0); for (var k = 0; k < nd.length; k++) nd[k] = Math.random() * 2 - 1;
+      } catch(e){ am = null; }
+    }
+    if (am && am.state === 'suspended') am.resume();
+    return am;
   }
-  function sndPlace(){ beep(420, 0.06, 'triangle', 0.09); }
-  function sndBad(){ beep(160, 0.12, 'sawtooth', 0.05); }
-  function sndDeal(){ for (var i = 0; i < 5; i++) beep(300 + i * 40, 0.04, 'triangle', 0.05, i * 35); }
-  function sndDone(){ [523, 659, 784, 1047].forEach(function(f, i){ beep(f, 0.14, 'sine', 0.09, i * 90); }); }
+  function rustle(t0, dur, f0, f1, q, vol, hp){
+    var s = am.createBufferSource(), bp = am.createBiquadFilter(), g = am.createGain(), last = bp;
+    s.buffer = NB; bp.type = 'bandpass'; bp.Q.value = q; bp.frequency.setValueAtTime(f0, t0); bp.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + Math.min(0.006, dur / 4)); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    if (hp){ var f = am.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = hp; bp.connect(f); last = f; }
+    s.connect(bp); last.connect(g); g.connect(OUT); s.start(t0, Math.random() * 0.3); s.stop(t0 + dur + 0.02);
+  }
+  function knock(t0, f, dur, vol){
+    var o = am.createOscillator(), g = am.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(f, t0); o.frequency.exponentialRampToValueAtTime(f * 0.55, t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(OUT); o.start(t0); o.stop(t0 + dur + 0.02);
+  }
+  function bell(t0, f, dur, vol){
+    [[1, 1], [2, 0.32], [3, 0.12], [4.2, 0.05]].forEach(function(p){
+      var o = am.createOscillator(), g = am.createGain(), d = dur / (1 + p[0] * 0.4);
+      o.type = 'sine'; o.frequency.value = f * p[0];
+      g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol * p[1], t0 + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+      o.connect(g); g.connect(OUT); g.connect(VERB); o.start(t0); o.stop(t0 + d + 0.05);
+    });
+  }
+  function swish(t0, pan, vol){
+    var s = am.createBufferSource(), bp = am.createBiquadFilter(), hp = am.createBiquadFilter(), g = am.createGain(), last;
+    s.buffer = NB; s.playbackRate.value = 1 + Math.random() * 0.15;
+    bp.type = 'bandpass'; bp.Q.value = 1.1; bp.frequency.setValueAtTime(4800, t0); bp.frequency.exponentialRampToValueAtTime(1300, t0 + 0.14);
+    hp.type = 'highpass'; hp.frequency.value = 500;
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.025); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.16);
+    s.connect(bp); bp.connect(hp); hp.connect(g); last = g;
+    if (am.createStereoPanner){ var pn = am.createStereoPanner(); pn.pan.value = pan; g.connect(pn); last = pn; }
+    last.connect(OUT); var sv = am.createGain(); sv.gain.value = 0.35; last.connect(sv); sv.connect(VERB);
+    s.start(t0, Math.random() * 0.3); s.stop(t0 + 0.2);
+  }
+  function brass(t0, f, dur, vol){
+    var lp = am.createBiquadFilter(), g = am.createGain();
+    lp.type = 'lowpass'; lp.Q.value = 2; lp.frequency.setValueAtTime(500, t0); lp.frequency.exponentialRampToValueAtTime(2600, t0 + 0.05); lp.frequency.exponentialRampToValueAtTime(1300, t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.03); g.gain.setValueAtTime(vol * 0.8, t0 + dur * 0.6); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    [-6, 6].forEach(function(dt){ var o = am.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = dt; o.connect(lp); o.start(t0); o.stop(t0 + dur + 0.05); });
+    lp.connect(g); g.connect(OUT); var sv = am.createGain(); sv.gain.value = 0.5; g.connect(sv); sv.connect(VERB);
+  }
+  function snd(fn){ if (!cfg.sound || !ac()) return; try { fn(am.currentTime + 0.005); } catch(e){} }
+  var PENTA = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.5, 1567.98, 1760, 2093, 2349.3, 2637];
+  function sndPlace(){ snd(function(t){ rustle(t, 0.05, 2600, 1400, 0.9, 0.55, 600); knock(t + 0.004, 170, 0.07, 0.22); }); }
+  function sndBad(){ snd(function(t){ knock(t, 120, 0.16, 0.35); rustle(t, 0.05, 500, 300, 0.7, 0.12); }); }
+  function sndDealSeq(n, gapMs){ snd(function(t){ for (var i = 0; i < n; i++){ var d = t + i * gapMs / 1000; swish(d, (i % 2 ? 0.35 : -0.35), 0.42); knock(d + 0.12, 230, 0.05, 0.07); } }); }
+  function sndDeal(){ sndDealSeq(27, DEAL_GAP_INIT * 2); }
+  function sndHint(){ snd(function(t){ bell(t, 1318.5, 0.7, 0.10); bell(t + 0.09, 1760, 0.9, 0.08); }); }
+  function sndCollectStep(i){ snd(function(t){ bell(t, PENTA[Math.min(i, 12)], 0.6, 0.075); rustle(t, 0.06, 2200, 4200, 1.2, 0.12, 900); }); }
+  function sndDone(){ snd(function(t){ // "Ta – ta – taaa!" chiến thắng 1 chặng nhỏ
+    brass(t, 392, 0.14, 0.09); brass(t + 0.13, 523.25, 0.14, 0.09);
+    [523.25, 659.25, 783.99].forEach(function(f){ brass(t + 0.28, f, 0.95, 0.075); });
+    bell(t + 0.28, 1046.5, 1.6, 0.10); bell(t + 0.28, 1318.5, 1.4, 0.06); knock(t + 0.28, 95, 0.35, 0.35);
+    for (var i = 0; i < 8; i++) bell(t + 0.42 + i * 0.07, 1567.98 + Math.random() * 1600, 0.5, 0.035);
+  }); }
+  function sndWin(){ snd(function(t){
+    [[523.25, 0], [659.25, .14], [783.99, .28], [1046.5, .42], [987.77, .62], [1046.5, .76], [1318.5, .92], [1567.98, 1.12]].forEach(function(m){ bell(t + m[1], m[0], 1.6, 0.11); });
+    [261.63, 329.63, 392].forEach(function(f){ bell(t + 0.42, f, 2.4, 0.05); bell(t + 1.12, f * 1.5, 2.6, 0.04); });
+  }); }
+  // Nhịp hiệu ứng (ms): chia bài đầu ván, chia thêm từ xấp, thu dãy A→K — chậm vừa phải cho cảm giác phấn khích
+  var DEAL_GAP_INIT = 30, DEAL_GAP = 90, DEAL_DUR = 420, COLLECT_GAP = 120, COLLECT_DUR = 520, _busyUntil = 0, _pendingDone = 0;
+  function busy(){ return Date.now() < _busyUntil; }
+  // lấp lánh nhỏ + chữ "+100" (không cần canvas)
+  function spark(x, y, n){
+    for (var i = 0; i < n; i++){
+      var s = document.createElement('div'), a = Math.random() * Math.PI * 2, v = 20 + Math.random() * 55;
+      s.className = 'sol-spk'; s.style.left = x + 'px'; s.style.top = y + 'px';
+      s.style.setProperty('--dx', (Math.cos(a) * v).toFixed(1) + 'px'); s.style.setProperty('--dy', (Math.sin(a) * v - 15).toFixed(1) + 'px');
+      s.style.background = ['#ffd166', '#fff3b0', '#ffffff', '#7ee3ff'][i % 4];
+      board.appendChild(s); setTimeout((function(el){ return function(){ el.remove(); }; })(s), 800);
+    }
+  }
+  function popTxt(t, x, y){ var e = document.createElement('div'); e.className = 'sol-pop'; e.textContent = t; e.style.left = x + 'px'; e.style.top = y + 'px'; board.appendChild(e); setTimeout(function(){ e.remove(); }, 1400); }
+  // thu dãy A→K: từng lá bay lên góc trái, mỗi lá 1 nốt nhạc cao dần + lấp lánh; xong có nhạc chiến thắng + "+100"
+  function flyRun(run, k, ci){
+    var G = COLLECT_GAP, D = COLLECT_DUR, tx = pad + k * cw * 0.32, ty = topY;
+    _pendingDone++; _busyUntil = Math.max(_busyUntil, Date.now() + 13 * G + D + 500);
+    for (var i = run.length - 1, n = 0; i >= 0; i--, n++){
+      (function(c, d){
+        var e = els[c.id]; if (!e) return;
+        e._flying = true;
+        setTimeout(function(){
+          e.style.transition = 'left ' + D + 'ms ease, top ' + D + 'ms ease, transform ' + D + 'ms ease';
+          e.style.zIndex = 800 + d; e.style.left = tx + 'px'; e.style.top = ty + 'px'; e.style.transform = 'scale(1.08)';
+          sndCollectStep(d);
+        }, d * G);
+        setTimeout(function(){ spark(tx + cw / 2, ty + ch / 2, 6); }, d * G + D - 60);
+        setTimeout(function(){ e.style.display = 'none'; e._flying = false; e._shown = false; e.style.transition = ''; e.style.transform = ''; }, d * G + D + 40);
+      })(run[i], n);
+    }
+    setTimeout(function(){
+      _pendingDone = Math.max(0, _pendingDone - 1); render();
+      spark(tx + cw / 2, ty + ch / 2, 26); popTxt('+100', colX(ci) + cw / 2, colY + 30); sndDone();
+      if (navigator.vibrate) try { navigator.vibrate([25, 50, 25]); } catch(e){}
+    }, 13 * G + D - 40);
+  }
 
   // ── Trạng thái ván ──
   function newGame(suits){
@@ -14286,8 +14385,8 @@ var SOL = (function(){
     var s = col[n - 1].s;
     for (var i = 0; i < 13; i++){ var c = col[n - 1 - i]; if (!c.up || c.s !== s || c.r !== i + 1) return false; }
     var run = col.splice(n - 13, 13);
-    done.push(s); score += 100; flipTop(col); sndDone();
-    run.forEach(function(c){ var e = els[c.id]; if (e) e.classList.add('sol-gone'); });
+    done.push(s); score += 100; flipTop(col);
+    flyRun(run, done.length - 1, ci);
     return true;
   }
   function doMove(from, idx, to){
@@ -14300,17 +14399,18 @@ var SOL = (function(){
     sndPlace(); after();
   }
   function deal(){
-    if (won) return;
+    if (won || busy()) return;
     if (!stock.length){ toastS('Đã chia hết bài'); sndBad(); return; }
     for (var i = 0; i < 10; i++) if (!cols[i].length){ toastS('Phải lấp hết cột trống trước khi chia bài'); sndBad(); flashSlot(i); return; }
     pushHist();
     for (var c = 0; c < 10; c++){ var card = stock.pop(); card.up = true; cols[c].push(card); }
     score--; moves++; startClock();
-    for (var k = 0; k < 10; k++) checkDone(k);
-    sndDeal(); after();
+    sndDealSeq(10, DEAL_GAP); render(); updStats(); // lá bay ra từng lá một, xong mới xét dãy hoàn thành
+    var dealT = 10 * DEAL_GAP + DEAL_DUR + 120; _busyUntil = Date.now() + dealT;
+    setTimeout(function(){ for (var k = 0; k < 10; k++) checkDone(k); after(); }, dealT);
   }
   function undo(){
-    if (won || !hist.length){ sndBad(); return; }
+    if (won || !hist.length || busy()){ sndBad(); return; }
     var g = JSON.parse(hist.pop());
     cols = g.cols; stock = g.stock; done = g.done; score = g.score - 1; moves++;
     Object.keys(els).forEach(function(id){ els[id].classList.remove('sol-gone'); });
@@ -14318,9 +14418,10 @@ var SOL = (function(){
   }
   function after(){
     hintI = 0; render(); updStats();
-    if (done.length === 8 && !won) win();
+    if (done.length === 8 && !won && !_winPending){ _winPending = true; setTimeout(function(){ _winPending = false; if (!won && done.length === 8) win(); }, busy() ? _busyUntil - Date.now() + 500 : 0); }
     save();
   }
+  var _winPending = false;
   function win(){
     won = true; stopClock();
     var st = stats(), k = 's' + mode;
@@ -14329,7 +14430,7 @@ var SOL = (function(){
     setTimeout(function(){
       $('sol-win-info').innerHTML = 'Điểm: <b>' + score + '</b>' + (rec ? ' 🏆 Điểm cao mới!' : '') + '<br>Thời gian: <b>' + fmtT(curElapsed()) + '</b> · Nước đi: <b>' + moves + '</b>';
       $('sol-win').style.display = 'flex';
-      [523, 659, 784, 1047, 784, 1047].forEach(function(f, i){ beep(f, 0.18, 'sine', 0.09, i * 120); });
+      sndWin();
     }, 400);
   }
   function stats(){ try { return JSON.parse(lsGet('sol_stat', '{}')) || {}; } catch(e){ return {}; } }
@@ -14371,7 +14472,7 @@ var SOL = (function(){
     return list;
   }
   function hint(){
-    if (won) return;
+    if (won || busy()) return;
     var list = allHints();
     if (!list.length){
       if (stock.length){ toastS('Hết nước đi — chạm xấp bài góc phải để chia thêm'); var st = $('sol-stock'); if (st){ st.classList.remove('sol-hl'); void st.offsetWidth; st.classList.add('sol-hl'); } }
@@ -14383,7 +14484,7 @@ var SOL = (function(){
     var dt = cols[h.t][cols[h.t].length - 1];
     if (dt) hl.push(els[dt.id]); else { var sl = $('sol-slot-' + h.t); if (sl) hl.push(sl); }
     hl.forEach(function(e){ if (!e) return; e.classList.remove('sol-hl'); void e.offsetWidth; e.classList.add('sol-hl'); });
-    beep(880, 0.08, 'sine', 0.06);
+    sndHint();
   }
   function shake(ci, idx){
     cols[ci].slice(idx).forEach(function(c){ var e = els[c.id]; if (!e) return; e.classList.remove('sol-shake'); void e.offsetWidth; e.classList.add('sol-shake'); });
@@ -14480,7 +14581,7 @@ var SOL = (function(){
   function stockPos(){ return { x: board.clientWidth - pad - cw, y: topY }; }
   function render(first){
     layout();
-    var H = board.clientHeight, avail = H - colY - 6, sp = stockPos(), inCol = {};
+    var H = board.clientHeight, avail = H - colY - 6, sp = stockPos(), inCol = {}, nNew = 0, maxD = 0;
     for (var i = 0; i < 10; i++){
       var sl = $('sol-slot-' + i);
       if (sl){ sl.style.left = colX(i) + 'px'; sl.style.top = colY + 'px'; sl.style.width = cw + 'px'; sl.style.height = ch + 'px'; }
@@ -14500,8 +14601,11 @@ var SOL = (function(){
           e._shown = true; e.classList.remove('sol-gone');
           e.classList.add('sol-notr'); e.style.left = sp.x + 'px'; e.style.top = sp.y + 'px'; e.style.display = '';
           void e.offsetWidth; e.classList.remove('sol-notr');
-          if (!first) e.style.transitionDelay = (i * 25) + 'ms';
-        } else e.style.transitionDelay = '';
+          // chia bài: từng lá bay ra lần lượt (đầu ván theo hàng ngang, chia thêm thì lần lượt từng cột)
+          var dl = first ? (j * 10 + i) * DEAL_GAP_INIT : (nNew++) * DEAL_GAP; maxD = Math.max(maxD, dl);
+          e.style.transitionDelay = dl + 'ms'; e.style.transitionDuration = DEAL_DUR + 'ms';
+          (function(el, t){ setTimeout(function(){ el.style.transitionDelay = ''; el.style.transitionDuration = ''; }, t + DEAL_DUR + 60); })(e, dl);
+        } else if (!e._flying) e.style.transitionDelay = '';
         e.style.display = '';
         e.style.left = colX(i) + 'px'; e.style.top = y + 'px';
         y += c.up ? uStep : dStep;
@@ -14511,6 +14615,7 @@ var SOL = (function(){
     Object.keys(els).forEach(function(id){
       if (inCol[id]) return;
       var e = els[id];
+      if (e._flying) return;
       if (e.classList.contains('sol-gone') && e.style.display !== 'none'){
         e.style.zIndex = 500; e.style.left = pad + 'px'; e.style.top = topY + 'px';
         setTimeout(function(){ if (e.classList.contains('sol-gone')) { e.style.display = 'none'; e._shown = false; } }, 260);
@@ -14523,7 +14628,8 @@ var SOL = (function(){
     stk.style.visibility = nDeal ? 'visible' : 'hidden';
     // các dãy đã thu (góc trái): hiện lá K
     var fd = $('sol-done'), fh = '';
-    done.forEach(function(s, k){
+    if (maxD) _busyUntil = Math.max(_busyUntil, Date.now() + maxD + DEAL_DUR);
+    done.slice(0, done.length - _pendingDone).forEach(function(s, k){
       fh += '<div class="sol-c' + ((s === 1 || s === 2) ? ' red' : '') + ' face" style="position:absolute;left:' + (k * cw * 0.32) + 'px;top:0;width:' + cw + 'px;height:' + ch + 'px">' + cardInner(13, s) + '</div>';
     });
     fd.innerHTML = fh; fd.style.left = pad + 'px'; fd.style.top = topY + 'px';
@@ -14535,7 +14641,7 @@ var SOL = (function(){
     return null;
   }
   function onDown(e){
-    if (won) return;
+    if (won || busy()) return;
     var t = e.target.closest && e.target.closest('.sol-c[data-id]');
     if (!t) return;
     var loc = findCard(+t.dataset.id); if (!loc) return;
