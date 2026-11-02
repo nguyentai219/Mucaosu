@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.9.3</title>
+<title>Mua Bán Mủ Cao Su v2.9.4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -625,7 +625,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.9.3 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.9.4 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2008,7 +2008,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.9.3</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.9.4</div>
       </div>
     </div>
 
@@ -2174,7 +2174,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.9.3</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.9.4</div>
       </div>
     </div>
 
@@ -4457,7 +4457,7 @@ var _cfShow = { mua: false, ban: false }; // trạng thái "đã nhập dữ li�
 // Ngày đang xem CHƯA có giao dịch nào → luôn hiện (dù có ẩn thì bên dưới cũng chỉ là khoảng trống, không có
 // dữ liệu gì để xem); có từ 1 giao dịch trở lên mới làm theo cài đặt.
 // Đang SỬA giao dịch: hàng nút "Huỷ/Lưu giao dịch" (thêm mới) LUÔN ẩn — chỉ còn hàng "Huỷ/Lưu thay đổi/Xoá"
-// (trước v2.9.3, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
+// (trước v2.9.4, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
 // "Lưu giao dịch" sẽ thêm 1 giao dịch MỚI thay vì sửa).
 function _capNhatCompactForm(tab, show){
   if (tab!=='mua' && tab!=='ban') return;
@@ -14390,14 +14390,28 @@ var SOL = (function(){
     flyRun(run, done.length - 1, ci);
     return true;
   }
+  function runComplete(col){
+    var n = col.length; if (n < 13) return false;
+    var s = col[n - 1].s;
+    for (var i = 0; i < 13; i++){ var c = col[n - 1 - i]; if (!c.up || c.s !== s || c.r !== i + 1) return false; }
+    return true;
+  }
+  var SETTLE_MS = 380; // chờ dãy vừa kéo trượt hẳn sang cột đích + dừng 1 nhịp rồi mới thu (thời gian trượt 180 ms)
   function doMove(from, idx, to){
     pushHist();
     var seq = cols[from].splice(idx);
     cols[to] = cols[to].concat(seq);
     flipTop(cols[from]);
     score--; moves++; startClock();
-    checkDone(to);
-    sndPlace(); after();
+    sndPlace();
+    if (runComplete(cols[to])){
+      // Đủ dãy A→K: cho dãy vừa kéo trượt sang cột đích TRƯỚC, sau đó mới thu cả dãy lên góc
+      hintI = 0; render(); updStats(); save();
+      _busyUntil = Date.now() + SETTLE_MS + 100;
+      setTimeout(function(){ checkDone(to); after(); }, SETTLE_MS);
+      return;
+    }
+    after();
   }
   function deal(){
     if (won || busy()) return;
