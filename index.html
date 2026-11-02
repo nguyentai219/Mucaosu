@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.8.9</title>
+<title>Mua Bán Mủ Cao Su v2.9.0</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -91,6 +91,7 @@ body.gmp-open{overflow:hidden}
 .sol-b{position:absolute;left:0;right:0;bottom:calc(var(--cw)*.08);text-align:center;font-size:calc(var(--cw)*.62);line-height:1}
 .sol-f{position:absolute;left:calc(var(--cw)*.05);right:calc(var(--cw)*.05);top:calc(var(--cw)*.46);bottom:calc(var(--cw)*.05)}
 .sol-f svg{display:block;width:100%;height:100%}
+.sol-f.sol-fr{background-size:100% 100%;border:1px solid #6f73c9;top:calc(var(--cw)*.44)}
 .sol-c.down{background:repeating-linear-gradient(45deg,#2d6a4f 0 4px,#40916c 4px 8px);border:2px solid #fff}
 .sol-c.down>span{display:none}
 .sol-c.sol-notr{transition:none!important}
@@ -619,7 +620,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.8.9 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.9.0 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2002,7 +2003,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.8.9</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.9.0</div>
       </div>
     </div>
 
@@ -2168,7 +2169,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.8.9</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.9.0</div>
       </div>
     </div>
 
@@ -4451,7 +4452,7 @@ var _cfShow = { mua: false, ban: false }; // trạng thái "đã nhập dữ li�
 // Ngày đang xem CHƯA có giao dịch nào → luôn hiện (dù có ẩn thì bên dưới cũng chỉ là khoảng trống, không có
 // dữ liệu gì để xem); có từ 1 giao dịch trở lên mới làm theo cài đặt.
 // Đang SỬA giao dịch: hàng nút "Huỷ/Lưu giao dịch" (thêm mới) LUÔN ẩn — chỉ còn hàng "Huỷ/Lưu thay đổi/Xoá"
-// (trước v2.8.9, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
+// (trước v2.9.0, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
 // "Lưu giao dịch" sẽ thêm 1 giao dịch MỚI thay vì sửa).
 function _capNhatCompactForm(tab, show){
   if (tab!=='mua' && tab!=='ban') return;
@@ -14427,9 +14428,33 @@ var SOL = (function(){
       '<g>' + h + '</g><g transform="rotate(180 25 28)">' + h + '</g>' +
       '<path d="M2 28H48" stroke="' + col + '" stroke-width=".6"/></svg>');
   }
+  // Hình J Q K bài tây thật kiểu Anh (Adrian Kennard, CC0 — tài sản chung), file riêng game-la-bai.json chỉ tải khi mở
+  // game (không làm nặng app chính; Service Worker lưu lại để chơi offline). Chỉ lấy NỬA TRÊN, đứng 1 chiều, phóng to.
+  // Chưa tải xong / không tải được → dùng hình vẽ đơn giản faceSvg ở trên.
+  var _realFaces = null, _realUrl = {}, _facesLoading = false;
+  function loadRealFaces(){
+    if (_realFaces || _facesLoading) return;
+    _facesLoading = true;
+    fetch('game-la-bai.json').then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
+      _facesLoading = false;
+      if (!j || !j.SK) return;
+      _realFaces = j;
+      if (isOpen() && cols){ buildEls(); render(true); }
+    }).catch(function(){ _facesLoading = false; });
+  }
+  function realFaceUrl(r, s){
+    var k = 'SHDC'.charAt(s) + RANKS[r];
+    if (!_realFaces || !_realFaces[k]) return '';
+    if (!_realUrl[k]) _realUrl[k] = "url('data:image/svg+xml;charset=utf-8," + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-57 -132 114 132" preserveAspectRatio="xMidYMin slice">' + _realFaces[k] + '</svg>'
+    ).replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29') + "')";
+    return _realUrl[k];
+  }
   function cardInner(r, s){
+    var face = '';
+    if (r > 10){ var u = realFaceUrl(r, s); face = u ? '<span class="sol-f sol-fr" style="background-image:' + u + '"></span>' : '<span class="sol-f">' + faceSvg(r, s) + '</span>'; }
     return '<span class="sol-r">' + RANKS[r] + '</span><span class="sol-s">' + SUITS[s] + '</span>' +
-      (r > 10 ? '<span class="sol-f">' + faceSvg(r, s) + '</span>' : '<span class="sol-b">' + SUITS[s] + '</span>');
+      (r > 10 ? face : '<span class="sol-b">' + SUITS[s] + '</span>');
   }
   // ── Vẽ ──
   function layout(){
@@ -14548,6 +14573,7 @@ var SOL = (function(){
   // ── Mở / đóng / cài đặt ──
   function open(){
     ov = $('sol-overlay'); board = $('sol-board'); if (!ov || !board) return;
+    loadRealFaces(); // tải hình J Q K bài thật (lần đầu; sau đó lấy từ bộ nhớ đệm)
     try { var c = JSON.parse(lsGet('sol_cfg', 'null')); if (c) { cfg.sound = c.sound !== false; cfg.suits = [1, 2, 4].indexOf(c.suits) >= 0 ? c.suits : 1; } } catch(e){}
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     ov.style.display = 'flex'; document.body.classList.add('gmp-open');
