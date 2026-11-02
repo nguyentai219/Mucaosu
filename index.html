@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.9.2</title>
+<title>Mua Bán Mủ Cao Su v2.9.3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -625,7 +625,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.9.2 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.9.3 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2008,7 +2008,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.9.2</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.9.3</div>
       </div>
     </div>
 
@@ -2174,7 +2174,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.9.2</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.9.3</div>
       </div>
     </div>
 
@@ -4457,7 +4457,7 @@ var _cfShow = { mua: false, ban: false }; // trạng thái "đã nhập dữ li�
 // Ngày đang xem CHƯA có giao dịch nào → luôn hiện (dù có ẩn thì bên dưới cũng chỉ là khoảng trống, không có
 // dữ liệu gì để xem); có từ 1 giao dịch trở lên mới làm theo cài đặt.
 // Đang SỬA giao dịch: hàng nút "Huỷ/Lưu giao dịch" (thêm mới) LUÔN ẩn — chỉ còn hàng "Huỷ/Lưu thay đổi/Xoá"
-// (trước v2.9.2, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
+// (trước v2.9.3, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
 // "Lưu giao dịch" sẽ thêm 1 giao dịch MỚI thay vì sửa).
 function _capNhatCompactForm(tab, show){
   if (tab!=='mua' && tab!=='ban') return;
@@ -14261,13 +14261,13 @@ var SOL = (function(){
   function swish(t0, pan, vol){
     var s = am.createBufferSource(), bp = am.createBiquadFilter(), hp = am.createBiquadFilter(), g = am.createGain(), last;
     s.buffer = NB; s.playbackRate.value = 1 + Math.random() * 0.15;
-    bp.type = 'bandpass'; bp.Q.value = 0.7; bp.frequency.setValueAtTime(2400, t0); bp.frequency.exponentialRampToValueAtTime(650, t0 + 0.2); // tông thấp, mềm (không chói)
-    hp.type = 'lowpass'; hp.frequency.value = 2800; // cắt phần rít cao
-    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.05); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.22);
+    bp.type = 'bandpass'; bp.Q.value = 0.6; bp.frequency.setValueAtTime(1500, t0); bp.frequency.exponentialRampToValueAtTime(420, t0 + 0.28); // tông trầm, mềm như tiếng sột giấy khẽ
+    hp.type = 'lowpass'; hp.frequency.value = 1700; // cắt hết phần rít cao
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.08); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.32);
     s.connect(bp); bp.connect(hp); hp.connect(g); last = g;
     if (am.createStereoPanner){ var pn = am.createStereoPanner(); pn.pan.value = pan; g.connect(pn); last = pn; }
-    last.connect(OUT); var sv = am.createGain(); sv.gain.value = 0.18; last.connect(sv); sv.connect(VERB);
-    s.start(t0, Math.random() * 0.3); s.stop(t0 + 0.26);
+    last.connect(OUT); var sv = am.createGain(); sv.gain.value = 0.1; last.connect(sv); sv.connect(VERB);
+    s.start(t0, Math.random() * 0.3); s.stop(t0 + 0.36);
   }
   function brass(t0, f, dur, vol){
     var lp = am.createBiquadFilter(), g = am.createGain();
@@ -14280,7 +14280,7 @@ var SOL = (function(){
   var PENTA = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.5, 1567.98, 1760, 2093, 2349.3, 2637];
   function sndPlace(){ snd(function(t){ rustle(t, 0.05, 2600, 1400, 0.9, 0.55, 600); knock(t + 0.004, 170, 0.07, 0.22); }); }
   function sndBad(){ snd(function(t){ knock(t, 120, 0.16, 0.35); rustle(t, 0.05, 500, 300, 0.7, 0.12); }); }
-  function sndDealSeq(n, gapMs){ snd(function(t){ for (var i = 0; i < n; i++){ var d = t + i * gapMs / 1000; swish(d, (i % 2 ? 0.25 : -0.25), 0.26); knock(d + 0.16, 160, 0.06, 0.05); } }); }
+  function sndDealSeq(n, gapMs){ snd(function(t){ for (var i = 0; i < n; i++){ var d = t + i * gapMs / 1000; swish(d, (i % 2 ? 0.15 : -0.15), 0.17); knock(d + 0.2, 120, 0.06, 0.025); } }); }
   function sndDeal(){ sndDealSeq(27, DEAL_GAP_INIT * 2); }
   function sndHint(){ snd(function(t){ bell(t, 1318.5, 0.7, 0.10); bell(t + 0.09, 1760, 0.9, 0.08); }); }
   function sndCollectStep(i){ snd(function(t){ bell(t, PENTA[Math.min(i, 12)], 0.6, 0.075); rustle(t, 0.06, 2200, 4200, 1.2, 0.12, 900); }); }
@@ -14315,7 +14315,7 @@ var SOL = (function(){
     for (var i = run.length - 1, n = 0; i >= 0; i--, n++){
       (function(c, d){
         var e = els[c.id]; if (!e) return;
-        e._flying = true;
+        e._flying = true; e._inFound = k;
         setTimeout(function(){
           e.style.transition = 'left ' + D + 'ms ease, top ' + D + 'ms ease, transform ' + D + 'ms ease';
           e.style.zIndex = 800 + d; e.style.left = tx + 'px'; e.style.top = ty + 'px'; e.style.transform = 'scale(1.08)';
@@ -14602,7 +14602,12 @@ var SOL = (function(){
         e.classList.toggle('down', !c.up);
         e.classList.toggle('sol-dim', c.up && j < runStart);
         e.style.width = cw + 'px'; e.style.height = ch + 'px'; e.style.zIndex = 10 + j;
-        if (!e._shown){
+        e._toStock = false; clearTimeout(e._hideT);
+        if (!e._shown && e._inFound != null && !first){
+          // hoàn nguyên dãy đã thu: lá bay từ góc trái về cột (không chớp, không chia lại)
+          e._shown = true; e.classList.add('sol-notr'); e.style.left = (pad + e._inFound * cw * 0.32) + 'px'; e.style.top = topY + 'px'; e.style.display = '';
+          void e.offsetWidth; e.classList.remove('sol-notr');
+        } else if (!e._shown){
           e._shown = true; e.classList.remove('sol-gone');
           e.classList.add('sol-notr'); e.style.left = sp.x + 'px'; e.style.top = sp.y + 'px'; e.style.display = '';
           void e.offsetWidth; e.classList.remove('sol-notr');
@@ -14611,12 +14616,14 @@ var SOL = (function(){
           e.style.transitionDelay = dl + 'ms'; e.style.transitionDuration = DEAL_DUR + 'ms';
           (function(el, t){ setTimeout(function(){ el.style.transitionDelay = ''; el.style.transitionDuration = ''; }, t + DEAL_DUR + 60); })(e, dl);
         } else if (!e._flying) e.style.transitionDelay = '';
+        e._inFound = null;
         e.style.display = '';
         e.style.left = colX(i) + 'px'; e.style.top = y + 'px';
         y += c.up ? uStep : dStep;
       }
     }
     // lá chưa chia (trong xấp) và lá đã thu: ẩn đi (xấp bài + dãy đã thu vẽ riêng)
+    var inStock = {}; stock.forEach(function(c){ inStock[c.id] = 1; });
     Object.keys(els).forEach(function(id){
       if (inCol[id]) return;
       var e = els[id];
@@ -14624,7 +14631,13 @@ var SOL = (function(){
       if (e.classList.contains('sol-gone') && e.style.display !== 'none'){
         e.style.zIndex = 500; e.style.left = pad + 'px'; e.style.top = topY + 'px';
         setTimeout(function(){ if (e.classList.contains('sol-gone')) { e.style.display = 'none'; e._shown = false; } }, 260);
-      } else if (!e.classList.contains('sol-gone')){ e.style.display = 'none'; e._shown = false; }
+      } else if (!e.classList.contains('sol-gone')){
+        if (!first && inStock[id] && e.style.display !== 'none' && e._shown){
+          // hoàn nguyên lần chia bài: lá bay ngược về xấp rồi mới ẩn
+          if (!e._toStock){ e._toStock = true; e.classList.add('down'); e.classList.remove('sol-dim'); e.style.zIndex = 600; e.style.left = sp.x + 'px'; e.style.top = sp.y + 'px';
+            e._hideT = setTimeout(function(){ if (e._toStock){ e.style.display = 'none'; e._shown = false; e._toStock = false; } }, 300); }
+        } else if (!e._toStock){ e.style.display = 'none'; e._shown = false; }
+      }
     });
     // xấp bài còn chia được (góc phải)
     var stk = $('sol-stock'), nDeal = Math.ceil(stock.length / 10), sh = '';
@@ -15008,7 +15021,7 @@ if ('serviceWorker' in navigator) {
   <div class="sol-bot">
     <button class="sol-bb" onclick="SOL.newGame()"><span>🔄</span>Ván mới</button>
     <button class="sol-bb" onclick="SOL.hint()"><span>💡</span>Gợi ý</button>
-    <button class="sol-bb" onclick="SOL.undo()"><span>↩️</span>Hoàn nguyên</button>
+    <button class="sol-bb" onclick="SOL.undo()"><span><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#ff8a7a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span>Hoàn nguyên</button>
   </div>
   <div id="sol-toast"></div>
   <div id="sol-set" onclick="if(event.target===this)SOL.closeSet()">
