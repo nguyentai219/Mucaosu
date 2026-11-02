@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.9.1</title>
+<title>Mua Bán Mủ Cao Su v2.9.2</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -85,6 +85,7 @@ body.gmp-open{overflow:hidden}
 #sol-board{position:relative;flex:1;overflow:hidden}
 .sol-c{position:absolute;box-sizing:border-box;background:#fff;border:1px solid #9aa79f;border-radius:calc(var(--cw)*.12);box-shadow:0 1px 2px rgba(0,0,0,.35);color:#0b0b0f;overflow:hidden;transition:left .18s ease,top .18s ease}
 .sol-c.red{color:#d0021b}
+.sol-c.sol-dim{filter:brightness(.62) saturate(.75)}
 .sol-spk{position:absolute;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;pointer-events:none;z-index:2500;box-shadow:0 0 6px #ffd166;animation:solSpk .75s ease-out forwards}
 @keyframes solSpk{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
 .sol-pop{position:absolute;z-index:2600;transform:translateX(-50%);font-weight:900;font-size:24px;color:#ffd166;text-shadow:0 2px 0 #7a4b00,0 0 10px rgba(255,209,102,.8);pointer-events:none;animation:solPop 1.3s ease-out forwards}
@@ -624,7 +625,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.9.1 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.9.2 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2007,7 +2008,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.9.1</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.9.2</div>
       </div>
     </div>
 
@@ -2173,7 +2174,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.9.1</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.9.2</div>
       </div>
     </div>
 
@@ -4456,7 +4457,7 @@ var _cfShow = { mua: false, ban: false }; // trạng thái "đã nhập dữ li�
 // Ngày đang xem CHƯA có giao dịch nào → luôn hiện (dù có ẩn thì bên dưới cũng chỉ là khoảng trống, không có
 // dữ liệu gì để xem); có từ 1 giao dịch trở lên mới làm theo cài đặt.
 // Đang SỬA giao dịch: hàng nút "Huỷ/Lưu giao dịch" (thêm mới) LUÔN ẩn — chỉ còn hàng "Huỷ/Lưu thay đổi/Xoá"
-// (trước v2.9.1, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
+// (trước v2.9.2, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
 // "Lưu giao dịch" sẽ thêm 1 giao dịch MỚI thay vì sửa).
 function _capNhatCompactForm(tab, show){
   if (tab!=='mua' && tab!=='ban') return;
@@ -14260,13 +14261,13 @@ var SOL = (function(){
   function swish(t0, pan, vol){
     var s = am.createBufferSource(), bp = am.createBiquadFilter(), hp = am.createBiquadFilter(), g = am.createGain(), last;
     s.buffer = NB; s.playbackRate.value = 1 + Math.random() * 0.15;
-    bp.type = 'bandpass'; bp.Q.value = 1.1; bp.frequency.setValueAtTime(4800, t0); bp.frequency.exponentialRampToValueAtTime(1300, t0 + 0.14);
-    hp.type = 'highpass'; hp.frequency.value = 500;
-    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.025); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.16);
+    bp.type = 'bandpass'; bp.Q.value = 0.7; bp.frequency.setValueAtTime(2400, t0); bp.frequency.exponentialRampToValueAtTime(650, t0 + 0.2); // tông thấp, mềm (không chói)
+    hp.type = 'lowpass'; hp.frequency.value = 2800; // cắt phần rít cao
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.05); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.22);
     s.connect(bp); bp.connect(hp); hp.connect(g); last = g;
     if (am.createStereoPanner){ var pn = am.createStereoPanner(); pn.pan.value = pan; g.connect(pn); last = pn; }
-    last.connect(OUT); var sv = am.createGain(); sv.gain.value = 0.35; last.connect(sv); sv.connect(VERB);
-    s.start(t0, Math.random() * 0.3); s.stop(t0 + 0.2);
+    last.connect(OUT); var sv = am.createGain(); sv.gain.value = 0.18; last.connect(sv); sv.connect(VERB);
+    s.start(t0, Math.random() * 0.3); s.stop(t0 + 0.26);
   }
   function brass(t0, f, dur, vol){
     var lp = am.createBiquadFilter(), g = am.createGain();
@@ -14279,7 +14280,7 @@ var SOL = (function(){
   var PENTA = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.5, 1567.98, 1760, 2093, 2349.3, 2637];
   function sndPlace(){ snd(function(t){ rustle(t, 0.05, 2600, 1400, 0.9, 0.55, 600); knock(t + 0.004, 170, 0.07, 0.22); }); }
   function sndBad(){ snd(function(t){ knock(t, 120, 0.16, 0.35); rustle(t, 0.05, 500, 300, 0.7, 0.12); }); }
-  function sndDealSeq(n, gapMs){ snd(function(t){ for (var i = 0; i < n; i++){ var d = t + i * gapMs / 1000; swish(d, (i % 2 ? 0.35 : -0.35), 0.42); knock(d + 0.12, 230, 0.05, 0.07); } }); }
+  function sndDealSeq(n, gapMs){ snd(function(t){ for (var i = 0; i < n; i++){ var d = t + i * gapMs / 1000; swish(d, (i % 2 ? 0.25 : -0.25), 0.26); knock(d + 0.16, 160, 0.06, 0.05); } }); }
   function sndDeal(){ sndDealSeq(27, DEAL_GAP_INIT * 2); }
   function sndHint(){ snd(function(t){ bell(t, 1318.5, 0.7, 0.10); bell(t + 0.09, 1760, 0.9, 0.08); }); }
   function sndCollectStep(i){ snd(function(t){ bell(t, PENTA[Math.min(i, 12)], 0.6, 0.075); rustle(t, 0.06, 2200, 4200, 1.2, 0.12, 900); }); }
@@ -14592,10 +14593,14 @@ var SOL = (function(){
       var maxH = avail - ch;
       if (need > maxH && need > 0){ var k = maxH / need; dStep *= k; uStep *= k; }
       var y = colY;
+      // dãy liền mạch (cùng chất, giảm dần) ở dưới cùng cột = kéo đi được → sáng; lá ngửa phía trên đứt mạch → mờ
+      var runStart = col.length - 1;
+      while (runStart > 0 && col[runStart - 1].up && col[runStart - 1].s === col[runStart].s && col[runStart - 1].r === col[runStart].r + 1) runStart--;
       for (var j = 0; j < col.length; j++){
         var c = col[j], e = els[c.id]; inCol[c.id] = 1;
         if (!e) continue;
         e.classList.toggle('down', !c.up);
+        e.classList.toggle('sol-dim', c.up && j < runStart);
         e.style.width = cw + 'px'; e.style.height = ch + 'px'; e.style.zIndex = 10 + j;
         if (!e._shown){
           e._shown = true; e.classList.remove('sol-gone');
