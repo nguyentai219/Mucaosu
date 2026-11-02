@@ -1,4 +1,4 @@
-const CACHE = 'mu-cao-su-v2.8.9';
+const CACHE = 'mu-cao-su-v2.9.0';
 const FILES = ['/Mucaosu/','/Mucaosu/index.html','/Mucaosu/manifest.json','/Mucaosu/icon-192.png','/Mucaosu/icon-512.png','/Mucaosu/apple-touch-icon.png','/Mucaosu/logo.png','/Mucaosu/splash.png'];
 
 self.addEventListener('install', e => {
@@ -66,7 +66,11 @@ self.addEventListener('fetch', e => {
   } else {
     // Tài nguyên tĩnh khác: Cache First — nhanh hơn
     e.respondWith(
-      caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('/Mucaosu/index.html')))
+      caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
+        // Lưu lại tài nguyên tải lần đầu (VD game-la-bai.json — hình lá bài của game, chỉ tải khi mở game) để lần sau chơi offline
+        if (resp && resp.ok) { const clone = resp.clone(); caches.open(CACHE).then(c => c.put(e.request, clone)); }
+        return resp;
+      }).catch(() => caches.match('/Mucaosu/index.html')))
     );
   }
 });
