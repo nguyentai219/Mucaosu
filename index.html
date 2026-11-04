@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.9.7</title>
+<title>Mua Bán Mủ Cao Su v2.9.8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -112,6 +112,12 @@ body.gmp-open{overflow:hidden}
 .sol-bot{display:flex;justify-content:space-around;padding:8px 6px calc(10px + env(safe-area-inset-bottom));background:rgba(0,0,0,.18)}
 .sol-bb{display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:none;color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;min-width:80px}
 .sol-bb span{width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;font-size:24px}
+#sol-overlay .sol-bn{display:none;position:absolute;left:0;right:0;top:calc(var(--cw)*.5);bottom:calc(var(--cw)*.03);flex-direction:column;align-items:center;justify-content:center;font-family:Roboto,'Arial Black',Arial,sans-serif;font-weight:900;font-size:calc(var(--cw)*.72);line-height:.95;letter-spacing:-3px}
+#sol-overlay .sol-bn i{font-style:normal;font-size:calc(var(--cw)*.32);letter-spacing:0}
+#sol-overlay .sol-c.bigc .sol-bn{display:flex}#sol-overlay .sol-c.bigc .sol-b{display:none}
+@media (orientation:landscape){#sol-overlay{max-width:none}}
+@media (orientation:landscape) and (max-height:560px){#sol-overlay .sol-top{padding:calc(2px + env(safe-area-inset-top)) 10px 2px}#sol-overlay .sol-ib{width:36px;height:36px;font-size:17px}#sol-overlay .sol-stat b{font-size:16px}
+  #sol-overlay .sol-bot{padding:2px 6px calc(4px + env(safe-area-inset-bottom))}#sol-overlay .sol-bb{flex-direction:row;gap:6px;font-size:12px}#sol-overlay .sol-bb span{width:36px;height:36px;font-size:18px}#sol-auto{bottom:calc(52px + env(safe-area-inset-bottom))}}
 #sol-auto{position:absolute;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));z-index:1900;display:none;padding:11px 20px;border:none;border-radius:24px;background:linear-gradient(135deg,#ffb703,#fb8500);color:#fff;font-weight:900;font-size:15px;font-family:inherit;box-shadow:0 6px 16px rgba(0,0,0,.4);transform:translateX(-50%);animation:solAutoP 1.3s ease infinite}
 @keyframes solAutoP{50%{transform:translateX(-50%) scale(1.07)}}
 #sol-toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;padding:9px 14px;border-radius:14px;font-size:13px;font-weight:600;opacity:0;transition:opacity .25s;pointer-events:none;z-index:2000;width:max-content;max-width:88%;text-align:center}
@@ -627,7 +633,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.9.7 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.9.8 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2010,7 +2016,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.9.7</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.9.8</div>
       </div>
     </div>
 
@@ -2176,7 +2182,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.9.7</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.9.8</div>
       </div>
     </div>
 
@@ -4459,7 +4465,7 @@ var _cfShow = { mua: false, ban: false }; // trạng thái "đã nhập dữ li�
 // Ngày đang xem CHƯA có giao dịch nào → luôn hiện (dù có ẩn thì bên dưới cũng chỉ là khoảng trống, không có
 // dữ liệu gì để xem); có từ 1 giao dịch trở lên mới làm theo cài đặt.
 // Đang SỬA giao dịch: hàng nút "Huỷ/Lưu giao dịch" (thêm mới) LUÔN ẩn — chỉ còn hàng "Huỷ/Lưu thay đổi/Xoá"
-// (trước v2.9.7, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
+// (trước v2.9.8, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
 // "Lưu giao dịch" sẽ thêm 1 giao dịch MỚI thay vì sửa).
 function _capNhatCompactForm(tab, show){
   if (tab!=='mua' && tab!=='ban') return;
@@ -14216,7 +14222,7 @@ var GMP = (function(){
 // 'sol_stat' (số ván thắng + điểm cao theo số chất). Mở lại game mà còn ván dở → hỏi chơi tiếp hay chơi ván mới.
 var SOL = (function(){
   var SUITS = ['♠', '♥', '♦', '♣'], RANKS = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-  var ov, board, cols, stock, done, score, moves, elapsed, startAt, hist, mode = 1, cfg = { sound: true, suits: 1 };
+  var ov, board, cols, stock, done, score, moves, elapsed, startAt, hist, mode = 1, cfg = { sound: true, suits: 1, land: false, bigNum: false }, land = false;
   var els = {}, cw = 36, ch = 50, gap = 3, pad = 3, topY = 0, colY = 0, timerT = 0, drag = null, hintI = 0, won = false, am = null;
   function lsGet(k, d){ try { var v = MCS_LS.getItem(k); return v == null ? d : v; } catch(e){ return d; } }
   function lsSet(k, v){ try { MCS_LS.setItem(k, v); } catch(e){} }
@@ -14312,7 +14318,7 @@ var SOL = (function(){
   function popTxt(t, x, y){ var e = document.createElement('div'); e.className = 'sol-pop'; e.textContent = t; e.style.left = x + 'px'; e.style.top = y + 'px'; board.appendChild(e); setTimeout(function(){ e.remove(); }, 1400); }
   // thu dãy A→K: từng lá bay lên góc trái, mỗi lá 1 nốt nhạc cao dần + lấp lánh; xong có nhạc chiến thắng + "+100"
   function flyRun(run, k, ci){
-    var G = COLLECT_GAP, D = COLLECT_DUR, tx = pad + k * cw * 0.32, ty = topY;
+    var G = COLLECT_GAP, D = COLLECT_DUR, fp0 = foundPos(k), tx = fp0.x, ty = fp0.y;
     _pendingDone++; _busyUntil = Math.max(_busyUntil, Date.now() + 13 * G + D + 500);
     for (var i = run.length - 1, n = 0; i >= 0; i--, n++){
       (function(c, d){
@@ -14616,7 +14622,7 @@ var SOL = (function(){
     var face = '';
     if (r > 10){ var u = realFaceUrl(r, s); face = u ? '<span class="sol-f sol-fr" style="background-image:' + u + '"></span>' : '<span class="sol-f">' + faceSvg(r, s) + '</span>'; }
     return '<span class="sol-r">' + RANKS[r] + '</span><span class="sol-s">' + SUITS[s] + '</span>' +
-      (r > 10 ? face : '<span class="sol-b">' + SUITS[s] + '</span>');
+      (r > 10 ? face : '<span class="sol-b">' + SUITS[s] + '</span><span class="sol-bn">' + RANKS[r] + '<i>' + SUITS[s] + '</i></span>');
   }
   // ── Vẽ ──
   function layout(){
@@ -14624,8 +14630,17 @@ var SOL = (function(){
     cw = Math.floor((W - pad * 2 - gap * 9) / 10); ch = Math.round(cw * 1.42);
     ov.style.setProperty('--cw', cw + 'px');
     topY = Math.max(14, Math.round(ch * 0.22)); colY = topY + ch + Math.max(22, Math.round(ch * 0.42)); // cách xa nút ⚙️ và hàng cột cho khỏi bấm nhầm xấp bài
+    var H = board.clientHeight; land = W > H * 1.15; x0 = pad;
+    if (land){
+      // màn ngang: dãy đã thu dọc bên trái, xấp bài dọc bên phải, 10 cột ở giữa → lá to hơn
+      cw = Math.floor(Math.min((W - 16 - gap * 11) / 12.6, H / 3.1, 140)); ch = Math.round(cw * 1.42);
+      ov.style.setProperty('--cw', cw + 'px');
+      var side = Math.round(cw * 1.3) + gap; x0 = Math.round(side + (W - 2 * side - (cw * 10 + gap * 9)) / 2); topY = 6; colY = 6;
+    }
   }
-  function colX(i){ return pad + i * (cw + gap); }
+  var x0 = 3;
+  function foundPos(k){ return land ? { x: 8, y: topY + k * Math.round(ch * 0.2) } : { x: pad + k * cw * 0.32, y: topY }; }
+  function colX(i){ return x0 + i * (cw + gap); }
   function buildEls(){
     board.querySelectorAll('.sol-c').forEach(function(e){ e.remove(); });
     els = {};
@@ -14639,7 +14654,7 @@ var SOL = (function(){
       board.appendChild(e); els[c.id] = e;
     });
   }
-  function stockPos(){ return { x: board.clientWidth - pad - cw, y: topY }; }
+  function stockPos(){ return { x: board.clientWidth - (land ? 8 : pad) - cw, y: topY }; }
   function render(first){
     layout();
     var H = board.clientHeight, avail = H - colY - 6, sp = stockPos(), inCol = {}, nNew = 0, maxD = 0;
@@ -14661,11 +14676,12 @@ var SOL = (function(){
         if (!e) continue;
         e.classList.toggle('down', !c.up);
         e.classList.toggle('sol-dim', c.up && j < runStart);
+        e.classList.toggle('bigc', !!(cfg.bigNum && c.up && j === col.length - 1 && c.r <= 10)); // "Số lớn hơn": lá ngoài cùng hiện số to giữa lá (trừ J Q K)
         e.style.width = cw + 'px'; e.style.height = ch + 'px'; e.style.zIndex = 10 + j;
         e._toStock = false; clearTimeout(e._hideT);
         if (!e._shown && e._inFound != null && !first){
           // hoàn nguyên dãy đã thu: lá bay từ góc trái về cột (không chớp, không chia lại)
-          e._shown = true; e.classList.add('sol-notr'); e.style.left = (pad + e._inFound * cw * 0.32) + 'px'; e.style.top = topY + 'px'; e.style.display = '';
+          e._shown = true; e.classList.add('sol-notr'); var fpu = foundPos(e._inFound); e.style.left = fpu.x + 'px'; e.style.top = fpu.y + 'px'; e.style.display = '';
           void e.offsetWidth; e.classList.remove('sol-notr');
         } else if (!e._shown){
           e._shown = true; e.classList.remove('sol-gone');
@@ -14701,16 +14717,16 @@ var SOL = (function(){
     });
     // xấp bài còn chia được (góc phải)
     var stk = $('sol-stock'), nDeal = Math.ceil(stock.length / 10), sh = '';
-    for (var d = 0; d < nDeal; d++) sh += '<div class="sol-c down" style="position:absolute;left:' + (-d * cw * 0.28) + 'px;top:0;width:' + cw + 'px;height:' + ch + 'px"></div>';
+    for (var d = 0; d < nDeal; d++) sh += '<div class="sol-c down" style="position:absolute;left:' + (land ? 0 : -d * cw * 0.28) + 'px;top:' + (land ? d * Math.round(ch * 0.16) : 0) + 'px;width:' + cw + 'px;height:' + ch + 'px"></div>';
     stk.innerHTML = sh; stk.style.left = sp.x + 'px'; stk.style.top = topY + 'px'; stk.style.width = cw + 'px'; stk.style.height = ch + 'px';
     stk.style.visibility = nDeal ? 'visible' : 'hidden';
     // các dãy đã thu (góc trái): hiện lá K
     var fd = $('sol-done'), fh = '';
     if (maxD) _busyUntil = Math.max(_busyUntil, Date.now() + maxD + DEAL_DUR);
     done.slice(0, done.length - _pendingDone).forEach(function(s, k){
-      fh += '<div class="sol-c' + ((s === 1 || s === 2) ? ' red' : '') + ' face" style="position:absolute;left:' + (k * cw * 0.32) + 'px;top:0;width:' + cw + 'px;height:' + ch + 'px">' + cardInner(13, s) + '</div>';
+      fh += '<div class="sol-c' + ((s === 1 || s === 2) ? ' red' : '') + ' face" style="position:absolute;left:' + (land ? 0 : k * cw * 0.32) + 'px;top:' + (land ? k * Math.round(ch * 0.2) : 0) + 'px;width:' + cw + 'px;height:' + ch + 'px">' + cardInner(13, s) + '</div>';
     });
-    fd.innerHTML = fh; fd.style.left = pad + 'px'; fd.style.top = topY + 'px';
+    fd.innerHTML = fh; fd.style.left = (land ? 8 : pad) + 'px'; fd.style.top = topY + 'px';
   }
 
   // ── Kéo thả + chạm ──
@@ -14758,7 +14774,8 @@ var SOL = (function(){
   function open(){
     ov = $('sol-overlay'); board = $('sol-board'); if (!ov || !board) return;
     loadRealFaces(); // tải hình J Q K bài thật (lần đầu; sau đó lấy từ bộ nhớ đệm)
-    try { var c = JSON.parse(lsGet('sol_cfg', 'null')); if (c) { cfg.sound = c.sound !== false; cfg.suits = [1, 2, 4].indexOf(c.suits) >= 0 ? c.suits : 1; } } catch(e){}
+    setTimeout(function(){ if (cfg.land) lockLand(); }, 0); // bật "Màn hình ngang" → xoay ngang khi mở game
+    try { var c = JSON.parse(lsGet('sol_cfg', 'null')); if (c) { cfg.sound = c.sound !== false; cfg.suits = [1, 2, 4].indexOf(c.suits) >= 0 ? c.suits : 1; cfg.land = !!c.land; cfg.bigNum = !!c.bigNum; } } catch(e){}
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     ov.style.display = 'flex'; document.body.classList.add('gmp-open');
     if (!ov._bound){
@@ -14800,6 +14817,7 @@ var SOL = (function(){
     if (!ov) return;
     var rp = $('sol-resume'); if (rp) rp.style.display = 'none';
     _autoRun = false; var ab = $('sol-auto'); if (ab) ab.style.display = 'none';
+    if (cfg.land) unlockLand();
     stopClock(); save(); clearInterval(timerT);
     ov.style.display = 'none'; document.body.classList.remove('gmp-open');
   }
@@ -14808,6 +14826,8 @@ var SOL = (function(){
   function renderSet(){
     var p = $('sol-set'); if (!p) return;
     p.querySelector('[data-k="sound"]').classList.toggle('on', !!cfg.sound);
+    p.querySelector('[data-k="land"]').classList.toggle('on', !!cfg.land);
+    p.querySelector('[data-k="bigNum"]').classList.toggle('on', !!cfg.bigNum);
     p.querySelectorAll('[data-suits]').forEach(function(b){ b.classList.toggle('on', +b.getAttribute('data-suits') === cfg.suits); });
     var st = stats(), txt = [1, 2, 4].map(function(n){ var s = st['s' + n] || { w: 0, b: 0 }; return n + ' chất: thắng ' + s.w + ' ván' + (s.b ? ', điểm cao ' + s.b : ''); }).join('<br>');
     $('sol-set-stat').innerHTML = txt;
@@ -14816,6 +14836,21 @@ var SOL = (function(){
   function resumeOpen(){ var p = $('sol-resume'); return !!(p && p.style.display === 'flex'); }
   function closeSet(){ var p = $('sol-set'); if (p) p.style.display = 'none'; if (isOpen() && moves && !won && !resumeOpen()) startClock(); }
   function toggleSound(){ cfg.sound = !cfg.sound; saveCfg(); renderSet(); sndPlace(); }
+  function toggleBig(){ cfg.bigNum = !cfg.bigNum; saveCfg(); renderSet(); render(true); }
+  // Màn hình ngang: thử khoá xoay ngang (cần toàn màn hình); máy không cho khoá thì nhắc xoay tay — bố cục tự đổi theo
+  function lockLand(){
+    if (!cfg.land) return;
+    try {
+      var de = document.documentElement, p = (!document.fullscreenElement && de.requestFullscreen) ? de.requestFullscreen() : Promise.resolve();
+      p.then(function(){ return screen.orientation && screen.orientation.lock ? screen.orientation.lock('landscape') : Promise.reject(); })
+       .catch(function(){ toastS('🔄 Hãy xoay ngang điện thoại để chơi màn hình ngang'); });
+    } catch(e){ toastS('🔄 Hãy xoay ngang điện thoại để chơi màn hình ngang'); }
+  }
+  function unlockLand(){
+    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e){}
+    try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen(); } catch(e){}
+  }
+  function toggleLand(){ cfg.land = !cfg.land; saveCfg(); renderSet(); if (cfg.land) lockLand(); else unlockLand(); }
   function setSuits(n){
     if (n === cfg.suits) return;
     var lam = function(){ cfg.suits = n; saveCfg(); newGame(n); renderSet(); closeSet(); };
@@ -14832,7 +14867,7 @@ var SOL = (function(){
     if (e.key === 'Escape'){ if (GAME_CFM.isOpen()) GAME_CFM.done(false); else if ($('sol-set').style.display === 'flex') closeSet(); else close(); }
     else if ((e.ctrlKey || e.metaKey) && e.key === 'z'){ e.preventDefault(); undo(); }
   });
-  return { open: open, close: close, isOpen: isOpen, deal: deal, resumeChoice: resumeChoice, undo: undo, hint: hint, newGame: newGameAsk,
+  return { toggleLand: toggleLand, toggleBig: toggleBig, open: open, close: close, isOpen: isOpen, deal: deal, resumeChoice: resumeChoice, undo: undo, hint: hint, newGame: newGameAsk,
            openSet: openSet, closeSet: closeSet, toggleSound: toggleSound, setSuits: setSuits,
            _st: function(){ return { cols: cols, stock: stock, done: done, score: score, moves: moves }; }, _move: doMove, _hints: allHints, _best: bestTarget, auto: autoStart, _canAuto: canAuto, _after: after };
 })();
@@ -15090,6 +15125,8 @@ if ('serviceWorker' in navigator) {
     <div class="gmp-set-box">
       <div class="gmp-set-ttl">⚙️ Cài đặt Xếp Bài Nhện</div>
       <div class="gmp-set-row" onclick="SOL.toggleSound()"><span>🔊 Âm thanh</span><span class="gmp-sw" data-k="sound"></span></div>
+      <div class="gmp-set-row" onclick="SOL.toggleLand()"><span>🔄 Màn hình ngang (lá to hơn)</span><span class="gmp-sw" data-k="land"></span></div>
+      <div class="gmp-set-row" onclick="SOL.toggleBig()"><span>🔢 Số lớn hơn (dễ nhìn)</span><span class="gmp-sw" data-k="bigNum"></span></div>
       <div class="gmp-set-lbl">♠️ Số chất (độ khó)</div>
       <div class="gmp-seg">
         <button data-suits="1" onclick="SOL.setSuits(1)">1 chất ♠</button>
