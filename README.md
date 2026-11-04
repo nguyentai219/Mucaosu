@@ -18,6 +18,7 @@ Số phiên bản theo dạng **`Z.X.Y`**:
 
 | Phiên bản | Ngày | Thay đổi |
 |-----------|------|----------|
+| **v2.9.6** | 2026-11-04 | 🎴 Xếp Bài Nhện: **giãn khoảng cách** giữa nút ⚙️ Cài đặt, xấp bài chia thêm và hàng cột bên dưới (trước quá sát, dễ bấm nhầm). |
 | **v2.9.5** | 2026-11-04 | 🧠 Xếp Bài Nhện: **chạm 1 lá hoặc 1 dãy → tự đi thông minh hơn**, chấm điểm mọi cột đặt được rồi chọn chỗ tốt nhất: ưu tiên **hoàn thành dãy A → K** → **nối cùng chất thành dãy dài nhất** (gần đủ A → K nhất, dãy bắt đầu từ K được cộng thêm) → **lật được lá úp** → khác chất thì chọn cột có dãy dài hơn; **tránh phá dãy cùng chất** đang có; **cột trống chỉ dùng khi không còn chỗ khác**, không dời cả cột sang cột trống vô ích. |
 | **v2.9.4** | 2026-11-02 | 🎴 Xếp Bài Nhện: kéo 1 dãy sang cột khác làm đủ **A → K** thì giờ **dãy trượt sang cột đích trước**, dừng 1 nhịp, **rồi mới thu cả dãy lên góc** (trước đây thu ngay nên trông như thiếu bước di chuyển). |
 | **v2.9.3** | 2026-11-02 | 🎴 Xếp Bài Nhện: (1) **Tiếng chia bài nhẹ nhàng, êm dịu hơn** (tông trầm mềm, nhỏ, gần như tiếng sột giấy khẽ). (2) **Hoàn nguyên không còn chớp màn hình**: chỉ các lá của nước vừa đi trượt về chỗ cũ; hoàn nguyên lần chia bài thì 10 lá bay ngược về xấp; hoàn nguyên dãy đã thu thì các lá bay từ góc trái về cột. (3) Nút Hoàn nguyên đổi biểu tượng **mũi tên cong quay lại**. |
