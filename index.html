@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.9.8</title>
+<title>Mua Bán Mủ Cao Su v2.9.9</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -126,7 +126,9 @@ body.gmp-open{overflow:hidden}
 #sol-win .gmp-set-box,#sol-resume .gmp-set-box{text-align:center}
 .sol-win-info{font-size:14px;line-height:1.7;margin:6px 0 4px}
 #gmp-set{display:none;position:absolute;inset:0;z-index:2;background:rgba(10,30,20,.45);align-items:center;justify-content:center;padding:20px}
-.gmp-set-box{width:100%;max-width:330px;background:#fffaf0;border:3px solid #2d6a4f;border-radius:18px;padding:16px 16px 14px;box-shadow:0 10px 30px rgba(0,0,0,.3);font-family:'Be Vietnam Pro',sans-serif;color:#1b4332}
+.gmp-x{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;border:none;background:#e8efe9;color:#1b4332;font-size:18px;font-weight:900;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1}
+.gmp-x:active{transform:scale(.9)}
+.gmp-set-box{position:relative;width:100%;max-width:330px;background:#fffaf0;border:3px solid #2d6a4f;border-radius:18px;padding:16px 16px 14px;box-shadow:0 10px 30px rgba(0,0,0,.3);font-family:'Be Vietnam Pro',sans-serif;color:#1b4332}
 .gmp-set-ttl{font-size:17px;font-weight:800;text-align:center;margin-bottom:10px}
 .gmp-set-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 2px;border-bottom:1px solid #e3eadf;font-size:14px;font-weight:700;cursor:pointer}
 .gmp-sw{flex:0 0 auto;width:46px;height:26px;border-radius:13px;background:#c8d3cc;position:relative;transition:background .2s}
@@ -633,7 +635,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.9.8 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.9.9 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2016,7 +2018,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.9.8</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.9.9</div>
       </div>
     </div>
 
@@ -2182,7 +2184,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.9.8</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.9.9</div>
       </div>
     </div>
 
@@ -4465,7 +4467,7 @@ var _cfShow = { mua: false, ban: false }; // trạng thái "đã nhập dữ li�
 // Ngày đang xem CHƯA có giao dịch nào → luôn hiện (dù có ẩn thì bên dưới cũng chỉ là khoảng trống, không có
 // dữ liệu gì để xem); có từ 1 giao dịch trở lên mới làm theo cài đặt.
 // Đang SỬA giao dịch: hàng nút "Huỷ/Lưu giao dịch" (thêm mới) LUÔN ẩn — chỉ còn hàng "Huỷ/Lưu thay đổi/Xoá"
-// (trước v2.9.8, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
+// (trước v2.9.9, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
 // "Lưu giao dịch" sẽ thêm 1 giao dịch MỚI thay vì sửa).
 function _capNhatCompactForm(tab, show){
   if (tab!=='mua' && tab!=='ban') return;
@@ -14634,12 +14636,30 @@ var SOL = (function(){
     if (land){
       // màn ngang: dãy đã thu dọc bên trái, xấp bài dọc bên phải, 10 cột ở giữa → lá to hơn
       cw = Math.floor(Math.min((W - 16 - gap * 11) / 12.6, H / 3.1, 140)); ch = Math.round(cw * 1.42);
+      // cột dài → lá tự nhỏ lại vừa đủ để mọi lá ngửa vẫn lộ rõ số (không nhỏ hơn 34 px)
+      if (cols){ var fc = Math.floor(fitCh(H - 6 - 6) / 1.42); if (fc < cw){ cw = Math.max(34, fc); ch = Math.round(cw * 1.42); } }
       ov.style.setProperty('--cw', cw + 'px');
       var side = Math.round(cw * 1.3) + gap; x0 = Math.round(side + (W - 2 * side - (cw * 10 + gap * 9)) / 2); topY = 6; colY = 6;
     }
   }
   var x0 = 3;
   function foundPos(k){ return land ? { x: 8, y: topY + k * Math.round(ch * 0.2) } : { x: pad + k * cw * 0.32, y: topY }; }
+  // Ép cột dài: thu hẹp phần lá ÚP trước (tối thiểu 4% chiều cao lá), chỉ khi vẫn thiếu chỗ mới ép phần lá NGỬA,
+  // và không bao giờ dưới 25% (vẫn thấy rõ số). Trả về [bước lá úp, bước lá ngửa].
+  function fitSteps(nd, nu, chh, maxH){
+    var dS = chh * 0.12, uS = chh * 0.3, U = Math.max(0, nu - 1);
+    if (nd * dS + U * uS <= maxH || maxH <= 0) return [dS, uS];
+    dS = Math.max(chh * 0.04, nd ? (maxH - U * uS) / nd : 0);
+    if (nd * dS + U * uS <= maxH) return [dS, uS];
+    uS = U ? Math.max(chh * 0.25, (maxH - nd * dS) / U) : uS;
+    return [dS, uS];
+  }
+  // Cỡ lá lớn nhất để cột dài nhất vẫn lộ đủ số trên mọi lá ngửa (lá úp 4%, lá ngửa 27% chiều cao lá)
+  function fitCh(avail){
+    var m = 1;
+    cols.forEach(function(c){ var nd = 0, nu = 0; c.forEach(function(x){ if (x.up) nu++; else nd++; }); m = Math.max(m, 1 + 0.04 * nd + 0.27 * Math.max(0, nu - 1)); });
+    return avail / m;
+  }
   function colX(i){ return x0 + i * (cw + gap); }
   function buildEls(){
     board.querySelectorAll('.sol-c').forEach(function(e){ e.remove(); });
@@ -14663,10 +14683,7 @@ var SOL = (function(){
       if (sl){ sl.style.left = colX(i) + 'px'; sl.style.top = colY + 'px'; sl.style.width = cw + 'px'; sl.style.height = ch + 'px'; }
       var col = cols[i], nd = 0, nu = 0;
       col.forEach(function(c){ if (c.up) nu++; else nd++; });
-      var dStep = ch * 0.14, uStep = ch * 0.3;
-      var need = nd * dStep + Math.max(0, nu - 1) * uStep;
-      var maxH = avail - ch;
-      if (need > maxH && need > 0){ var k = maxH / need; dStep *= k; uStep *= k; }
+      var fs = fitSteps(nd, nu, ch, avail - ch), dStep = fs[0], uStep = fs[1];
       var y = colY;
       // dãy liền mạch (cùng chất, giảm dần) ở dưới cùng cột = kéo đi được → sáng; lá ngửa phía trên đứt mạch → mờ
       var runStart = col.length - 1;
@@ -14827,6 +14844,7 @@ var SOL = (function(){
     var p = $('sol-set'); if (!p) return;
     p.querySelector('[data-k="sound"]').classList.toggle('on', !!cfg.sound);
     p.querySelector('[data-k="land"]').classList.toggle('on', !!cfg.land);
+    var vm = (document.title.match(/v\d+(\.\d+)+/) || [''])[0]; p.querySelector('.sol-ver').textContent = '🕷️ Xếp Bài Nhện · trong app Mủ Cao Su ' + vm; // số phiên bản lấy theo app
     p.querySelector('[data-k="bigNum"]').classList.toggle('on', !!cfg.bigNum);
     p.querySelectorAll('[data-suits]').forEach(function(b){ b.classList.toggle('on', +b.getAttribute('data-suits') === cfg.suits); });
     var st = stats(), txt = [1, 2, 4].map(function(n){ var s = st['s' + n] || { w: 0, b: 0 }; return n + ' chất: thắng ' + s.w + ' ván' + (s.b ? ', điểm cao ' + s.b : ''); }).join('<br>');
@@ -15066,6 +15084,7 @@ if ('serviceWorker' in navigator) {
   <button class="gmp-btn" style="left:12px" onclick="GMP.openSet()" title="Cài đặt trò chơi">⚙️</button>
   <div id="gmp-set" onclick="if(event.target===this)GMP.closeSet()">
     <div class="gmp-set-box">
+      <button class="gmp-x" onclick="GMP.closeSet()" aria-label="Đóng">✕</button>
       <div class="gmp-set-ttl">⚙️ Cài đặt trò chơi</div>
       <div class="gmp-set-row" onclick="GMP.toggleCfg('sound')"><span>🔊 Âm thanh</span><span class="gmp-sw" data-k="sound"></span></div>
       <div class="gmp-set-row" onclick="GMP.toggleCfg('vib')"><span>📳 Rung khi ghi điểm / va chạm</span><span class="gmp-sw" data-k="vib"></span></div>
@@ -15123,6 +15142,7 @@ if ('serviceWorker' in navigator) {
   <button id="sol-auto" onclick="SOL.auto()">⚡ Tự hoàn thành</button>
   <div id="sol-set" onclick="if(event.target===this)SOL.closeSet()">
     <div class="gmp-set-box">
+      <button class="gmp-x" onclick="SOL.closeSet()" aria-label="Đóng">✕</button>
       <div class="gmp-set-ttl">⚙️ Cài đặt Xếp Bài Nhện</div>
       <div class="gmp-set-row" onclick="SOL.toggleSound()"><span>🔊 Âm thanh</span><span class="gmp-sw" data-k="sound"></span></div>
       <div class="gmp-set-row" onclick="SOL.toggleLand()"><span>🔄 Màn hình ngang (lá to hơn)</span><span class="gmp-sw" data-k="land"></span></div>
@@ -15137,6 +15157,7 @@ if ('serviceWorker' in navigator) {
       <div class="gmp-set-best" id="sol-set-stat"></div>
       <button class="gmp-set-del" style="color:#2d6a4f;border-color:#b7d3c2;background:#fff" onclick="SOL.newGame()">🔄 Chia ván mới</button>
       <button class="gmp-set-ok" onclick="SOL.closeSet()">Xong</button>
+      <div class="sol-ver" style="text-align:center;font-size:12px;opacity:.6;margin-top:10px"></div>
     </div>
   </div>
   <div id="sol-resume">
