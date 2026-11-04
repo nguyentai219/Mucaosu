@@ -18,6 +18,7 @@ Số phiên bản theo dạng **`Z.X.Y`**:
 
 | Phiên bản | Ngày | Thay đổi |
 |-----------|------|----------|
+| **v2.9.9** | 2026-11-04 | 🎴 Xếp Bài Nhện: (1) **Màn hình ngang khi cột dài vẫn thấy rõ số**: ép phần lá úp trước, phần lộ của lá ngửa luôn ≥ 25% chiều cao lá; cột quá dài thì lá tự nhỏ lại vừa đủ (to trở lại khi cột ngắn). (2) Nút **✕** góc trên bảng Cài đặt (Xếp Bài Nhện và Giọt Mủ). (3) Cuối bảng Cài đặt hiện **số phiên bản** đang dùng. |
 | **v2.9.8** | 2026-11-04 | 🔄🔢 Xếp Bài Nhện — 2 tuỳ chọn mới trong ⚙️ Cài đặt: (1) **Màn hình ngang (lá to hơn)**: thử khoá xoay ngang (máy không cho thì nhắc xoay tay), bố cục ngang riêng — dãy đã thu dọc bên trái, xấp bài dọc bên phải, 10 cột ở giữa nên **lá bài to gần gấp đôi**; thanh trên/dưới thu gọn. (2) **Số lớn hơn (dễ nhìn)**: lá ngoài cùng của mỗi cột hiện **số thật to giữa lá** kèm chất (trừ J Q K — đã có hình người), lá bị đè vẫn hiện số ở góc. |
 | **v2.9.7** | 2026-11-04 | ⚡ Xếp Bài Nhện: thêm nút **Tự hoàn thành** (như bản APK) — chỉ hiện khi đã chia hết xấp, mọi lá trên bàn đã ngửa và **mỗi cột là 1 dãy cùng chất liền mạch, không còn lá mờ**; bấm thì máy tự gom từng nước tới khi thắng. |
 | **v2.9.6** | 2026-11-04 | 🎴 Xếp Bài Nhện: **giãn khoảng cách** giữa nút ⚙️ Cài đặt, xấp bài chia thêm và hàng cột bên dưới (trước quá sát, dễ bấm nhầm). |
