@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v2.9.6</title>
+<title>Mua Bán Mủ Cao Su v2.9.7</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -112,6 +112,8 @@ body.gmp-open{overflow:hidden}
 .sol-bot{display:flex;justify-content:space-around;padding:8px 6px calc(10px + env(safe-area-inset-bottom));background:rgba(0,0,0,.18)}
 .sol-bb{display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:none;color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;min-width:80px}
 .sol-bb span{width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;font-size:24px}
+#sol-auto{position:absolute;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));z-index:1900;display:none;padding:11px 20px;border:none;border-radius:24px;background:linear-gradient(135deg,#ffb703,#fb8500);color:#fff;font-weight:900;font-size:15px;font-family:inherit;box-shadow:0 6px 16px rgba(0,0,0,.4);transform:translateX(-50%);animation:solAutoP 1.3s ease infinite}
+@keyframes solAutoP{50%{transform:translateX(-50%) scale(1.07)}}
 #sol-toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;padding:9px 14px;border-radius:14px;font-size:13px;font-weight:600;opacity:0;transition:opacity .25s;pointer-events:none;z-index:2000;width:max-content;max-width:88%;text-align:center}
 #sol-toast.show{opacity:1}
 #sol-set,#sol-win,#sol-resume{display:none;position:absolute;inset:0;z-index:3000;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:20px}
@@ -625,7 +627,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v2.9.6 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v2.9.7 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2008,7 +2010,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.9.6</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v2.9.7</div>
       </div>
     </div>
 
@@ -2174,7 +2176,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.9.6</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v2.9.7</div>
       </div>
     </div>
 
@@ -4457,7 +4459,7 @@ var _cfShow = { mua: false, ban: false }; // trạng thái "đã nhập dữ li�
 // Ngày đang xem CHƯA có giao dịch nào → luôn hiện (dù có ẩn thì bên dưới cũng chỉ là khoảng trống, không có
 // dữ liệu gì để xem); có từ 1 giao dịch trở lên mới làm theo cài đặt.
 // Đang SỬA giao dịch: hàng nút "Huỷ/Lưu giao dịch" (thêm mới) LUÔN ẩn — chỉ còn hàng "Huỷ/Lưu thay đổi/Xoá"
-// (trước v2.9.6, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
+// (trước v2.9.7, khi tắt cài đặt mà sửa số liệu lúc đang sửa giao dịch thì hiện cả 2 hàng nút, bấm nhầm
 // "Lưu giao dịch" sẽ thêm 1 giao dịch MỚI thay vì sửa).
 function _capNhatCompactForm(tab, show){
   if (tab!=='mua' && tab!=='ban') return;
@@ -14334,7 +14336,7 @@ var SOL = (function(){
 
   // ── Trạng thái ván ──
   function newGame(suits){
-    mode = suits || cfg.suits || 1;
+    mode = suits || cfg.suits || 1; _autoRun = false;
     var deck = [], id = 0;
     for (var d = 0; d < 8; d++){
       var s = mode === 1 ? 0 : mode === 2 ? (d % 2) : (d % 4);
@@ -14427,12 +14429,28 @@ var SOL = (function(){
   function undo(){
     if (won || !hist.length || busy()){ sndBad(); return; }
     var g = JSON.parse(hist.pop());
-    cols = g.cols; stock = g.stock; done = g.done; score = g.score - 1; moves++;
+    cols = g.cols; stock = g.stock; done = g.done; score = g.score - 1; moves++; _autoRun = false;
     Object.keys(els).forEach(function(id){ els[id].classList.remove('sol-gone'); });
     sndPlace(); after();
   }
+  // ── Tự hoàn thành: chỉ hiện khi đã chia hết xấp, mọi lá ngửa và MỖI cột là 1 dãy cùng chất liền mạch (không lá mờ)
+  //    → phần còn lại chắc chắn ghép đủ A→K, máy gom giúp từng nước ──
+  var _autoRun = false, _autoSeen = {};
+  function canAuto(){ return cols && !won && !stock.length && done.length < 8 && cols.every(function(c){ return !c.length || (c.every(function(x){ return x.up; }) && runLenTop(c).len === c.length); }); }
+  function updAuto(){ var b = $('sol-auto'); if (b) b.style.display = canAuto() && !_autoRun ? 'block' : 'none'; }
+  function autoStep(){
+    if (!_autoRun || won || !isOpen()) { _autoRun = false; return; }
+    if (done.length >= 8){ _autoRun = false; return; }
+    if (busy()){ setTimeout(autoStep, 120); return; }
+    var key = JSON.stringify(cols.map(function(c){ return c.map(function(x){ return x.id; }); })), list = allHints(), m = null;
+    for (var i = 0; i < list.length && !m; i++){ var c = list[i], k2 = key + '|' + c.f + ',' + c.i + ',' + c.t; if (!_autoSeen[k2]){ _autoSeen[k2] = 1; m = c; } }
+    if (!m){ _autoRun = false; updAuto(); toastS('Phần còn lại bạn tự xếp tiếp nhé!'); return; }
+    doMove(m.f, m.i, m.t);
+    setTimeout(autoStep, 320);
+  }
+  function autoStart(){ if (!canAuto() || busy()) return; _autoRun = true; _autoSeen = {}; updAuto(); sndHint(); setTimeout(autoStep, 400); }
   function after(){
-    hintI = 0; render(); updStats();
+    hintI = 0; render(); updStats(); updAuto();
     if (done.length === 8 && !won && !_winPending){ _winPending = true; setTimeout(function(){ _winPending = false; if (!won && done.length === 8) win(); }, busy() ? _busyUntil - Date.now() + 500 : 0); }
     save();
   }
@@ -14760,7 +14778,7 @@ var SOL = (function(){
     board.querySelectorAll('.sol-slot').forEach(function(e){ e.remove(); });
     board.insertAdjacentHTML('afterbegin', slots);
     if (load()){
-      buildEls(); render(true);
+      buildEls(); render(true); updAuto();
       // Có ván đang chơi dở (đã đi ít nhất 1 nước) → hỏi chơi tiếp hay chơi ván mới; đồng hồ dừng tới khi chọn
       if (moves) showResume();
     }
@@ -14781,6 +14799,7 @@ var SOL = (function(){
   function close(){
     if (!ov) return;
     var rp = $('sol-resume'); if (rp) rp.style.display = 'none';
+    _autoRun = false; var ab = $('sol-auto'); if (ab) ab.style.display = 'none';
     stopClock(); save(); clearInterval(timerT);
     ov.style.display = 'none'; document.body.classList.remove('gmp-open');
   }
@@ -14815,7 +14834,7 @@ var SOL = (function(){
   });
   return { open: open, close: close, isOpen: isOpen, deal: deal, resumeChoice: resumeChoice, undo: undo, hint: hint, newGame: newGameAsk,
            openSet: openSet, closeSet: closeSet, toggleSound: toggleSound, setSuits: setSuits,
-           _st: function(){ return { cols: cols, stock: stock, done: done, score: score, moves: moves }; }, _move: doMove, _hints: allHints, _best: bestTarget };
+           _st: function(){ return { cols: cols, stock: stock, done: done, score: score, moves: moves }; }, _move: doMove, _hints: allHints, _best: bestTarget, auto: autoStart, _canAuto: canAuto, _after: after };
 })();
 
 // ─── POPUP XÁC NHẬN TRONG GAME (thay hộp thoại confirm() của trình duyệt — vốn hiện dòng
@@ -15066,6 +15085,7 @@ if ('serviceWorker' in navigator) {
     <button class="sol-bb" onclick="SOL.undo()"><span><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#ff8a7a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span>Hoàn nguyên</button>
   </div>
   <div id="sol-toast"></div>
+  <button id="sol-auto" onclick="SOL.auto()">⚡ Tự hoàn thành</button>
   <div id="sol-set" onclick="if(event.target===this)SOL.closeSet()">
     <div class="gmp-set-box">
       <div class="gmp-set-ttl">⚙️ Cài đặt Xếp Bài Nhện</div>
