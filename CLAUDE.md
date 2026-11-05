@@ -67,3 +67,9 @@ cần file `.nojekyll`).
 
 Game APK riêng của người dùng **không đưa lên GitHub** (không thêm vào repo này): mã nguồn giữ ngoài repo, chỉ gửi file
 `.apk`/`.zip` trực tiếp cho người dùng.
+
+## App quản trị (công cụ tính mã gia hạn)
+
+App quản trị Mủ Cao Su (vỏ APK + file công cụ `cong-cu-tinh-ma-MG1-*.html` chứa khoá bí mật tính mã gia hạn)
+**không đưa lên GitHub** (không thêm vào repo này, kể cả mã nguồn vỏ APK): giữ ngoài repo, chỉ gửi file `.html`/`.apk`/`.zip`
+trực tiếp cho người dùng. Thư mục `android-admin/` và `android-xepbai/` đã bị chặn trong `.gitignore`.
