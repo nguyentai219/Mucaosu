@@ -73,3 +73,6 @@ Game APK riêng của người dùng **không đưa lên GitHub** (không thêm 
 App quản trị Mủ Cao Su (vỏ APK + file công cụ `cong-cu-tinh-ma-MG1-*.html` chứa khoá bí mật tính mã gia hạn)
 **không đưa lên GitHub** (không thêm vào repo này, kể cả mã nguồn vỏ APK): giữ ngoài repo, chỉ gửi file `.html`/`.apk`/`.zip`
 trực tiếp cho người dùng. Thư mục `android-admin/` và `android-xepbai/` đã bị chặn trong `.gitignore`.
+App này chỉ chạy trên máy của người quản trị. **Mỗi lần cập nhật app quản trị** (công cụ tính mã hoặc vỏ APK): tăng
+`versionCode`/`versionName`, build lại APK (`ADMIN_HTML=... KEYSTORE=... KS_PASS=... ./build.sh` trong mã nguồn vỏ APK giữ ngoài repo)
+rồi **gửi APK quản trị mới nhất cho người dùng cùng với báo cáo kết quả**.
