@@ -18,6 +18,7 @@ Số phiên bản theo dạng **`Z.X.Y`**:
 
 | Phiên bản | Ngày | Thay đổi |
 |-----------|------|----------|
+| **v3.1.5** | 2026-11-07 | 🎴 Xếp Bài Nhện **màn hình ngang**: kéo bài làm đủ dãy K→A thì **giữ nguyên cỡ lá** — game nhận ra nước đi này sẽ thu dãy nên không thu nhỏ lá một nhịp rồi phóng lại như trước; dãy vẫn tự thu lên bên trái kèm hiệu ứng và +100 điểm. |
 | **v3.1.4** | 2026-11-07 | 🎴 Xếp Bài Nhện **màn hình ngang**: đổi thứ tự 3 nút bên phải thành **Gợi ý → Hoàn nguyên → Ván mới** (từ trên xuống; Ván mới nằm dưới cùng để tránh bấm nhầm khi đang chơi). Màn hình dọc giữ nguyên thứ tự cũ. |
 | **v3.1.3** | 2026-11-05 | 🔐 **Mật khẩu gia hạn hôm nay đổi tiền tố sang dạng 8 số** (vẫn = tiền tố + mã thiết bị 4 số + tháng ngày MMDD), dùng chung với game Xếp Bài Nhện bản APK và công cụ quản trị. Mã gia hạn 6 số (MG1) không đổi. |
 | **v3.1.2** | 2026-11-05 | 🎮 Game trong app (Xếp Bài Nhện, Giọt Mủ Phiêu Lưu) **không có hạn dùng riêng mà đi theo hạn dùng của app**: app còn hạn thì chơi bình thường; app hết hạn thì không mở được game, hiện bảng gia hạn của app (gia hạn xong chơi được ngay). Bản APK Xếp Bài Nhện riêng mới có hạn dùng riêng (dùng thử 3 ngày, mã gia hạn MG1 tính bằng công cụ quản trị Mủ Cao Su). |
