@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v3.1.4</title>
+<title>Mua Bán Mủ Cao Su v3.1.5</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -647,7 +647,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.1.4 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.1.5 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2030,7 +2030,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.1.4</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.1.5</div>
       </div>
     </div>
 
@@ -2196,7 +2196,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.1.4</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.1.5</div>
       </div>
     </div>
 
@@ -14237,7 +14237,7 @@ var GMP = (function(){
 var SOL = (function(){
   var SUITS = ['♠', '♥', '♦', '♣'], RANKS = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
   var ov, board, cols, stock, done, score, moves, elapsed, startAt, hist, mode = 1, cfg = { sound: true, suits: 1, land: false, bigNum: false, diff: 1 }, land = false;
-  var gdiff = 1, round = 0, _zoomGrow = true, zLv = null, zBase = null, side = 0, fTop = 6, fStep = 10, DIFF_N = ['Dễ', 'Trung bình', 'Khó'];
+  var gdiff = 1, round = 0, _zoomGrow = true, _zoomHold = false, zLv = null, zBase = null, side = 0, fTop = 6, fStep = 10, DIFF_N = ['Dễ', 'Trung bình', 'Khó'];
   var els = {}, cw = 36, ch = 50, gap = 3, pad = 3, topY = 0, colY = 0, timerT = 0, drag = null, hintI = 0, won = false, am = null;
   function lsGet(k, d){ try { var v = MCS_LS.getItem(k); return v == null ? d : v; } catch(e){ return d; } }
   function lsSet(k, v){ try { MCS_LS.setItem(k, v); } catch(e){} }
@@ -14448,7 +14448,8 @@ var SOL = (function(){
     var s = col[n - 1].s;
     for (var i = 0; i < 13; i++){ var c = col[n - 1 - i]; if (!c.up || c.s !== s || c.r !== i + 1) return false; }
     var run = col.splice(n - 13, 13);
-    done.push(s); score += 100; flipTop(col); _zoomGrow = true;
+    done.push(s); score += 100; flipTop(col);
+    if (_zoomHold) _zoomHold = false; else _zoomGrow = true; // thu dãy do kéo bài: giữ nguyên cỡ lá; do chia bài: cho to lại nếu vừa
     flyRun(run, done.length - 1, ci);
     return true;
   }
@@ -14467,10 +14468,11 @@ var SOL = (function(){
     score--; moves++; startClock();
     sndPlace();
     if (runComplete(cols[to])){
+      _zoomHold = true; // sắp thu dãy → giữ nguyên cỡ lá, không thu/phóng
       // Đủ dãy A→K: cho dãy vừa kéo trượt sang cột đích TRƯỚC, sau đó mới thu cả dãy lên góc
       hintI = 0; render(); updStats(); save();
       _busyUntil = Date.now() + SETTLE_MS + 100;
-      setTimeout(function(){ checkDone(to); after(); }, SETTLE_MS);
+      setTimeout(function(){ checkDone(to); _zoomHold = false; after(); }, SETTLE_MS);
       return;
     }
     after();
@@ -14715,7 +14717,8 @@ var SOL = (function(){
       if (cols){
         var need = fitCh(H - 6 - 6) / 1.42, lv = 0;
         while (lv < 12 && zoomCw(cw, lv) > need && zoomCw(cw, lv) > 34) lv++;
-        if (zBase !== cw || zLv == null || _zoomGrow || lv > zLv){ zBase = cw; zLv = lv; }
+        if (_zoomHold && zBase === cw && zLv != null){ /* đang chờ thu dãy: giữ nguyên */ }
+        else if (zBase !== cw || zLv == null || _zoomGrow || lv > zLv){ zBase = cw; zLv = lv; }
         _zoomGrow = false; cw = zoomCw(cw, zLv);
       }
       ch = Math.round(cw * 1.42);
