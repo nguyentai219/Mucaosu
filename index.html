@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v3.1.7</title>
+<title>Mua Bán Mủ Cao Su v3.1.8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -648,7 +648,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.1.7 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.1.8 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2031,7 +2031,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.1.7</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.1.8</div>
       </div>
     </div>
 
@@ -2197,7 +2197,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.1.7</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.1.8</div>
       </div>
     </div>
 
@@ -6242,7 +6242,7 @@ var SB_NO_SYNC_KEYS = ['device_code','gd_token','gd_token_expiry','gd_folder_id'
   // hoặc tự đặt lại mật khẩu giao dịch về mặc định).
   'admin_override_applied_at','pw_reset_applied_at','registry_sync_debug','last_ext_info',
   'gmp_best','gmp_best_de','gmp_best_kho','gmp_sound','gmp_cfg', // kỷ lục + cài đặt game ẩn Giọt Mủ Phiêu Lưu: riêng từng máy
-  'sol_cfg','sol_save','sol_stat','sol_round','sol_roundw']; // game ẩn Xếp Bài Nhện: cài đặt, ván đang chơi dở, thống kê, số vòng — riêng từng máy
+  'sol_cfg','sol_save','sol_stat','sol_round','sol_roundw','sol_rtry']; // game ẩn Xếp Bài Nhện: cài đặt, ván đang chơi dở, thống kê, số vòng — riêng từng máy
 // Danh sách khoá THỰC SỰ sẽ đồng bộ mỗi lần: hợp của SB_DATA_KEYS (đảm bảo có giá trị mặc định hợp lý
 // nếu máy chưa từng có khoá đó) VÀ toàn bộ khoá đang thực sự tồn tại trong localStorage của app (trừ
 // danh sách chỉ-riêng-máy-này ở trên) — để không bỏ sót dữ liệu của các tính năng thêm sau này mà lỡ
@@ -14358,11 +14358,14 @@ var SOL = (function(){
 
   // ── Ván chia theo độ khó + vòng đánh số 1, 2, 3... (riêng từng số chất + độ khó), số vòng vô hạn, KHÔNG BAO GIỜ TRÙNG:
   //    mỗi ván thử của mỗi vòng có 1 mã riêng (vòng, lần thử, độ khó, số chất) đưa qua hàm trộn 32-bit 1-đổi-1
-  //    → 2 vòng bất kỳ không thể ra cùng 1 ván (đủ cho hơn 1,8 triệu vòng mỗi mức).
-  //    Dễ: ván thuận lợi nhất trong 150 ván · Trung bình: thuận lợi nhất trong 40 ván · Khó: bí nhất trong 40 ván (vẫn có ít nhất 1 nước)
+  //    → 2 vòng / 2 lượt bất kỳ không thể ra cùng 1 ván. Mỗi vòng 4096 chỗ = 136 nhóm x 30 ván thử, mỗi nhóm dùng cho 3 lượt chơi (hơn 110 nghìn vòng mỗi mức).
+  //    Chọn ván: chơi thử mỗi ván 3 lần (simEase), xếp dễ → khó, lấy theo phân vị: Dễ = nhóm dễ nhất, Trung bình = khoảng giữa,
+  //    Khó = nhóm khó (~10% khó nhất, không lấy ván khó nhất để tránh bế tắc). Chơi lại 2 lần đầu = đúng ván cũ, lần 3 mới đổi ván khác (cùng vòng, cùng độ khó).
   function rngOf(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
   function mix32(x){ x ^= x >>> 16; x = Math.imul(x, 0x7feb352d); x ^= x >>> 15; x = Math.imul(x, 0x846ca68b); x ^= x >>> 16; return x >>> 0; }
-  function roundSeed(m, d, n, t){ var mi = m === 1 ? 0 : m === 2 ? 1 : 2; return mix32((((n * 256 + t) * 3 + d) * 3 + mi) >>> 0); }
+  var DEAL_N = 30, DEAL_PICK = [0.03, 0.4, 0.9];
+  function roundSeed(m, d, n, a, t){ var mi = m === 1 ? 0 : m === 2 ? 1 : 2; return mix32((((n * 4096 + (a % 136) * DEAL_N + t) * 3 + d) * 3 + mi) >>> 0); }
+  function nextTry(m, d, n){ var t; try { t = JSON.parse(lsGet('sol_rtry', '{}')) || {}; } catch(e){ t = {}; } var k = m + '_' + d, a = t[k] && t[k].n === n ? t[k].a + 1 : 0; t[k] = { n: n, a: a }; lsSet('sol_rtry', JSON.stringify(t)); return a; }
   function makeDeck(m, sd){
     var deck = [], id = 0, r = rngOf(sd);
     for (var d = 0; d < 8; d++){ var su = m === 1 ? 0 : m === 2 ? (d % 2) : (d % 4); for (var k = 1; k <= 13; k++) deck.push({ id: id++, s: su, r: k, up: false }); }
@@ -14374,22 +14377,77 @@ var SOL = (function(){
     var sc = 0; tops.forEach(function(a){ tops.forEach(function(b){ if (a !== b && a.r === b.r + 1) sc += a.s === b.s ? 2 : 1; }); });
     return sc;
   }
-  function easeScore(deck){ // độ "dễ": nước đi lúc mở đầu (x2) + nước đi trong mỗi lượt chia, trừ điểm K bị úp sâu
-    var sc = dealScore(deck) * 2;
-    for (var r = 0; r < 5; r++){ var row = deck.slice(54 + r * 10, 64 + r * 10);
-      row.forEach(function(a){ row.forEach(function(b){ if (a !== b && a.r === b.r + 1) sc += a.s === b.s ? 1 : 0.5; }); }); }
-    for (var k = 0; k < 54; k++){ if (k >= 50 || (k >= 44 && k % 10 >= 4)) continue; if (deck[k].r === 13) sc -= k < 20 ? 1 : 2; }
-    return sc;
-  }
-  function pickDeal(m, d, n){
-    var best = null, bestV = 0, maxTry = d === 0 ? 150 : 40;
-    for (var t = 0; t < maxTry; t++){
-      var sd = roundSeed(m, d, n, t), dk = makeDeck(m, sd);
-      if (d === 2 && dealScore(dk) < 1) continue;
-      var v = easeScore(dk) * (d === 2 ? -1 : 1);
-      if (!best || v > bestV){ best = dk; bestV = v; }
+  // ===== Bộ chơi thử (dán nguyên vào game) =====
+  // Chơi thử 1 ván bằng chiến lược tham lam có chấm điểm; trả về độ "dễ": thắng nhanh = rất dễ; thua → theo số dãy thu được + lá úp đã lật.
+  function simEase(deck, noise){
+    var nz = noise || null;
+    var C = [], S = [], i, k, n, done = 0, moves = 0, seen = {}, flips = 0;
+    for (k = 0; k < 10; k++) C.push([]);
+    for (k = 0; k < 54; k++) C[k % 10].push({ s: deck[k].s, r: deck[k].r, u: false });
+    for (k = 0; k < 10; k++) C[k][C[k].length - 1].u = true;
+    for (k = 54; k < 104; k++) S.push({ s: deck[k].s, r: deck[k].r, u: false });
+    function runStart(c){ var j = c.length - 1; if (j < 0 || !c[j].u) return -1; while (j > 0 && c[j - 1].u && c[j - 1].s === c[j].s && c[j - 1].r === c[j].r + 1) j--; return j; }
+    function collect(t){ var c = C[t], L = c.length; if (L < 13) return; var s = c[L - 1].s;
+      for (var q = 0; q < 13; q++){ var x = c[L - 1 - q]; if (!x.u || x.s !== s || x.r !== q + 1) return; }
+      c.splice(L - 13, 13); done++; if (c.length && !c[c.length - 1].u){ c[c.length - 1].u = true; flips++; } }
+    function sig(){ var o = ''; for (var a = 0; a < 10; a++){ var c = C[a]; for (var b = 0; b < c.length; b++) o += (c[b].u ? '' : '~') + c[b].s + '.' + c[b].r + ','; o += '|'; } return o + S.length; }
+    while (moves < 600){
+      var best = null, bs = -1e9;
+      for (var f = 0; f < 10; f++){
+        var src = C[f]; if (!src.length) continue;
+        var rs = runStart(src); if (rs < 0) continue;
+        // chỉ xét đi từ đầu dãy liền mạch hoặc các điểm trong dãy (tách dãy)
+        for (i = rs; i < src.length; i++){
+          var card = src[i], below = src[i - 1], len = src.length - i;
+          var reveal = !!(below && !below.u), empties = !below, linked = !!(below && below.u && below.s === card.s && below.r === card.r + 1);
+          for (var t = 0; t < 10; t++){
+            if (t === f) continue; var dst = C[t], top = dst[dst.length - 1], sc;
+            if (!top){ if (i === 0) continue; if (linked) continue; sc = 20 + (reveal ? 60 : 0); }
+            else {
+              if (top.r !== card.r + 1) continue;
+              var same = top.s === card.s;
+              if (linked && !same) continue;                       // không phá dãy cùng chất để nối khác chất
+              if (linked && same){ var rt = runStart(dst), newLen = dst.length - rt + len; if (newLen <= src.length - rs) continue; sc = 40 + newLen; } // chỉ chuyển nếu dãy dài hơn
+              else sc = (same ? 100 + (dst.length - runStart(dst) + len) * 4 : 50) + (reveal ? 80 : 0) + (empties ? 40 : 0);
+              if (same && dst.length - runStart(dst) + len >= 13) sc += 1000;
+            }
+            if (nz) sc += nz() * 30;                                // chơi thử nhiều lần: mỗi lần chọn nước hơi khác nhau
+            if (sc > bs){ best = [f, i, t]; bs = sc; }
+          }
+          if (!linked) break; // chỉ tách dãy tại chỗ nối (đã xét đầu dãy ở lượt i = rs)
+        }
+      }
+      var key = null;
+      if (best){ var mv = C[best[0]].splice(best[1]); C[best[2]] = C[best[2]].concat(mv); var sb = C[best[0]];
+        if (sb.length && !sb[sb.length - 1].u){ sb[sb.length - 1].u = true; flips++; }
+        collect(best[2]); moves++; key = sig(); if (seen[key]) best = null; else seen[key] = 1; }
+      if (done === 8) return 1000 - moves;                         // thắng: càng ít nước càng dễ
+      if (!best){
+        if (!S.length) break;
+        var emp = false; for (k = 0; k < 10; k++) if (!C[k].length) emp = true;
+        if (emp){ // lấp cột trống bằng lá ngửa ở cột có nhiều lá nhất (luật: không chia khi còn cột trống)
+          var donor = -1, dl = 1; for (k = 0; k < 10; k++){ var rr = runStart(C[k]); if (C[k].length > dl && rr > 0){ dl = C[k].length; donor = k; } }
+          if (donor < 0) break;
+          for (k = 0; k < 10; k++) if (!C[k].length){ var rs2 = runStart(C[donor]); if (rs2 <= 0) break; C[k] = C[donor].splice(rs2); if (C[donor].length && !C[donor][C[donor].length - 1].u){ C[donor][C[donor].length - 1].u = true; flips++; } }
+        }
+        for (k = 0; k < 10; k++){ if (!S.length) break; var cd = S.pop(); cd.u = true; C[k].push(cd); }
+        for (k = 0; k < 10; k++) collect(k);
+        moves++;
+      }
     }
-    return best || makeDeck(m, roundSeed(m, d, n, 0));
+    return done * 40 + flips;                                     // thua: dãy đã thu + lá úp đã lật
+  }
+  function pickDeal(m, d, n, at){
+    var c = [];
+    for (var j = 0; j < DEAL_N; j++){
+      var sd = roundSeed(m, d, n, at, j), dk = makeDeck(m, sd);
+      if (d === 2 && dealScore(dk) < 1) continue;
+      var e = 0; for (var q = 0; q < 3; q++) e += simEase(dk, rngOf(Math.imul(sd, 31) + q));
+      c.push({ sd: sd, dk: dk, e: e });
+    }
+    if (!c.length) return makeDeck(m, roundSeed(m, d, n, at, 0));
+    c.sort(function(x, y){ return y.e - x.e || x.sd - y.sd; });
+    return c[Math.min(c.length - 1, Math.floor(c.length * DEAL_PICK[d]))].dk;
   }
   function roundsGet(){ try { return JSON.parse(lsGet('sol_round', '{}')) || {}; } catch(e){ return {}; } }
   // 'sol_roundw' = vòng cao nhất đã THẮNG theo số chất + độ khó → thua / chơi lại thì vẫn đúng vòng đó, đúng ván đó.
@@ -14410,7 +14468,8 @@ var SOL = (function(){
     mode = suits || cfg.suits || 1; _autoRun = false; _zoomGrow = true;
     gdiff = keepDiff != null ? keepDiff : cfg.diff == null ? 1 : cfg.diff; round = nextRound(mode, gdiff);
     var rr = roundsGet(); rr[mode + '_' + gdiff] = round; lsSet('sol_round', JSON.stringify(rr));
-    var deck = pickDeal(mode, gdiff, round);
+    // Chơi lại: 2 lần đầu vẫn ra đúng ván cũ (cảm giác vượt vòng); chia lại tới lần thứ 3 mới đổi ván khác (cùng vòng, cùng độ khó)
+    var deck = pickDeal(mode, gdiff, round, Math.floor(nextTry(mode, gdiff, round) / 3));
     var st0 = stats(), k0 = statKey(mode, gdiff); st0[k0] = st0[k0] || { w: 0, b: 0 }; st0[k0].p = (st0[k0].p || 0) + 1; lsSet('sol_stat', JSON.stringify(st0));
     cols = []; for (var c = 0; c < 10; c++) cols.push([]);
     for (var k = 0; k < 54; k++) cols[k % 10].push(deck[k]);
