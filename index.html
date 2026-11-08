@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v3.1.6</title>
+<title>Mua Bán Mủ Cao Su v3.1.7</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -122,6 +122,7 @@ body.gmp-open{overflow:hidden}
 @keyframes solAutoP{50%{transform:translateX(-50%) scale(1.07)}}
 #sol-toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;padding:9px 14px;border-radius:14px;font-size:13px;font-weight:600;opacity:0;transition:opacity .25s;pointer-events:none;z-index:2000;width:max-content;max-width:88%;text-align:center}
 #sol-toast.show{opacity:1}
+#sol-overlay .sol-bot.five .sol-bb{min-width:0;flex:1;font-size:11.5px;white-space:nowrap}#sol-overlay .sol-bot.five .sol-bb span{width:44px;height:44px}
 /* màn ngang: ✕ + ⚙️ góc trên trái; trái 3 ô Điểm / Thời gian / Nước; phải 3 nút Ván mới / Gợi ý / Hoàn nguyên — cùng cỡ, thẳng hàng */
 .sol-side{display:none}
 #sol-overlay.sol-land .sol-top,#sol-overlay.sol-land .sol-bot{display:none}
@@ -647,7 +648,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.1.6 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.1.7 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2030,7 +2031,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.1.6</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.1.7</div>
       </div>
     </div>
 
@@ -2196,7 +2197,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.1.6</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.1.7</div>
       </div>
     </div>
 
@@ -6241,7 +6242,7 @@ var SB_NO_SYNC_KEYS = ['device_code','gd_token','gd_token_expiry','gd_folder_id'
   // hoặc tự đặt lại mật khẩu giao dịch về mặc định).
   'admin_override_applied_at','pw_reset_applied_at','registry_sync_debug','last_ext_info',
   'gmp_best','gmp_best_de','gmp_best_kho','gmp_sound','gmp_cfg', // kỷ lục + cài đặt game ẩn Giọt Mủ Phiêu Lưu: riêng từng máy
-  'sol_cfg','sol_save','sol_stat','sol_round']; // game ẩn Xếp Bài Nhện: cài đặt, ván đang chơi dở, thống kê, số vòng — riêng từng máy
+  'sol_cfg','sol_save','sol_stat','sol_round','sol_roundw']; // game ẩn Xếp Bài Nhện: cài đặt, ván đang chơi dở, thống kê, số vòng — riêng từng máy
 // Danh sách khoá THỰC SỰ sẽ đồng bộ mỗi lần: hợp của SB_DATA_KEYS (đảm bảo có giá trị mặc định hợp lý
 // nếu máy chưa từng có khoá đó) VÀ toàn bộ khoá đang thực sự tồn tại trong localStorage của app (trừ
 // danh sách chỉ-riêng-máy-này ở trên) — để không bỏ sót dữ liệu của các tính năng thêm sau này mà lỡ
@@ -14391,13 +14392,23 @@ var SOL = (function(){
     return best || makeDeck(m, roundSeed(m, d, n, 0));
   }
   function roundsGet(){ try { return JSON.parse(lsGet('sol_round', '{}')) || {}; } catch(e){ return {}; } }
-  function nextRound(m, d){ var r = roundsGet(); return (r[m + '_' + d] || 0) + 1; }
+  // 'sol_roundw' = vòng cao nhất đã THẮNG theo số chất + độ khó → thua / chơi lại thì vẫn đúng vòng đó, đúng ván đó.
+  // Lần đầu: lấy từ 'sol_round' (vòng đã chia gần nhất); ván đang lưu dở thuộc đúng mục đó thì vòng đó chưa thắng → trừ 1.
+  function roundsWon(){
+    var w; try { w = JSON.parse(lsGet('sol_roundw', 'null')); } catch(e){ w = null; }
+    if (!w){ w = {}; var r = roundsGet(), sv = null; try { sv = JSON.parse(lsGet('sol_save', 'null')); } catch(e){}
+      Object.keys(r).forEach(function(k){ var cur = sv && !sv.won && (sv.mode + '_' + (sv.diff == null ? 1 : sv.diff)) === k && sv.round === r[k]; w[k] = Math.max(0, r[k] - (cur ? 1 : 0)); });
+      lsSet('sol_roundw', JSON.stringify(w)); }
+    return w;
+  }
+  function markRoundWon(m, d, n){ var w = roundsWon(), k = m + '_' + d; if (n > (w[k] || 0)){ w[k] = n; lsSet('sol_roundw', JSON.stringify(w)); } }
+  function nextRound(m, d){ return (roundsWon()[m + '_' + d] || 0) + 1; }
   function statKey(m, d){ return 's' + m + (d === 1 ? '' : 'd' + d); } // khoá cũ 's1','s2','s4' = Trung bình (giữ số liệu cũ)
 
   // ── Trạng thái ván ──
-  function newGame(suits){
+  function newGame(suits, keepDiff){
     mode = suits || cfg.suits || 1; _autoRun = false; _zoomGrow = true;
-    gdiff = cfg.diff == null ? 1 : cfg.diff; round = nextRound(mode, gdiff);
+    gdiff = keepDiff != null ? keepDiff : cfg.diff == null ? 1 : cfg.diff; round = nextRound(mode, gdiff);
     var rr = roundsGet(); rr[mode + '_' + gdiff] = round; lsSet('sol_round', JSON.stringify(rr));
     var deck = pickDeal(mode, gdiff, round);
     var st0 = stats(), k0 = statKey(mode, gdiff); st0[k0] = st0[k0] || { w: 0, b: 0 }; st0[k0].p = (st0[k0].p || 0) + 1; lsSet('sol_stat', JSON.stringify(st0));
@@ -14405,7 +14416,7 @@ var SOL = (function(){
     for (var k = 0; k < 54; k++) cols[k % 10].push(deck[k]);
     cols.forEach(function(col){ col[col.length - 1].up = true; });
     stock = deck.slice(54); done = []; score = 500; moves = 0; elapsed = 0; startAt = 0; hist = []; won = false; hintI = 0;
-    buildEls(); render(true); save(); updStats();
+    buildEls(); render(true); save(); updStats(); updRetry();
     setTimeout(function(){ toastS('🎯 Vòng ' + round + ' · ' + mode + ' chất · ' + DIFF_N[gdiff]); }, 300);
   }
   function snap(){ return JSON.stringify({ cols: cols, stock: stock, done: done, score: score }); }
@@ -14511,14 +14522,23 @@ var SOL = (function(){
     setTimeout(autoStep, 320);
   }
   function autoStart(){ if (!canAuto() || busy()) return; _autoRun = true; _autoSeen = {}; updAuto(); sndHint(); setTimeout(autoStep, 400); }
+  // Hết nước đi: đã chia hết xấp, chưa thắng, không còn nước nào → thông báo nhanh (tự tắt) + nút Trang chủ, Chơi lại trên Gợi ý
+  function isStuck(){ return !!cols && !won && !stock.length && done.length < 8 && !canAuto() && !allHints().length; }
+  var _stuckT = 0;
+  function updRetry(){ var on = isStuck(); $('sol-bretry').style.display = $('sol-bhome').style.display = on ? '' : 'none'; var bt = ov && ov.querySelector('.sol-bot'); if (bt) bt.classList.toggle('five', on); }
+  function showStuck(){ updRetry(); toastS('😕 Hết nước đi — bấm Chơi lại hoặc Trang chủ'); sndBad(); }
+  function stuckCheck(){ if (!isOpen() || !isStuck()) return; if (busy()){ _stuckT = setTimeout(stuckCheck, 400); return; } showStuck(); }
+  function retry(){ clearTimeout(_stuckT); newGame(mode, gdiff); sndDeal(); } // chưa thắng → cùng vòng, cùng ván, cùng độ khó
   function after(){
     hintI = 0; render(); updStats(); updAuto();
+    updRetry(); clearTimeout(_stuckT); if (isStuck()) _stuckT = setTimeout(stuckCheck, busy() ? _busyUntil - Date.now() + 300 : 600);
     if (done.length === 8 && !won && !_winPending){ _winPending = true; setTimeout(function(){ _winPending = false; if (!won && done.length === 8) win(); }, busy() ? _busyUntil - Date.now() + 500 : 0); }
     save();
   }
   var _winPending = false;
   function win(){
-    won = true; stopClock();
+    won = true; stopClock(); updRetry();
+    if (round) markRoundWon(mode, gdiff, round); // thắng → lần sau sang vòng tiếp theo
     var st = stats(), k = statKey(mode, gdiff);
     st[k] = st[k] || { w: 0, b: 0 }; st[k].w++; var rec = score > st[k].b; if (rec) st[k].b = score;
     lsSet('sol_stat', JSON.stringify(st));
@@ -14600,7 +14620,7 @@ var SOL = (function(){
     var list = allHints();
     if (!list.length){
       if (stock.length){ toastS('Hết nước đi — chạm xấp bài góc phải để chia thêm'); var st = $('sol-stock'); if (st){ st.classList.remove('sol-hl'); void st.offsetWidth; st.classList.add('sol-hl'); } }
-      else toastS('Không còn nước đi nào — thử Hoàn nguyên hoặc Ván mới');
+      else { showStuck(); return; }
       sndBad(); return;
     }
     var h = list[hintI % list.length]; hintI++;
@@ -14692,10 +14712,10 @@ var SOL = (function(){
     if (l){
       $('sol-sideT').appendChild($('sol-x')); $('sol-sideT').appendChild($('sol-gear'));
       st3.forEach(function(e){ $('sol-sideL').appendChild(e); });
-      ['sol-bhint', 'sol-bundo', 'sol-bnew'].forEach(function(id){ $('sol-sideR').appendChild($(id)); });
+      ['sol-bhome', 'sol-bretry', 'sol-bhint', 'sol-bundo', 'sol-bnew'].forEach(function(id){ $('sol-sideR').appendChild($(id)); }); // khi hết nước: Trang chủ, Chơi lại trên Gợi ý
     } else {
       top.appendChild($('sol-x')); st3.forEach(function(e){ top.appendChild(e); }); top.appendChild($('sol-gear'));
-      ['sol-bnew', 'sol-bhint', 'sol-bundo'].forEach(function(id){ bot.appendChild($(id)); });
+      ['sol-bnew', 'sol-bhome', 'sol-bretry', 'sol-bhint', 'sol-bundo'].forEach(function(id){ bot.appendChild($(id)); });
     }
   }
   function zoomCw(base, lv){ return Math.max(34, Math.floor(base * Math.pow(0.88, lv))); }
@@ -14899,7 +14919,7 @@ var SOL = (function(){
     board.querySelectorAll('.sol-slot').forEach(function(e){ e.remove(); });
     board.insertAdjacentHTML('afterbegin', slots);
     if (load()){
-      buildEls(); render(true); updAuto();
+      buildEls(); render(true); updAuto(); updRetry();
       // Có ván đang chơi dở (đã đi ít nhất 1 nước) → hỏi chơi tiếp hay chơi ván mới; đồng hồ dừng tới khi chọn
       if (moves) showResume();
     }
@@ -14984,7 +15004,7 @@ var SOL = (function(){
     else if ((e.ctrlKey || e.metaKey) && e.key === 'z'){ e.preventDefault(); undo(); }
   });
   return { toggleLand: toggleLand, toggleBig: toggleBig, open: open, close: close, isOpen: isOpen, deal: deal, resumeChoice: resumeChoice, undo: undo, hint: hint, newGame: newGameAsk,
-           openSet: openSet, closeSet: closeSet, toggleSound: toggleSound, setSuits: setSuits, setDiff: setDiff, nextRound: nextRoundGo,
+           openSet: openSet, closeSet: closeSet, toggleSound: toggleSound, setSuits: setSuits, setDiff: setDiff, nextRound: nextRoundGo, retry: retry,
            _st: function(){ return { cols: cols, stock: stock, done: done, score: score, moves: moves }; }, _move: doMove, _hints: allHints, _best: bestTarget, auto: autoStart, _canAuto: canAuto, _after: after, _round: function(){ return { round: round, diff: gdiff }; }, _pick: pickDeal };
 })();
 
@@ -15243,6 +15263,8 @@ if ('serviceWorker' in navigator) {
   <div id="sol-board"><div id="sol-done"></div><div id="sol-stock" title="Chia thêm bài"></div></div>
   <div class="sol-bot">
     <button class="sol-bb" id="sol-bnew" onclick="SOL.newGame()"><span>🔄</span>Ván mới</button>
+    <button class="sol-bb" id="sol-bhome" style="display:none" onclick="SOL.close()"><span>🏠</span>Trang chủ</button>
+    <button class="sol-bb" id="sol-bretry" style="display:none" onclick="SOL.retry()"><span>🔁</span>Chơi lại</button>
     <button class="sol-bb" id="sol-bhint" onclick="SOL.hint()"><span>💡</span>Gợi ý</button>
     <button class="sol-bb" id="sol-bundo" onclick="SOL.undo()"><span><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#ff8a7a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span>Hoàn nguyên</button>
   </div>

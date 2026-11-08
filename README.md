@@ -18,6 +18,7 @@ Số phiên bản theo dạng **`Z.X.Y`**:
 
 | Phiên bản | Ngày | Thay đổi |
 |-----------|------|----------|
+| **v3.1.7** | 2026-11-08 | 🎴 Xếp Bài Nhện: (1) **Hết bài chia và hết nước đi** → thông báo nhanh (tự tắt) và hiện thêm 2 nút **🏠 Trang chủ** (về app) và **🔁 Chơi lại** phía trên nút Gợi ý (màn ngang); màn dọc nằm trên thanh dưới cạnh Gợi ý. (2) **Vòng chỉ tăng khi thắng**: thua hoặc chơi lại thì vẫn đúng vòng đó, đúng ván bài đó, cùng độ khó (trước đây chơi lại nhảy sang vòng kế tiếp). Lưu thêm khoá `sol_roundw` (trên máy, không đồng bộ). |
 | **v3.1.6** | 2026-11-08 | 🐛 Xếp Bài Nhện màn ngang: **sửa lỗi thu xong dãy K→A (cột đã gọn) mà lá không phóng to lại** (lỗi từ v3.1.5). Nay lúc chờ thu dãy vẫn giữ nguyên cỡ lá, rồi lá **to lại âm thầm ngay khi bắt đầu thu dãy**, cùng lúc với hiệu ứng. |
 | **v3.1.5** | 2026-11-07 | 🎴 Xếp Bài Nhện **màn hình ngang**: kéo bài làm đủ dãy K→A thì **giữ nguyên cỡ lá** — game nhận ra nước đi này sẽ thu dãy nên không thu nhỏ lá một nhịp rồi phóng lại như trước; dãy vẫn tự thu lên bên trái kèm hiệu ứng và +100 điểm. |
 | **v3.1.4** | 2026-11-07 | 🎴 Xếp Bài Nhện **màn hình ngang**: đổi thứ tự 3 nút bên phải thành **Gợi ý → Hoàn nguyên → Ván mới** (từ trên xuống; Ván mới nằm dưới cùng để tránh bấm nhầm khi đang chơi). Màn hình dọc giữ nguyên thứ tự cũ. |
