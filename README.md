@@ -18,6 +18,7 @@ Số phiên bản theo dạng **`Z.X.Y`**:
 
 | Phiên bản | Ngày | Thay đổi |
 |-----------|------|----------|
+| **v3.1.6** | 2026-11-08 | 🐛 Xếp Bài Nhện màn ngang: **sửa lỗi thu xong dãy K→A (cột đã gọn) mà lá không phóng to lại** (lỗi từ v3.1.5). Nay lúc chờ thu dãy vẫn giữ nguyên cỡ lá, rồi lá **to lại âm thầm ngay khi bắt đầu thu dãy**, cùng lúc với hiệu ứng. |
 | **v3.1.5** | 2026-11-07 | 🎴 Xếp Bài Nhện **màn hình ngang**: kéo bài làm đủ dãy K→A thì **giữ nguyên cỡ lá** — game nhận ra nước đi này sẽ thu dãy nên không thu nhỏ lá một nhịp rồi phóng lại như trước; dãy vẫn tự thu lên bên trái kèm hiệu ứng và +100 điểm. |
 | **v3.1.4** | 2026-11-07 | 🎴 Xếp Bài Nhện **màn hình ngang**: đổi thứ tự 3 nút bên phải thành **Gợi ý → Hoàn nguyên → Ván mới** (từ trên xuống; Ván mới nằm dưới cùng để tránh bấm nhầm khi đang chơi). Màn hình dọc giữ nguyên thứ tự cũ. |
 | **v3.1.3** | 2026-11-05 | 🔐 **Mật khẩu gia hạn hôm nay đổi tiền tố sang dạng 8 số** (vẫn = tiền tố + mã thiết bị 4 số + tháng ngày MMDD), dùng chung với game Xếp Bài Nhện bản APK và công cụ quản trị. Mã gia hạn 6 số (MG1) không đổi. |
