@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v3.2.6</title>
+<title>Mua Bán Mủ Cao Su v3.2.7</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -714,7 +714,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.2.6 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.2.7 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2190,7 +2190,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.2.6</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.2.7</div>
       </div>
     </div>
 
@@ -2362,7 +2362,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.2.6</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.2.7</div>
       </div>
     </div>
 
@@ -4784,7 +4784,10 @@ function vnListen(btn, onText){
   if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); // ẩn bàn phím
   var rec; try { rec = new SR(); } catch(e) { toast('⚠️ Không mở được micro'); return; }
   // Mặc định nghe tới khi bấm micro; bật "Tự điền khi nói xong" (Cài đặt) thì ngừng nói là tự kết thúc + tự điền
-  rec.lang = 'vi-VN'; rec.interimResults = true; rec.continuous = !getSetting('vnTuDong', false); rec.maxAlternatives = 1;
+  // (tự đếm 2 giây im lặng rồi mới kết thúc — để máy tự cắt thì hay mất số nói sau 1 nhịp ngập ngừng, VD "33 độ … 7")
+  var tuDong = getSetting('vnTuDong', false), lang = null;
+  var henKetThuc = function(ms){ clearTimeout(lang); lang = setTimeout(function(){ if (_vnRec === rec) { try { rec.stop(); } catch(e){} } }, ms); };
+  rec.lang = 'vi-VN'; rec.interimResults = true; rec.continuous = true; rec.maxAlternatives = 1;
   var finalTxt = '', interimTxt = '', loi = '';
   _vnHuy = false;
   rec.onresult = function(e){
@@ -4797,9 +4800,18 @@ function vnListen(btn, onText){
       var last = parts.length ? parts[parts.length-1] : null, tl = t.toLowerCase();
       if (last !== null && tl.indexOf(last.toLowerCase()) === 0) parts[parts.length-1] = t;
       else if (last !== null && last.toLowerCase().indexOf(tl) === 0) continue;
+      else if (last !== null) {
+        // đoạn mới lặp lại phần cuối đoạn trước ("… 33 độ" + "33 độ 7") → chỉ nối phần chưa có
+        var lw = last.split(' '), nw = t.split(' '), ov = 0;
+        for (var k = Math.min(lw.length, nw.length - 1); k >= 1; k--) {
+          if (lw.slice(lw.length - k).join(' ').toLowerCase() === nw.slice(0, k).join(' ').toLowerCase()) { ov = k; break; }
+        }
+        parts[parts.length-1] = last + ' ' + nw.slice(ov).join(' ');
+      }
       else parts.push(t);
     }
     var fin = parts.join(' '), interim = '';
+    if (tuDong) henKetThuc(2000);
     finalTxt = fin; interimTxt = interim;
     var t = document.getElementById('vn-pop-txt');
     if (t) { t.textContent = (fin + interim).trim() || '…'; t.classList.remove('hint'); }
@@ -4812,6 +4824,7 @@ function vnListen(btn, onText){
     loi = (e.error in m) ? m[e.error] : ('⚠️ Lỗi nhận giọng nói: ' + e.error);
   };
   rec.onend = function(){
+    clearTimeout(lang);
     _vnRec = null;
     if (btn) btn.classList.remove('rec');
     _vnPop(false);
@@ -4824,6 +4837,7 @@ function vnListen(btn, onText){
   _vnRec = rec;
   if (btn) btn.classList.add('rec');
   _vnPop(true);
+  if (tuDong) henKetThuc(8000); // không nói gì trong 8 giây → tự đóng
 }
 
 // ── Phân tích câu nói → {ten, kg, do, bi, gia, loai} ──
@@ -4940,9 +4954,18 @@ function vnAnGoiYTen(boxId){ var b = document.getElementById(boxId); if (b) { b.
 function vnParse(text, loaiHienTai){
   var r = { ten:'', tenNoi:'', kg:null, do:null, bi:null, gia:null, loai:null, raw:text };
   var s = String(text||'').toLowerCase()
+    .replace(/\s*[°º˚]\s*c?\b/g, ' độ ').replace(/\s*[°º˚]/g, ' độ ') // Google hay ghi "33°7", "33° 7" thay cho "33 độ 7"
     .replace(/(\d)([a-zà-ỹđ])/g, '$1 $2')            // "32kg" → "32 kg", "15.000đ" → "15.000 đ"
+    .replace(/([a-zà-ỹđ])(\d)/g, '$1 $2')            // "độ7" → "độ 7", "ký6" → "ký 6"
     .replace(/[?!;:"“”()]/g, ' ').replace(/,(?!\d)/g, ' ').replace(/\.(?!\d)/g, ' ');
   var t0 = s.split(/\s+/).filter(Boolean), raw = [];
+  // Android đôi khi nhắc lại đoạn vừa nói ("… 33 độ 33 độ 7"): bỏ cụm 2–4 từ lặp liền nhau ngay sau chính nó
+  for (var lp = 4; lp >= 2; lp--) {
+    for (var q0 = 0; q0 + 2 * lp <= t0.length; q0++) {
+      var c1 = t0.slice(q0, q0 + lp).join(' '), c2 = t0.slice(q0 + lp, q0 + 2 * lp).join(' ');
+      if (c1 === c2 && /\d|ký|kg|độ/.test(c1)) { t0.splice(q0 + lp, lp); q0--; }
+    }
+  }
   for (var q = 0; q < t0.length; q++) {
     var w0 = t0[q];
     if ((w0 === 'ki' || w0 === 'kí' || w0 === 'ký') && (t0[q+1] === 'lô' || t0[q+1] === 'lo')) { raw.push('kg'); q++; if (t0[q+1] === 'gam') q++; continue; }
