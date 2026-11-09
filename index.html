@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v3.2.0</title>
+<title>Mua Bán Mủ Cao Su v3.2.1</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -637,6 +637,49 @@ input[type=date]:focus{border-color:var(--gl)}
 /* Dải phân cách xám cũ không còn cần vì các khối thẻ đã tự tách: chỉ giữ khoảng cách */
 .tab-pane .sec-divider{height:0;background:none;border:none;margin:8px 0}
 .tab-pane .mm-card.tk .sec-title,.tab-pane .mm-card.tk .tk-grid{min-width:0}
+/* ── Micro nhập bằng giọng nói + Chế độ nhập liên tiếp (Thu Mua) ── */
+.vn-mic{flex:0 0 40px;width:40px;min-width:40px;border:1.5px solid var(--gd);border-radius:var(--rs);background:var(--gb);color:var(--gd);font-size:18px;line-height:1;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.vn-mic.rec{background:#dc2626;border-color:#dc2626;color:#fff;animation:vnPulse 1s ease-in-out infinite}
+@keyframes vnPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.55)}50%{box-shadow:0 0 0 7px rgba(220,38,38,0)}}
+.vn-bubble{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:4000;background:#111827;color:#fff;padding:9px 16px;border-radius:14px;font-size:13px;font-weight:600;max-width:90vw;width:max-content;text-align:center;line-height:1.45;box-shadow:0 6px 20px rgba(0,0,0,.3);display:none;pointer-events:none}
+.nlt-open{font-size:10px;line-height:1.25;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--gd),var(--gm));border-radius:6px;padding:1px 6px;text-transform:none;letter-spacing:0;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+#modal-nlt{z-index:900}
+.nlt-box{max-width:560px;height:100%;max-height:100%;border-radius:0;padding:0;display:flex;flex-direction:column;overflow:hidden;animation:none}
+.nlt-head{display:flex;align-items:center;gap:8px;padding:10px 12px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;flex:0 0 auto}
+.nlt-head .t{font-size:15px;font-weight:800;flex:1;min-width:0}
+.nlt-head .d{font-size:11px;opacity:.9;font-weight:600}
+.nlt-x{border:none;background:rgba(255,255,255,.18);color:#fff;width:34px;height:34px;border-radius:10px;font-size:16px;font-weight:800;cursor:pointer;flex:0 0 auto}
+.nlt-body{flex:1 1 auto;overflow-y:auto;padding:10px 12px 16px;-webkit-overflow-scrolling:touch}
+.nlt-loai{display:flex;gap:5px}
+.nlt-loai button{flex:1;padding:8px 2px;border:1.5px solid var(--g200);border-radius:var(--rs);background:var(--g50);font-family:'Be Vietnam Pro',sans-serif;font-size:12px;font-weight:700;color:var(--g600);cursor:pointer}
+.nlt-loai button.sel{background:var(--gd);border-color:var(--gd);color:#fff}
+.nlt-tabs{display:flex;gap:6px;margin:10px 0 6px}
+.nlt-tabs button{flex:1;padding:9px 4px;border:none;border-radius:10px;font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:800;cursor:pointer;background:var(--g50);color:var(--g600)}
+.nlt-tabs button.sel{background:#1d4ed8;color:#fff}
+.nlt-hint{font-size:11px;color:var(--g600);margin-bottom:8px;line-height:1.45}
+.nlt-sec{font-size:12px;font-weight:800;color:var(--gd);margin:8px 0 5px}
+.nlt-sec span{font-weight:500;color:var(--g400);font-size:10.5px}
+.nlt-chips{display:flex;flex-wrap:wrap;gap:5px;max-height:98px;overflow-y:auto;margin-bottom:8px}
+.nlt-chip{border:1.5px solid var(--gp);background:var(--gb);color:var(--gd);border-radius:16px;padding:5px 10px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;white-space:nowrap}
+.nlt-chip.du{border-color:#f59e0b;background:#fffbeb;color:#92400e}
+.nlt-chip.done{opacity:.42;text-decoration:line-through;border-color:var(--g200);background:var(--g50);color:var(--g600)}
+.nlt-entry{display:flex;gap:4px;align-items:stretch}
+.nlt-entry .fi{padding:9px 6px;font-size:15px;text-align:center}
+.nlt-entry #nlt-ten{text-align:left;padding-left:9px}
+.nlt-tt{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:7px 0 4px;font-size:12px;color:var(--g600)}
+.nlt-tt b{font-size:15px;color:var(--gd)}
+.nlt-add{width:100%;padding:11px;border:none;border-radius:var(--r);background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;font-family:'Be Vietnam Pro',sans-serif;font-size:14.5px;font-weight:800;cursor:pointer;margin-top:4px}
+.nlt-tbl{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+.nlt-tbl th{background:var(--g50);color:var(--g600);font-size:10.5px;font-weight:700;padding:5px 3px;text-align:center}
+.nlt-tbl td{border-bottom:1px solid var(--g100);padding:3px 2px;text-align:center;vertical-align:middle}
+.nlt-tbl input{width:100%;box-sizing:border-box;border:1px solid transparent;border-radius:6px;background:transparent;padding:6px 3px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;color:var(--g800);text-align:center;outline:none}
+.nlt-tbl input:focus{border-color:var(--gp);background:#fff}
+.nlt-tbl input.err{border-color:#dc2626;background:#fef2f2}
+.nlt-tbl td.ten input{text-align:left}
+.nlt-del{border:none;background:#fee2e2;color:#dc2626;border-radius:7px;width:28px;height:28px;font-size:12px;font-weight:800;cursor:pointer}
+.nlt-foot{flex:0 0 auto;padding:9px 12px calc(9px + env(safe-area-inset-bottom));border-top:1px solid var(--g100);background:#fff;display:none}
+.nlt-foot .sum{display:flex;justify-content:space-between;font-size:12px;color:var(--g600);margin-bottom:7px}
+.nlt-foot .sum b{color:var(--gd);font-size:14px}
 </style>
 </head>
 <body>
@@ -650,7 +693,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.2.0 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.2.1 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -671,6 +714,53 @@ input[type=date]:focus{border-color:var(--gl)}
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="vn-bubble" id="vn-bubble"></div>
+
+<!-- CHẾ ĐỘ NHẬP LIÊN TIẾP (Thu Mua) — màn riêng, không thay đổi form nhập thường -->
+<div class="modal" id="modal-nlt">
+  <div class="modal-box nlt-box">
+    <div class="nlt-head">
+      <div class="t">⚡ Nhập liên tiếp · Thu Mua<div class="d" id="nlt-date"></div></div>
+      <button class="nlt-x" onclick="closeNLT()">✕</button>
+    </div>
+    <div class="nlt-body" id="nlt-body">
+      <div class="nlt-loai" id="nlt-loai">
+        <button onclick="nltChonLoai('nuoc')" data-l="nuoc">💧 Nước</button>
+        <button onclick="nltChonLoai('chen')" data-l="chen">🥣 Chén</button>
+        <button onclick="nltChonLoai('day')" data-l="day">🪢 Dây</button>
+        <button onclick="nltChonLoai('dong')" data-l="dong">🧱 Đông</button>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;margin-top:6px">
+        <label class="fl" style="margin:0;white-space:nowrap" id="nlt-gia-lbl">Đơn giá</label>
+        <input type="text" inputmode="numeric" id="nlt-gia" class="fi" placeholder="Giá chung cho cả lượt" oninput="nltOnGia(this)" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('nlt-ten').focus();}">
+      </div>
+      <div class="nlt-tabs">
+        <button id="nlt-tab-nhanh" onclick="nltSetMode('nhanh')">⚡ Lưu từng người</button>
+        <button id="nlt-tab-bang" onclick="nltSetMode('bang')">📋 Bảng nhập</button>
+      </div>
+      <div class="nlt-hint" id="nlt-hint"></div>
+      <div class="nlt-sec">👥 Khách hôm nay <span>— chạm tên để chọn, khách đã nhập tự mờ đi</span></div>
+      <div class="nlt-chips" id="nlt-chips"></div>
+      <div class="nlt-entry">
+        <div style="flex:1 1 auto;min-width:0;position:relative">
+          <input type="search" id="nlt-ten" class="fi" placeholder="Tên" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="q" oninput="nltOnTen()" onkeydown="nltKey(event,'ten')" onblur="setTimeout(function(){document.getElementById('nlt-ac').style.display='none'},200)">
+          <div class="ac-list" id="nlt-ac"></div>
+        </div>
+        <input type="text" inputmode="decimal" id="nlt-kg" class="fi" placeholder="Kg" style="flex:0 0 64px;width:64px" oninput="nltCalc()" onkeydown="nltKey(event,'kg')">
+        <input type="text" inputmode="decimal" id="nlt-do" class="fi" placeholder="Độ" style="flex:0 0 50px;width:50px" oninput="nltCalc()" onkeydown="nltKey(event,'do')">
+        <input type="text" inputmode="decimal" id="nlt-bi" class="fi" placeholder="Bì" style="flex:0 0 48px;width:48px" oninput="nltCalc()" onkeydown="nltKey(event,'bi')">
+        <button type="button" class="vn-mic" id="nlt-mic" onclick="vnMicNLT()" title="Nói: tên, số ký, độ">🎤</button>
+      </div>
+      <div class="nlt-tt"><span id="nlt-tt-info">Thành tiền</span><b id="nlt-tt">0 ₫</b></div>
+      <button class="nlt-add" id="nlt-add" onclick="nltCommit()">✅ Lưu</button>
+      <div id="nlt-list"></div>
+    </div>
+    <div class="nlt-foot" id="nlt-foot">
+      <div class="sum"><span id="nlt-foot-info"></span><b id="nlt-foot-tt"></b></div>
+      <button class="nlt-add" style="margin:0;background:linear-gradient(135deg,#1d4ed8,#2563eb)" onclick="nltLuuTatCa()">💾 Lưu tất cả</button>
+    </div>
+  </div>
+</div>
 
 <!-- ===== TAB MUA ===== -->
 <div class="tab-pane active" id="tab-mua">
@@ -687,7 +777,7 @@ input[type=date]:focus{border-color:var(--gl)}
     <div id="mua-form-wrap">
       <div class="g2" style="align-items:end">
         <div class="fr">
-          <label class="fl">Loại mủ</label>
+          <label class="fl" style="display:flex;align-items:center;justify-content:space-between;gap:4px;white-space:nowrap">Loại mủ <span class="nlt-open" onclick="event.preventDefault();openNLT()" title="Nhập nhiều khách liên tiếp">⚡ Liên tiếp</span></label>
           <div class="loai-wrap">
             <button class="loai-btn" id="mua-loai-btn" onclick="toggleLoai('mua')">
               <span id="mua-loai-txt">-- Chọn --</span><span class="loai-arrow" id="mua-loai-arr">▼</span>
@@ -702,7 +792,10 @@ input[type=date]:focus{border-color:var(--gl)}
         </div>
         <div class="fr">
           <label class="fl">Đơn giá (đ/kg)</label>
-          <input type="text" inputmode="numeric" id="mua-gia" class="fi" placeholder="0" oninput="onGia(this,'mua')" onkeydown="nf(event,'mua-ten')" onfocus="showGiaSuggest('mua')" onblur="hideGiaSuggest('mua')">
+          <div style="display:flex;gap:5px">
+            <input type="text" inputmode="numeric" id="mua-gia" class="fi" placeholder="0" style="flex:1 1 auto;min-width:0;width:auto" oninput="onGia(this,'mua')" onkeydown="nf(event,'mua-ten')" onfocus="showGiaSuggest('mua')" onblur="hideGiaSuggest('mua')">
+            <button type="button" class="vn-mic" id="mua-mic" onclick="vnMicMain()" title="Nhập bằng giọng nói: tên, số ký, độ">🎤</button>
+          </div>
           <div id="mua-gia-suggest" style="display:none;flex-wrap:wrap;gap:5px;margin-top:5px"></div>
         </div>
       </div>
@@ -2049,7 +2142,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.2.0</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.2.1</div>
       </div>
     </div>
 
@@ -2062,7 +2155,11 @@ input[type=date]:focus{border-color:var(--gl)}
         • <b>Mủ nước</b>: nhập thêm độ (VD: 0.35) → tự tính thành tiền<br>
         • <b>Mủ đông</b>: nhập khấu hao bì (kg) → tự trừ vào kg thực<br>
         • <b>Nhấp đúp</b> vào giao dịch để chỉnh sửa hoặc xoá<br>
-        • Tích ✅ "Gửi sổ" khi lưu để tự động đưa vào tab Sổ Gửi
+        • Tích ✅ "Gửi sổ" khi lưu để tự động đưa vào tab Sổ Gửi<br>
+        • <b>🎤 Nhập bằng giọng nói</b> (nút micro cạnh ô Đơn giá): bấm micro rồi nói, VD <i>"Ba Tư 32 ký 35 độ"</i>, <i>"chú Hai 40 ký rưỡi bì 2"</i>, <i>"mủ chén giá 15 nghìn"</i>, <i>"mủ nước giá 320"</i> → app tự điền tên (khớp với khách đã có), số ký, độ, bì, giá; xem lại rồi bấm Lưu. Cần mạng và cho phép dùng micro<br>
+        • <b>⚡ Liên tiếp</b> (nút cạnh chữ "Loại mủ"): màn nhập nhiều khách liền nhau — chọn loại mủ + giá 1 lần, bấm tên khách ở hàng <i>Khách hôm nay</i> (khách đã nhập tự mờ đi) hoặc gõ/nói tên, rồi:<br>
+        &nbsp;&nbsp;– <i>Lưu từng người</i>: Tên → Kg → Độ → Bì, Enter ở ô cuối là lưu ngay, quay lại ô Tên cho người kế tiếp; danh sách vừa lưu có nút ✕ để xoá nếu nhập nhầm<br>
+        &nbsp;&nbsp;– <i>Bảng nhập</i>: mỗi người 1 dòng, sửa ngay trên bảng, xong bấm <b>💾 Lưu tất cả</b> (bảng nhập dở được giữ lại trên máy nếu lỡ đóng)
       </div>
     </div>
 
@@ -2217,7 +2314,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.2.0</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.2.1</div>
       </div>
     </div>
 
@@ -4603,6 +4700,561 @@ function luuGD(tab){
   });
 }
 
+// ═══════════════════════════════════════════════════════
+// NHẬP BẰNG GIỌNG NÓI (Web Speech API, tiếng Việt) — dùng cho form Thu Mua (micro cạnh ô Đơn giá)
+// và màn "⚡ Nhập liên tiếp". Câu nói kiểu: "Ba Tư 32 ký 35 độ", "chú Hai 40 ký rưỡi bì 2",
+// "mủ nước giá 15 nghìn". Tên được đối chiếu với danh sách khách đã có (không phân biệt dấu) để lấy
+// đúng tên đang lưu. Cần mạng (Chrome gửi âm thanh tới dịch vụ nhận giọng nói của Google).
+// ═══════════════════════════════════════════════════════
+var _vnRec = null, _vnBubbleTimer = null;
+function _vnBoDau(s){ return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase(); }
+function _vnBubble(msg, ms){
+  var b = document.getElementById('vn-bubble'); if (!b) return;
+  clearTimeout(_vnBubbleTimer);
+  if (!msg) { b.style.display = 'none'; return; }
+  b.textContent = msg; b.style.display = 'block';
+  if (ms) _vnBubbleTimer = setTimeout(function(){ b.style.display = 'none'; }, ms);
+}
+function vnSupported(){ return !!(window.SpeechRecognition || window.webkitSpeechRecognition); }
+function vnListen(btn, onText){
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { toast('⚠️ Máy/trình duyệt này chưa hỗ trợ nhập bằng giọng nói (hãy mở bằng Chrome)'); return; }
+  if (_vnRec) { try { _vnRec.stop(); } catch(e){} return; } // bấm lần nữa = nói xong
+  if (!navigator.onLine) { toast('📶 Nhập bằng giọng nói cần có mạng'); return; }
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); // ẩn bàn phím
+  var rec; try { rec = new SR(); } catch(e) { toast('⚠️ Không mở được micro'); return; }
+  rec.lang = 'vi-VN'; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
+  var finalTxt = '', loi = '';
+  rec.onresult = function(e){
+    var interim = '';
+    for (var i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) finalTxt += e.results[i][0].transcript + ' ';
+      else interim += e.results[i][0].transcript;
+    }
+    _vnBubble('🎤 ' + (finalTxt + interim).trim());
+  };
+  rec.onerror = function(e){
+    var m = { 'not-allowed':'🎤 Chưa cho phép dùng micro — vào cài đặt quyền của Chrome/app và bật Micro',
+      'service-not-allowed':'🎤 Chưa cho phép dùng micro — vào cài đặt quyền của Chrome/app và bật Micro',
+      'no-speech':'🎤 Không nghe thấy gì, bấm micro và nói lại', 'audio-capture':'🎤 Không tìm thấy micro trên máy',
+      'network':'📶 Cần có mạng để nhận giọng nói', 'aborted':'' };
+    loi = (e.error in m) ? m[e.error] : ('⚠️ Lỗi nhận giọng nói: ' + e.error);
+  };
+  rec.onend = function(){
+    _vnRec = null;
+    if (btn) btn.classList.remove('rec');
+    var t = finalTxt.trim();
+    if (t) { _vnBubble('🎤 "' + t + '"', 3500); try { onText(t); } catch(err){ toast('⚠️ Không hiểu câu nói, thử lại'); } }
+    else { _vnBubble(''); if (loi) toast(loi); }
+  };
+  try { rec.start(); } catch(e) { toast('⚠️ Không mở được micro'); return; }
+  _vnRec = rec;
+  if (btn) btn.classList.add('rec');
+  _vnBubble('🎤 Đang nghe… nói: tên, số ký, độ (bấm micro lần nữa khi nói xong)');
+}
+
+// ── Phân tích câu nói → {ten, kg, do, bi, gia, loai} ──
+var _VN_SO = { 'không':0,'một':1,'mốt':1,'hai':2,'ba':3,'bốn':4,'tư':4,'năm':5,'lăm':5,'nhăm':5,'sáu':6,'bảy':7,'bẩy':7,'tám':8,'chín':9 };
+var _VN_SO_KHAC = ['mười','mươi','trăm','nghìn','ngàn','triệu','linh','lẻ','rưỡi','phẩy','chấm'];
+var _VN_KG = ['ký','kí','kg','kilo','kilôgam','kilogam','ki-lô','kílô','kílo'];
+var _VN_LOAI = { 'nước':'nuoc','chén':'chen','dây':'day','đông':'dong' };
+function _vnLaSoChu(w){ return (w in _VN_SO) || _VN_SO_KHAC.indexOf(w) >= 0; }
+function _vnSoTuChuSo(s){ // "32,5" → 32.5 · "15.000" → 15000 · "32.5" → 32.5
+  s = String(s);
+  if (/^\d{1,3}(\.\d{3})+$/.test(s)) return parseFloat(s.replace(/\./g,''));
+  return parseFloat(s.replace(',', '.'));
+}
+// Đọc 1 cụm số (chữ số và/hoặc số đọc bằng chữ) → giá trị
+function _vnDocCumSo(toks){
+  var acc = 0, grp = 0, unit = null, prevDigitWord = false, lastMul = 1, dec = null;
+  for (var i = 0; i < toks.length; i++) {
+    var w = toks[i];
+    if (dec !== null) { // phần thập phân sau "phẩy"
+      if (w in _VN_SO) dec += String(_VN_SO[w]); else if (/^\d+$/.test(w)) dec += w;
+      continue;
+    }
+    if (/^\d/.test(w)) { unit = (unit || 0) + _vnSoTuChuSo(w); prevDigitWord = false; continue; }
+    if (w in _VN_SO) {
+      var d = _VN_SO[w];
+      if (unit !== null && prevDigitWord) { grp += unit * 10; unit = d; } // "ba hai" = 32
+      else unit = d;
+      prevDigitWord = true; continue;
+    }
+    prevDigitWord = false;
+    if (w === 'mười' || w === 'mươi') { grp += (unit === null ? 1 : unit) * 10; unit = null; lastMul = 10; }
+    else if (w === 'trăm') { grp += (unit === null ? 1 : unit) * 100; unit = null; lastMul = 100; }
+    else if (w === 'nghìn' || w === 'ngàn') { acc += (grp + (unit || 0) || 1) * 1000; grp = 0; unit = null; lastMul = 1000; }
+    else if (w === 'triệu') { acc += (grp + (unit || 0) || 1) * 1e6; grp = 0; unit = null; lastMul = 1e6; }
+    else if (w === 'rưỡi') { if (lastMul >= 1000) acc += lastMul / 2; else if (lastMul === 100) grp += 50; else grp += 0.5; }
+    else if (w === 'phẩy' || w === 'chấm') { dec = ''; }
+  }
+  var v = acc + grp + (unit || 0);
+  if (dec) v = parseFloat(String(Math.floor(v)) + '.' + dec);
+  return v;
+}
+function _vnDsKhach(){
+  var m = {}, out = [];
+  try { getKHAll().concat(getKH('mua')).forEach(function(n){ var k = normTen(n); if (n && !m[k]) { m[k] = 1; out.push(n); } }); } catch(e){}
+  return out;
+}
+function _vnLev(a, b){
+  var m = a.length, n = b.length; if (!m) return n; if (!n) return m;
+  var p = [], c, i, j; for (j = 0; j <= n; j++) p[j] = j;
+  for (i = 1; i <= m; i++) { c = [i]; for (j = 1; j <= n; j++) c[j] = Math.min(p[j] + 1, c[j-1] + 1, p[j-1] + (a[i-1] === b[j-1] ? 0 : 1)); p = c; }
+  return p[n];
+}
+// Tìm tên khách đã lưu khớp nhất với tên vừa nói (không phân biệt dấu/hoa thường)
+function _vnKhopTen(noi){
+  var k = _vnBoDau(noi).replace(/\s+/g,' ').trim(); if (!k) return '';
+  var ds = _vnDsKhach(), best = null, bestD = 99;
+  for (var i = 0; i < ds.length; i++) { if (_vnBoDau(ds[i]).replace(/\s+/g,' ').trim() === k) return ds[i]; }
+  var chua = ds.filter(function(n){ var x = _vnBoDau(n); return x.indexOf(k) >= 0; });
+  if (chua.length === 1) return chua[0];
+  ds.forEach(function(n){ var d = _vnLev(_vnBoDau(n), k); if (d < bestD) { bestD = d; best = n; } });
+  if (best && bestD <= Math.max(1, Math.floor(k.length / 4))) return best;
+  return noi.replace(/\s+/g,' ').trim().replace(/(^|\s)(\S)/g, function(_, a, b){ return a + b.toUpperCase(); });
+}
+function vnParse(text, loaiHienTai){
+  var r = { ten:'', kg:null, do:null, bi:null, gia:null, loai:null, raw:text };
+  var s = String(text||'').toLowerCase()
+    .replace(/(\d)([a-zà-ỹđ])/g, '$1 $2')            // "32kg" → "32 kg", "15.000đ" → "15.000 đ"
+    .replace(/[?!;:"“”()]/g, ' ').replace(/,(?!\d)/g, ' ').replace(/\.(?!\d)/g, ' ');
+  var t0 = s.split(/\s+/).filter(Boolean), raw = [];
+  for (var q = 0; q < t0.length; q++) {
+    var w0 = t0[q];
+    if ((w0 === 'ki' || w0 === 'kí' || w0 === 'ký') && (t0[q+1] === 'lô' || t0[q+1] === 'lo')) { raw.push('kg'); q++; if (t0[q+1] === 'gam') q++; continue; }
+    if (w0 === 'trừ' && t0[q+1] === 'bì') continue;
+    if (w0 === 'mủ' && (t0[q+1] in _VN_LOAI)) continue;
+    if (w0 === 'đ') w0 = 'đồng';
+    raw.push(w0);
+  }
+  // 1) Tên: ưu tiên phần đầu câu trùng với 1 khách đã lưu (dài nhất); nếu không, lấy các từ trước
+  //    con số / từ khoá đầu tiên
+  var batDau = 0;
+  if (raw[0] === 'tên' || raw[0] === 'khách') { batDau = 1; if (raw[1] === 'hàng') batDau = 2; }
+  while (raw[batDau] in _VN_LOAI) { if (!r.loai) r.loai = _VN_LOAI[raw[batDau]]; batDau++; } // "mủ chén chú Hai 50 ký"
+  if (raw[batDau] === 'tên' || raw[batDau] === 'khách') batDau++;
+  var ds = _vnDsKhach().map(function(n){ return { n:n, k:_vnBoDau(n).replace(/\s+/g,' ').trim() }; });
+  var hetTen = -1, tenKhop = '';
+  for (var j = raw.length; j > batDau; j--) {
+    var cum = _vnBoDau(raw.slice(batDau, j).join(' '));
+    var f = ds.filter(function(x){ return x.k === cum; })[0];
+    if (f) { hetTen = j; tenKhop = f.n; break; }
+  }
+  var laTuKhoa = function(w){ return /^\d/.test(w) || _VN_KG.indexOf(w) >= 0 || w === 'độ' || w === 'bì' || w === 'giá' || w === 'đồng' || (w in _VN_LOAI); };
+  if (hetTen < 0) {
+    hetTen = batDau;
+    while (hetTen < raw.length && !laTuKhoa(raw[hetTen])) hetTen++;
+    // tên đọc toàn chữ số kiểu "Ba Tư" mà sau đó không còn gì → vẫn là tên
+    if (hetTen > batDau) tenKhop = _vnKhopTen(raw.slice(batDau, hetTen).join(' '));
+  }
+  r.ten = tenKhop;
+  // 2) Phần còn lại: gom cụm số, gắn nhãn theo từ khoá đứng trước/sau
+  var rest = raw.slice(hetTen), items = [], i = 0;
+  while (i < rest.length) {
+    var w = rest[i];
+    if (/^\d/.test(w) || (w in _VN_SO) || w === 'mười' || ((w === 'phẩy' || w === 'chấm') && items.length && items[items.length-1].t === 'n')) {
+      var cumSo = [w]; i++;
+      while (i < rest.length) {
+        var x = rest[i];
+        if (/^\d/.test(x)) { if (['phẩy','chấm','nghìn','ngàn','trăm','lẻ','linh','mươi','mười','triệu'].indexOf(cumSo[cumSo.length-1]) >= 0) { cumSo.push(x); i++; continue; } break; }
+        if (_vnLaSoChu(x)) {
+          // chữ số đọc bằng chữ ngay sau 1 chữ số viết bằng số → là số khác ("32 ba lăm"), không gộp
+          if ((x in _VN_SO) && /^\d/.test(cumSo[cumSo.length-1])) break;
+          cumSo.push(x); i++; continue;
+        }
+        break;
+      }
+      items.push({ t:'n', v:_vnDocCumSo(cumSo), tien: cumSo.indexOf('nghìn') >= 0 || cumSo.indexOf('ngàn') >= 0 || cumSo.indexOf('triệu') >= 0 });
+      continue;
+    }
+    if (_VN_KG.indexOf(w) >= 0) items.push({ t:'kg' });
+    else if (w === 'độ') items.push({ t:'do' });
+    else if (w === 'bì') items.push({ t:'bi' });
+    else if (w === 'giá') items.push({ t:'gia' });
+    else if (w === 'đồng' || w === 'k' || w === 'nghìn' || w === 'ngàn') items.push({ t:'dong' });
+    else if (w === 'rưỡi') items.push({ t:'ruoi' });
+    else if (w in _VN_LOAI) { if (!r.loai) r.loai = _VN_LOAI[w]; }
+    i++;
+  }
+  var dung = items.map(function(){ return false; });
+  // Giá nói tắt "giá 15" = 15.000đ/kg — trừ mủ nước (giá tính theo kg·độ, VD 320đ nên giữ nguyên)
+  function ganTien(v, laNghin){ if (v < 1000 && laNghin !== false && (r.loai || loaiHienTai) !== 'nuoc') v = v * 1000; r.gia = Math.round(v); }
+  // a) Từ khoá đứng TRƯỚC con số: "bì 2", "giá 15 nghìn", "độ 35"
+  for (var a = 0; a < items.length - 1; a++) {
+    var it = items[a], nx = items[a+1];
+    if (nx.t !== 'n' || dung[a+1]) continue;
+    if (it.t === 'bi' && r.bi === null) { r.bi = nx.v; dung[a+1] = true; if (items[a+2] && items[a+2].t === 'kg') dung[a+2] = true; }
+    else if (it.t === 'gia' && r.gia === null) { ganTien(nx.v, !nx.tien); dung[a+1] = true; }
+    else if (it.t === 'do' && r.do === null && !(a > 0 && items[a-1].t === 'n' && !dung[a-1])) { r.do = nx.v; dung[a+1] = true; }
+  }
+  // b) Con số có đơn vị đứng SAU: "32 ký (rưỡi)", "35 độ", "15 nghìn/đồng", "2 ký bì"
+  for (var b = 0; b < items.length; b++) {
+    if (items[b].t !== 'n' || dung[b]) continue;
+    var sau = items[b+1] ? items[b+1].t : '';
+    var v = items[b].v;
+    if (items[b].tien && r.gia === null) { r.gia = Math.round(v); dung[b] = true; }
+    else if (sau === 'kg') {
+      if (items[b+2] && items[b+2].t === 'ruoi') v += 0.5;
+      if (items[b+2] && items[b+2].t === 'bi' && r.bi === null) r.bi = v;
+      else if (r.kg === null) r.kg = v;
+      dung[b] = true;
+    }
+    else if (sau === 'do' && r.do === null) { r.do = v; dung[b] = true; }
+    else if (sau === 'dong' && r.gia === null) { ganTien(v); dung[b] = true; }
+    else if (sau === 'bi' && r.bi === null) { r.bi = v; dung[b] = true; }
+  }
+  // c) Số không có đơn vị: lần lượt là kg → độ → bì
+  items.forEach(function(it, k){
+    if (it.t !== 'n' || dung[k]) return;
+    if (r.kg === null) r.kg = it.v;
+    else if (r.do === null) r.do = it.v;
+    else if (r.bi === null) r.bi = it.v;
+  });
+  return r;
+}
+function _vnTomTat(r){
+  var p = [];
+  if (r.loai) p.push(LOAI_ICO[r.loai] + ' ' + LOAI_LBL[r.loai]);
+  if (r.ten) p.push('👤 ' + r.ten);
+  if (r.kg !== null) p.push(fmtKg(r.kg) + ' kg');
+  if (r.do !== null) p.push(fmtDo(r.do) + ' độ');
+  if (r.bi !== null) p.push('bì ' + fmtKg(r.bi));
+  if (r.gia !== null) p.push('giá ' + fmtNum(r.gia));
+  return p.join(' · ');
+}
+// Micro trên form Thu Mua thường: điền vào các ô, KHÔNG tự lưu (người dùng xem lại rồi bấm Lưu)
+function vnMicMain(){
+  if (guardLicense()) return;
+  vnListen(document.getElementById('mua-mic'), function(txt){
+    var r = vnParse(txt, getLoai('mua'));
+    if (!r.ten && r.kg === null && r.do === null && r.gia === null && !r.loai) { toast('⚠️ Không nhận ra tên/số ký — nói lại, VD: "Ba Tư 32 ký 35 độ"'); return; }
+    if (r.loai && r.loai !== getLoai('mua')) chonLoai('mua', r.loai);
+    var loai = getLoai('mua');
+    if (r.gia !== null) { var g = document.getElementById('mua-gia'); g.value = parseInt(r.gia).toLocaleString('vi-VN'); onGia(g, 'mua'); hideGiaSuggest('mua'); }
+    if (r.ten) { document.getElementById('mua-ten').value = r.ten; document.getElementById('mua-ac').style.display = 'none'; updateKhInfoTicker('mua'); updPhanSuggest(); }
+    if (r.kg !== null) document.getElementById('mua-kg').value = fmtKg(r.kg);
+    if (r.do !== null && loai === 'nuoc') document.getElementById('mua-do').value = fmtDo(r.do);
+    if (r.bi !== null) document.getElementById('mua-bi-inline-inp').value = fmtKg(r.bi);
+    calc('mua');
+    toast('🎤 ' + _vnTomTat(r));
+    setTimeout(function(){
+      var thieu = !loai ? null : !getGiaVal('mua') ? 'mua-gia' : !document.getElementById('mua-ten').value.trim() ? 'mua-ten'
+        : !document.getElementById('mua-kg').value ? 'mua-kg' : (loai === 'nuoc' && !document.getElementById('mua-do').value) ? 'mua-do' : null;
+      if (thieu) document.getElementById(thieu).focus();
+    }, 250);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// ⚡ NHẬP LIÊN TIẾP (Thu Mua) — màn riêng để nhập nhiều khách liền nhau, không đổi form nhập thường.
+// Loại mủ + đơn giá chọn 1 lần cho cả lượt. 2 chế độ:
+//  • "Lưu từng người": Tên → Kg → Độ → Bì, Enter ở ô cuối (hoặc nút ✅) là lưu ngay, quay về ô Tên.
+//  • "Bảng nhập": mỗi người 1 dòng (sửa được ngay trên bảng), xong bấm "Lưu tất cả". Bảng nhập dở được
+//    giữ trên máy (khoá nlt_draft, không đồng bộ) nên lỡ đóng app vẫn còn.
+// Hàng nút "Khách hôm nay": khách dự kiến bán hôm nay (theo Gợi Ý Người Bán) + khách bán thường xuyên
+// 30 ngày qua; khách đã nhập trong ngày / đã có trong bảng tự mờ đi.
+// Giao dịch tạo ra giống hệt giao dịch lưu từ form thường (cùng cách tính tiền, làm tròn, lưu giá,
+// thêm khách, đồng bộ).
+// ═══════════════════════════════════════════════════════
+var _nlt = { loai:null, gia:0, saved:[], chips:[] };
+function _nltMode(){ return MCS_LS.getItem('nlt_mode') === 'bang' ? 'bang' : 'nhanh'; }
+function _nltDraft(){ try { var d = JSON.parse(MCS_LS.getItem('nlt_draft') || '[]'); return Array.isArray(d) ? d : []; } catch(e){ return []; } }
+function _nltSetDraft(d){ if (d.length) MCS_LS.setItem('nlt_draft', JSON.stringify(d)); else MCS_LS.removeItem('nlt_draft'); }
+function _nltNum(v){ v = String(v == null ? '' : v).trim().replace(',', '.'); var n = parseFloat(v); return isNaN(n) ? 0 : n; }
+function _nltTien(loai, kg, gia, doV, bi){
+  var tt = tinhTien(loai, kg, gia, doV, bi);
+  if (getSetting && getSetting('round', true)) { var r3 = Math.round(tt) % 1000; tt = r3 >= 500 ? Math.round(tt) - r3 + 1000 : Math.round(tt) - r3; }
+  return tt;
+}
+function openNLT(){
+  if (guardLicense()) return;
+  _nlt.loai = getLoai('mua') || null;
+  _nlt.gia = getGiaVal('mua') || (_nlt.loai ? (parseFloat(getGia('mua')[_nlt.loai]) || 0) : 0);
+  _nlt.saved = [];
+  document.getElementById('nlt-gia').value = _nlt.gia ? parseInt(_nlt.gia).toLocaleString('vi-VN') : '';
+  document.getElementById('nlt-date').textContent = 'Ngày ' + fmtDate(curDate.mua) + (curDate.mua !== today() ? ' (không phải hôm nay)' : '');
+  _nltClearEntry();
+  _nltRenderLoai(); _nltRenderMode(); _nltRenderChips(); _nltRenderList();
+  openM('modal-nlt');
+  setTimeout(function(){ document.getElementById(!_nlt.loai ? 'nlt-gia' : !_nlt.gia ? 'nlt-gia' : 'nlt-ten').focus(); }, 250);
+}
+function closeNLT(){
+  if (_nltMode() === 'bang' && _nltDraft().length) toast('📋 Bảng nhập còn ' + _nltDraft().length + ' dòng chưa lưu — đã giữ lại, mở lại để lưu tiếp');
+  closeM('modal-nlt');
+}
+function nltChonLoai(l){
+  var doi = _nlt.loai !== l;
+  _nlt.loai = l;
+  if (doi) {
+    var gdHomNay = getGD('mua').filter(function(g){ return g.date === curDate.mua && g.loai === l; });
+    var g = gdHomNay.length ? parseFloat(gdHomNay[gdHomNay.length-1].gia) : parseFloat(getGia('mua')[l]);
+    _nlt.gia = g > 0 ? g : 0;
+    document.getElementById('nlt-gia').value = _nlt.gia ? parseInt(_nlt.gia).toLocaleString('vi-VN') : '';
+    if (_nltMode() === 'bang' && _nltDraft().length) toast('Loại mủ ' + LOAI_LBL[l] + ' áp dụng cho cả bảng');
+  }
+  _nltRenderLoai(); _nltRenderList(); nltCalc();
+  setTimeout(function(){ document.getElementById(_nlt.gia ? 'nlt-ten' : 'nlt-gia').focus(); }, 60);
+}
+function nltOnGia(el){
+  var raw = el.value.replace(/[^0-9]/g, '');
+  el.value = raw ? parseInt(raw, 10).toLocaleString('vi-VN') : '';
+  _nlt.gia = raw ? parseInt(raw, 10) : 0;
+  nltCalc(); if (_nltMode() === 'bang') _nltCapNhatTongBang();
+}
+function _nltRenderLoai(){
+  document.querySelectorAll('#nlt-loai button').forEach(function(b){ b.classList.toggle('sel', b.getAttribute('data-l') === _nlt.loai); });
+  var nuoc = _nlt.loai === 'nuoc';
+  document.getElementById('nlt-do').style.display = nuoc ? '' : 'none';
+  document.getElementById('nlt-gia-lbl').textContent = nuoc ? 'Giá (đ/kg·độ)' : 'Đơn giá (đ/kg)';
+}
+function nltSetMode(m){ MCS_LS.setItem('nlt_mode', m); _nltRenderMode(); _nltRenderList(); setTimeout(function(){ document.getElementById('nlt-ten').focus(); }, 60); }
+function _nltRenderMode(){
+  var m = _nltMode();
+  document.getElementById('nlt-tab-nhanh').classList.toggle('sel', m === 'nhanh');
+  document.getElementById('nlt-tab-bang').classList.toggle('sel', m === 'bang');
+  document.getElementById('nlt-add').textContent = m === 'bang' ? '➕ Thêm vào bảng' : '✅ Lưu';
+  document.getElementById('nlt-hint').innerHTML = m === 'bang'
+    ? 'Nhập từng người rồi bấm <b>Enter</b> ở ô cuối để thêm 1 dòng vào bảng. Sửa trực tiếp trên bảng; xong bấm <b>💾 Lưu tất cả</b>. 🎤 Nói đủ tên + số ký (+ độ) là tự thêm dòng.'
+    : 'Nhập <b>Tên → Kg' + (_nlt.loai === 'nuoc' ? ' → Độ' : '') + ' → Bì</b>, bấm <b>Enter</b> ở ô cuối (hoặc ✅ Lưu) là lưu ngay và quay lại ô Tên cho người kế tiếp. 🎤 Nói VD: "Ba Tư 32 ký 35 độ".';
+  document.getElementById('nlt-foot').style.display = m === 'bang' ? 'block' : 'none';
+}
+// Hàng nút tên khách
+function _nltKhachGoiY(){
+  var out = [], seen = {};
+  function them(ten, du){ var k = normTen(ten); if (!ten || seen[k]) return; seen[k] = 1; out.push({ ten:ten, du:du }); }
+  try { buildGoiYBanHomNay(curDate.mua).forEach(function(x){ if (x.due) them(x.ten, true); }); } catch(e){}
+  var tu = new Date(curDate.mua + 'T00:00:00'); tu.setDate(tu.getDate() - 30);
+  var tuStr = tu.getFullYear() + '-' + String(tu.getMonth()+1).padStart(2,'0') + '-' + String(tu.getDate()).padStart(2,'0');
+  var dem = {}, ten1 = {};
+  getGD('mua').forEach(function(g){ if (g.date >= tuStr && g.date <= curDate.mua && g.ten) { var k = normTen(g.ten); dem[k] = (dem[k] || 0) + 1; ten1[k] = g.ten; } });
+  var hidden = (typeof getKhHidden === 'function') ? getKhHidden() : [];
+  Object.keys(dem).sort(function(a, b){ return dem[b] - dem[a]; }).forEach(function(k){ if (hidden.indexOf(k) < 0) them(ten1[k], false); });
+  return out.slice(0, 60);
+}
+function _nltDaNhap(){
+  var m = {};
+  getGD('mua').forEach(function(g){ if (g.date === curDate.mua) m[normTen(g.ten)] = 1; });
+  if (_nltMode() === 'bang') _nltDraft().forEach(function(d){ m[normTen(d.ten)] = 1; });
+  return m;
+}
+function _nltRenderChips(){
+  var box = document.getElementById('nlt-chips');
+  _nlt.chips = _nltKhachGoiY();
+  if (!_nlt.chips.length) { box.innerHTML = '<span style="font-size:11.5px;color:var(--g400)">Chưa có khách quen — gõ tên ở ô bên dưới</span>'; return; }
+  var da = _nltDaNhap();
+  var chua = [], xong = [];
+  _nlt.chips.forEach(function(c, i){ (da[normTen(c.ten)] ? xong : chua).push(i); });
+  box.innerHTML = chua.concat(xong).map(function(i){
+    var c = _nlt.chips[i], d = da[normTen(c.ten)];
+    return '<button type="button" class="nlt-chip' + (d ? ' done' : (c.du ? ' du' : '')) + '" onmousedown="event.preventDefault()" onclick="nltPickTen(' + i + ')">' + (d ? '✓ ' : '') + escHtml(c.ten) + '</button>';
+  }).join('');
+}
+function nltPickTen(i){
+  var c = _nlt.chips[i]; if (!c) return;
+  if (_nltDaNhap()[normTen(c.ten)]) toast('ℹ️ ' + c.ten + ' đã nhập rồi — vẫn có thể nhập thêm lượt nữa');
+  _nltChonTen(c.ten);
+}
+function _nltChonTen(ten){
+  document.getElementById('nlt-ten').value = ten;
+  document.getElementById('nlt-ac').style.display = 'none';
+  setTimeout(function(){ document.getElementById('nlt-kg').focus(); }, 30);
+}
+function nltOnTen(){
+  var v = document.getElementById('nlt-ten').value.trim(), ac = document.getElementById('nlt-ac');
+  if (!v) { ac.style.display = 'none'; return; }
+  var k = _vnBoDau(v);
+  var ds = _vnDsKhach().filter(function(n){ return _vnBoDau(n).indexOf(k) >= 0; }).slice(0, 8);
+  if (!ds.length || (ds.length === 1 && normTen(ds[0]) === normTen(v))) { ac.style.display = 'none'; return; }
+  _nlt.ac = ds;
+  ac.innerHTML = ds.map(function(n, i){ return '<div class="ac-item" onmousedown="event.preventDefault();_nltChonTen(_nlt.ac[' + i + '])">👤 ' + escHtml(n) + '</div>'; }).join('');
+  ac.style.display = 'block';
+}
+function nltKey(e, o){
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  if (o === 'ten') {
+    var ac = document.getElementById('nlt-ac');
+    if (ac.style.display === 'block' && _nlt.ac && _nlt.ac.length === 1) { _nltChonTen(_nlt.ac[0]); return; }
+    ac.style.display = 'none'; document.getElementById('nlt-kg').focus();
+  }
+  else if (o === 'kg') document.getElementById(_nlt.loai === 'nuoc' ? 'nlt-do' : 'nlt-bi').focus();
+  else if (o === 'do') document.getElementById('nlt-bi').focus();
+  else nltCommit();
+}
+function nltCalc(){
+  var kg = _nltNum(document.getElementById('nlt-kg').value), doV = _nltNum(document.getElementById('nlt-do').value), bi = _nltNum(document.getElementById('nlt-bi').value);
+  var tt = (_nlt.loai && _nlt.gia && kg) ? _nltTien(_nlt.loai, kg, _nlt.gia, doV, bi) : 0;
+  document.getElementById('nlt-tt').textContent = fmtNum(tt) + ' ₫';
+  document.getElementById('nlt-tt-info').textContent = (_nlt.loai ? LOAI_ICO[_nlt.loai] + ' ' + LOAI_LBL[_nlt.loai] : 'Chưa chọn loại mủ') + (_nlt.gia ? ' · ' + fmtNum(_nlt.gia) + 'đ' : ' · chưa có giá');
+}
+function _nltClearEntry(){
+  ['nlt-ten','nlt-kg','nlt-do','nlt-bi'].forEach(function(id){ document.getElementById(id).value = ''; });
+  document.getElementById('nlt-ac').style.display = 'none';
+  nltCalc();
+}
+function _nltKiemTraChung(){
+  if (!_nlt.loai) { toast('⚠️ Chọn loại mủ trước!'); return false; }
+  if (!_nlt.gia) { toast('⚠️ Nhập đơn giá!'); document.getElementById('nlt-gia').focus(); return false; }
+  return true;
+}
+// Tạo 1 giao dịch Thu Mua giống hệt luuGD (không hiện popup xác nhận)
+function _nltTaoGD(ten, kg, doV, bi, idx){
+  var loai = _nlt.loai, gia = _nlt.gia;
+  if (loai !== 'nuoc') doV = 0;
+  var tt = _nltTien(loai, kg, gia, doV, bi);
+  var khMoi = !getKHAll().some(function(n){ return normTen(n) === normTen(ten); });
+  var giaObj = getGia('mua'); giaObj[loai] = gia; setGia('mua', giaObj);
+  var ghKey = 'giaHistory3_mua_' + loai;
+  var ghArr = JSON.parse(MCS_LS.getItem(ghKey) || '[]');
+  if (!ghArr.includes(gia)) ghArr.push(gia);
+  MCS_LS.setItem(ghKey, JSON.stringify(ghArr.slice(-6)));
+  saveKHShared(ten, 'mua');
+  return { gd:{ id:Date.now() + (idx || 0) + Math.random(), date:curDate.mua, ten:ten, loai:loai, kg:kg, do:doV, bi:bi, gia:gia, tt:tt, guiSo:false, edited:false }, khMoi:khMoi };
+}
+function _nltSauKhiLuu(lastId){
+  renderTbl('mua', lastId); updTK('mua'); updTK('ban');
+  if (typeof updSSSummary === 'function') updSSSummary();
+  if (typeof updThangData === 'function') updThangData();
+  autoSync();
+  if (typeof renderGoiYBanHomNay === 'function') renderGoiYBanHomNay();
+  playSaveSound();
+}
+function nltCommit(){
+  if (guardLicense()) return;
+  if (!_nltKiemTraChung()) return;
+  var ten = document.getElementById('nlt-ten').value.trim().replace(/\s+/g, ' ');
+  var kg = _nltNum(document.getElementById('nlt-kg').value), doV = _nltNum(document.getElementById('nlt-do').value), bi = _nltNum(document.getElementById('nlt-bi').value);
+  if (!ten) { toast('⚠️ Nhập tên!'); document.getElementById('nlt-ten').focus(); return; }
+  if (!kg) { toast('⚠️ Nhập số kg!'); document.getElementById('nlt-kg').focus(); return; }
+  if (_nlt.loai === 'nuoc' && !doV) { toast('⚠️ Nhập độ!'); document.getElementById('nlt-do').focus(); return; }
+  if (bi >= kg) { toast('⚠️ Trừ bì phải nhỏ hơn số kg!'); document.getElementById('nlt-bi').focus(); return; }
+  // Tên trùng khách đã lưu (không phân biệt hoa/thường) → dùng đúng cách viết đã lưu
+  var daCo = _vnDsKhach().filter(function(n){ return normTen(n) === normTen(ten); })[0];
+  if (daCo) ten = daCo;
+  if (_nltMode() === 'bang') {
+    var d = _nltDraft(); d.push({ ten:ten, kg:kg, do:doV, bi:bi }); _nltSetDraft(d);
+    toast('➕ ' + ten + ' — đã thêm dòng ' + d.length);
+    playSaveSound();
+  } else {
+    var r = _nltTaoGD(ten, kg, doV, bi, 0);
+    var all = getGD('mua'); all.push(r.gd); setGD('mua', all);
+    _nlt.saved.unshift(r.gd.id);
+    _nltSauKhiLuu(r.gd.id);
+    docTienTuDongSauLuu(r.gd.tt);
+    if (!getSetting('docTien', true)) toast('✅ Đã lưu ' + ten + ' · ' + fmtNum(r.gd.tt) + ' ₫');
+    if (r.khMoi) setTimeout(function(){ toast('🆕 ' + ten + ' là khách mới — bổ sung SĐT/địa chỉ sau ở mục Khách hàng'); }, 2700);
+  }
+  _nltClearEntry(); _nltRenderChips(); _nltRenderList();
+  document.getElementById('nlt-ten').focus();
+}
+function _nltRenderList(){
+  var box = document.getElementById('nlt-list');
+  if (_nltMode() === 'bang') { _nltRenderBang(box); return; }
+  var all = getGD('mua'), ds = _nlt.saved.map(function(id){ return all.find(function(g){ return String(g.id) === String(id); }); }).filter(Boolean);
+  if (!ds.length) { box.innerHTML = ''; return; }
+  var tong = 0, tongKg = 0;
+  var rows = ds.map(function(g){
+    tong += parseFloat(g.tt) || 0; tongKg += kgThuc(g.loai, g.kg, g.do, g.bi || 0);
+    return '<tr><td style="text-align:left;padding-left:6px">' + LOAI_ICO[g.loai] + ' ' + escHtml(g.ten) + '</td><td>' + fmtKg(kgThuc(g.loai, g.kg, g.do, g.bi || 0)) + '</td><td>' + (g.loai === 'nuoc' ? fmtDo(g.do) : '') + '</td><td style="font-weight:700">' + fmtNum(g.tt) + '</td>'
+      + '<td><button class="nlt-del" onclick="nltXoaDaLuu(\'' + String(g.id) + '\')" title="Xoá giao dịch vừa lưu">✕</button></td></tr>';
+  }).join('');
+  box.innerHTML = '<div class="nlt-sec" style="margin-top:14px">✅ Vừa lưu trong lượt này (' + ds.length + ') <span>— ' + fmtKg(Math.round(tongKg * 10) / 10) + ' kg · ' + fmtNum(tong) + ' ₫</span></div>'
+    + '<table class="nlt-tbl"><thead><tr><th style="text-align:left">Tên</th><th>Kg thực</th><th>Độ</th><th>Tiền</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+}
+function nltXoaDaLuu(id){
+  var all = getGD('mua'), g = all.find(function(x){ return String(x.id) === String(id); });
+  if (!g) return;
+  if (!confirm('Xoá giao dịch vừa lưu của ' + g.ten + ' (' + fmtNum(g.tt) + ' ₫)?')) return;
+  setGD('mua', all.filter(function(x){ return String(x.id) !== String(id); }));
+  _nlt.saved = _nlt.saved.filter(function(x){ return String(x) !== String(id); });
+  renderTbl('mua'); updTK('mua'); updTK('ban');
+  if (typeof updSSSummary === 'function') updSSSummary();
+  if (typeof updThangData === 'function') updThangData();
+  autoSync();
+  _nltRenderChips(); _nltRenderList();
+  toast('🗑️ Đã xoá giao dịch của ' + g.ten);
+}
+// ── Bảng nhập ──
+function _nltRenderBang(box){
+  var d = _nltDraft(), nuoc = _nlt.loai === 'nuoc';
+  if (!d.length) { box.innerHTML = '<div style="text-align:center;font-size:12px;color:var(--g400);padding:16px 6px">Bảng trống — nhập ở trên rồi bấm Enter / ➕ để thêm dòng</div>'; _nltCapNhatTongBang(); return; }
+  var rows = d.map(function(r, i){
+    return '<tr><td style="color:var(--g400);font-size:11px">' + (i + 1) + '</td>'
+      + '<td class="ten"><input value="' + escHtml(r.ten) + '" onchange="nltSuaO(' + i + ',\'ten\',this)"></td>'
+      + '<td><input inputmode="decimal" value="' + (r.kg || '') + '" onchange="nltSuaO(' + i + ',\'kg\',this)"></td>'
+      + (nuoc ? '<td><input inputmode="decimal" value="' + (r.do || '') + '" onchange="nltSuaO(' + i + ',\'do\',this)"></td>' : '')
+      + '<td><input inputmode="decimal" value="' + (r.bi || '') + '" onchange="nltSuaO(' + i + ',\'bi\',this)"></td>'
+      + '<td id="nlt-r-tt-' + i + '" style="font-weight:700;white-space:nowrap;font-size:12px">' + fmtNum(_nltDongTien(r)) + '</td>'
+      + '<td><button class="nlt-del" onclick="nltXoaDong(' + i + ')">✕</button></td></tr>';
+  }).join('');
+  box.innerHTML = '<div class="nlt-sec" style="margin-top:14px">📋 Bảng nhập (' + d.length + ' dòng) <span>— chạm vào ô để sửa</span></div>'
+    + '<table class="nlt-tbl"><thead><tr><th style="width:20px">#</th><th style="text-align:left">Tên</th><th style="width:60px">Kg</th>' + (nuoc ? '<th style="width:46px">Độ</th>' : '') + '<th style="width:44px">Bì</th><th>Tiền</th><th style="width:30px"></th></tr></thead><tbody>' + rows + '</tbody></table>';
+  _nltCapNhatTongBang();
+}
+function _nltDongTien(r){ return (_nlt.loai && _nlt.gia && r.kg) ? _nltTien(_nlt.loai, r.kg, _nlt.gia, _nlt.loai === 'nuoc' ? r.do : 0, r.bi) : 0; }
+function _nltCapNhatTongBang(){
+  var d = _nltDraft(), tong = 0, kg = 0;
+  d.forEach(function(r, i){ var t = _nltDongTien(r); tong += t; kg += kgThuc(_nlt.loai, r.kg, _nlt.loai === 'nuoc' ? r.do : 0, r.bi || 0); var c = document.getElementById('nlt-r-tt-' + i); if (c) c.textContent = fmtNum(t); });
+  document.getElementById('nlt-foot-info').textContent = d.length + ' người · ' + fmtKg(Math.round(kg * 10) / 10) + ' kg';
+  document.getElementById('nlt-foot-tt').textContent = fmtNum(tong) + ' ₫';
+}
+function nltSuaO(i, f, el){
+  var d = _nltDraft(); if (!d[i]) return;
+  if (f === 'ten') { var v = el.value.trim().replace(/\s+/g, ' '); var daCo = _vnDsKhach().filter(function(n){ return normTen(n) === normTen(v); })[0]; d[i].ten = daCo || v; el.value = d[i].ten; }
+  else d[i][f] = _nltNum(el.value);
+  el.classList.remove('err');
+  _nltSetDraft(d); _nltCapNhatTongBang(); _nltRenderChips();
+}
+function nltXoaDong(i){ var d = _nltDraft(); d.splice(i, 1); _nltSetDraft(d); _nltRenderList(); _nltRenderChips(); }
+function nltLuuTatCa(){
+  if (guardLicense()) return;
+  if (!_nltKiemTraChung()) return;
+  var d = _nltDraft();
+  if (!d.length) { toast('📋 Bảng trống'); return; }
+  var loi = -1;
+  d.forEach(function(r, i){ if (loi < 0 && (!r.ten || !r.kg || (_nlt.loai === 'nuoc' && !r.do) || (r.bi || 0) >= r.kg)) loi = i; });
+  if (loi >= 0) {
+    toast('⚠️ Dòng ' + (loi + 1) + ' thiếu tên / số kg' + (_nlt.loai === 'nuoc' ? ' / độ' : '') + ' hoặc bì không hợp lệ');
+    var tr = document.querySelectorAll('#nlt-list .nlt-tbl tbody tr')[loi];
+    if (tr) { tr.querySelectorAll('input').forEach(function(x){ x.classList.add('err'); }); tr.scrollIntoView({ block:'center' }); }
+    return;
+  }
+  var tong = d.reduce(function(s, r){ return s + _nltDongTien(r); }, 0);
+  if (!confirm('Lưu ' + d.length + ' giao dịch ' + LOAI_LBL[_nlt.loai] + ' giá ' + fmtNum(_nlt.gia) + 'đ, ngày ' + fmtDate(curDate.mua) + '?\nTổng tiền: ' + fmtNum(tong) + ' ₫')) return;
+  var all = getGD('mua'), moi = [], khMoi = 0;
+  d.forEach(function(r, i){ var x = _nltTaoGD(r.ten, r.kg, r.do || 0, r.bi || 0, i); all.push(x.gd); moi.push(x.gd); if (x.khMoi) khMoi++; });
+  setGD('mua', all);
+  _nltSetDraft([]);
+  _nltSauKhiLuu(moi[moi.length - 1].id);
+  _nltRenderChips(); _nltRenderList();
+  toast('✅ Đã lưu ' + moi.length + ' giao dịch · ' + fmtNum(tong) + ' ₫' + (khMoi ? ' (' + khMoi + ' khách mới)' : ''));
+}
+// Micro trong màn Nhập liên tiếp
+function vnMicNLT(){
+  if (guardLicense()) return;
+  vnListen(document.getElementById('nlt-mic'), function(txt){
+    var r = vnParse(txt, _nlt.loai);
+    if (!r.ten && r.kg === null && r.gia === null && !r.loai) { toast('⚠️ Không nhận ra — nói lại, VD: "Ba Tư 32 ký 35 độ"'); return; }
+    if (r.loai && r.loai !== _nlt.loai) nltChonLoai(r.loai);
+    if (r.gia !== null) { var g = document.getElementById('nlt-gia'); g.value = String(r.gia); nltOnGia(g); }
+    if (r.ten) document.getElementById('nlt-ten').value = r.ten;
+    if (r.kg !== null) document.getElementById('nlt-kg').value = fmtKg(r.kg);
+    if (r.do !== null && _nlt.loai === 'nuoc') document.getElementById('nlt-do').value = fmtDo(r.do);
+    if (r.bi !== null) document.getElementById('nlt-bi').value = fmtKg(r.bi);
+    nltCalc();
+    var du = _nlt.loai && _nlt.gia && document.getElementById('nlt-ten').value.trim() && _nltNum(document.getElementById('nlt-kg').value)
+      && (_nlt.loai !== 'nuoc' || _nltNum(document.getElementById('nlt-do').value));
+    if (du && _nltMode() === 'bang') { nltCommit(); return; } // bảng nhập: đủ thông tin → tự thêm dòng (sửa lại được trên bảng)
+    toast('🎤 ' + _vnTomTat(r) + (du ? ' — bấm ✅ Lưu' : ''));
+    setTimeout(function(){
+      var thieu = !_nlt.gia ? 'nlt-gia' : !document.getElementById('nlt-ten').value.trim() ? 'nlt-ten' : !document.getElementById('nlt-kg').value ? 'nlt-kg'
+        : (_nlt.loai === 'nuoc' && !document.getElementById('nlt-do').value) ? 'nlt-do' : null;
+      if (thieu) document.getElementById(thieu).focus();
+    }, 200);
+  });
+}
+
 function buildRows(loai,ten,kg,gia,doV,bi){
   bi=parseNum(bi);
   var donViGia = (loai==='nuoc') ? 'đ/(kg·độ)' : 'đ/kg';
@@ -6262,7 +6914,8 @@ var SB_NO_SYNC_KEYS = ['device_code','gd_token','gd_token_expiry','gd_folder_id'
   // hoặc tự đặt lại mật khẩu giao dịch về mặc định).
   'admin_override_applied_at','pw_reset_applied_at','registry_sync_debug','last_ext_info',
   'gmp_best','gmp_best_de','gmp_best_kho','gmp_sound','gmp_cfg', // kỷ lục + cài đặt game ẩn Giọt Mủ Phiêu Lưu: riêng từng máy
-  'sol_cfg','sol_save','sol_stat','sol_round','sol_roundw','sol_rtry']; // game ẩn Xếp Bài Nhện: cài đặt, ván đang chơi dở, thống kê, số vòng — riêng từng máy
+  'sol_cfg','sol_save','sol_stat','sol_round','sol_roundw','sol_rtry', // game ẩn Xếp Bài Nhện: cài đặt, ván đang chơi dở, thống kê, số vòng — riêng từng máy
+  'nlt_mode','nlt_draft']; // Nhập liên tiếp: chế độ đang chọn + bảng nhập dở chưa lưu — riêng từng máy
 // Danh sách khoá THỰC SỰ sẽ đồng bộ mỗi lần: hợp của SB_DATA_KEYS (đảm bảo có giá trị mặc định hợp lý
 // nếu máy chưa từng có khoá đó) VÀ toàn bộ khoá đang thực sự tồn tại trong localStorage của app (trừ
 // danh sách chỉ-riêng-máy-này ở trên) — để không bỏ sót dữ liệu của các tính năng thêm sau này mà lỡ
