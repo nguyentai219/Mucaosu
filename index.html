@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v3.2.4</title>
+<title>Mua Bán Mủ Cao Su v3.2.5</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -714,7 +714,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.2.4 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.2.5 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -744,7 +744,7 @@ input[type=date]:focus{border-color:var(--gl)}
     </button>
     <div class="vn-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <div class="vn-pop-ttl">Đang nhập liệu bằng giọng nói</div>
-    <div class="vn-pop-sub">Nhấp vào micro sau khi nói xong</div>
+    <div class="vn-pop-sub" id="vn-pop-sub">Nhấp vào micro sau khi nói xong</div>
     <div class="vn-pop-txt" id="vn-pop-txt">VD: "Ba Tư 32 ký 35 độ"</div>
     <button type="button" class="vn-pop-huy" onclick="vnCancel()">Huỷ</button>
   </div>
@@ -1367,6 +1367,17 @@ input[type=date]:focus{border-color:var(--gl)}
         </div>
         <label class="toggle-sw">
           <input type="checkbox" id="setting-round" onchange="saveSetting('round',this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <!-- NHẬP GIỌNG NÓI: TỰ ĐIỀN KHI NGỪNG NÓI -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 4px;border-bottom:1px solid var(--g100)">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--g800)">🎤 Tự điền khi nói xong</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:2px">Nhập bằng giọng nói: ngừng nói là bảng micro tự ẩn và tự điền, không cần nhấp lại vào micro</div>
+        </div>
+        <label class="toggle-sw">
+          <input type="checkbox" id="setting-vnTuDong" onchange="saveSetting('vnTuDong',this.checked)">
           <span class="toggle-slider"></span>
         </label>
       </div>
@@ -2179,7 +2190,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.2.4</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.2.5</div>
       </div>
     </div>
 
@@ -2193,7 +2204,7 @@ input[type=date]:focus{border-color:var(--gl)}
         • <b>Mủ đông</b>: nhập khấu hao bì (kg) → tự trừ vào kg thực<br>
         • <b>Nhấp đúp</b> vào giao dịch để chỉnh sửa hoặc xoá<br>
         • Tích ✅ "Gửi sổ" khi lưu để tự động đưa vào tab Sổ Gửi<br>
-        • <b>🎤 Nhập bằng giọng nói</b> (nút micro cạnh ô Đơn giá): bấm micro → hiện bảng micro giữa màn hình → nói, VD <i>"Ba Tư 32 ký 35 độ"</i>, <i>"chú Hai 40 ký rưỡi bì 2"</i>, <i>"chị Cả 45 ký 8, 32 độ 7"</i> (= 45,8 kg · 32,7 độ), <i>"mủ chén giá 15 nghìn"</i>, <i>"mủ nước giá 320"</i> → nói xong nhấp vào micro, app tự điền tên (tên khách đã lưu trùng hoặc giống nhất), số ký, độ, bì, giá; dưới ô tên hiện vài tên khách gần giống để chạm đổi nhanh nếu app chọn chưa đúng; xem lại rồi bấm Lưu. Cần mạng và cho phép dùng micro<br>
+        • <b>🎤 Nhập bằng giọng nói</b> (nút micro cạnh ô Đơn giá): bấm micro → hiện bảng micro giữa màn hình → nói, VD <i>"Ba Tư 32 ký 35 độ"</i>, <i>"chú Hai 40 ký rưỡi bì 2"</i>, <i>"chị Cả 45 ký 8, 32 độ 7"</i> (= 45,8 kg · 32,7 độ), <i>"mủ chén giá 15 nghìn"</i>, <i>"mủ nước giá 320"</i> → nói xong nhấp vào micro (hoặc bật <i>⚙️ Cài đặt → 🎤 Tự điền khi nói xong</i> để ngừng nói là tự điền), app tự điền tên (tên khách đã lưu trùng hoặc giống nhất), số ký, độ, bì, giá; dưới ô tên hiện vài tên gần giống <b>trong danh sách khách hàng đã lưu</b> để chạm đổi nhanh nếu app chọn chưa đúng; xem lại rồi bấm Lưu. Cần mạng và cho phép dùng micro<br>
         • <b>⚡ Nhập liên tiếp nhiều khách</b> (trong <i>Các Giao Dịch Khác</i> ở cuối tab Thu Mua): màn nhập nhiều khách liền nhau — chọn loại mủ + giá 1 lần, bấm tên khách ở hàng <i>Khách hôm nay</i> (khách đã nhập tự mờ đi) hoặc gõ/nói tên, rồi:<br>
         &nbsp;&nbsp;– <i>Lưu từng người</i>: Tên → Kg → Độ → Bì, Enter ở ô cuối là lưu ngay, quay lại ô Tên cho người kế tiếp; danh sách vừa lưu có nút ✕ để xoá nếu nhập nhầm<br>
         &nbsp;&nbsp;– <i>Bảng nhập</i>: mỗi người 1 dòng, sửa ngay trên bảng, xong bấm <b>💾 Lưu tất cả</b> (bảng nhập dở được giữ lại trên máy nếu lỡ đóng)
@@ -2351,7 +2362,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.2.4</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.2.5</div>
       </div>
     </div>
 
@@ -4758,7 +4769,10 @@ var _vnHuy = false;
 function _vnPop(show){
   var p = document.getElementById('vn-pop'); if (!p) return;
   p.classList.toggle('show', !!show);
-  if (show) { var t = document.getElementById('vn-pop-txt'); t.textContent = 'VD: "Ba Tư 32 ký 35 độ"'; t.classList.add('hint'); }
+  if (show) {
+    var t = document.getElementById('vn-pop-txt'); t.textContent = 'VD: "Ba Tư 32 ký 35 độ"'; t.classList.add('hint');
+    document.getElementById('vn-pop-sub').textContent = getSetting('vnTuDong', false) ? 'Nói xong app tự điền (hoặc nhấp vào micro)' : 'Nhấp vào micro sau khi nói xong';
+  }
 }
 function vnStop(){ if (_vnRec) { try { _vnRec.stop(); } catch(e){} } else _vnPop(false); }   // nói xong → xử lý câu nói
 function vnCancel(){ _vnHuy = true; if (_vnRec) { try { _vnRec.abort(); } catch(e){ try { _vnRec.stop(); } catch(e2){} } } _vnPop(false); }
@@ -4769,7 +4783,8 @@ function vnListen(btn, onText){
   if (!navigator.onLine) { toast('📶 Nhập bằng giọng nói cần có mạng'); return; }
   if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); // ẩn bàn phím
   var rec; try { rec = new SR(); } catch(e) { toast('⚠️ Không mở được micro'); return; }
-  rec.lang = 'vi-VN'; rec.interimResults = true; rec.continuous = true; rec.maxAlternatives = 1; // nghe tới khi bấm micro
+  // Mặc định nghe tới khi bấm micro; bật "Tự điền khi nói xong" (Cài đặt) thì ngừng nói là tự kết thúc + tự điền
+  rec.lang = 'vi-VN'; rec.interimResults = true; rec.continuous = !getSetting('vnTuDong', false); rec.maxAlternatives = 1;
   var finalTxt = '', interimTxt = '', loi = '';
   _vnHuy = false;
   rec.onresult = function(e){
@@ -4852,7 +4867,8 @@ function _vnDocCumSo(toks){
 }
 function _vnDsKhach(){
   var m = {}, out = [];
-  try { getKHAll().concat(getKH('mua')).forEach(function(n){ var k = normTen(n); if (n && !m[k]) { m[k] = 1; out.push(n); } }); } catch(e){}
+  // Đúng danh sách khách hàng đã lưu (màn 👥): kh3_all, bỏ các khách đã xoá — không lấy tên từ giao dịch cũ
+  try { var an = getKhHidden(); getKHAll().forEach(function(n){ var k = normTen(n); if (n && !m[k] && an.indexOf(k) < 0) { m[k] = 1; out.push(n); } }); } catch(e){}
   return out;
 }
 function _vnLev(a, b){
@@ -10808,6 +10824,7 @@ setInterval(_syncErrorLogFromCloud, 5*60*1000);
 function openSettings() {
   document.getElementById('setting-round').checked = getSetting('round', true);
   document.getElementById('setting-docTien').checked = getSetting('docTien', true);
+  document.getElementById('setting-vnTuDong').checked = getSetting('vnTuDong', false);
   document.getElementById('setting-amBao').checked = getSetting('amBao', true);
   document.getElementById('setting-wakelock').checked = getSetting('wakelock', true);
   document.getElementById('setting-bubbleSaver').checked = getSetting('bubbleSaver', true);
