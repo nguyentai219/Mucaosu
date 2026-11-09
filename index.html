@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v3.2.1</title>
+<title>Mua Bán Mủ Cao Su v3.2.2</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -638,12 +638,33 @@ input[type=date]:focus{border-color:var(--gl)}
 .tab-pane .sec-divider{height:0;background:none;border:none;margin:8px 0}
 .tab-pane .mm-card.tk .sec-title,.tab-pane .mm-card.tk .tk-grid{min-width:0}
 /* ── Micro nhập bằng giọng nói + Chế độ nhập liên tiếp (Thu Mua) ── */
-.vn-mic{flex:0 0 40px;width:40px;min-width:40px;border:1.5px solid var(--gd);border-radius:var(--rs);background:var(--gb);color:var(--gd);font-size:18px;line-height:1;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.vn-mic{flex:0 0 38px;width:38px;min-width:38px;box-sizing:border-box;border:1.5px solid var(--gd);border-radius:var(--rs);background:var(--gb);color:var(--gd);font-size:18px;line-height:1;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
 .vn-mic.rec{background:#dc2626;border-color:#dc2626;color:#fff;animation:vnPulse 1s ease-in-out infinite}
 @keyframes vnPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.55)}50%{box-shadow:0 0 0 7px rgba(220,38,38,0)}}
 .vn-bubble{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:4000;background:#111827;color:#fff;padding:9px 16px;border-radius:14px;font-size:13px;font-weight:600;max-width:90vw;width:max-content;text-align:center;line-height:1.45;box-shadow:0 6px 20px rgba(0,0,0,.3);display:none;pointer-events:none}
-.nlt-open{font-size:10px;line-height:1.25;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--gd),var(--gm));border-radius:6px;padding:1px 6px;text-transform:none;letter-spacing:0;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent}
 #modal-nlt{z-index:900}
+.vn-pop{position:fixed;inset:0;z-index:3900;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
+.vn-pop.show{display:flex}
+.vn-pop-box{background:#fff;border-radius:22px;padding:26px 20px 16px;width:100%;max-width:320px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.35);animation:popIn .2s ease}
+.vn-pop-mic{position:relative;width:96px;height:96px;border-radius:50%;border:none;background:linear-gradient(135deg,#dc2626,#ef4444);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent}
+.vn-pop-mic svg{position:relative;z-index:1}
+.vn-ring{position:absolute;inset:0;border-radius:50%;border:3px solid rgba(220,38,38,.55);animation:vnRing 1.6s ease-out infinite}
+.vn-ring.r2{animation-delay:.8s}
+@keyframes vnRing{0%{transform:scale(1);opacity:1}100%{transform:scale(1.7);opacity:0}}
+.vn-wave{display:flex;align-items:center;justify-content:center;gap:4px;height:34px;margin:16px 0 8px}
+.vn-wave i{display:block;width:5px;height:8px;border-radius:3px;background:linear-gradient(180deg,var(--gl),var(--gd));animation:vnWave 1s ease-in-out infinite}
+.vn-wave i:nth-child(2){animation-delay:.1s}.vn-wave i:nth-child(3){animation-delay:.2s}.vn-wave i:nth-child(4){animation-delay:.3s}.vn-wave i:nth-child(5){animation-delay:.4s}
+.vn-wave i:nth-child(6){animation-delay:.3s}.vn-wave i:nth-child(7){animation-delay:.2s}.vn-wave i:nth-child(8){animation-delay:.1s}.vn-wave i:nth-child(9){animation-delay:0s}
+@keyframes vnWave{0%,100%{height:8px}50%{height:32px}}
+.vn-pop-ttl{font-size:15.5px;font-weight:800;color:var(--gd)}
+.vn-pop-sub{font-size:12.5px;color:var(--g600);margin-top:3px}
+.vn-pop-txt{margin:12px 0 4px;min-height:42px;font-size:14px;font-weight:700;color:var(--g800);background:var(--g50);border-radius:12px;padding:10px;line-height:1.4;word-break:break-word}
+.vn-pop-txt.hint{font-weight:500;color:var(--g400);font-size:12.5px}
+.vn-pop-huy{margin-top:8px;border:none;background:none;color:var(--g600);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;padding:8px 18px;cursor:pointer}
+.vn-sg{display:none;flex-wrap:wrap;align-items:center;gap:5px;margin-top:5px;font-size:11.5px;color:var(--g600)}
+.vn-sg.show{display:flex}
+.vn-sg button{border:1.5px solid #93c5fd;background:#eff6ff;color:#1d4ed8;border-radius:14px;padding:4px 10px;font-family:'Be Vietnam Pro',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer}
+.vn-sg .x{border:none;background:none;color:var(--g400);padding:2px 6px;font-size:13px}
 .nlt-box{max-width:560px;height:100%;max-height:100%;border-radius:0;padding:0;display:flex;flex-direction:column;overflow:hidden;animation:none}
 .nlt-head{display:flex;align-items:center;gap:8px;padding:10px 12px;background:linear-gradient(135deg,var(--gd),var(--gm));color:#fff;flex:0 0 auto}
 .nlt-head .t{font-size:15px;font-weight:800;flex:1;min-width:0}
@@ -693,7 +714,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.2.1 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.2.2 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -715,6 +736,19 @@ input[type=date]:focus{border-color:var(--gl)}
 
 <div class="toast" id="toast"></div>
 <div class="vn-bubble" id="vn-bubble"></div>
+<div class="vn-pop" id="vn-pop">
+  <div class="vn-pop-box">
+    <button type="button" class="vn-pop-mic" onclick="vnStop()" aria-label="Nói xong">
+      <span class="vn-ring"></span><span class="vn-ring r2"></span>
+      <svg viewBox="0 0 24 24" width="46" height="46" fill="#fff"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>
+    </button>
+    <div class="vn-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="vn-pop-ttl">Đang nhập liệu bằng giọng nói</div>
+    <div class="vn-pop-sub">Nhấp vào micro sau khi nói xong</div>
+    <div class="vn-pop-txt" id="vn-pop-txt">VD: "Ba Tư 32 ký 35 độ"</div>
+    <button type="button" class="vn-pop-huy" onclick="vnCancel()">Huỷ</button>
+  </div>
+</div>
 
 <!-- CHẾ ĐỘ NHẬP LIÊN TIẾP (Thu Mua) — màn riêng, không thay đổi form nhập thường -->
 <div class="modal" id="modal-nlt">
@@ -751,6 +785,7 @@ input[type=date]:focus{border-color:var(--gl)}
         <input type="text" inputmode="decimal" id="nlt-bi" class="fi" placeholder="Bì" style="flex:0 0 48px;width:48px" oninput="nltCalc()" onkeydown="nltKey(event,'bi')">
         <button type="button" class="vn-mic" id="nlt-mic" onclick="vnMicNLT()" title="Nói: tên, số ký, độ">🎤</button>
       </div>
+      <div id="nlt-vn-sg" class="vn-sg"></div>
       <div class="nlt-tt"><span id="nlt-tt-info">Thành tiền</span><b id="nlt-tt">0 ₫</b></div>
       <button class="nlt-add" id="nlt-add" onclick="nltCommit()">✅ Lưu</button>
       <div id="nlt-list"></div>
@@ -777,7 +812,7 @@ input[type=date]:focus{border-color:var(--gl)}
     <div id="mua-form-wrap">
       <div class="g2" style="align-items:end">
         <div class="fr">
-          <label class="fl" style="display:flex;align-items:center;justify-content:space-between;gap:4px;white-space:nowrap">Loại mủ <span class="nlt-open" onclick="event.preventDefault();openNLT()" title="Nhập nhiều khách liên tiếp">⚡ Liên tiếp</span></label>
+          <label class="fl">Loại mủ</label>
           <div class="loai-wrap">
             <button class="loai-btn" id="mua-loai-btn" onclick="toggleLoai('mua')">
               <span id="mua-loai-txt">-- Chọn --</span><span class="loai-arrow" id="mua-loai-arr">▼</span>
@@ -790,10 +825,10 @@ input[type=date]:focus{border-color:var(--gl)}
             </div>
           </div>
         </div>
-        <div class="fr">
+        <div class="fr" style="min-width:0">
           <label class="fl">Đơn giá (đ/kg)</label>
-          <div style="display:flex;gap:5px">
-            <input type="text" inputmode="numeric" id="mua-gia" class="fi" placeholder="0" style="flex:1 1 auto;min-width:0;width:auto" oninput="onGia(this,'mua')" onkeydown="nf(event,'mua-ten')" onfocus="showGiaSuggest('mua')" onblur="hideGiaSuggest('mua')">
+          <div style="display:flex;gap:5px;min-width:0">
+            <input type="text" inputmode="numeric" id="mua-gia" class="fi" placeholder="0" style="flex:1 1 0;min-width:0;width:0" oninput="onGia(this,'mua')" onkeydown="nf(event,'mua-ten')" onfocus="showGiaSuggest('mua')" onblur="hideGiaSuggest('mua')">
             <button type="button" class="vn-mic" id="mua-mic" onclick="vnMicMain()" title="Nhập bằng giọng nói: tên, số ký, độ">🎤</button>
           </div>
           <div id="mua-gia-suggest" style="display:none;flex-wrap:wrap;gap:5px;margin-top:5px"></div>
@@ -815,6 +850,7 @@ input[type=date]:focus{border-color:var(--gl)}
         </div>
         <input type="text" id="mua-phan" class="fi" placeholder="Tên Phần Bán" maxlength="30" style="flex:0 0 36%;width:36%;min-width:0" autocomplete="off" autocorrect="off" spellcheck="false" oninput="updPhanSuggest()" onfocus="updPhanSuggest()" onkeydown="nf(event,'mua-kg')">
       </div>
+      <div id="mua-vn-sg" class="vn-sg"></div>
       <div id="mua-phan-sg" style="display:none;flex-wrap:wrap;align-items:center;gap:5px;margin-top:5px"></div>
       <div class="kh-info-ticker" id="mua-info-ticker"></div>
     </div>
@@ -893,6 +929,7 @@ input[type=date]:focus{border-color:var(--gl)}
   <div class="mm-card more">
     <button class="mm-toggle" id="mua-more-toggle" onclick="toggleMuaMore()" aria-expanded="false"><span class="mm-ico">🗂️</span> Các Giao Dịch Khác <span class="mm-arrow">▼</span></button>
     <div class="mm-body" id="mua-more-body" ontouchstart="_mmReset()" onclick="_mmReset()">
+      <button class="mm-btn" onclick="openNLT()">⚡ Nhập liên tiếp nhiều khách</button>
       <button class="mm-btn" onclick="openChiTietMua()">📋 Xem chi tiết thu mua trong ngày</button>
       <button class="mm-btn" onclick="openXemGDCu()">🔍 Xem lại giao dịch của khách hàng</button>
       <button class="mm-btn" onclick="openBangKeExport('thu_mua')">🖨️ Xuất bảng kê thu mua &amp; thanh toán</button>
@@ -2142,7 +2179,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.2.1</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.2.2</div>
       </div>
     </div>
 
@@ -2156,8 +2193,8 @@ input[type=date]:focus{border-color:var(--gl)}
         • <b>Mủ đông</b>: nhập khấu hao bì (kg) → tự trừ vào kg thực<br>
         • <b>Nhấp đúp</b> vào giao dịch để chỉnh sửa hoặc xoá<br>
         • Tích ✅ "Gửi sổ" khi lưu để tự động đưa vào tab Sổ Gửi<br>
-        • <b>🎤 Nhập bằng giọng nói</b> (nút micro cạnh ô Đơn giá): bấm micro rồi nói, VD <i>"Ba Tư 32 ký 35 độ"</i>, <i>"chú Hai 40 ký rưỡi bì 2"</i>, <i>"mủ chén giá 15 nghìn"</i>, <i>"mủ nước giá 320"</i> → app tự điền tên (khớp với khách đã có), số ký, độ, bì, giá; xem lại rồi bấm Lưu. Cần mạng và cho phép dùng micro<br>
-        • <b>⚡ Liên tiếp</b> (nút cạnh chữ "Loại mủ"): màn nhập nhiều khách liền nhau — chọn loại mủ + giá 1 lần, bấm tên khách ở hàng <i>Khách hôm nay</i> (khách đã nhập tự mờ đi) hoặc gõ/nói tên, rồi:<br>
+        • <b>🎤 Nhập bằng giọng nói</b> (nút micro cạnh ô Đơn giá): bấm micro → hiện bảng micro giữa màn hình → nói, VD <i>"Ba Tư 32 ký 35 độ"</i>, <i>"chú Hai 40 ký rưỡi bì 2"</i>, <i>"mủ chén giá 15 nghìn"</i>, <i>"mủ nước giá 320"</i> → nói xong nhấp vào micro, app tự điền tên (tên khách đã lưu trùng hoặc giống nhất), số ký, độ, bì, giá; dưới ô tên hiện vài tên khách gần giống để chạm đổi nhanh nếu app chọn chưa đúng; xem lại rồi bấm Lưu. Cần mạng và cho phép dùng micro<br>
+        • <b>⚡ Nhập liên tiếp nhiều khách</b> (trong <i>Các Giao Dịch Khác</i> ở cuối tab Thu Mua): màn nhập nhiều khách liền nhau — chọn loại mủ + giá 1 lần, bấm tên khách ở hàng <i>Khách hôm nay</i> (khách đã nhập tự mờ đi) hoặc gõ/nói tên, rồi:<br>
         &nbsp;&nbsp;– <i>Lưu từng người</i>: Tên → Kg → Độ → Bì, Enter ở ô cuối là lưu ngay, quay lại ô Tên cho người kế tiếp; danh sách vừa lưu có nút ✕ để xoá nếu nhập nhầm<br>
         &nbsp;&nbsp;– <i>Bảng nhập</i>: mỗi người 1 dòng, sửa ngay trên bảng, xong bấm <b>💾 Lưu tất cả</b> (bảng nhập dở được giữ lại trên máy nếu lỡ đóng)
       </div>
@@ -2314,7 +2351,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.2.1</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.2.2</div>
       </div>
     </div>
 
@@ -4369,6 +4406,7 @@ function restoreGia(tab){
 function onTen(tab){
   // Hủy timer ẩn bàn phím khi bắt đầu nhập
   if(kbHideTimer[tab]){ clearTimeout(kbHideTimer[tab]); delete kbHideTimer[tab]; }
+  if(tab==='mua' && typeof vnAnGoiYTen==='function') vnAnGoiYTen('mua-vn-sg'); // tự gõ tên → ẩn đề xuất từ giọng nói
   rebuildKHRoleLists(); // luôn tính lại đúng danh sách theo giao dịch thật trước khi gợi ý
   const v=document.getElementById(tab+'-ten').value.trim();
   const ac=document.getElementById(tab+'-ac');
@@ -4716,22 +4754,33 @@ function _vnBubble(msg, ms){
   if (ms) _vnBubbleTimer = setTimeout(function(){ b.style.display = 'none'; }, ms);
 }
 function vnSupported(){ return !!(window.SpeechRecognition || window.webkitSpeechRecognition); }
+var _vnHuy = false;
+function _vnPop(show){
+  var p = document.getElementById('vn-pop'); if (!p) return;
+  p.classList.toggle('show', !!show);
+  if (show) { var t = document.getElementById('vn-pop-txt'); t.textContent = 'VD: "Ba Tư 32 ký 35 độ"'; t.classList.add('hint'); }
+}
+function vnStop(){ if (_vnRec) { try { _vnRec.stop(); } catch(e){} } else _vnPop(false); }   // nói xong → xử lý câu nói
+function vnCancel(){ _vnHuy = true; if (_vnRec) { try { _vnRec.abort(); } catch(e){ try { _vnRec.stop(); } catch(e2){} } } _vnPop(false); }
 function vnListen(btn, onText){
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) { toast('⚠️ Máy/trình duyệt này chưa hỗ trợ nhập bằng giọng nói (hãy mở bằng Chrome)'); return; }
-  if (_vnRec) { try { _vnRec.stop(); } catch(e){} return; } // bấm lần nữa = nói xong
+  if (_vnRec) { vnStop(); return; } // bấm lần nữa = nói xong
   if (!navigator.onLine) { toast('📶 Nhập bằng giọng nói cần có mạng'); return; }
   if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); // ẩn bàn phím
   var rec; try { rec = new SR(); } catch(e) { toast('⚠️ Không mở được micro'); return; }
-  rec.lang = 'vi-VN'; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
-  var finalTxt = '', loi = '';
+  rec.lang = 'vi-VN'; rec.interimResults = true; rec.continuous = true; rec.maxAlternatives = 1; // nghe tới khi bấm micro
+  var finalTxt = '', interimTxt = '', loi = '';
+  _vnHuy = false;
   rec.onresult = function(e){
-    var interim = '';
-    for (var i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) finalTxt += e.results[i][0].transcript + ' ';
+    var fin = '', interim = '';
+    for (var i = 0; i < e.results.length; i++) {
+      if (e.results[i].isFinal) fin += e.results[i][0].transcript + ' ';
       else interim += e.results[i][0].transcript;
     }
-    _vnBubble('🎤 ' + (finalTxt + interim).trim());
+    finalTxt = fin; interimTxt = interim;
+    var t = document.getElementById('vn-pop-txt');
+    if (t) { t.textContent = (fin + interim).trim() || '…'; t.classList.remove('hint'); }
   };
   rec.onerror = function(e){
     var m = { 'not-allowed':'🎤 Chưa cho phép dùng micro — vào cài đặt quyền của Chrome/app và bật Micro',
@@ -4743,14 +4792,16 @@ function vnListen(btn, onText){
   rec.onend = function(){
     _vnRec = null;
     if (btn) btn.classList.remove('rec');
-    var t = finalTxt.trim();
+    _vnPop(false);
+    if (_vnHuy) return;
+    var t = (finalTxt + interimTxt).trim(); // bấm "nói xong" sớm thì vẫn lấy phần đang nhận dạng dở
     if (t) { _vnBubble('🎤 "' + t + '"', 3500); try { onText(t); } catch(err){ toast('⚠️ Không hiểu câu nói, thử lại'); } }
-    else { _vnBubble(''); if (loi) toast(loi); }
+    else if (loi) toast(loi);
   };
   try { rec.start(); } catch(e) { toast('⚠️ Không mở được micro'); return; }
   _vnRec = rec;
   if (btn) btn.classList.add('rec');
-  _vnBubble('🎤 Đang nghe… nói: tên, số ký, độ (bấm micro lần nữa khi nói xong)');
+  _vnPop(true);
 }
 
 // ── Phân tích câu nói → {ten, kg, do, bi, gia, loai} ──
@@ -4803,19 +4854,48 @@ function _vnLev(a, b){
   for (i = 1; i <= m; i++) { c = [i]; for (j = 1; j <= n; j++) c[j] = Math.min(p[j] + 1, c[j-1] + 1, p[j-1] + (a[i-1] === b[j-1] ? 0 : 1)); p = c; }
   return p[n];
 }
-// Tìm tên khách đã lưu khớp nhất với tên vừa nói (không phân biệt dấu/hoa thường)
+// Độ khác nhau giữa tên đã lưu và tên vừa nói (0 = trùng, càng lớn càng khác) — không phân biệt dấu/hoa
+// thường; tên nói ra là 1 phần tên đã lưu (VD "Hai" ↔ "Chú Hai") được tính là rất gần.
+function _vnDiemTen(n, k){
+  var a = _vnBoDau(n).replace(/\s+/g,' ').trim();
+  if (!a || !k) return 9;
+  if (a === k) return 0;
+  var aw = a.split(' '), kw = k.split(' ');
+  var khopTu = kw.filter(function(w){ return aw.indexOf(w) >= 0; }).length;
+  if (khopTu === kw.length || khopTu === aw.length) return 0.1 + Math.abs(aw.length - kw.length) * 0.05; // trùng trọn từ
+  var d = _vnLev(a, k) / Math.max(a.length, k.length);
+  var dKhongCach = _vnLev(a.replace(/ /g,''), k.replace(/ /g,'')) / Math.max(a.length, k.length);
+  return Math.min(d, dKhongCach) - khopTu * 0.08;
+}
+function _vnXepTen(noi){
+  var k = _vnBoDau(noi).replace(/\s+/g,' ').trim(); if (!k) return [];
+  return _vnDsKhach().map(function(n){ return { n:n, d:_vnDiemTen(n, k) }; }).sort(function(x, y){ return x.d - y.d; });
+}
+// Tìm tên khách đã lưu trùng hoặc gần giống nhất với tên vừa nói; không có ai đủ giống → giữ tên vừa nói
 function _vnKhopTen(noi){
-  var k = _vnBoDau(noi).replace(/\s+/g,' ').trim(); if (!k) return '';
-  var ds = _vnDsKhach(), best = null, bestD = 99;
-  for (var i = 0; i < ds.length; i++) { if (_vnBoDau(ds[i]).replace(/\s+/g,' ').trim() === k) return ds[i]; }
-  var chua = ds.filter(function(n){ var x = _vnBoDau(n); return x.indexOf(k) >= 0; });
-  if (chua.length === 1) return chua[0];
-  ds.forEach(function(n){ var d = _vnLev(_vnBoDau(n), k); if (d < bestD) { bestD = d; best = n; } });
-  if (best && bestD <= Math.max(1, Math.floor(k.length / 4))) return best;
+  var ds = _vnXepTen(noi);
+  if (ds.length && ds[0].d <= 0.4) return ds[0].n;
   return noi.replace(/\s+/g,' ').trim().replace(/(^|\s)(\S)/g, function(_, a, b){ return a + b.toUpperCase(); });
 }
+// Vài tên khách gần giống nhất (trừ tên đã điền) để chạm chọn nhanh, hiện ngay dưới ô tên
+function _vnGoiYTen(noi, daChon, soLuong){
+  return _vnXepTen(noi).filter(function(x){ return x.d <= 0.5 && normTen(x.n) !== normTen(daChon); }).slice(0, soLuong || 4).map(function(x){ return x.n; });
+}
+var _vnSgDs = {};
+function vnHienGoiYTen(boxId, tenNoi, daChon, onPick){
+  var box = document.getElementById(boxId); if (!box) return;
+  var ds = tenNoi ? _vnGoiYTen(tenNoi, daChon, 4) : [];
+  _vnSgDs[boxId] = { ds:ds, onPick:onPick };
+  if (!ds.length) { box.classList.remove('show'); box.innerHTML = ''; return; }
+  box.innerHTML = '<span>🎤 Hay là:</span>' + ds.map(function(n, i){
+    return '<button type="button" onmousedown="event.preventDefault()" onclick="vnChonGoiYTen(\'' + boxId + '\',' + i + ')">' + escHtml(n) + '</button>';
+  }).join('') + '<button type="button" class="x" onclick="vnAnGoiYTen(\'' + boxId + '\')" title="Ẩn">✕</button>';
+  box.classList.add('show');
+}
+function vnChonGoiYTen(boxId, i){ var o = _vnSgDs[boxId]; if (!o || !o.ds[i]) return; var n = o.ds[i]; vnAnGoiYTen(boxId); o.onPick(n); }
+function vnAnGoiYTen(boxId){ var b = document.getElementById(boxId); if (b) { b.classList.remove('show'); b.innerHTML = ''; } }
 function vnParse(text, loaiHienTai){
-  var r = { ten:'', kg:null, do:null, bi:null, gia:null, loai:null, raw:text };
+  var r = { ten:'', tenNoi:'', kg:null, do:null, bi:null, gia:null, loai:null, raw:text };
   var s = String(text||'').toLowerCase()
     .replace(/(\d)([a-zà-ỹđ])/g, '$1 $2')            // "32kg" → "32 kg", "15.000đ" → "15.000 đ"
     .replace(/[?!;:"“”()]/g, ' ').replace(/,(?!\d)/g, ' ').replace(/\.(?!\d)/g, ' ');
@@ -4839,14 +4919,14 @@ function vnParse(text, loaiHienTai){
   for (var j = raw.length; j > batDau; j--) {
     var cum = _vnBoDau(raw.slice(batDau, j).join(' '));
     var f = ds.filter(function(x){ return x.k === cum; })[0];
-    if (f) { hetTen = j; tenKhop = f.n; break; }
+    if (f) { hetTen = j; tenKhop = f.n; r.tenNoi = raw.slice(batDau, j).join(' '); break; }
   }
   var laTuKhoa = function(w){ return /^\d/.test(w) || _VN_KG.indexOf(w) >= 0 || w === 'độ' || w === 'bì' || w === 'giá' || w === 'đồng' || (w in _VN_LOAI); };
   if (hetTen < 0) {
     hetTen = batDau;
     while (hetTen < raw.length && !laTuKhoa(raw[hetTen])) hetTen++;
     // tên đọc toàn chữ số kiểu "Ba Tư" mà sau đó không còn gì → vẫn là tên
-    if (hetTen > batDau) tenKhop = _vnKhopTen(raw.slice(batDau, hetTen).join(' '));
+    if (hetTen > batDau) { r.tenNoi = raw.slice(batDau, hetTen).join(' '); tenKhop = _vnKhopTen(r.tenNoi); }
   }
   r.ten = tenKhop;
   // 2) Phần còn lại: gom cụm số, gắn nhãn theo từ khoá đứng trước/sau
@@ -4932,7 +5012,11 @@ function vnMicMain(){
     if (r.loai && r.loai !== getLoai('mua')) chonLoai('mua', r.loai);
     var loai = getLoai('mua');
     if (r.gia !== null) { var g = document.getElementById('mua-gia'); g.value = parseInt(r.gia).toLocaleString('vi-VN'); onGia(g, 'mua'); hideGiaSuggest('mua'); }
-    if (r.ten) { document.getElementById('mua-ten').value = r.ten; document.getElementById('mua-ac').style.display = 'none'; updateKhInfoTicker('mua'); updPhanSuggest(); }
+    var datTen = function(n){ document.getElementById('mua-ten').value = n; document.getElementById('mua-ac').style.display = 'none'; updateKhInfoTicker('mua'); updPhanSuggest(); };
+    if (r.ten) {
+      datTen(r.ten);
+      vnHienGoiYTen('mua-vn-sg', r.tenNoi, r.ten, function(n){ datTen(n); toast('👤 Đã đổi tên thành ' + n); });
+    } else vnAnGoiYTen('mua-vn-sg');
     if (r.kg !== null) document.getElementById('mua-kg').value = fmtKg(r.kg);
     if (r.do !== null && loai === 'nuoc') document.getElementById('mua-do').value = fmtDo(r.do);
     if (r.bi !== null) document.getElementById('mua-bi-inline-inp').value = fmtKg(r.bi);
@@ -5061,6 +5145,7 @@ function _nltChonTen(ten){
   setTimeout(function(){ document.getElementById('nlt-kg').focus(); }, 30);
 }
 function nltOnTen(){
+  vnAnGoiYTen('nlt-vn-sg');
   var v = document.getElementById('nlt-ten').value.trim(), ac = document.getElementById('nlt-ac');
   if (!v) { ac.style.display = 'none'; return; }
   var k = _vnBoDau(v);
@@ -5089,6 +5174,7 @@ function nltCalc(){
   document.getElementById('nlt-tt-info').textContent = (_nlt.loai ? LOAI_ICO[_nlt.loai] + ' ' + LOAI_LBL[_nlt.loai] : 'Chưa chọn loại mủ') + (_nlt.gia ? ' · ' + fmtNum(_nlt.gia) + 'đ' : ' · chưa có giá');
 }
 function _nltClearEntry(){
+  vnAnGoiYTen('nlt-vn-sg');
   ['nlt-ten','nlt-kg','nlt-do','nlt-bi'].forEach(function(id){ document.getElementById(id).value = ''; });
   document.getElementById('nlt-ac').style.display = 'none';
   nltCalc();
@@ -5238,14 +5324,21 @@ function vnMicNLT(){
     if (!r.ten && r.kg === null && r.gia === null && !r.loai) { toast('⚠️ Không nhận ra — nói lại, VD: "Ba Tư 32 ký 35 độ"'); return; }
     if (r.loai && r.loai !== _nlt.loai) nltChonLoai(r.loai);
     if (r.gia !== null) { var g = document.getElementById('nlt-gia'); g.value = String(r.gia); nltOnGia(g); }
-    if (r.ten) document.getElementById('nlt-ten').value = r.ten;
+    var coGoiY = false;
+    if (r.ten) {
+      document.getElementById('nlt-ten').value = r.ten;
+      vnHienGoiYTen('nlt-vn-sg', r.tenNoi, r.ten, function(n){ document.getElementById('nlt-ten').value = n; toast('👤 Đã đổi tên thành ' + n); });
+      coGoiY = document.getElementById('nlt-vn-sg').classList.contains('show') && normTen(_vnBoDau(r.tenNoi)) !== normTen(_vnBoDau(r.ten));
+    } else vnAnGoiYTen('nlt-vn-sg');
     if (r.kg !== null) document.getElementById('nlt-kg').value = fmtKg(r.kg);
     if (r.do !== null && _nlt.loai === 'nuoc') document.getElementById('nlt-do').value = fmtDo(r.do);
     if (r.bi !== null) document.getElementById('nlt-bi').value = fmtKg(r.bi);
     nltCalc();
     var du = _nlt.loai && _nlt.gia && document.getElementById('nlt-ten').value.trim() && _nltNum(document.getElementById('nlt-kg').value)
       && (_nlt.loai !== 'nuoc' || _nltNum(document.getElementById('nlt-do').value));
-    if (du && _nltMode() === 'bang') { nltCommit(); return; } // bảng nhập: đủ thông tin → tự thêm dòng (sửa lại được trên bảng)
+    // bảng nhập: đủ thông tin và tên nói ra trùng đúng khách đã lưu → tự thêm dòng; tên chỉ gần giống
+    // thì chờ chọn lại tên trong đề xuất rồi bấm ➕
+    if (du && _nltMode() === 'bang' && !coGoiY) { nltCommit(); return; }
     toast('🎤 ' + _vnTomTat(r) + (du ? ' — bấm ✅ Lưu' : ''));
     setTimeout(function(){
       var thieu = !_nlt.gia ? 'nlt-gia' : !document.getElementById('nlt-ten').value.trim() ? 'nlt-ten' : !document.getElementById('nlt-kg').value ? 'nlt-kg'
@@ -5292,6 +5385,7 @@ function resetF(tab){
   document.getElementById(tab+'-tt-chu').textContent='--';
   document.getElementById(tab+'-ac').style.display='none';
   var _phanEl=document.getElementById(tab+'-phan'); if(_phanEl){ _phanEl.value=''; updPhanSuggest(); }
+  if (tab === 'mua' && typeof vnAnGoiYTen === 'function') vnAnGoiYTen('mua-vn-sg');
   _cfShow[tab] = false;
   _capNhatCompactForm(tab, false);
   updateKhInfoTicker(tab);
