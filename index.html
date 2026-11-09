@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v3.2.3</title>
+<title>Mua Bán Mủ Cao Su v3.2.4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -714,7 +714,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.2.3 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.2.4 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2179,7 +2179,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.2.3</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.2.4</div>
       </div>
     </div>
 
@@ -2351,7 +2351,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.2.3</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.2.4</div>
       </div>
     </div>
 
@@ -4863,8 +4863,20 @@ function _vnLev(a, b){
 }
 // Độ khác nhau giữa tên đã lưu và tên vừa nói (0 = trùng, càng lớn càng khác) — không phân biệt dấu/hoa
 // thường; tên nói ra là 1 phần tên đã lưu (VD "Hai" ↔ "Chú Hai") được tính là rất gần.
+// Dạng chuẩn để so tên: bỏ dấu, chữ thường, số đọc bằng chữ đổi thành chữ số — "Chị Ba" = "chi 3",
+// "Chú Tư" = "chu 4" (tên đã lưu dù viết chữ hay số đều khớp với câu nói)
+var _VN_SO_TEN = { 'một':'1','mốt':'1','hai':'2','ba':'3','bốn':'4','tư':'4','năm':'5','lăm':'5','sáu':'6','bảy':'7','bẩy':'7','tám':'8','chín':'9','mười':'10' };
+function _vnChuan(s){
+  return String(s||'').toLowerCase().split(/\s+/).filter(Boolean).map(function(w){ return _VN_SO_TEN[w] || _vnBoDau(w); }).join(' ');
+}
+// Số lần khách đã bán (Thu Mua) — 2 tên cùng khớp (VD "chi ba" và "chi 3") thì ưu tiên khách bán nhiều hơn
+function _vnSoLanBan(){
+  var m = {};
+  try { getGD('mua').forEach(function(g){ var k = normTen(g.ten); m[k] = (m[k] || 0) + 1; }); } catch(e){}
+  return m;
+}
 function _vnDiemTen(n, k){
-  var a = _vnBoDau(n).replace(/\s+/g,' ').trim();
+  var a = _vnChuan(n);
   if (!a || !k) return 9;
   if (a === k) return 0;
   var aw = a.split(' '), kw = k.split(' ');
@@ -4875,14 +4887,16 @@ function _vnDiemTen(n, k){
   return Math.min(d, dKhongCach) - khopTu * 0.08;
 }
 function _vnXepTen(noi){
-  var k = _vnBoDau(noi).replace(/\s+/g,' ').trim(); if (!k) return [];
-  return _vnDsKhach().map(function(n){ return { n:n, d:_vnDiemTen(n, k) }; }).sort(function(x, y){ return x.d - y.d; });
+  var k = _vnChuan(noi); if (!k) return [];
+  var lan = _vnSoLanBan();
+  return _vnDsKhach().map(function(n){ return { n:n, d:_vnDiemTen(n, k), c:lan[normTen(n)] || 0 }; })
+    .sort(function(x, y){ return (x.d - y.d) || (y.c - x.c); });
 }
 // Tìm tên khách đã lưu trùng hoặc gần giống nhất với tên vừa nói; không có ai đủ giống → giữ tên vừa nói
 // Từng từ vừa nói đều có 1 từ gần giống trong tên đã lưu (sai tối đa ~1/3 số chữ, VD "lũng"≈"lùn",
 // "hay"≈"hai") — tránh tự đổi "chị cả" thành "chị ba" chỉ vì cùng chữ "chị".
 function _vnTuDeuKhop(n, noi){
-  var aw = _vnBoDau(n).split(/\s+/).filter(Boolean), kw = _vnBoDau(noi).split(/\s+/).filter(Boolean);
+  var aw = _vnChuan(n).split(' ').filter(Boolean), kw = _vnChuan(noi).split(' ').filter(Boolean);
   return kw.every(function(w){ return aw.some(function(a){ return _vnLev(a, w) / Math.max(a.length, w.length) <= 0.34; }); });
 }
 function _vnKhopTen(noi){
@@ -4927,12 +4941,20 @@ function vnParse(text, loaiHienTai){
   if (raw[0] === 'tên' || raw[0] === 'khách') { batDau = 1; if (raw[1] === 'hàng') batDau = 2; }
   while (raw[batDau] in _VN_LOAI) { if (!r.loai) r.loai = _VN_LOAI[raw[batDau]]; batDau++; } // "mủ chén chú Hai 50 ký"
   if (raw[batDau] === 'tên' || raw[batDau] === 'khách') batDau++;
-  var ds = _vnDsKhach().map(function(n){ return { n:n, k:_vnBoDau(n).replace(/\s+/g,' ').trim() }; });
+  var lanBan = _vnSoLanBan();
+  var ds = _vnDsKhach().map(function(n){ return { n:n, k:_vnChuan(n), c:lanBan[normTen(n)] || 0 }; });
   var hetTen = -1, tenKhop = '';
   for (var j = raw.length; j > batDau; j--) {
-    var cum = _vnBoDau(raw.slice(batDau, j).join(' '));
-    var f = ds.filter(function(x){ return x.k === cum; })[0];
-    if (f) { hetTen = j; tenKhop = f.n; r.tenNoi = raw.slice(batDau, j).join(' '); break; }
+    // "chị ba mươi hai ký" → "ba" là đầu số 32, không phải tên "chị Ba"
+    if ((raw[j-1] in _VN_SO) && (raw[j] === 'mươi' || raw[j] === 'trăm' || raw[j] === 'nghìn' || raw[j] === 'ngàn')) continue;
+    var cum = _vnChuan(raw.slice(batDau, j).join(' '));
+    var khop = ds.filter(function(x){ return x.k === cum; });
+    if (khop.length) {
+      // nhiều tên cùng khớp ("chi ba" và "chi 3"): khách bán nhiều hơn trước, rồi tới tên viết giống hệt câu nói
+      var noiBD = _vnBoDau(raw.slice(batDau, j).join(' '));
+      khop.sort(function(x, y){ return (y.c - x.c) || ((_vnBoDau(x.n) === noiBD ? 0 : 1) - (_vnBoDau(y.n) === noiBD ? 0 : 1)); });
+      hetTen = j; tenKhop = khop[0].n; r.tenNoi = raw.slice(batDau, j).join(' '); break;
+    }
   }
   var laTuKhoa = function(w){ return /^\d/.test(w) || _VN_KG.indexOf(w) >= 0 || w === 'độ' || w === 'bì' || w === 'giá' || w === 'đồng' || (w in _VN_LOAI); };
   if (hetTen < 0) {
