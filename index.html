@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v3.2.2</title>
+<title>Mua Bán Mủ Cao Su v3.2.3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -714,7 +714,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.2.2 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.2.3 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2179,7 +2179,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.2.2</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.2.3</div>
       </div>
     </div>
 
@@ -2193,7 +2193,7 @@ input[type=date]:focus{border-color:var(--gl)}
         • <b>Mủ đông</b>: nhập khấu hao bì (kg) → tự trừ vào kg thực<br>
         • <b>Nhấp đúp</b> vào giao dịch để chỉnh sửa hoặc xoá<br>
         • Tích ✅ "Gửi sổ" khi lưu để tự động đưa vào tab Sổ Gửi<br>
-        • <b>🎤 Nhập bằng giọng nói</b> (nút micro cạnh ô Đơn giá): bấm micro → hiện bảng micro giữa màn hình → nói, VD <i>"Ba Tư 32 ký 35 độ"</i>, <i>"chú Hai 40 ký rưỡi bì 2"</i>, <i>"mủ chén giá 15 nghìn"</i>, <i>"mủ nước giá 320"</i> → nói xong nhấp vào micro, app tự điền tên (tên khách đã lưu trùng hoặc giống nhất), số ký, độ, bì, giá; dưới ô tên hiện vài tên khách gần giống để chạm đổi nhanh nếu app chọn chưa đúng; xem lại rồi bấm Lưu. Cần mạng và cho phép dùng micro<br>
+        • <b>🎤 Nhập bằng giọng nói</b> (nút micro cạnh ô Đơn giá): bấm micro → hiện bảng micro giữa màn hình → nói, VD <i>"Ba Tư 32 ký 35 độ"</i>, <i>"chú Hai 40 ký rưỡi bì 2"</i>, <i>"chị Cả 45 ký 8, 32 độ 7"</i> (= 45,8 kg · 32,7 độ), <i>"mủ chén giá 15 nghìn"</i>, <i>"mủ nước giá 320"</i> → nói xong nhấp vào micro, app tự điền tên (tên khách đã lưu trùng hoặc giống nhất), số ký, độ, bì, giá; dưới ô tên hiện vài tên khách gần giống để chạm đổi nhanh nếu app chọn chưa đúng; xem lại rồi bấm Lưu. Cần mạng và cho phép dùng micro<br>
         • <b>⚡ Nhập liên tiếp nhiều khách</b> (trong <i>Các Giao Dịch Khác</i> ở cuối tab Thu Mua): màn nhập nhiều khách liền nhau — chọn loại mủ + giá 1 lần, bấm tên khách ở hàng <i>Khách hôm nay</i> (khách đã nhập tự mờ đi) hoặc gõ/nói tên, rồi:<br>
         &nbsp;&nbsp;– <i>Lưu từng người</i>: Tên → Kg → Độ → Bì, Enter ở ô cuối là lưu ngay, quay lại ô Tên cho người kế tiếp; danh sách vừa lưu có nút ✕ để xoá nếu nhập nhầm<br>
         &nbsp;&nbsp;– <i>Bảng nhập</i>: mỗi người 1 dòng, sửa ngay trên bảng, xong bấm <b>💾 Lưu tất cả</b> (bảng nhập dở được giữ lại trên máy nếu lỡ đóng)
@@ -2351,7 +2351,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.2.2</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.2.3</div>
       </div>
     </div>
 
@@ -4773,11 +4773,18 @@ function vnListen(btn, onText){
   var finalTxt = '', interimTxt = '', loi = '';
   _vnHuy = false;
   rec.onresult = function(e){
-    var fin = '', interim = '';
+    // Chrome Android ở chế độ nghe liên tục trả các kết quả CỘNG DỒN ("chị", "chị cả", "chị cả 45"...):
+    // kết quả sau bắt đầu bằng kết quả trước thì thay thế, chỉ nối thêm khi là đoạn nói mới hẳn.
+    var parts = [];
     for (var i = 0; i < e.results.length; i++) {
-      if (e.results[i].isFinal) fin += e.results[i][0].transcript + ' ';
-      else interim += e.results[i][0].transcript;
+      var t = String(e.results[i][0].transcript || '').replace(/\s+/g, ' ').trim();
+      if (!t) continue;
+      var last = parts.length ? parts[parts.length-1] : null, tl = t.toLowerCase();
+      if (last !== null && tl.indexOf(last.toLowerCase()) === 0) parts[parts.length-1] = t;
+      else if (last !== null && last.toLowerCase().indexOf(tl) === 0) continue;
+      else parts.push(t);
     }
+    var fin = parts.join(' '), interim = '';
     finalTxt = fin; interimTxt = interim;
     var t = document.getElementById('vn-pop-txt');
     if (t) { t.textContent = (fin + interim).trim() || '…'; t.classList.remove('hint'); }
@@ -4872,9 +4879,15 @@ function _vnXepTen(noi){
   return _vnDsKhach().map(function(n){ return { n:n, d:_vnDiemTen(n, k) }; }).sort(function(x, y){ return x.d - y.d; });
 }
 // Tìm tên khách đã lưu trùng hoặc gần giống nhất với tên vừa nói; không có ai đủ giống → giữ tên vừa nói
+// Từng từ vừa nói đều có 1 từ gần giống trong tên đã lưu (sai tối đa ~1/3 số chữ, VD "lũng"≈"lùn",
+// "hay"≈"hai") — tránh tự đổi "chị cả" thành "chị ba" chỉ vì cùng chữ "chị".
+function _vnTuDeuKhop(n, noi){
+  var aw = _vnBoDau(n).split(/\s+/).filter(Boolean), kw = _vnBoDau(noi).split(/\s+/).filter(Boolean);
+  return kw.every(function(w){ return aw.some(function(a){ return _vnLev(a, w) / Math.max(a.length, w.length) <= 0.34; }); });
+}
 function _vnKhopTen(noi){
   var ds = _vnXepTen(noi);
-  if (ds.length && ds[0].d <= 0.4) return ds[0].n;
+  if (ds.length && ds[0].d <= 0.4 && _vnTuDeuKhop(ds[0].n, noi)) return ds[0].n;
   return noi.replace(/\s+/g,' ').trim().replace(/(^|\s)(\S)/g, function(_, a, b){ return a + b.toUpperCase(); });
 }
 // Vài tên khách gần giống nhất (trừ tên đã điền) để chạm chọn nhanh, hiện ngay dưới ô tên
@@ -4925,6 +4938,20 @@ function vnParse(text, loaiHienTai){
   if (hetTen < 0) {
     hetTen = batDau;
     while (hetTen < raw.length && !laTuKhoa(raw[hetTen])) hetTen++;
+    // Số đọc bằng chữ dính liền sau tên rồi tới đơn vị ("chị cả bốn mươi lăm ký"): tách phần số ra khỏi tên
+    if (hetTen < raw.length && hetTen - batDau >= 2 && /^(ký|kí|kg|kilo|độ|bì)$/.test(raw[hetTen])) {
+      var cuoi = hetTen, dau = hetTen;
+      while (dau - 1 > batDau && _vnLaSoChu(raw[dau-1])) dau--;
+      if (dau < cuoi) {
+        var cat = -1;
+        for (var u = dau; u < cuoi; u++) {
+          if (raw[u] === 'mười') { cat = u; break; }
+          if ((raw[u] === 'mươi' || raw[u] === 'trăm') && u > dau && (raw[u-1] in _VN_SO)) { cat = u - 1; break; }
+        }
+        if (cat < 0) cat = (cuoi - dau >= 2 && (raw[cuoi-1] in _VN_SO) && (raw[cuoi-2] in _VN_SO) && cuoi - 2 > batDau) ? cuoi - 2 : cuoi - 1;
+        if (cat > batDau) hetTen = cat;
+      }
+    }
     // tên đọc toàn chữ số kiểu "Ba Tư" mà sau đó không còn gì → vẫn là tên
     if (hetTen > batDau) { r.tenNoi = raw.slice(batDau, hetTen).join(' '); tenKhop = _vnKhopTen(r.tenNoi); }
   }
@@ -4941,6 +4968,8 @@ function vnParse(text, loaiHienTai){
         if (_vnLaSoChu(x)) {
           // chữ số đọc bằng chữ ngay sau 1 chữ số viết bằng số → là số khác ("32 ba lăm"), không gộp
           if ((x in _VN_SO) && /^\d/.test(cumSo[cumSo.length-1])) break;
+          // "tám ba mươi hai": chữ số mới ngay trước "mươi/trăm" là đầu 1 số khác
+          if ((x in _VN_SO) && (cumSo[cumSo.length-1] in _VN_SO) && (rest[i+1] === 'mươi' || rest[i+1] === 'trăm')) break;
           cumSo.push(x); i++; continue;
         }
         break;
@@ -4967,6 +4996,18 @@ function vnParse(text, loaiHienTai){
     if (it.t === 'bi' && r.bi === null) { r.bi = nx.v; dung[a+1] = true; if (items[a+2] && items[a+2].t === 'kg') dung[a+2] = true; }
     else if (it.t === 'gia' && r.gia === null) { ganTien(nx.v, !nx.tien); dung[a+1] = true; }
     else if (it.t === 'do' && r.do === null && !(a > 0 && items[a-1].t === 'n' && !dung[a-1])) { r.do = nx.v; dung[a+1] = true; }
+  }
+  // Cách nói "45 ký 8" = 45,8 kg; "32 độ 7" = 32,7 độ: 1 chữ số (0–9) ngay sau đơn vị ký/độ và
+  // sau nó không có đơn vị riêng → là phần lẻ của số đứng trước đơn vị
+  var laDonVi = function(t){ return t === 'kg' || t === 'do' || t === 'bi' || t === 'dong' || t === 'ruoi'; };
+  for (var z = 0; z + 2 < items.length; z++) {
+    var dv = items[z+1].t, le = items[z+2];
+    if (items[z].t !== 'n' || (dv !== 'kg' && dv !== 'do') || le.t !== 'n' || le.tien) continue;
+    if (!(le.v >= 0 && le.v <= 9 && Math.floor(le.v) === le.v)) continue;
+    if (items[z+3] && laDonVi(items[z+3].t)) continue;
+    if (dv === 'do' && z > 0 && items[z-1].t === 'bi') continue;
+    items[z].v = parseFloat(String(Math.floor(items[z].v)) + '.' + le.v);
+    items.splice(z+2, 1); dung.splice(z+2, 1);
   }
   // b) Con số có đơn vị đứng SAU: "32 ký (rưỡi)", "35 độ", "15 nghìn/đồng", "2 ký bì"
   for (var b = 0; b < items.length; b++) {
