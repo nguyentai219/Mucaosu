@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v3.1.8</title>
+<title>Mua Bán Mủ Cao Su v3.1.9</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -648,7 +648,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.1.8 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.1.9 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2031,7 +2031,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.1.8</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.1.9</div>
       </div>
     </div>
 
@@ -2197,7 +2197,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.1.8</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.1.9</div>
       </div>
     </div>
 
@@ -14356,15 +14356,12 @@ var SOL = (function(){
     }, 13 * G + D - 40);
   }
 
-  // ── Ván chia theo độ khó + vòng đánh số 1, 2, 3... (riêng từng số chất + độ khó), số vòng vô hạn, KHÔNG BAO GIỜ TRÙNG:
-  //    mỗi ván thử của mỗi vòng có 1 mã riêng (vòng, lần thử, độ khó, số chất) đưa qua hàm trộn 32-bit 1-đổi-1
-  //    → 2 vòng / 2 lượt bất kỳ không thể ra cùng 1 ván. Mỗi vòng 4096 chỗ = 136 nhóm x 30 ván thử, mỗi nhóm dùng cho 3 lượt chơi (hơn 110 nghìn vòng mỗi mức).
-  //    Chọn ván: chơi thử mỗi ván 3 lần (simEase), xếp dễ → khó, lấy theo phân vị: Dễ = nhóm dễ nhất, Trung bình = khoảng giữa,
-  //    Khó = nhóm khó (~10% khó nhất, không lấy ván khó nhất để tránh bế tắc). Chơi lại 2 lần đầu = đúng ván cũ, lần 3 mới đổi ván khác (cùng vòng, cùng độ khó).
+  // ── Ván chia + vòng đánh số 1, 2, 3... (riêng từng số chất + độ khó), số vòng vô hạn, KHÔNG BAO GIỜ TRÙNG, LUÔN THẮNG ĐƯỢC:
+  //    mọi ván lấy từ KHO ván gốc đã được bộ giải kiểm chứng tìm ra đường thắng (xếp dễ → khó thành 3 mức), nhân lên bằng
+  //    đổi chỗ cột + đổi tên chất (vẫn đúng 1 ván, vẫn thắng được). Màn K = (vòng - 1) x 136 + nhóm lượt chơi → 1-đổi-1.
+  //    Chơi lại: 2 lần đầu đúng ván cũ, lần thứ 3 mới đổi ván khác (cùng vòng, cùng độ khó).
   function rngOf(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
   function mix32(x){ x ^= x >>> 16; x = Math.imul(x, 0x7feb352d); x ^= x >>> 15; x = Math.imul(x, 0x846ca68b); x ^= x >>> 16; return x >>> 0; }
-  var DEAL_N = 30, DEAL_PICK = [0.03, 0.4, 0.9];
-  function roundSeed(m, d, n, a, t){ var mi = m === 1 ? 0 : m === 2 ? 1 : 2; return mix32((((n * 4096 + (a % 136) * DEAL_N + t) * 3 + d) * 3 + mi) >>> 0); }
   function nextTry(m, d, n){ var t; try { t = JSON.parse(lsGet('sol_rtry', '{}')) || {}; } catch(e){ t = {}; } var k = m + '_' + d, a = t[k] && t[k].n === n ? t[k].a + 1 : 0; t[k] = { n: n, a: a }; lsSet('sol_rtry', JSON.stringify(t)); return a; }
   function makeDeck(m, sd){
     var deck = [], id = 0, r = rngOf(sd);
@@ -14377,77 +14374,36 @@ var SOL = (function(){
     var sc = 0; tops.forEach(function(a){ tops.forEach(function(b){ if (a !== b && a.r === b.r + 1) sc += a.s === b.s ? 2 : 1; }); });
     return sc;
   }
-  // ===== Bộ chơi thử (dán nguyên vào game) =====
-  // Chơi thử 1 ván bằng chiến lược tham lam có chấm điểm; trả về độ "dễ": thắng nhanh = rất dễ; thua → theo số dãy thu được + lá úp đã lật.
-  function simEase(deck, noise){
-    var nz = noise || null;
-    var C = [], S = [], i, k, n, done = 0, moves = 0, seen = {}, flips = 0;
-    for (k = 0; k < 10; k++) C.push([]);
-    for (k = 0; k < 54; k++) C[k % 10].push({ s: deck[k].s, r: deck[k].r, u: false });
-    for (k = 0; k < 10; k++) C[k][C[k].length - 1].u = true;
-    for (k = 54; k < 104; k++) S.push({ s: deck[k].s, r: deck[k].r, u: false });
-    function runStart(c){ var j = c.length - 1; if (j < 0 || !c[j].u) return -1; while (j > 0 && c[j - 1].u && c[j - 1].s === c[j].s && c[j - 1].r === c[j].r + 1) j--; return j; }
-    function collect(t){ var c = C[t], L = c.length; if (L < 13) return; var s = c[L - 1].s;
-      for (var q = 0; q < 13; q++){ var x = c[L - 1 - q]; if (!x.u || x.s !== s || x.r !== q + 1) return; }
-      c.splice(L - 13, 13); done++; if (c.length && !c[c.length - 1].u){ c[c.length - 1].u = true; flips++; } }
-    function sig(){ var o = ''; for (var a = 0; a < 10; a++){ var c = C[a]; for (var b = 0; b < c.length; b++) o += (c[b].u ? '' : '~') + c[b].s + '.' + c[b].r + ','; o += '|'; } return o + S.length; }
-    while (moves < 600){
-      var best = null, bs = -1e9;
-      for (var f = 0; f < 10; f++){
-        var src = C[f]; if (!src.length) continue;
-        var rs = runStart(src); if (rs < 0) continue;
-        // chỉ xét đi từ đầu dãy liền mạch hoặc các điểm trong dãy (tách dãy)
-        for (i = rs; i < src.length; i++){
-          var card = src[i], below = src[i - 1], len = src.length - i;
-          var reveal = !!(below && !below.u), empties = !below, linked = !!(below && below.u && below.s === card.s && below.r === card.r + 1);
-          for (var t = 0; t < 10; t++){
-            if (t === f) continue; var dst = C[t], top = dst[dst.length - 1], sc;
-            if (!top){ if (i === 0) continue; if (linked) continue; sc = 20 + (reveal ? 60 : 0); }
-            else {
-              if (top.r !== card.r + 1) continue;
-              var same = top.s === card.s;
-              if (linked && !same) continue;                       // không phá dãy cùng chất để nối khác chất
-              if (linked && same){ var rt = runStart(dst), newLen = dst.length - rt + len; if (newLen <= src.length - rs) continue; sc = 40 + newLen; } // chỉ chuyển nếu dãy dài hơn
-              else sc = (same ? 100 + (dst.length - runStart(dst) + len) * 4 : 50) + (reveal ? 80 : 0) + (empties ? 40 : 0);
-              if (same && dst.length - runStart(dst) + len >= 13) sc += 1000;
-            }
-            if (nz) sc += nz() * 30;                                // chơi thử nhiều lần: mỗi lần chọn nước hơi khác nhau
-            if (sc > bs){ best = [f, i, t]; bs = sc; }
-          }
-          if (!linked) break; // chỉ tách dãy tại chỗ nối (đã xét đầu dãy ở lượt i = rs)
-        }
-      }
-      var key = null;
-      if (best){ var mv = C[best[0]].splice(best[1]); C[best[2]] = C[best[2]].concat(mv); var sb = C[best[0]];
-        if (sb.length && !sb[sb.length - 1].u){ sb[sb.length - 1].u = true; flips++; }
-        collect(best[2]); moves++; key = sig(); if (seen[key]) best = null; else seen[key] = 1; }
-      if (done === 8) return 1000 - moves;                         // thắng: càng ít nước càng dễ
-      if (!best){
-        if (!S.length) break;
-        var emp = false; for (k = 0; k < 10; k++) if (!C[k].length) emp = true;
-        if (emp){ // lấp cột trống bằng lá ngửa ở cột có nhiều lá nhất (luật: không chia khi còn cột trống)
-          var donor = -1, dl = 1; for (k = 0; k < 10; k++){ var rr = runStart(C[k]); if (C[k].length > dl && rr > 0){ dl = C[k].length; donor = k; } }
-          if (donor < 0) break;
-          for (k = 0; k < 10; k++) if (!C[k].length){ var rs2 = runStart(C[donor]); if (rs2 <= 0) break; C[k] = C[donor].splice(rs2); if (C[donor].length && !C[donor][C[donor].length - 1].u){ C[donor][C[donor].length - 1].u = true; flips++; } }
-        }
-        for (k = 0; k < 10; k++){ if (!S.length) break; var cd = S.pop(); cd.u = true; C[k].push(cd); }
-        for (k = 0; k < 10; k++) collect(k);
-        moves++;
-      }
-    }
-    return done * 40 + flips;                                     // thua: dãy đã thu + lá úp đã lật
+  // KHO-BEGIN (dữ liệu kho ván gốc — sinh tự động, đừng sửa tay)
+  var XBN_KHO = {"1":["5brd44,1w5n0mx,7hyo6a,1sslccq,9rfvky,1rh9gru,ut2txu,342qig,1l6so7b,18rxvc9,1xcm4ll,ssiovi,14p4hzo,1fpnbs9,1hbagvd,yi14zw,9if3wj,167ehev,1jjwmok,p1rax2,qduo8i,1unwobi,p42ynl,15saqut,52op2w,rgcl3i,18boi8m,aq4hgi,otv553,okoz2k,14crivg,90i43t,nhiepd,1bdpnfu,d5uthm,1iv6e13,d13usv,id9467,1f2xu1b,1ue31g8,18aotuj,66sw44,v9s8k5,qpr4hm,1e1qvq7,5hu2od,725n2l,rcvbcn,1x1ta1w,1un68jo,85pu2u,uq0uv3,j6kzoa,1wwpmn9,saqhay,1429jz6,ju543z,j4k56c,2t3jmr,1v09vaa,1ky2qex,1cui7q,a2kyma,1cezgf3,7ve9zy,br7ykd,efg3we,sm9ips,1m43qnj,8v3080,1o96ic5,1gashxo,1no1036,zizij9,1m9nsad,9jds18,1besee5,16do08w,mtyax7,oni66q,ttpnmh,15or9uu,1qxwpge,wisaph,1pak0bs,wxf16l,yk7cfj,ehiuac,51mja8,xmxg46,1gb20n9,1ux5l90,j4qrus,10vs2x2,172y663,1ssgy2f,1k1sopo,iz5uif,1pdbm2a,43is0n,o63dss,1l447qn,wfek8c,r0m0gp,1srj5w8,sffk6s,syf2ae,1560bl4,1aww4m2,5yiwl9,ds0s8g,1dxz83p,g1dxa7,591evo,n65a4e,12dhm4q,1n8j997,1vzu6vx,x6xfp2,8hvxlf,1dtyu4t,6ldplv,gcnody,11bx055,1cyrzqs,1rz950r,1h4mgls,lz38ku,11bdfwi,1bvipz4,eurov8,r7e3b8,9rp4au,8qoxmg,1ghi023,jbo6sa,1h5pajg,oe8l3d,13ucb1u,13wwf3b,1cj4qup,dbcq53,igrdky,1uoquaj,o10q2h,19mz34g,e392md,eiiljj,mw8q6u,bqavp3,1fgpjyf,14lelvd,1ktn74n,1hf9e0d,l8f0zg,qsurzs,1cv8ger,riqrr4,1m3bsxt,19cyg6g,khzzlj,1mjc676,uarjbp,7ahc8b,4pom5r,jt3ufn,3d6aoj,1wywzbq,1idhxor,17rv9e8,hp0hth,2tbr50,gy0x9h,1v98n07,1pkurhu,1465v9h,hg0qtp,1u8i0tq,utf5bq,b9uhdx,1ytwjs0,1foq7zv,1oni8fv,140bpaj,1sl46w4,1egjub5,1h18p5o,1eaxmwq,eyhxg8,dupidc,13zlifv,16vsjvn,4yf0tm,1pqymrb,t3xuml,d0zuz9,7dd20g,1i1jcio,13c1yrv,1fyhnki","9p53hc,15xdp67,1af8n5y,ddxxjs,emo2nk,ynh36w,11yigsi,16u8oeg,cbxbdw,bcq9cq,gaxhz0,h5sppz,jxl804,1todiks,16lo89h,1dpqhms,9dac6e,icd8ca,l3oh8l,18oqye1,zf6c92,eyu7q,1hcbpd8,1lpnh4q,1ttgbdg,bun49m,14do3rc,1ss49ze,gtel7f,pui2ji,12j2v7a,4y9y9u,6hphul,1pq7slr,125jelw,gnt28i,10lpptz,1awkpiy,11ho7ar,1ykeb2f,1ywcqrx,t8wqk4,1e3ochm,tomc1c,1313box,m5siqg,3escew,1oewgsd,101jgs2,1b4bjtz,1nv63iy,1rugwir,1p6vpjm,13jypwo,4e3esw,1i5f4uq,au8un3,1fan0mo,qg0unb,dk0y3u,5u9v37,ek84vo,1so72cc,ga8wah,12uqw3v,1rd9ekd,3b2j59,afimy5,swyl96,1g7jz0g,amh20j,1ihsgvn,1xoql9z,1h1cahe,1ywusnt,1fxngvi,ahr3bd,frsy4v,1y242mh,1u95baw,19kjaco,1hbusqr,15900r,9ghxix,eh3x3m,z5fefh,11rmzw,15nhlvn,1dm4zwf,nb8qas,19glvow,ixofso,433xun,1dm8ln7,17fhiu5,1olbmv4,1uo8ne5,1pskpz1,oq3f3z,tjmf1i,wx2u2h,1gvhen8,3awukv,3f81mm,1s4hx6w,zpkzjy,cfzis,1xq60qm,1bmjpa0,1tqtzab,gvpf4n,i2n6wy,rpjbfg,1e2ts9z,1j1rnac,mcb1f7,pd48cd,hh8zup,1gr90yu,1r4it1w,zoi7i1,q8lksg,10rnuqt,vp4471,14r5dly,1egub2,1jgtdgc,iqfhbq,ylpuuq,wfpjf0,1epuck3,oelz0p,t8sulg,1q02gcb,lq0nkl,1gy6rie,qzvenn,y1d1j7,kp9wpo,1lsiz9o,1tzbicq,871e7h,14le4e0,17n9lpp,1b47dq2,38wxdi,3thgf6,cfmqtv,o31ltp,um0wfb,103r744,1crbvpd,nhlqfv,1l2fk3o,1x8fjll,19wwua,6l8tdr,82onpv,gzsu34,veu41m,199lvjx,1fg3m8w,1pmw4p7,1x6uy59,1w0dz6l,zfzzjb,acanzd,dd8bpg,olw2re,162yics,179mlt6,1aauf0p,1brar24,1e6uuql,1jvv0qs,cw4pde,1dwg4m4,doir4i,10q9egu,1i3rk3k,j7txrd,z6m7ov,12dr5zi,155y18i,1ayxcu2,1dgnzqd,1dx7tnj,1ivufos,1of1x68,jgyp8q,18zxoeg,1s3k3nf,130txma,ou4mtb,5h2lmx,1dtgxrx,ngkupr,3uwfks,9wqo8d,cgygik","k884w5,12q4q1i,19fmr3c,1c1yh30,1hgf8bv,1hgq89e,1m0e80p,1xx2evq,mng9ub,3jp4q7,9oi92,n0bx9w,1ny7d08,v8mlxg,18wfju7,1gnuyc4,pjrq91,grs7en,1wctvd1,15r9zs2,kl7mls,1m2ox8j,13oj1ra,1vm0pin,z1u2ex,bxmy1a,c3wozt,ui8kbg,1jsn3kw,8kgo1q,cd40bi,svs9ot,1ar8ceh,1j5f76m,1jgkx4p,u4fnyy,1bfdte8,153otpd,gtcg9i,1hiq6cz,1iecw1a,gy3py4,1clpo3t,1jh4nkk,1shgiva,pa86bi,oilyfe,ojaibu,14srgjo,18mr7nb,ikxllj,1eqldvw,1ipwi2h,1mre52o,1mz3wqe,vfyovv,wppqwp,1qaoiuk,tetkls,1u3b7yh,upczwc,19vmgak,lb6llm,3qvcvr,llwn6t,lryeiy,pqxf40,1ba9wcg,1qzl7x5,4rfra9,1bfbq16,1gj9f0h,1ossc8h,neuipp,1kr1lgf,1cyfzqh,1b95u9k,1gkpyi4,zf3sql,y9rufp,aq4nnd,y3hoa1,448im0,1pdx4qt,1xmkvrt,hjvocb,1b65khr,9r0l9l,13ww0zk,vpdjdl,18keikb,101o3g,1h5fjgv,4uck6i,1ccg92t,1jx5h0n,1ojt9al,zn43aq,1ovrwe2,6iftl9,126ebhe,3vn0pp,19hpq9l,g0gbkt,1rb6v86,6ur3d,ras3yf,12f1yvf,fv8cbr,a59o0m,15i89dg,a32w7i,iixeth,otjddj,1sxp5ex,166j2zf,18yf45l,19qfeh4,qiufmv,91nb6n,9lhapo,987qsz,1irn7vt,tx5ffq,1q4dq70,vhxlxm,14l9avc,1pxcm01,1xxszg3,tphgde,1c6m3uk,1uzj8jf,12de11w,1rohqe1,sb1vs8,1cpj7jo,ix10rk,1c8jhe2,1kzh7v1,1cj06bw,dz5xil,hbtzc7,dbqdjn,1bjlr3q,gw5zoe,izjq9z,txo1we,3c0v1f,1rjlbjp,36co6b,15vzxzy,zkgxjz,1o4l5v1,1ondhi4,2klzq3,s8hszh,y4qkob,6o424s,kr0y70,14n1j3v,ynrwem,du2w5h,1yxe5w6,17nxl7k,1dypdei,1th0azw,puni5n,1qunwuk,1jgngk3,1nni7zb,z5z2il,16mcz4s,bx8fe8,1loely7,izn77r,rymihm,63nb5w,1x31ur,co0wdy,n3h2ux,ntztrg,9n1a63,1cqtcyp,16brsrc,ai29rh,1mtmd90,mfv4ke,xlybyy,12tn3o9,wkc36c,1gpy9l5,1ovksae,vhdikn,10uj0qe,128s5bu,18ke3o5,uz5l37,8oaxl2,4n07o,1wlr1u4"],"2":["pmalui,1vpg283,idzlmb,bpy69k,ohvdqf,8f005c,sylgxi,1g70wqq,19rwiq3,1kg5g76,1bexhb5,1pixi5q,1ow8t4t,8pf8d6,15vsr69,1u8yhqu,1q1ux1i,3sgk2v,1d5twgz,qvu3uz,d7u332,i2b4nw,xboj3v,79c5o1,wrjc80,kfl3ga,tki4x5,1qfm7t0,374uuc,1q4a1ap,ndo6oo,p51l4l,8u911k,k5q23q,9s0b80,4mrgah,1ix484g,sx9u95,1rauwev,14qlisn,ylrknq,xwllok,81tajc,ail8il,1kclgbp,1rtls8j,nh5ckp,1rfebn0,sqaqpg,1yyrrc,172vgw0,gf7cw5,13dvcxo,1lkosu3,94pq52,oubb35,1pab0lf,1789m1e,1o8td6a,15b3ejm,t4tq4l,zxaixv,1ak2v3,ppvrv8,1b13mft,1kob0zx,1kle8ho,1qteraa,x0475t,13pykt4,1dcsmgz,ibvuhs,185vl4q,2bosv4,cd7igf,xepdtb,10mef7s,s2lkna,1jnowst,1l8r2zt,7rcuio,h091md,1cieria,mflx4i,fy52fm,1hucg9h,113rnw,162pzfc,1kbj2aa,1xnqyct,1n76aun,bgb8kb,c8lgt8,sqywuc,103zr71,1bz3rsf,13jo32v,1troagd,1tzs24z,vg93if,rsudk5,tdd2eh,1xfngzk,1ddc2qc,83nfpw,8ir8z9,c4w5s3,1jb9v78,1e88gxm,9drqo4,1bxczd4,1t1jz1q,19rgl93,nw0jms,1kbx0xu,1oxlrij,21zmm2,1992y6g,1yzga1r,jsr02a,pt96rh,83u9ll,kvptdk,1q6k7ew,3jx4np,jjx3ki,x9wezc,tdhaoy,wr4bet,o0529g,3x89zs,d532lm,clqqww,1k0c9hg,1yjy38i,1pouv3x,k8od7c,14c7mey,1a89zq6,1sf0weg,hbh8wy,1tbzoaj,u3vbz,13tctxz,co11z7,18yalsp,1bshrnl,1ic1izl,1twspdk,o8659v","1g5gi7e,by630e,gvpje0,u2ol70,z1gecw,1va3rzv,1virgim,1w3rq3g,112icyn,129pxa8,12wkj1t,roc073,19xzgzp,4ycj1t,c0vhbv,iocoqv,19vt0t9,1oho3gx,1qqxlhk,734zd5,1k846vm,1mzc9wc,1oatbop,1p4l0wg,vqap3r,13r7sey,1m8b35l,bfx7og,171j0b7,u1yaj1,6hjzqe,fpa1tn,19rcnp3,1lvz0m7,3gfrj2,5mcma4,5metth,e1ppxa,1v3y1vu,axsltn,ngcvkr,tnbdpj,14qwsbn,1n1k7pw,9h827g,1sckwze,1vgxxir,12r2512,19e0jeb,52kn8r,py0qx2,12nvolt,14kk80k,1d5yi46,1mfxd9f,3q4w0y,cec0jn,10odxza,1oavw95,1egni6l,1ey8893,2lcsiq,8vp06y,ow6h42,1ik8csz,1tl5bfk,1tx8nmf,w7mzu,iyzi77,n09vqg,1k4w584,wysbw1,82wmbl,166g1km,1f1mc3g,fj6ohh,vg81l8,14jgmo8,1k9th9a,8vzty1,lxuunp,sqgz10,12vmdeb,1oqb5z2,1pi79pa,969er6,1n07rr8,1pv0x4g,1vap3pr,b7c8yc,lodasy,v16eyb,vtooer,1m6lsmd,13gem5t,1vw73t4,t5fi4j,1y8vemp,1ym4kse,3ozjir,9dhh2r,10qok8h,1t6qpc1,wu0qfs,mcmg73,1tiykip,wuuwmu,133lcsp,87cxei,chptw2,ddl4y3,8jl8a0,q6469h,1ld0qit,1y1p39j,fivr2d,ppxjjc,18lz42q,1nhcqzz,abbqi,me284g,rogjb7,zhqf9y,6pfkl,eiv0x0,10gvgcg,1olzlll,bwgq4c,1divwsy,1gisblh,1qc5fxy,1ly21n7,1ptxxth,1w1vafb,1wuejrs,1mfh7,5mv1g7,b83soh,nusaw9,tbzltm,ntasf,rceew2,xf8xss,17kgxh3,tzntxy,1orbx2s,1re3jzc,hfpa8w,yhy3zx,14x5ghh","161azvu,17yn7xs,1ckpydb,1h61ac1,1qwirbl,1s5xaav,bo3u8p,1ghmi9x,1p8c6f2,1w9xs3j,1lj46n,1cx04hg,1dp5h0x,1mz670c,305ter,tnavvx,16rimk0,19whns8,1jrifuj,5apenv,5iwr34,1664zez,1fg7nnb,1gakfq3,1v7kinl,p8bcni,120i8fo,1adg01d,1f14uq5,1g4krnv,1jskf90,1x0odeh,1bd7lb,263mw6,fmtqgt,gkfsn4,n2qp0h,tggd79,vzecoq,1e4aa0b,1urzmwq,16zeml,1587y3k,1nn1dmq,1qa4365,jdy7h1,rbtt3a,yedofd,zkzeq2,10ckmcj,19c9z05,1kxg703,1xuar2n,15jzu7l,163fjwh,1uzsz1x,1xk8omq,1yjn6yp,fy2zne,15t41wn,19yz958,1iuz9zr,1uhu983,8twmuj,tjapnd,uf6x6k,1011dd8,2p3tyu,1rz4wp2,1wqnm9b,g2q7ao,v5ghqk,132icn9,1cj9o5l,1o5zula,1qoy32q,1w6manx,amc199,ir89jt,zll2y4,12xiqew,1ccbhor,1dy450y,1st55tk,1xpoot5,dxdkr,kkvnz3,mplvug,olepkt,pdvqpx,14uhkmv,15zpfwi,1mn1tku,1soz0rg,1l1lgv,40x6x4,1951r0m,1lenq7w,13w0tes,1hpjy2i,1m9a2kn,1q8tad3,4qo1az,9yl7kf,67xzxy,11dig7s,1i7m9yo,rq4zis,18tkgm9,1ri3lt5,1sr868e,8cxhyr,ib79yl,19i54xe,1h23ofb,1aic5x,bvaqs6,i19loj,le7d74,147juts,1adlp5o,1or4t78,1tdoh3f,1en9kkr,1h3ft6f,66nai8,d2xhtp,1wswlcc,rbide4,1xuyip8,97xecv,105tret,1bpz0h4,1fmz7q,13ais2d,1j01kr1,1v4b4y9,1wu903p,h898bi,1pdknay,ag09mw,xqf80h,6uld1o,1u8jqx5,oupn0h,15vyizd,icjrb7,14996ll,1fqtcd7,qvzdz4"],"4":["1g8uh9b,9lzyey,11gzdz8,17ye5o6,1xir6cb,yef02j,rkoofk,1aw50li,lr0af4,1gx8f80,1and5xq,77ben6,b2njcz,ca29ic,1pyym14,13nfosn,1gxp82g,1v1u5w,1q2w2j8,13f5ubu,dcxb31","hd0isj,tubdjb,9tiz4c,gv05n1,1jtgp7c,1keyd8l,1t6v30q,9e07t8,1dkiyj4,youbn2,d58ipk,1oufkhu,1hq66dz,xndzm8,1gviwvd,q8wzuv,usl1dv,1cw3alj,5e9d5b,1d2kj5t,cbcz5a","105rb19,1e8tryp,1s6up4,5m6ar5,1pjf56d,1nytzls,1vt3eic,k40tkn,pawh2j,qo7vqz,1uape1o,1wgf43r,1vforz,1ce6c3u,qpam6e,57732m,149axrq,10nmx6j,1aszzzw,er3gna,1qsx62f"]};
+  // KHO-END
+  // ===== KHO MÀN CHƠI (ván gốc đã được bộ giải kiểm chứng THẮNG ĐƯỢC) =====
+  // XBN_KHO[số chất] = [Dễ, Trung bình, Khó]: mỗi mục là chuỗi mã ván gốc (cơ số 36, cách nhau dấu phẩy), xếp từ dễ đến khó.
+  // Mỗi ván gốc nhân thành nhiều biến thể vẫn thắng được: đổi chỗ 4 cột 6 lá với nhau, 6 cột 5 lá với nhau (xấp bài đổi theo)
+  // và đổi tên chất (2 chất: 2 cách, 4 chất: 24 cách) → 1 ván gốc = 17.280 x (1 | 2 | 24) màn khác nhau.
+  // Màn thứ K của 1 mức = ván gốc (K mod L) + biến thể ((K div L) x 7919 + muối) mod P — 1-đổi-1 nên không bao giờ trùng.
+  function khoList(m, d){ var l = XBN_KHO[m] && XBN_KHO[m][d]; if (!l) return []; if (typeof l === 'string') l = XBN_KHO[m][d] = l.split(',').map(function(x){ return parseInt(x, 36); }); return l; }
+  function permNth(arr, n){ var a = arr.slice(), out = []; for (var i = a.length; i > 0; i--){ var f = 1; for (var j = 2; j < i; j++) f *= j; var q = Math.floor(n / f) % i; out.push(a.splice(q, 1)[0]); n %= f; } return out; }
+  function variantDeck(m, sd, p){
+    var dk = makeDeck(m, sd), sN = m === 4 ? 24 : m === 2 ? 2 : 1;
+    var pa = p % 24, pb = Math.floor(p / 24) % 720, ps = Math.floor(p / 17280) % sN;
+    var pi = permNth([0, 1, 2, 3], pa).concat(permNth([4, 5, 6, 7, 8, 9], pb));   // cột c → cột pi[c]
+    var sg = m === 4 ? permNth([0, 1, 2, 3], ps) : m === 2 ? (ps ? [1, 0] : [0, 1]) : [0];
+    var out = new Array(104), k;
+    for (k = 0; k < 54; k++){ var r = Math.floor(k / 10), c = k % 10; out[r * 10 + pi[c]] = dk[k]; }
+    for (k = 0; k < 50; k++){ var r2 = Math.floor(k / 10), c2 = k % 10; out[103 - (r2 * 10 + pi[c2])] = dk[103 - k]; }
+    for (k = 0; k < 104; k++){ var x = out[k]; out[k] = { id: x.id, s: sg[x.s], r: x.r, up: false }; }
+    return out;
+  }
+  function khoDeal(m, d, K){
+    var L = khoList(m, d), sN = m === 4 ? 24 : m === 2 ? 2 : 1, P = 17280 * sN;
+    if (!L.length) return null;
+    var idx = K % L.length, p = (Math.floor(K / L.length) * 7919 + (m * 131 + d * 17)) % P;
+    return { seed: (L[idx] ^ Math.imul(p + 1, 0x9E3779B1)) >>> 0, deck: variantDeck(m, L[idx], p) };
   }
   function pickDeal(m, d, n, at){
-    var c = [];
-    for (var j = 0; j < DEAL_N; j++){
-      var sd = roundSeed(m, d, n, at, j), dk = makeDeck(m, sd);
-      if (d === 2 && dealScore(dk) < 1) continue;
-      var e = 0; for (var q = 0; q < 3; q++) e += simEase(dk, rngOf(Math.imul(sd, 31) + q));
-      c.push({ sd: sd, dk: dk, e: e });
-    }
-    if (!c.length) return makeDeck(m, roundSeed(m, d, n, at, 0));
-    c.sort(function(x, y){ return y.e - x.e || x.sd - y.sd; });
-    return c[Math.min(c.length - 1, Math.floor(c.length * DEAL_PICK[d]))].dk;
+    var r = khoDeal(m, d, ((n - 1) * 136 + (at % 136)) >>> 0);
+    return r ? r.deck : makeDeck(m, (n * 2654435761 + at) >>> 0); // dự phòng (kho trống — không xảy ra)
   }
   function roundsGet(){ try { return JSON.parse(lsGet('sol_round', '{}')) || {}; } catch(e){ return {}; } }
   // 'sol_roundw' = vòng cao nhất đã THẮNG theo số chất + độ khó → thua / chơi lại thì vẫn đúng vòng đó, đúng ván đó.
