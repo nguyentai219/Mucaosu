@@ -12,6 +12,9 @@ PWA ghi chép mua bán mủ cao su, chạy trên GitHub Pages tại `/Mucaosu/`.
 2. **Gói file nén mới nhất**: sau khi gộp vào `main`, chạy `./dong-goi.sh <thư mục scratchpad> [thư mục
    chứa khoá ký nếu có]` rồi gửi file `.zip` cho người dùng tải về (gồm web app, APK, mã nguồn APK,
    assetlinks.json và khoá ký nếu có trong phiên).
+   **Gửi kết quả luôn gồm 2 loại file** (áp dụng cho MỌI dự án của người dùng): (a) **file nén `.zip`** chứa toàn bộ dữ
+   liệu; (b) **từng file `.apk` gửi riêng** (APK app, APK game, APK quản trị... bản mới nhất có thay đổi) để người dùng mở cài
+   thử trực tiếp trên điện thoại, không phải giải nén. Lần cập nhật nào có APK thay đổi thì gửi APK đó riêng.
 3. Sau đó **báo lại** đã sửa những gì, đã kiểm tra ra sao và đã đưa lên GitHub (kèm link pull request).
 4. **Hỏi người dùng còn muốn chỉnh sửa gì nữa không.**
 5. Trả lời người dùng bằng tiếng Việt.
@@ -66,7 +69,7 @@ cần file `.nojekyll`).
 ## Game APK riêng (Xếp Bài Nhện)
 
 Game APK riêng của người dùng **không đưa lên GitHub** (không thêm vào repo này): mã nguồn giữ ngoài repo, chỉ gửi file
-`.apk`/`.zip` trực tiếp cho người dùng.
+`.apk`/`.zip` trực tiếp cho người dùng — mỗi lần cập nhật gửi cả file `.zip` đầy đủ lẫn file `.apk` riêng để cài thử ngay.
 
 ## App quản trị (công cụ tính mã gia hạn)
 
@@ -75,4 +78,4 @@ App quản trị Mủ Cao Su (vỏ APK + file công cụ `cong-cu-tinh-ma-MG1-*.
 trực tiếp cho người dùng. Thư mục `android-admin/` và `android-xepbai/` đã bị chặn trong `.gitignore`.
 App này chỉ chạy trên máy của người quản trị. **Mỗi lần cập nhật app quản trị** (công cụ tính mã hoặc vỏ APK): tăng
 `versionCode`/`versionName`, build lại APK (`ADMIN_HTML=... KEYSTORE=... KS_PASS=... ./build.sh` trong mã nguồn vỏ APK giữ ngoài repo)
-rồi **gửi APK quản trị mới nhất cho người dùng cùng với báo cáo kết quả**.
+rồi **gửi APK quản trị mới nhất (file `.apk` riêng, không nén) cho người dùng cùng với báo cáo kết quả**.
