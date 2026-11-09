@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v3.2.7</title>
+<title>Mua Bán Mủ Cao Su v3.2.8</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -714,7 +714,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.2.7 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.2.8 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2190,7 +2190,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.2.7</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.2.8</div>
       </div>
     </div>
 
@@ -2362,7 +2362,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.2.7</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.2.8</div>
       </div>
     </div>
 
@@ -4766,6 +4766,11 @@ function _vnBubble(msg, ms){
 }
 function vnSupported(){ return !!(window.SpeechRecognition || window.webkitSpeechRecognition); }
 var _vnHuy = false;
+// 2 câu bắt đầu bằng cùng 2 từ (VD "chị Mười 18,8 kg…" và "chị Mười 18 kg 8…") = cùng 1 câu nói được nghe lại
+function _vnCungDau(a, b){
+  var x = _vnBoDau(a).split(/\s+/).filter(Boolean), y = _vnBoDau(b).split(/\s+/).filter(Boolean);
+  return x.length >= 2 && y.length >= 2 && x[0] === y[0] && x[1] === y[1] && !/^\d/.test(x[0]);
+}
 function _vnPop(show){
   var p = document.getElementById('vn-pop'); if (!p) return;
   p.classList.toggle('show', !!show);
@@ -4800,6 +4805,7 @@ function vnListen(btn, onText){
       var last = parts.length ? parts[parts.length-1] : null, tl = t.toLowerCase();
       if (last !== null && tl.indexOf(last.toLowerCase()) === 0) parts[parts.length-1] = t;
       else if (last !== null && last.toLowerCase().indexOf(tl) === 0) continue;
+      else if (last !== null && _vnCungDau(last, t)) parts[parts.length-1] = t; // máy nghe lại cả câu (cách ghi khác) → lấy bản mới
       else if (last !== null) {
         // đoạn mới lặp lại phần cuối đoạn trước ("… 33 độ" + "33 độ 7") → chỉ nối phần chưa có
         var lw = last.split(' '), nw = t.split(' '), ov = 0;
@@ -4959,6 +4965,12 @@ function vnParse(text, loaiHienTai){
     .replace(/([a-zà-ỹđ])(\d)/g, '$1 $2')            // "độ7" → "độ 7", "ký6" → "ký 6"
     .replace(/[?!;:"“”()]/g, ' ').replace(/,(?!\d)/g, ' ').replace(/\.(?!\d)/g, ' ');
   var t0 = s.split(/\s+/).filter(Boolean), raw = [];
+  // Cả câu bị nhắc lại từ đầu ("chị mười 18,8 kg 41° 2 chị mười 18 kg 8 41° 2") → chỉ lấy lần sau cùng
+  if (t0.length >= 4 && !/^\d/.test(t0[0])) {
+    for (var p0 = t0.length - 2; p0 >= 2; p0--) {
+      if (t0[p0] === t0[0] && t0[p0+1] === t0[1]) { t0 = t0.slice(p0); break; }
+    }
+  }
   // Android đôi khi nhắc lại đoạn vừa nói ("… 33 độ 33 độ 7"): bỏ cụm 2–4 từ lặp liền nhau ngay sau chính nó
   for (var lp = 4; lp >= 2; lp--) {
     for (var q0 = 0; q0 + 2 * lp <= t0.length; q0++) {
