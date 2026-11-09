@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v3.1.9</title>
+<title>Mua Bán Mủ Cao Su v3.2.0</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -648,7 +648,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.1.9 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.2.0 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2015,6 +2015,22 @@ input[type=date]:focus{border-color:var(--gl)}
   </div>
 </div>
 
+<!-- MODAL XÁC NHẬN MẬT KHẨU QUẢN TRỊ — KHÔI PHỤC SUPABASE BẰNG FILE SAO LƯU (thay thế toàn bộ, không hoàn tác) -->
+<div class="modal center" id="modal-sb-bk-restore" style="z-index:2600">
+  <div class="modal-box center-box">
+    <div class="cfm-ico">⚠️</div>
+    <div class="cfm-ttl">Khôi phục bằng file sao lưu</div>
+    <div style="font-size:12.5px;color:var(--g600);text-align:left;margin-bottom:12px;padding:0 4px;line-height:1.55" id="sbbk-msg"></div>
+    <input type="password" autocomplete="new-password" id="sbbk-pw" class="fi" placeholder="Nhập mật khẩu quản trị" style="margin-bottom:6px" onkeydown="if(event.key==='Enter')sbBackupRestoreSubmit()">
+    <div id="sbbk-err" style="color:#dc2626;font-size:11px;margin-bottom:6px;display:none">⚠️ Sai mật khẩu quản trị, vui lòng nhập lại!</div>
+    <div class="cfm-btns">
+      <button class="cfm-btn n" onclick="sbBackupRestoreCancel()">Huỷ</button>
+      <button class="cfm-btn y" id="sbbk-ok" style="background:#dc2626" onclick="sbBackupRestoreSubmit()">♻️ Thay thế</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="sbbk-file" style="display:none" onchange="sbBackupFileChosen(this)">
+
 <!-- MODAL XEM ẢNH ĐÍNH KÈM GIAO DỊCH — PHÓNG TO TOÀN MÀN HÌNH -->
 <div class="modal center" id="modal-anh-viewer" style="z-index:3000;background:rgba(0,0,0,.92)">
   <div class="modal-box center-box" style="background:transparent;box-shadow:none;padding:0;max-width:96vw;width:auto;text-align:center;animation:none">
@@ -2031,7 +2047,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.1.9</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.2.0</div>
       </div>
     </div>
 
@@ -2159,7 +2175,9 @@ input[type=date]:focus{border-color:var(--gl)}
         &nbsp;&nbsp;– <i>Theo khách hàng (chưa chốt sổ)</i>: chỉ hiện sổ gửi/ứng tiền còn hiệu lực<br>
         &nbsp;&nbsp;– <i>Toàn bộ dữ liệu của khách hàng</i>: hiện cả phần đã chốt sổ<br>
         • Nút <b>"Tải PDF"</b> xuất đúng phần dữ liệu đang lọc trên màn hình về điện thoại<br>
-        • "Khôi phục từ Supabase": tải lại dữ liệu mới nhất về máy (dùng khi đổi máy hoặc cài lại app)
+        • "Khôi phục từ Supabase": tải lại dữ liệu mới nhất về máy (dùng khi đổi máy hoặc cài lại app)<br>
+        • <b>"Tải bản sao lưu về điện thoại"</b>: lưu toàn bộ dữ liệu của tài khoản trên Supabase thành file <i>backup mu cao su dd-mm-yyyy.json</i> (trong thư mục Tải xuống)<br>
+        • <b>"Khôi phục Supabase bằng file sao lưu"</b>: chọn file sao lưu đã tải trước đó → toàn bộ dữ liệu trên Supabase (và trên máy này) bị <b>thay thế</b> bằng dữ liệu trong file. Dùng được file của tài khoản khác để chuyển dữ liệu sang tài khoản đang đăng nhập. Không hoàn tác được nên phải nhập <b>mật khẩu quản trị</b>. Hạn dùng app và ảnh đính kèm không nằm trong file sao lưu.
       </div>
     </div>
 
@@ -2197,7 +2215,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.1.9</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.2.0</div>
       </div>
     </div>
 
@@ -6351,6 +6369,16 @@ function openSbModal() {
       + '<div class="gd-opt-txt"><div>Khôi phục từ Supabase</div>'
       + '<div class="gd-opt-sub">Tải dữ liệu mới nhất về máy này</div></div>'
       + '</div>'
+      + '<div class="gd-opt" onclick="sbDownloadBackup()">'
+      + '<span class="gd-opt-ico">💾</span>'
+      + '<div class="gd-opt-txt"><div>Tải bản sao lưu về điện thoại</div>'
+      + '<div class="gd-opt-sub">Lưu toàn bộ dữ liệu tài khoản trên Supabase thành 1 file</div></div>'
+      + '</div>'
+      + '<div class="gd-opt" onclick="sbBackupPickFile()">'
+      + '<span class="gd-opt-ico">♻️</span>'
+      + '<div class="gd-opt-txt"><div style="color:#b45309">Khôi phục Supabase bằng file sao lưu</div>'
+      + '<div class="gd-opt-sub">Thay thế toàn bộ dữ liệu trên Supabase — cần mật khẩu quản trị</div></div>'
+      + '</div>'
       + '<div class="gd-opt" onclick="openSbDataView()">'
       + '<span class="gd-opt-ico">📊</span>'
       + '<div class="gd-opt-txt"><div>Xem dữ liệu ghi chép và tải PDF chi tiết</div>'
@@ -7173,6 +7201,136 @@ function syncClientRegistry() {
     MCS_LS.setItem('registry_sync_debug', '❌ Lỗi JS lúc ' + new Date().toLocaleTimeString('vi-VN') + ': ' + e.message);
     logSyncError(e.message || 'Lỗi JS không rõ', 'syncClientRegistry try/catch');
   }
+}
+
+// ══════════════════════════════════════════
+// SAO LƯU / KHÔI PHỤC SUPABASE BẰNG FILE TRÊN ĐIỆN THOẠI
+// - Tải bản sao lưu: lấy TOÀN BỘ dòng của tài khoản trong bảng mucaosu_data (bỏ khoá app khác) → file
+//   JSON "backup mu cao su dd-mm-yyyy.json" tải về máy.
+// - Khôi phục: chọn file đó → xác nhận bằng MẬT KHẨU QUẢN TRỊ → ghi dữ liệu trong file lên Supabase của
+//   tài khoản ĐANG đăng nhập (có thể là tài khoản khác với tài khoản đã tạo file), xoá các mục trên
+//   Supabase không có trong file, rồi thay luôn dữ liệu trên máy này (nếu để nguyên dữ liệu cũ trên máy,
+//   lần đồng bộ ngầm kế tiếp sẽ đẩy dữ liệu cũ lên đè lại). Không hoàn tác được.
+// - 'license_expiry' KHÔNG sao lưu/khôi phục: hạn dùng theo từng máy (bảng device_trials), giữ nguyên.
+// ══════════════════════════════════════════
+var SB_BACKUP_TYPE = 'mu-cao-su-supabase-backup';
+function _sbBackupSkipKey(k){ return !k || k === 'license_expiry' || SB_NO_SYNC_KEYS.indexOf(k) !== -1 || isOtherAppKey(k); }
+function _sbBackupDateStr(d){ d = d || new Date(); function p(n){ return (n<10?'0':'')+n; } return p(d.getDate()) + '/' + p(d.getMonth()+1) + '/' + d.getFullYear(); }
+function _sbBackupCount(v){ return Array.isArray(v) ? v.length : 0; }
+function sbDownloadBackup(){
+  if (!sbClient || !sbUser) { toast('⚠️ Chưa đăng nhập Supabase'); return; }
+  if (!navigator.onLine) { toast('📶 Cần có mạng để tải bản sao lưu'); return; }
+  toast('⏳ Đang tạo bản sao lưu từ Supabase...');
+  sbClient.from('mucaosu_data').select('data_key,data_value,updated_at').eq('user_id', sbUser.id).then(function(res){
+    if (res.error) { toast('❌ Lỗi tải dữ liệu: ' + res.error.message); return; }
+    var rows = (res.data || []).filter(function(r){ return !_sbBackupSkipKey(r.data_key); });
+    if (!rows.length) { toast('ℹ️ Tài khoản chưa có dữ liệu nào trên Supabase'); return; }
+    var now = new Date(), ds = _sbBackupDateStr(now);
+    var data = {};
+    rows.forEach(function(r){ data[r.data_key] = r.data_value; });
+    var bk = {
+      type: SB_BACKUP_TYPE, format: 1,
+      name: 'backup mu cao su ' + ds,
+      created_at: now.toISOString(),
+      app_version: (document.title.match(/v[\d.]+/) || [''])[0],
+      account_email: sbUser.email || '',
+      count: { mua: _sbBackupCount(data.gd3_mua), ban: _sbBackupCount(data.gd3_ban), sg: _sbBackupCount(data.sg3), su: _sbBackupCount(data.su_data), cc: _sbBackupCount(data.cc_data) },
+      data: data
+    };
+    // Tên file không được chứa "/" nên ngày ghi dạng dd-mm-yyyy (tên đầy đủ dd/mm/yyyy nằm trong file)
+    var fname = 'backup mu cao su ' + ds.replace(/\//g, '-') + '.json';
+    try {
+      var blob = new Blob([JSON.stringify(bk)], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = fname; a.style.display = 'none';
+      document.body.appendChild(a); a.click();
+      setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 4000);
+      toast('✅ Đã tải "' + fname + '" (' + rows.length + ' mục) về thư mục Tải xuống');
+    } catch(e) { toast('❌ Không lưu được file: ' + (e && e.message ? e.message : 'lỗi không rõ')); }
+  }).catch(function(e){ toast('❌ Lỗi kết nối: ' + e.message); });
+}
+var _sbBkPending = null;
+function sbBackupPickFile(){
+  if (!sbClient || !sbUser) { toast('⚠️ Chưa đăng nhập Supabase'); return; }
+  var inp = document.getElementById('sbbk-file');
+  inp.value = '';
+  inp.click();
+}
+function sbBackupFileChosen(inp){
+  var f = inp.files && inp.files[0];
+  if (!f) return;
+  var rd = new FileReader();
+  rd.onload = function(){
+    var bk = null;
+    try { bk = JSON.parse(rd.result); } catch(e) {}
+    if (!bk || bk.type !== SB_BACKUP_TYPE || !bk.data || typeof bk.data !== 'object' || Array.isArray(bk.data)) {
+      toast('❌ File không phải bản sao lưu Mủ Cao Su hợp lệ'); return;
+    }
+    var keys = Object.keys(bk.data).filter(function(k){ return !_sbBackupSkipKey(k); });
+    if (!keys.length) { toast('❌ File sao lưu không có dữ liệu'); return; }
+    _sbBkPending = { bk: bk, keys: keys };
+    var d = bk.data, created = bk.created_at ? new Date(bk.created_at) : null;
+    var esc = function(x){ return String(x == null ? '' : x).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+    var same = (bk.account_email || '').toLowerCase() === (sbUser.email || '').toLowerCase();
+    document.getElementById('sbbk-msg').innerHTML =
+      '📄 <b>' + esc(f.name) + '</b><br>'
+      + '🕐 Tạo lúc: <b>' + (created && !isNaN(created) ? created.toLocaleString('vi-VN') : '?') + '</b><br>'
+      + '👤 Của tài khoản: <b>' + esc(bk.account_email || '?') + '</b>' + (same ? '' : ' <span style="color:#b45309">(khác tài khoản đang đăng nhập)</span>') + '<br>'
+      + '📊 Thu mua ' + _sbBackupCount(d.gd3_mua) + ' · Bán ra ' + _sbBackupCount(d.gd3_ban) + ' · Sổ gửi ' + _sbBackupCount(d.sg3) + ' · Ứng tiền ' + _sbBackupCount(d.su_data) + ' · Chấm công ' + _sbBackupCount(d.cc_data) + ' (' + keys.length + ' mục)<br><br>'
+      + '<span style="color:#dc2626;font-weight:700">TOÀN BỘ dữ liệu trên Supabase của tài khoản ' + esc(sbUser.email || '') + ' và trên máy này sẽ bị THAY THẾ bằng dữ liệu trong file. KHÔNG THỂ HOÀN TÁC.</span><br>'
+      + '<span style="font-size:11.5px">Mật khẩu quản trị / giao dịch cũng lấy theo file. Hạn dùng app giữ nguyên.</span><br>'
+      + 'Nhập <b>mật khẩu quản trị</b> để xác nhận.';
+    document.getElementById('sbbk-pw').value = '';
+    document.getElementById('sbbk-err').style.display = 'none';
+    document.getElementById('sbbk-ok').disabled = false;
+    openM('modal-sb-bk-restore');
+    setTimeout(function(){ document.getElementById('sbbk-pw').focus(); }, 200);
+  };
+  rd.onerror = function(){ toast('❌ Không đọc được file'); };
+  rd.readAsText(f);
+}
+function sbBackupRestoreCancel(){ _sbBkPending = null; closeM('modal-sb-bk-restore'); }
+function sbBackupRestoreSubmit(){
+  if (!_sbBkPending) return;
+  var pw = document.getElementById('sbbk-pw').value;
+  if (pw !== getAdminPW()) { document.getElementById('sbbk-err').style.display = 'block'; return; }
+  if (!sbClient || !sbUser) { toast('⚠️ Chưa đăng nhập Supabase'); return; }
+  if (!navigator.onLine) { toast('📶 Cần có mạng để khôi phục'); return; }
+  var pend = _sbBkPending, okBtn = document.getElementById('sbbk-ok');
+  okBtn.disabled = true;
+  sbSyncing = true; // chặn đồng bộ ngầm đẩy dữ liệu cũ của máy lên trong lúc đang thay thế
+  var now = new Date().toISOString();
+  var rows = pend.keys.map(function(k){ return { user_id: sbUser.id, data_key: k, data_value: pend.bk.data[k], updated_at: now }; });
+  function fail(msg){ sbSyncing = false; okBtn.disabled = false; toast('❌ ' + msg); }
+  toast('⏳ Đang thay thế dữ liệu trên Supabase...');
+  // B1: ghi dữ liệu trong file lên trước (lỗi ở bước này thì dữ liệu cũ chưa bị xoá)
+  sbClient.from('mucaosu_data').upsert(rows, { onConflict: 'user_id,data_key' }).then(function(res){
+    if (res.error) { fail('Lỗi ghi dữ liệu: ' + res.error.message); return; }
+    // B2: xoá các mục còn trên Supabase mà file sao lưu không có (giữ license_expiry)
+    return sbClient.from('mucaosu_data').select('data_key').eq('user_id', sbUser.id).then(function(r2){
+      if (r2.error) throw new Error(r2.error.message);
+      var extra = (r2.data || []).map(function(r){ return r.data_key; })
+        .filter(function(k){ return k !== 'license_expiry' && pend.keys.indexOf(k) === -1; });
+      if (!extra.length) return { error: null };
+      return sbClient.from('mucaosu_data').delete().eq('user_id', sbUser.id).in('data_key', extra);
+    }).then(function(r3){
+      if (r3 && r3.error) throw new Error(r3.error.message);
+      // B3: thay dữ liệu trên máy này cho khớp Supabase
+      getAllSyncableKeys().forEach(function(k){ if (k !== 'license_expiry' && pend.keys.indexOf(k) === -1) MCS_LS.removeItem(k); });
+      pend.keys.forEach(function(k){
+        var v = pend.bk.data[k];
+        if (v === null || v === undefined) MCS_LS.removeItem(k);
+        else MCS_LS.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
+      });
+      setPendingCount(0);
+      MCS_LS.setItem('sb_last_sync', String(Date.now()));
+      _sbBkPending = null;
+      closeM('modal-sb-bk-restore');
+      toast('✅ Đã thay thế dữ liệu Supabase bằng file sao lưu!');
+      setTimeout(function(){ location.reload(); }, 1200);
+    });
+  }).catch(function(e){ fail('Lỗi khôi phục: ' + (e && e.message ? e.message : 'không rõ') + '. Hãy thử lại.'); });
 }
 
 function restoreFromSupabase(silent) {
