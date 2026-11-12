@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v3.2.8</title>
+<title>Mua Bán Mủ Cao Su v3.2.9</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -65,7 +65,7 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g
 #gmp-canvas{display:block;width:100%;height:100%}
 .gmp-btn{position:absolute;top:calc(10px + env(safe-area-inset-top));width:42px;height:42px;border-radius:50%;border:2px solid rgba(255,255,255,.9);background:rgba(27,67,50,.55);color:#fff;font-size:19px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1}
 body.gmp-open{overflow:hidden}
-/* Game ẩn Xếp Bài Nhện + danh sách game */
+/* Game ẩn Xếp Bài + danh sách game */
 #game-cfm{display:none;position:fixed;inset:0;z-index:7000;background:rgba(10,30,20,.5);align-items:center;justify-content:center;padding:20px}
 #game-menu{display:none;position:fixed;inset:0;z-index:6500;background:rgba(10,30,20,.55);align-items:center;justify-content:center;padding:20px}
 .gm-box{width:100%;max-width:340px;background:#fffaf0;border:3px solid #2d6a4f;border-radius:18px;padding:16px;font-family:'Be Vietnam Pro',sans-serif;color:#1b4332;box-shadow:0 10px 30px rgba(0,0,0,.3)}
@@ -714,7 +714,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.2.8 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.2.9 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2190,7 +2190,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.2.8</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.2.9</div>
       </div>
     </div>
 
@@ -2362,7 +2362,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.2.8</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.2.9</div>
       </div>
     </div>
 
@@ -7120,7 +7120,7 @@ var SB_NO_SYNC_KEYS = ['device_code','gd_token','gd_token_expiry','gd_folder_id'
   // hoặc tự đặt lại mật khẩu giao dịch về mặc định).
   'admin_override_applied_at','pw_reset_applied_at','registry_sync_debug','last_ext_info',
   'gmp_best','gmp_best_de','gmp_best_kho','gmp_sound','gmp_cfg', // kỷ lục + cài đặt game ẩn Giọt Mủ Phiêu Lưu: riêng từng máy
-  'sol_cfg','sol_save','sol_stat','sol_round','sol_roundw','sol_rtry', // game ẩn Xếp Bài Nhện: cài đặt, ván đang chơi dở, thống kê, số vòng — riêng từng máy
+  'sol_cfg','sol_save','sol_stat','sol_round','sol_roundw','sol_rtry', // game ẩn Xếp Bài: cài đặt, ván đang chơi dở, thống kê, số vòng — riêng từng máy
   'nlt_mode','nlt_draft']; // Nhập liên tiếp: chế độ đang chọn + bảng nhập dở chưa lưu — riêng từng máy
 // Danh sách khoá THỰC SỰ sẽ đồng bộ mỗi lần: hợp của SB_DATA_KEYS (đảm bảo có giá trị mặc định hợp lý
 // nếu máy chưa từng có khoá đó) VÀ toàn bộ khoá đang thực sự tồn tại trong localStorage của app (trừ
@@ -15986,7 +15986,7 @@ var SOL = (function(){
     var p = $('sol-set'); if (!p) return;
     p.querySelector('[data-k="sound"]').classList.toggle('on', !!cfg.sound);
     p.querySelector('[data-k="land"]').classList.toggle('on', !!cfg.land);
-    var vm = (document.title.match(/v\d+(\.\d+)+/) || [''])[0]; p.querySelector('.sol-ver').textContent = '🕷️ Xếp Bài Nhện · TaiDauTieng@gmail.com · trong app Mủ Cao Su ' + vm; // số phiên bản lấy theo app
+    var vm = (document.title.match(/v\d+(\.\d+)+/) || [''])[0]; p.querySelector('.sol-ver').textContent = '🕷️ Xếp Bài · TaiDauTieng@gmail.com · trong app Mủ Cao Su ' + vm; // số phiên bản lấy theo app
     p.querySelector('[data-k="bigNum"]').classList.toggle('on', !!cfg.bigNum);
     p.querySelectorAll('[data-suits]').forEach(function(b){ b.classList.toggle('on', +b.getAttribute('data-suits') === cfg.suits); });
     var dv = cfg.diff == null ? 1 : cfg.diff;
@@ -16282,11 +16282,11 @@ if ('serviceWorker' in navigator) {
   <div class="gm-box">
     <div class="gm-ttl">🎮 Giải trí đôi chút nhé!</div>
     <button class="gm-item" onclick="GAME_MENU.play('gmp')"><span class="gm-ico">👼</span><span><div class="gm-name">Giọt Mủ Phiêu Lưu</div><div class="gm-desc">Chạm để bay qua khe giữa các thân cây cao su</div></span></button>
-    <button class="gm-item" onclick="GAME_MENU.play('sol')"><span class="gm-ico">🕷️</span><span><div class="gm-name">Xếp Bài Nhện</div><div class="gm-desc">Xếp bài cổ điển: xếp đủ dãy K → A cùng chất</div></span></button>
+    <button class="gm-item" onclick="GAME_MENU.play('sol')"><span class="gm-ico">🕷️</span><span><div class="gm-name">Xếp Bài</div><div class="gm-desc">Xếp bài cổ điển: xếp đủ dãy K → A cùng chất</div></span></button>
     <button class="gm-close" onclick="GAME_MENU.close()">Đóng</button>
   </div>
 </div>
-<!-- GAME ẨN: Xếp Bài Nhện -->
+<!-- GAME ẨN: Xếp Bài -->
 <div id="sol-overlay">
   <div class="sol-top">
     <button class="sol-ib" id="sol-x" onclick="SOL.close()" title="Thoát game">✕</button>
@@ -16309,7 +16309,7 @@ if ('serviceWorker' in navigator) {
   <div id="sol-set" onclick="if(event.target===this)SOL.closeSet()">
     <div class="gmp-set-box">
       <button class="gmp-x" onclick="SOL.closeSet()" aria-label="Đóng">✕</button>
-      <div class="gmp-set-ttl">⚙️ Cài đặt Xếp Bài Nhện</div>
+      <div class="gmp-set-ttl">⚙️ Cài đặt Xếp Bài</div>
       <div class="gmp-set-lbl">♠️ Số chất</div>
       <div class="gmp-seg">
         <button data-suits="1" onclick="SOL.setSuits(1)">1 chất ♠</button>

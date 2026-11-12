@@ -18,6 +18,7 @@ Số phiên bản theo dạng **`Z.X.Y`**:
 
 | Phiên bản | Ngày | Thay đổi |
 |-----------|------|----------|
+| **v3.2.9** | 2026-11-12 | 🎴 Đổi tên game **"Xếp Bài Nhện" → "Xếp Bài"** (danh sách game, bảng Cài đặt, dòng phiên bản) cho thống nhất với game APK riêng cùng tên. Luật chơi không đổi. |
 | **v3.2.8** | 2026-11-10 | 🎤 Nhập bằng giọng nói: Chrome Android đôi khi **nghe lại nguyên cả câu** theo cách ghi khác ("chị Mười 18,8 kg 41°2" rồi "chị Mười 18 kg 8 41°2") và nối 2 lần vào nhau — nay app nhận ra câu lặp từ đầu và chỉ lấy lần nghe sau cùng, không phụ thuộc may rủi. |
 | **v3.2.7** | 2026-11-10 | 🐛 Nhập bằng giọng nói — **sửa mất số lẻ của độ** ("33 độ 7" chỉ ra 33): Google hay ghi chữ "độ" thành ký hiệu **°** ("33° 7", "33°7", "33°C 7") hoặc dính liền ("độ7") → nay đều hiểu là 33,7. Ghép kết quả nhận dạng tốt hơn: đoạn sau lặp lại phần cuối đoạn trước ("… 33 độ" + "33 độ 7") hoặc cụm bị nhắc lại ("33 độ 33 độ 7") thì bỏ phần lặp. Chế độ **Tự điền khi nói xong**: chờ **2 giây im lặng** mới điền (trước đây máy tự cắt ngay khi ngập ngừng nên hay mất số nói sau), không nói gì 8 giây thì tự đóng. |
 | **v3.2.6** | 2026-11-10 | 🎤 Nhập bằng giọng nói **bỏ qua Trừ bì** để khỏi nhầm: ô Trừ bì không bao giờ được điền bằng giọng nói (nhập tay nếu có); câu lỡ nói "bì …" thì số đó chỉ bị bỏ ra, không lẫn vào số ký/độ. |
