@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v3.2.9</title>
+<title>Mua Bán Mủ Cao Su v3.3.0</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -714,7 +714,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.2.9 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.3.0 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2190,7 +2190,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.2.9</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.3.0</div>
       </div>
     </div>
 
@@ -2362,7 +2362,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.2.9</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.3.0</div>
       </div>
     </div>
 
@@ -15770,10 +15770,11 @@ var SOL = (function(){
       //  · cỡ lá theo các BẬC cố định (mỗi bậc nhỏ hơn 12%) · trong ván chỉ THU NHỎ khi cột không còn vừa
       //  · chỉ PHÓNG TO lại khi thu xong 1 dãy, ván mới, mở lại ván, xoay màn hình · đổi cỡ mượt (CSS width/height)
       if (cols){
-        var need = fitCh(H - 6 - 6) / 1.42, lv = 0;
-        while (lv < 12 && zoomCw(cw, lv) > need && zoomCw(cw, lv) > 34) lv++;
+        var av = H - 6 - 6, m = fitM(), lvFor = function(mm){ var nd = av / mm / 1.42, l = 0; while (l < 12 && zoomCw(cw, l) > nd && zoomCw(cw, l) > 34) l++; return l; };
+        var lv = lvFor(m), lvRoom = lvFor(m + 0.54);   // lvRoom: cỡ vẫn vừa kể cả khi cột dài nhất có thêm 2 lá → đủ chỗ dư để to lại
         if (_zoomHold && zBase === cw && zLv != null){ /* đang chờ thu dãy: giữ nguyên */ }
         else if (zBase !== cw || zLv == null || _zoomGrow || lv > zLv){ zBase = cw; zLv = lv; }
+        else if (lvRoom < zLv){ zLv = lvRoom; }           // cột đã ngắn lại (thu dãy, đi bài, hoàn nguyên) và đủ chỗ dư → tự to lại
         _zoomGrow = false; cw = zoomCw(cw, zLv);
       }
       ch = Math.round(cw * 1.42);
@@ -15797,11 +15798,12 @@ var SOL = (function(){
     return [dS, uS];
   }
   // Cỡ lá lớn nhất để cột dài nhất vẫn lộ đủ số trên mọi lá ngửa (lá úp 4%, lá ngửa 27% chiều cao lá)
-  function fitCh(avail){
+  function fitM(){ // chiều dài cột dài nhất, tính theo số lần chiều cao lá (lá úp 4%, lá ngửa 27%)
     var m = 1;
     cols.forEach(function(c){ var nd = 0, nu = 0; c.forEach(function(x){ if (x.up) nu++; else nd++; }); m = Math.max(m, 1 + 0.04 * nd + 0.27 * Math.max(0, nu - 1)); });
-    return avail / m;
+    return m;
   }
+  function fitCh(avail){ return avail / fitM(); }
   function colX(i){ return x0 + i * (cw + gap); }
   function buildEls(){
     board.querySelectorAll('.sol-c').forEach(function(e){ e.remove(); });
