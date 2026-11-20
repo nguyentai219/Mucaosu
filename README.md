@@ -18,6 +18,7 @@ Số phiên bản theo dạng **`Z.X.Y`**:
 
 | Phiên bản | Ngày | Thay đổi |
 |-----------|------|----------|
+| **v3.3.3** | 2026-11-20 | 🧹 Màn 👥: bỏ dòng hướng dẫn dưới **Mã cơ sở thu mua** và bỏ dòng hướng dẫn "Chế độ quản trị (email + mật khẩu quản trị)" — Sổ Khách Hàng v1.36 thay chế độ quản trị bằng mã cơ sở. |
 | **v3.3.2** | 2026-11-20 | 🏪 **Mã cơ sở thu mua** ngay dưới tiêu đề "Danh Sách và Mã Khách Hàng" (màn 👥): mã 7 số + mật khẩu 6 số, nút 📋 Sao chép và 🔄 Đổi mật khẩu (xác nhận mật khẩu giao dịch). Nhập vào app Sổ Khách Hàng (v1.35+) để xem toàn bộ sổ của cơ sở: Thu Mua, Bán Ra, Gửi sổ, Ứng tiền, Chấm Công, Tính Toán, danh sách khách. Đồng bộ lên Supabase (khoá `co_so_xem`, trộn an toàn khi đăng nhập). |
 | **v3.3.1** | 2026-11-17 | 🎴 Xếp Bài: **chia bài tự nhiên hơn** — loại 20% ván gốc "thuận tay" nhất khỏi kho (những ván mà lá chia ra từ xấp hay nối tiếp đúng dãy đang xếp); tỉ lệ lá chia nối tiếp nay khoảng 5–6% (ván ngẫu nhiên thuần khoảng 7–8%). Mọi ván vẫn là ván đã kiểm chứng thắng được. Kho còn 1 chất 394, 2 chất 288, 4 chất 49 ván gốc (mỗi ván nhân hàng chục nghìn biến thể). |
 | **v3.3.0** | 2026-11-16 | 🐛 Xếp Bài màn ngang: **sửa lỗi nhiều lúc lá không tự phóng to lại**. Trước đây lá chỉ to lại khi thu xong dãy / ván mới / xoay màn hình, nên cột dài được dọn ngắn bằng nước đi thường hay hoàn nguyên (hoặc lúc thu dãy mà cột khác còn dài) thì lá vẫn nhỏ. Nay sau mỗi nước đi, bàn bài đủ chỗ dư (cột dài nhất có thêm 2 lá vẫn vừa) thì lá tự to lại; chỗ dư này giữ cho lá không co giãn qua lại liên tục. Lúc chờ thu dãy vẫn giữ nguyên cỡ. |
