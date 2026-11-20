@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v3.3.2</title>
+<title>Mua Bán Mủ Cao Su v3.3.3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -714,7 +714,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.3.2 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.3.3 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2190,7 +2190,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.3.2</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.3.3</div>
       </div>
     </div>
 
@@ -2362,7 +2362,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.3.2</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.3.3</div>
       </div>
     </div>
 
@@ -2448,7 +2448,7 @@ input[type=date]:focus{border-color:var(--gl)}
     <div class="modal-title">📇 Danh Sách và Mã Khách Hàng</div>
     <!-- Mã cơ sở thu mua: nhập vào app Sổ Khách Hàng để xem TOÀN BỘ sổ của cơ sở này -->
     <div id="coso-box" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:1.5px solid #6ee7b7;border-radius:12px;padding:10px 12px;margin-bottom:10px"></div>
-    <div style="font-size:11.5px;color:var(--g600);margin-bottom:10px">Đưa <b>Mã KH + Mật khẩu xem sổ</b> cho khách hàng để họ nhập vào app <b>"Sổ Khách Hàng"</b> và tự xem sổ thu mua/gửi/ứng của riêng mình — không cần đăng nhập Supabase trên máy khách.<br>🔑 <b>Chế độ quản trị</b> (xem tất cả khách): tài khoản = <b id="khid-admin-email">email Supabase của bạn</b>, mật khẩu = <b>mật khẩu quản trị</b> của app này.</div>
+    <div style="font-size:11.5px;color:var(--g600);margin-bottom:10px">Đưa <b>Mã KH + Mật khẩu xem sổ</b> cho khách hàng để họ nhập vào app <b>"Sổ Khách Hàng"</b> và tự xem sổ thu mua/gửi/ứng của riêng mình — không cần đăng nhập Supabase trên máy khách.</div>
 
     <div style="background:var(--g50);border-radius:10px;padding:10px 12px;margin-bottom:12px">
       <button onclick="openThemKhachHang()" style="width:100%;padding:10px;background:var(--gd);color:#fff;border:none;border-radius:8px;font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:700;cursor:pointer">➕ Thêm khách hàng mới</button>
@@ -2880,7 +2880,6 @@ function renderCoSoBox(){
   var c = getOrCreateCoSo();
   box.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">'
     + '<div style="min-width:0"><div style="font-size:12px;font-weight:800;color:#047857">🏪 Mã cơ sở thu mua</div>'
-    + '<div style="font-size:10.5px;color:var(--g600);margin-top:1px">Nhập vào app Sổ Khách Hàng để xem toàn bộ sổ của cơ sở</div>'
     + '<div style="display:flex;gap:14px;margin-top:5px;flex-wrap:wrap">'
     + '<div><div style="font-size:10px;color:var(--g400);font-weight:700">MÃ CƠ SỞ</div><div style="font-size:17px;font-weight:800;color:var(--gd);letter-spacing:1.5px">' + c.ma + '</div></div>'
     + '<div><div style="font-size:10px;color:var(--g400);font-weight:700">MẬT KHẨU</div><div style="display:flex;align-items:center;gap:6px"><span style="font-size:17px;font-weight:800;color:#b45309;letter-spacing:1.5px">' + c.mk + '</span>'
@@ -3666,7 +3665,6 @@ function openHuyChotMua(){
 }
 function renderKhachIdList(){
   try { renderCoSoBox(); } catch(e){}
-  try { var _ae = document.getElementById('khid-admin-email'); if (_ae && typeof sbUser !== 'undefined' && sbUser && sbUser.email) _ae.textContent = sbUser.email; } catch(e){}
   rebuildKHRoleLists(); // luôn tính lại đúng vai trò theo giao dịch thật trước khi hiển thị
   var box = document.getElementById('khid-list');
   if (!box) return;
