@@ -1,5 +1,5 @@
-const CACHE = 'mu-cao-su-v3.3.4';
-const FILES = ['/Mucaosu/','/Mucaosu/index.html','/Mucaosu/manifest.json','/Mucaosu/icon-192.png','/Mucaosu/icon-512.png','/Mucaosu/apple-touch-icon.png','/Mucaosu/logo.png','/Mucaosu/logo-game.png','/Mucaosu/splash.png'];
+const CACHE = 'mu-cao-su-v3.3.5';
+const FILES = ['/Mucaosu/','/Mucaosu/index.html','/Mucaosu/manifest.json','/Mucaosu/icon-192.png','/Mucaosu/icon-512.png','/Mucaosu/apple-touch-icon.png','/Mucaosu/logo.png','/Mucaosu/logo-game.png','/Mucaosu/splash.png','/Mucaosu/games/vuon-qua.html','/Mucaosu/games/xep-gach.html','/Mucaosu/games/xep-bai.html'];
 
 self.addEventListener('install', e => {
   // Tải các file với cache:'reload' (bỏ qua HẲN bộ nhớ đệm HTTP của trình duyệt). GitHub Pages trả header
@@ -67,7 +67,7 @@ self.addEventListener('fetch', e => {
     // Tài nguyên tĩnh khác: Cache First — nhanh hơn
     e.respondWith(
       caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
-        // Lưu lại tài nguyên tải lần đầu (VD game-la-bai.json — hình lá bài của game, chỉ tải khi mở game) để lần sau chơi offline
+        // Lưu lại tài nguyên tải lần đầu (VD tài nguyên chỉ tải khi cần) để lần sau chơi offline
         if (resp && resp.ok) { const clone = resp.clone(); caches.open(CACHE).then(c => c.put(e.request, clone)); }
         return resp;
       }).catch(() => caches.match('/Mucaosu/index.html')))

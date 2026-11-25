@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v3.3.4</title>
+<title>Mua Bán Mủ Cao Su v3.3.5</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -67,7 +67,10 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g
 #gmp-canvas{display:block;width:100%;height:100%}
 .gmp-btn{position:absolute;top:calc(10px + env(safe-area-inset-top));width:42px;height:42px;border-radius:50%;border:2px solid rgba(255,255,255,.9);background:rgba(27,67,50,.55);color:#fff;font-size:19px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1}
 body.gmp-open{overflow:hidden}
-/* Game ẩn Xếp Bài + danh sách game */
+/* Màn chơi các game riêng (games/*.html) + danh sách game */
+#gf-overlay{display:none;position:fixed;inset:0;z-index:6000;background:#1d2a20}
+#gf-frame{display:block;width:100%;height:100%;border:0;background:#1d2a20}
+#game-menu .gm-box{max-height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 #game-cfm{display:none;position:fixed;inset:0;z-index:7000;background:rgba(10,30,20,.5);align-items:center;justify-content:center;padding:20px}
 #game-menu{display:none;position:fixed;inset:0;z-index:6500;background:rgba(10,30,20,.55);align-items:center;justify-content:center;padding:20px}
 .gm-box{width:100%;max-width:340px;background:#fffaf0;border:3px solid #2d6a4f;border-radius:18px;padding:16px;font-family:'Be Vietnam Pro',sans-serif;color:#1b4332;box-shadow:0 10px 30px rgba(0,0,0,.3)}
@@ -78,69 +81,7 @@ body.gmp-open{overflow:hidden}
 .gm-name{font-size:15px;font-weight:800;color:#1b4332}
 .gm-desc{font-size:12px;color:#52796f;margin-top:2px}
 .gm-close{width:100%;padding:10px;border-radius:12px;border:1.5px solid #b7d3c2;background:#fff;font-family:inherit;font-size:14px;font-weight:700;color:#2d6a4f;cursor:pointer}
-#sol-overlay{display:none;position:fixed;inset:0;z-index:6000;max-width:480px;margin:0 auto;flex-direction:column;background:radial-gradient(ellipse at 50% 30%,#2f7d4a,#1d5a33 70%,#174a2a);color:#fff;font-family:'Be Vietnam Pro',sans-serif;-webkit-user-select:none;user-select:none;touch-action:none}
-.sol-top{display:flex;align-items:center;justify-content:space-between;padding:calc(8px + env(safe-area-inset-top)) 10px 6px;gap:6px}
-.sol-ib{width:42px;height:42px;border-radius:50%;border:none;background:rgba(0,0,0,.25);color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}
-.sol-stat{flex:1;text-align:center}
-.sol-stat small{display:block;font-size:11px;font-weight:700;color:#ffd166;letter-spacing:.3px}
-.sol-stat b{font-size:19px;font-weight:800}
-#sol-board{position:relative;flex:1;overflow:hidden}
-.sol-c{position:absolute;box-sizing:border-box;background:#fff;border:1px solid #9aa79f;border-radius:calc(var(--cw)*.12);box-shadow:0 1px 2px rgba(0,0,0,.35);color:#0b0b0f;overflow:hidden;transition:left .18s ease,top .18s ease,width .3s ease,height .3s ease}
-.sol-c.red{color:#d0021b}
-.sol-c.sol-dim{filter:brightness(.62) saturate(.75)}
-.sol-spk{position:absolute;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;pointer-events:none;z-index:2500;box-shadow:0 0 6px #ffd166;animation:solSpk .75s ease-out forwards}
-@keyframes solSpk{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
-.sol-pop{position:absolute;z-index:2600;transform:translateX(-50%);font-weight:900;font-size:24px;color:#ffd166;text-shadow:0 2px 0 #7a4b00,0 0 10px rgba(255,209,102,.8);pointer-events:none;animation:solPop 1.3s ease-out forwards}
-@keyframes solPop{0%{opacity:0;transform:translate(-50%,0) scale(.5)}20%{opacity:1;transform:translate(-50%,-12px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-60px)}}
-.sol-c.face{background:linear-gradient(#fffdf2,#fff3cf)}
-.sol-r{position:absolute;left:calc(var(--cw)*.05);top:0;font-size:calc(var(--cw)*.5);font-weight:900;line-height:1.05;letter-spacing:-1.5px;font-family:Roboto,'Arial Black',Arial,sans-serif}
-.sol-s{position:absolute;right:calc(var(--cw)*.06);top:calc(var(--cw)*.04);font-size:calc(var(--cw)*.3);line-height:1}
-.sol-b{position:absolute;left:0;right:0;bottom:calc(var(--cw)*.08);text-align:center;font-size:calc(var(--cw)*.62);line-height:1}
-.sol-f{position:absolute;left:calc(var(--cw)*.05);right:calc(var(--cw)*.05);top:calc(var(--cw)*.46);bottom:calc(var(--cw)*.05)}
-.sol-f svg{display:block;width:100%;height:100%}
-.sol-f.sol-fr{background-size:100% 100%;border:1px solid #6f73c9;top:calc(var(--cw)*.44)}
-.sol-c.down{background:repeating-linear-gradient(45deg,#2d6a4f 0 4px,#40916c 4px 8px);border:2px solid #fff}
-.sol-c.down>span{display:none}
-.sol-c.sol-notr{transition:none!important}
-.sol-c.sol-drag{box-shadow:0 6px 14px rgba(0,0,0,.45)}
-.sol-c.sol-gone{transition:left .25s ease,top .25s ease,opacity .25s;opacity:0}
-.sol-slot{position:absolute;box-sizing:border-box;border:2px dashed rgba(255,255,255,.28);border-radius:6px}
-#sol-stock,#sol-done{position:absolute}
-#sol-stock{cursor:pointer;z-index:5}
-.sol-hl{animation:solHl 1s ease}
-@keyframes solHl{0%,100%{box-shadow:0 1px 2px rgba(0,0,0,.35)}30%,70%{box-shadow:0 0 0 3px #ffd166,0 0 12px #ffd166}}
-.sol-shake{animation:solSh .3s}
-@keyframes solSh{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
-.sol-bot{display:flex;justify-content:space-around;padding:8px 6px calc(10px + env(safe-area-inset-bottom));background:rgba(0,0,0,.18)}
-.sol-bb{display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:none;color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;min-width:80px}
-.sol-bb span{width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;font-size:24px}
-#sol-overlay .sol-bn{display:none;position:absolute;left:0;right:0;top:calc(var(--cw)*.5);bottom:calc(var(--cw)*.03);flex-direction:column;align-items:center;justify-content:center;font-family:Roboto,'Arial Black',Arial,sans-serif;font-weight:900;font-size:calc(var(--cw)*.72);line-height:.95;letter-spacing:-3px}
-#sol-overlay .sol-bn i{font-style:normal;font-size:calc(var(--cw)*.32);letter-spacing:0}
-#sol-overlay .sol-c.bigc .sol-bn{display:flex}#sol-overlay .sol-c.bigc .sol-b{display:none}
-@media (orientation:landscape){#sol-overlay{max-width:none}}
-@media (orientation:landscape) and (max-height:560px){#sol-overlay .sol-top{padding:calc(2px + env(safe-area-inset-top)) 10px 2px}#sol-overlay .sol-ib{width:36px;height:36px;font-size:17px}#sol-overlay .sol-stat b{font-size:16px}
-  #sol-overlay .sol-bot{padding:2px 6px calc(4px + env(safe-area-inset-bottom))}#sol-overlay .sol-bb{flex-direction:row;gap:6px;font-size:12px}#sol-overlay .sol-bb span{width:36px;height:36px;font-size:18px}#sol-auto{bottom:calc(52px + env(safe-area-inset-bottom))}}
-#sol-auto{position:absolute;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));z-index:1900;display:none;padding:11px 20px;border:none;border-radius:24px;background:linear-gradient(135deg,#ffb703,#fb8500);color:#fff;font-weight:900;font-size:15px;font-family:inherit;box-shadow:0 6px 16px rgba(0,0,0,.4);transform:translateX(-50%);animation:solAutoP 1.3s ease infinite}
-@keyframes solAutoP{50%{transform:translateX(-50%) scale(1.07)}}
-#sol-toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;padding:9px 14px;border-radius:14px;font-size:13px;font-weight:600;opacity:0;transition:opacity .25s;pointer-events:none;z-index:2000;width:max-content;max-width:88%;text-align:center}
-#sol-toast.show{opacity:1}
-#sol-overlay .sol-bot.five .sol-bb{min-width:0;flex:1;font-size:11.5px;white-space:nowrap}#sol-overlay .sol-bot.five .sol-bb span{width:44px;height:44px}
-/* màn ngang: ✕ + ⚙️ góc trên trái; trái 3 ô Điểm / Thời gian / Nước; phải 3 nút Ván mới / Gợi ý / Hoàn nguyên — cùng cỡ, thẳng hàng */
-.sol-side{display:none}
-#sol-overlay.sol-land .sol-top,#sol-overlay.sol-land .sol-bot{display:none}
-#sol-overlay.sol-land .sol-side{display:flex;position:absolute;z-index:1800;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;bottom:calc(6px + env(safe-area-inset-bottom));padding:0 3px;box-sizing:border-box}
-#sol-sideL{left:env(safe-area-inset-left)}#sol-sideR{right:env(safe-area-inset-right)}
-#sol-overlay.sol-land #sol-sideT{flex-direction:row;justify-content:center;gap:4px;top:6px;bottom:auto;padding:0}
-#sol-sideT .sol-ib{width:32px;height:32px;font-size:15px}
-.sol-side .sol-stat,.sol-side .sol-bb{flex:0 0 auto;width:100%;min-width:0;height:52px;border-radius:14px;background:rgba(0,0,0,.24);box-shadow:inset 0 1px 0 rgba(255,255,255,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05}
-.sol-side .sol-stat small{font-size:9px}.sol-side .sol-stat b{font-size:16px}
-#sol-overlay .sol-side .sol-bb{flex-direction:column;gap:1px;font-size:10.5px;white-space:nowrap}
-#sol-overlay .sol-side .sol-bb span{width:30px;height:30px;font-size:17px;background:none}
-#sol-overlay .sol-side .sol-bb svg{width:20px;height:20px}
-#sol-set,#sol-win,#sol-resume{display:none;position:absolute;inset:0;z-index:3000;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:20px}
-/* bảng cài đặt / kết quả cao hơn màn hình (màn ngang) → giới hạn chiều cao + cuộn được bằng vuốt (màn chơi chặn vuốt để kéo bài) */
-@media (max-height:560px){#sol-set,#sol-win,#sol-resume,#gmp-set{padding:8px 20px}}
-#sol-win .gmp-set-box,#sol-resume .gmp-set-box{text-align:center}
+@media (max-height:560px){#gmp-set{padding:8px 20px}}
 .sol-win-info{font-size:14px;line-height:1.7;margin:6px 0 4px}
 #gmp-set{display:none;position:absolute;inset:0;z-index:2;background:rgba(10,30,20,.45);align-items:center;justify-content:center;padding:20px}
 .gmp-x{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;border:none;background:#e8efe9;color:#1b4332;font-size:18px;font-weight:900;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1}
@@ -716,7 +657,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.3.4 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.3.5 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2192,7 +2133,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.3.4</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.3.5</div>
       </div>
     </div>
 
@@ -2364,7 +2305,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.3.4</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.3.5</div>
       </div>
     </div>
 
@@ -2646,8 +2587,9 @@ function _mcsStore(real, P) {
 }
 var MCS_LS = _mcsStore(window.localStorage, MCS_PREFIX);
 var MCS_SS = _mcsStore(window.sessionStorage, MCS_PREFIX);
-// Khoá của các app KHÁC cùng tên miền — không chuyển vào kho của app này, không đồng bộ lên Supabase.
-var MCS_OTHER_APP_KEY_RE = /^(quanlyheo|tk2_|kt_|ktai_|ltb_|tokhai-|lai_|ls_hist$|ls_unit$|hoc_|myWords$|xskh|mtdkq_|maytinh_|hui_|caosu_|rubberTasks$|dien_|elec_)/i;
+// Khoá của các app KHÁC cùng tên miền (và 'mcsg_' = dữ liệu các game riêng trong games/*.html) — không chuyển vào kho
+// của app này, không đồng bộ lên Supabase.
+var MCS_OTHER_APP_KEY_RE = /^(mcsg_|quanlyheo|tk2_|kt_|ktai_|ltb_|tokhai-|lai_|ls_hist$|ls_unit$|hoc_|myWords$|xskh|mtdkq_|maytinh_|hui_|caosu_|rubberTasks$|dien_|elec_)/i;
 // Chuyển 1 lần dữ liệu từ khoá cũ (không tiền tố) sang khoá 'mcs_'. Chuyển qua bộ nhớ tạm (đọc → xoá
 // khoá cũ → ghi khoá mới) để không cần thêm dung lượng; ghi lỗi thì trả lại khoá cũ. Khoá 'setting_...'
 // chỉ chép, không xoá (app Lãi Suất bản cũ cũng dùng). Phiên đăng nhập Supabase 'sb-...' cũng chuyển
@@ -7191,7 +7133,7 @@ var SB_NO_SYNC_KEYS = ['device_code','gd_token','gd_token_expiry','gd_folder_id'
   // hoặc tự đặt lại mật khẩu giao dịch về mặc định).
   'admin_override_applied_at','pw_reset_applied_at','registry_sync_debug','last_ext_info',
   'gmp_best','gmp_best_de','gmp_best_kho','gmp_sound','gmp_cfg', // kỷ lục + cài đặt game ẩn Giọt Mủ Phiêu Lưu: riêng từng máy
-  'sol_cfg','sol_save','sol_stat','sol_round','sol_roundw','sol_rtry', // game ẩn Xếp Bài: cài đặt, ván đang chơi dở, thống kê, số vòng — riêng từng máy
+  'sol_cfg','sol_save','sol_stat','sol_round','sol_roundw','sol_rtry', // Xếp Bài bản cũ trong app (đã thay bằng games/xep-bai.html) — riêng từng máy
   'nlt_mode','nlt_draft']; // Nhập liên tiếp: chế độ đang chọn + bảng nhập dở chưa lưu — riêng từng máy
 // Danh sách khoá THỰC SỰ sẽ đồng bộ mỗi lần: hợp của SB_DATA_KEYS (đảm bảo có giá trị mặc định hợp lý
 // nếu máy chưa từng có khoá đó) VÀ toàn bộ khoá đang thực sự tồn tại trong localStorage của app (trừ
@@ -10291,6 +10233,8 @@ window.addEventListener('resize', _bubbleResizeCanvas);
 
 function startBubbleSaver(){
   if (_bubbleActive) return;
+  // Đang chơi game riêng (chạm trong khung game không tới được app) → không hiện bong bóng, đếm lại từ đầu
+  if (typeof GAME_FRAME !== 'undefined' && GAME_FRAME.isOpen()) { resetIdleTimer(); return; }
   _bubbleActive = true;
   var overlay = document.getElementById('bubble-saver');
   _bubbleCanvas = document.getElementById('bubble-canvas');
@@ -15322,803 +15266,6 @@ var GMP = (function(){
   return { open: open, close: close, isOpen: isOpen, openSet: openSet, closeSet: closeSet, toggleCfg: toggleCfg, setDiff: setDiff, resetBest: resetBest };
 })();
 
-// ─── GAME ẨN "XẾP BÀI NHỆN" (Spider Solitaire, luật cổ điển) ───
-// 10 cột, chia sẵn 54 lá (4 cột đầu 6 lá, 6 cột sau 5 lá), 50 lá còn lại chia thêm 5 lần (mỗi lần 10 lá, chỉ
-// chia khi không còn cột trống). Xếp giảm dần K → A; chỉ kéo cả dãy khi các lá cùng chất. Đủ dãy K → A cùng chất
-// thì thu lên góc trái; thu đủ 8 dãy là thắng. Điểm: bắt đầu 500, mỗi nước −1, mỗi dãy hoàn thành +100.
-// Chơi 1 chất (mặc định) / 2 chất / 4 chất. Lá bài vẽ bằng HTML/CSS, hình J Q K vẽ bằng SVG (không dùng ảnh) cho nhẹ app.
-// Lưu trên máy (không đồng bộ — nằm trong SB_NO_SYNC_KEYS): 'sol_cfg' (cài đặt), 'sol_save' (ván đang chơi dở),
-// 'sol_stat' (số ván thắng + điểm cao theo số chất). Mở lại game mà còn ván dở → hỏi chơi tiếp hay chơi ván mới.
-var SOL = (function(){
-  var SUITS = ['♠', '♥', '♦', '♣'], RANKS = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-  var ov, board, cols, stock, done, score, moves, elapsed, startAt, hist, mode = 1, cfg = { sound: true, suits: 1, land: false, bigNum: false, diff: 1 }, land = false;
-  var gdiff = 1, round = 0, _zoomGrow = true, _zoomHold = false, zLv = null, zBase = null, side = 0, fTop = 6, fStep = 10, DIFF_N = ['Dễ', 'Trung bình', 'Khó'];
-  var els = {}, cw = 36, ch = 50, gap = 3, pad = 3, topY = 0, colY = 0, timerT = 0, drag = null, hintI = 0, won = false, am = null;
-  function lsGet(k, d){ try { var v = MCS_LS.getItem(k); return v == null ? d : v; } catch(e){ return d; } }
-  function lsSet(k, v){ try { MCS_LS.setItem(k, v); } catch(e){} }
-  function $(id){ return document.getElementById(id); }
-  // ── Âm thanh (tổng hợp, không dùng file): tiếng bài thật "tách", "xòe" khi chia, chuông có vang, nhạc chiến thắng
-  //    ngắn khi thu đủ dãy; tất cả qua bộ nén âm cho không chói ──
-  var OUT = null, VERB = null, NB = null;
-  function ac(){
-    if (!am){
-      try {
-        am = new (window.AudioContext || window.webkitAudioContext)();
-        var comp = am.createDynamicsCompressor(); comp.threshold.value = -18; comp.ratio.value = 4; comp.connect(am.destination);
-        OUT = am.createGain(); OUT.gain.value = 0.9; OUT.connect(comp);
-        var len = Math.floor(am.sampleRate * 1.6), ir = am.createBuffer(2, len, am.sampleRate);
-        for (var ch2 = 0; ch2 < 2; ch2++){ var d = ir.getChannelData(ch2); for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3); }
-        var conv = am.createConvolver(); conv.buffer = ir; VERB = am.createGain(); VERB.gain.value = 0.28; VERB.connect(conv); conv.connect(comp);
-        NB = am.createBuffer(1, am.sampleRate * 0.5, am.sampleRate); var nd = NB.getChannelData(0); for (var k = 0; k < nd.length; k++) nd[k] = Math.random() * 2 - 1;
-      } catch(e){ am = null; }
-    }
-    if (am && am.state === 'suspended') am.resume();
-    return am;
-  }
-  function rustle(t0, dur, f0, f1, q, vol, hp){
-    var s = am.createBufferSource(), bp = am.createBiquadFilter(), g = am.createGain(), last = bp;
-    s.buffer = NB; bp.type = 'bandpass'; bp.Q.value = q; bp.frequency.setValueAtTime(f0, t0); bp.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
-    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + Math.min(0.006, dur / 4)); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-    if (hp){ var f = am.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = hp; bp.connect(f); last = f; }
-    s.connect(bp); last.connect(g); g.connect(OUT); s.start(t0, Math.random() * 0.3); s.stop(t0 + dur + 0.02);
-  }
-  function knock(t0, f, dur, vol){
-    var o = am.createOscillator(), g = am.createGain();
-    o.type = 'sine'; o.frequency.setValueAtTime(f, t0); o.frequency.exponentialRampToValueAtTime(f * 0.55, t0 + dur);
-    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-    o.connect(g); g.connect(OUT); o.start(t0); o.stop(t0 + dur + 0.02);
-  }
-  function bell(t0, f, dur, vol){
-    [[1, 1], [2, 0.32], [3, 0.12], [4.2, 0.05]].forEach(function(p){
-      var o = am.createOscillator(), g = am.createGain(), d = dur / (1 + p[0] * 0.4);
-      o.type = 'sine'; o.frequency.value = f * p[0];
-      g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol * p[1], t0 + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
-      o.connect(g); g.connect(OUT); g.connect(VERB); o.start(t0); o.stop(t0 + d + 0.05);
-    });
-  }
-  function swish(t0, pan, vol){
-    var s = am.createBufferSource(), bp = am.createBiquadFilter(), hp = am.createBiquadFilter(), g = am.createGain(), last;
-    s.buffer = NB; s.playbackRate.value = 1 + Math.random() * 0.15;
-    bp.type = 'bandpass'; bp.Q.value = 0.6; bp.frequency.setValueAtTime(1500, t0); bp.frequency.exponentialRampToValueAtTime(420, t0 + 0.28); // tông trầm, mềm như tiếng sột giấy khẽ
-    hp.type = 'lowpass'; hp.frequency.value = 1700; // cắt hết phần rít cao
-    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.08); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.32);
-    s.connect(bp); bp.connect(hp); hp.connect(g); last = g;
-    if (am.createStereoPanner){ var pn = am.createStereoPanner(); pn.pan.value = pan; g.connect(pn); last = pn; }
-    last.connect(OUT); var sv = am.createGain(); sv.gain.value = 0.1; last.connect(sv); sv.connect(VERB);
-    s.start(t0, Math.random() * 0.3); s.stop(t0 + 0.36);
-  }
-  function brass(t0, f, dur, vol){
-    var lp = am.createBiquadFilter(), g = am.createGain();
-    lp.type = 'lowpass'; lp.Q.value = 2; lp.frequency.setValueAtTime(500, t0); lp.frequency.exponentialRampToValueAtTime(2600, t0 + 0.05); lp.frequency.exponentialRampToValueAtTime(1300, t0 + dur);
-    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.03); g.gain.setValueAtTime(vol * 0.8, t0 + dur * 0.6); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-    [-6, 6].forEach(function(dt){ var o = am.createOscillator(); o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = dt; o.connect(lp); o.start(t0); o.stop(t0 + dur + 0.05); });
-    lp.connect(g); g.connect(OUT); var sv = am.createGain(); sv.gain.value = 0.5; g.connect(sv); sv.connect(VERB);
-  }
-  function snd(fn){ if (!cfg.sound || !ac()) return; try { fn(am.currentTime + 0.005); } catch(e){} }
-  var PENTA = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.5, 1567.98, 1760, 2093, 2349.3, 2637];
-  function sndPlace(){ snd(function(t){ rustle(t, 0.05, 2600, 1400, 0.9, 0.55, 600); knock(t + 0.004, 170, 0.07, 0.22); }); }
-  function sndBad(){ snd(function(t){ knock(t, 120, 0.16, 0.35); rustle(t, 0.05, 500, 300, 0.7, 0.12); }); }
-  function sndDealSeq(n, gapMs){ snd(function(t){ for (var i = 0; i < n; i++){ var d = t + i * gapMs / 1000; swish(d, (i % 2 ? 0.15 : -0.15), 0.17); knock(d + 0.2, 120, 0.06, 0.025); } }); }
-  function sndDeal(){ sndDealSeq(27, DEAL_GAP_INIT * 2); }
-  function sndHint(){ snd(function(t){ bell(t, 1318.5, 0.7, 0.10); bell(t + 0.09, 1760, 0.9, 0.08); }); }
-  function sndCollectStep(i){ snd(function(t){ bell(t, PENTA[Math.min(i, 12)], 0.6, 0.075); rustle(t, 0.06, 2200, 4200, 1.2, 0.12, 900); }); }
-  function sndDone(){ snd(function(t){ // "Ta – ta – taaa!" chiến thắng 1 chặng nhỏ
-    brass(t, 392, 0.14, 0.09); brass(t + 0.13, 523.25, 0.14, 0.09);
-    [523.25, 659.25, 783.99].forEach(function(f){ brass(t + 0.28, f, 0.95, 0.075); });
-    bell(t + 0.28, 1046.5, 1.6, 0.10); bell(t + 0.28, 1318.5, 1.4, 0.06); knock(t + 0.28, 95, 0.35, 0.35);
-    for (var i = 0; i < 8; i++) bell(t + 0.42 + i * 0.07, 1567.98 + Math.random() * 1600, 0.5, 0.035);
-  }); }
-  function sndWin(){ snd(function(t){
-    [[523.25, 0], [659.25, .14], [783.99, .28], [1046.5, .42], [987.77, .62], [1046.5, .76], [1318.5, .92], [1567.98, 1.12]].forEach(function(m){ bell(t + m[1], m[0], 1.6, 0.11); });
-    [261.63, 329.63, 392].forEach(function(f){ bell(t + 0.42, f, 2.4, 0.05); bell(t + 1.12, f * 1.5, 2.6, 0.04); });
-  }); }
-  // Nhịp hiệu ứng (ms): chia bài đầu ván, chia thêm từ xấp, thu dãy A→K — chậm vừa phải cho cảm giác phấn khích
-  var DEAL_GAP_INIT = 30, DEAL_GAP = 90, DEAL_DUR = 420, COLLECT_GAP = 120, COLLECT_DUR = 520, _busyUntil = 0, _pendingDone = 0;
-  function busy(){ return Date.now() < _busyUntil; }
-  // lấp lánh nhỏ + chữ "+100" (không cần canvas)
-  function spark(x, y, n){
-    for (var i = 0; i < n; i++){
-      var s = document.createElement('div'), a = Math.random() * Math.PI * 2, v = 20 + Math.random() * 55;
-      s.className = 'sol-spk'; s.style.left = x + 'px'; s.style.top = y + 'px';
-      s.style.setProperty('--dx', (Math.cos(a) * v).toFixed(1) + 'px'); s.style.setProperty('--dy', (Math.sin(a) * v - 15).toFixed(1) + 'px');
-      s.style.background = ['#ffd166', '#fff3b0', '#ffffff', '#7ee3ff'][i % 4];
-      board.appendChild(s); setTimeout((function(el){ return function(){ el.remove(); }; })(s), 800);
-    }
-  }
-  function popTxt(t, x, y){ var e = document.createElement('div'); e.className = 'sol-pop'; e.textContent = t; e.style.left = x + 'px'; e.style.top = y + 'px'; board.appendChild(e); setTimeout(function(){ e.remove(); }, 1400); }
-  // thu dãy A→K: từng lá bay lên góc trái, mỗi lá 1 nốt nhạc cao dần + lấp lánh; xong có nhạc chiến thắng + "+100"
-  function flyRun(run, k, ci){
-    var G = COLLECT_GAP, D = COLLECT_DUR, fp0 = foundPos(k), tx = fp0.x, ty = fp0.y;
-    _pendingDone++; _busyUntil = Math.max(_busyUntil, Date.now() + 13 * G + D + 500);
-    for (var i = run.length - 1, n = 0; i >= 0; i--, n++){
-      (function(c, d){
-        var e = els[c.id]; if (!e) return;
-        e._flying = true; e._inFound = k;
-        setTimeout(function(){
-          e.style.transition = 'left ' + D + 'ms ease, top ' + D + 'ms ease, transform ' + D + 'ms ease';
-          e.style.zIndex = 800 + d; e.style.left = tx + 'px'; e.style.top = ty + 'px'; e.style.transform = 'scale(1.08)';
-          sndCollectStep(d);
-        }, d * G);
-        setTimeout(function(){ spark(tx + cw / 2, ty + ch / 2, 6); }, d * G + D - 60);
-        setTimeout(function(){ e.style.display = 'none'; e._flying = false; e._shown = false; e.style.transition = ''; e.style.transform = ''; }, d * G + D + 40);
-      })(run[i], n);
-    }
-    setTimeout(function(){
-      _pendingDone = Math.max(0, _pendingDone - 1); render();
-      spark(tx + cw / 2, ty + ch / 2, 26); popTxt('+100', colX(ci) + cw / 2, colY + 30); sndDone();
-      if (navigator.vibrate) try { navigator.vibrate([25, 50, 25]); } catch(e){}
-    }, 13 * G + D - 40);
-  }
-
-  // ── Ván chia + vòng đánh số 1, 2, 3... (riêng từng số chất + độ khó), số vòng vô hạn, KHÔNG BAO GIỜ TRÙNG, LUÔN THẮNG ĐƯỢC:
-  //    mọi ván lấy từ KHO ván gốc đã được bộ giải kiểm chứng tìm ra đường thắng (xếp dễ → khó thành 3 mức), nhân lên bằng
-  //    đổi chỗ cột + đổi tên chất (vẫn đúng 1 ván, vẫn thắng được). Màn K = (vòng - 1) x 136 + nhóm lượt chơi → 1-đổi-1.
-  //    Chơi lại: 2 lần đầu đúng ván cũ, lần thứ 3 mới đổi ván khác (cùng vòng, cùng độ khó).
-  function rngOf(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-  function mix32(x){ x ^= x >>> 16; x = Math.imul(x, 0x7feb352d); x ^= x >>> 15; x = Math.imul(x, 0x846ca68b); x ^= x >>> 16; return x >>> 0; }
-  function nextTry(m, d, n){ var t; try { t = JSON.parse(lsGet('sol_rtry', '{}')) || {}; } catch(e){ t = {}; } var k = m + '_' + d, a = t[k] && t[k].n === n ? t[k].a + 1 : 0; t[k] = { n: n, a: a }; lsSet('sol_rtry', JSON.stringify(t)); return a; }
-  function makeDeck(m, sd){
-    var deck = [], id = 0, r = rngOf(sd);
-    for (var d = 0; d < 8; d++){ var su = m === 1 ? 0 : m === 2 ? (d % 2) : (d % 4); for (var k = 1; k <= 13; k++) deck.push({ id: id++, s: su, r: k, up: false }); }
-    for (var i = deck.length - 1; i > 0; i--){ var j = Math.floor(r() * (i + 1)), t = deck[i]; deck[i] = deck[j]; deck[j] = t; }
-    return deck;
-  }
-  function dealScore(deck){ // số nước đi có ngay lúc mở đầu (cùng chất tính 2)
-    var tops = []; for (var c = 0; c < 10; c++) tops.push(deck[c < 4 ? 50 + c : 40 + c]);
-    var sc = 0; tops.forEach(function(a){ tops.forEach(function(b){ if (a !== b && a.r === b.r + 1) sc += a.s === b.s ? 2 : 1; }); });
-    return sc;
-  }
-  // KHO-BEGIN (dữ liệu kho ván gốc — sinh tự động, đừng sửa tay)
-  var XBN_KHO = {"1":["1w5n0mx,7hyo6a,1sslccq,9rfvky,ut2txu,342qig,1l6so7b,1xcm4ll,ssiovi,1fpnbs9,1hbagvd,yi14zw,9if3wj,167ehev,1jjwmok,p1rax2,p42ynl,15saqut,aq4hgi,otv553,okoz2k,14crivg,90i43t,nhiepd,1bdpnfu,d13usv,id9467,1f2xu1b,1ue31g8,18aotuj,qpr4hm,1e1qvq7,5hu2od,725n2l,rcvbcn,1x1ta1w,85pu2u,uq0uv3,j6kzoa,1wwpmn9,saqhay,1429jz6,j4k56c,2t3jmr,1v09vaa,1cui7q,1cezgf3,8v3080,1o96ic5,1gashxo,1no1036,mtyax7,oni66q,ttpnmh,15or9uu,wisaph,wxf16l,51mja8,xmxg46,1ux5l90,j4qrus,1ssgy2f,1k1sopo,iz5uif,1l447qn,wfek8c,1srj5w8,sffk6s,syf2ae,1560bl4,1aww4m2,ds0s8g,1dxz83p,g1dxa7,591evo,n65a4e,x6xfp2,1dtyu4t,6ldplv,gcnody,11bx055,1h4mgls,lz38ku,11bdfwi,1bvipz4,eurov8,r7e3b8,9rp4au,8qoxmg,1ghi023,oe8l3d,13ucb1u,1cj4qup,dbcq53,igrdky,1uoquaj,o10q2h,19mz34g,eiiljj,bqavp3,1fgpjyf,1hf9e0d,l8f0zg,qsurzs,1cv8ger,riqrr4,1m3bsxt,19cyg6g,1mjc676,7ahc8b,4pom5r,3d6aoj,1wywzbq,1idhxor,gy0x9h,1v98n07,1pkurhu,1465v9h,hg0qtp,1u8i0tq,b9uhdx,1foq7zv,1oni8fv,140bpaj,1sl46w4,1egjub5,1eaxmwq,eyhxg8,dupidc,4yf0tm,1pqymrb","t3xuml,d0zuz9,7dd20g,1i1jcio,13c1yrv,15xdp67,1af8n5y,ddxxjs,emo2nk,ynh36w,16u8oeg,cbxbdw,bcq9cq,jxl804,icd8ca,l3oh8l,zf6c92,eyu7q,1hcbpd8,bun49m,14do3rc,1ss49ze,gtel7f,pui2ji,12j2v7a,6hphul,125jelw,gnt28i,1awkpiy,11ho7ar,1ykeb2f,t8wqk4,1e3ochm,1313box,m5siqg,3escew,1oewgsd,101jgs2,1b4bjtz,1rugwir,1p6vpjm,13jypwo,4e3esw,1i5f4uq,au8un3,1fan0mo,qg0unb,5u9v37,ga8wah,amh20j,1xoql9z,1h1cahe,1ywusnt,ahr3bd,frsy4v,1y242mh,1u95baw,19kjaco,15900r,eh3x3m,z5fefh,15nhlvn,19glvow,ixofso,433xun,1uo8ne5,1pskpz1,tjmf1i,wx2u2h,1gvhen8,3awukv,1s4hx6w,cfzis,1xq60qm,1bmjpa0,gvpf4n,1j1rnac,mcb1f7,pd48cd,1gr90yu,q8lksg,10rnuqt,vp4471,14r5dly,1egub2,iqfhbq,1epuck3,1q02gcb,1gy6rie,qzvenn,y1d1j7,871e7h,17n9lpp,38wxdi,cfmqtv,o31ltp,1crbvpd,nhlqfv,19wwua,gzsu34,199lvjx,1fg3m8w,1pmw4p7,1x6uy59,1w0dz6l,zfzzjb,acanzd,olw2re,162yics,179mlt6,1aauf0p,1brar24,1e6uuql,1jvv0qs,1dwg4m4,10q9egu,1i3rk3k,j7txrd,z6m7ov,12dr5zi,1ayxcu2,1ivufos,1of1x68,jgyp8q,18zxoeg,1s3k3nf,ou4mtb,5h2lmx,ngkupr,9wqo8d,k884w5,12q4q1i","19fmr3c,1c1yh30,1hgf8bv,1hgq89e,1m0e80p,mng9ub,9oi92,n0bx9w,pjrq91,grs7en,1wctvd1,15r9zs2,kl7mls,1m2ox8j,13oj1ra,1vm0pin,z1u2ex,bxmy1a,cd40bi,svs9ot,1ar8ceh,1bfdte8,153otpd,gtcg9i,1hiq6cz,1iecw1a,1jh4nkk,1shgiva,ojaibu,18mr7nb,ikxllj,1eqldvw,1mz3wqe,wppqwp,tetkls,1u3b7yh,19vmgak,lb6llm,3qvcvr,lryeiy,pqxf40,1ba9wcg,4rfra9,1gj9f0h,1ossc8h,neuipp,1b95u9k,zf3sql,y9rufp,1pdx4qt,1xmkvrt,hjvocb,1b65khr,9r0l9l,13ww0zk,vpdjdl,18keikb,101o3g,1h5fjgv,4uck6i,zn43aq,1ovrwe2,126ebhe,3vn0pp,g0gbkt,1rb6v86,ras3yf,a59o0m,15i89dg,a32w7i,otjddj,1sxp5ex,166j2zf,18yf45l,qiufmv,91nb6n,9lhapo,987qsz,1irn7vt,tx5ffq,1q4dq70,vhxlxm,14l9avc,1xxszg3,1c6m3uk,12de11w,sb1vs8,1cpj7jo,ix10rk,1c8jhe2,1kzh7v1,hbtzc7,dbqdjn,1bjlr3q,gw5zoe,izjq9z,txo1we,3c0v1f,36co6b,zkgxjz,1o4l5v1,1ondhi4,s8hszh,y4qkob,6o424s,ynrwem,1yxe5w6,17nxl7k,puni5n,z5z2il,16mcz4s,1loely7,1x31ur,co0wdy,ntztrg,9n1a63,1cqtcyp,16brsrc,1mtmd90,mfv4ke,xlybyy,12tn3o9,wkc36c,1gpy9l5,1ovksae,vhdikn,10uj0qe,128s5bu,18ke3o5,uz5l37,8oaxl2"],"2":["pmalui,idzlmb,bpy69k,ohvdqf,1g70wqq,19rwiq3,1kg5g76,1bexhb5,1pixi5q,15vsr69,1q1ux1i,3sgk2v,1d5twgz,d7u332,i2b4nw,xboj3v,wrjc80,kfl3ga,tki4x5,1qfm7t0,1q4a1ap,8u911k,k5q23q,4mrgah,1ix484g,1rauwev,14qlisn,ylrknq,1rtls8j,1yyrrc,172vgw0,13dvcxo,1lkosu3,94pq52,oubb35,1pab0lf,1789m1e,1o8td6a,15b3ejm,t4tq4l,zxaixv,1ak2v3,ppvrv8,1kob0zx,1qteraa,x0475t,1dcsmgz,185vl4q,2bosv4,10mef7s,s2lkna,1jnowst,1l8r2zt,fy52fm,1hucg9h,162pzfc,1kbj2aa,bgb8kb,c8lgt8,13jo32v,1troagd,rsudk5,tdd2eh,1xfngzk,1ddc2qc,83nfpw,c4w5s3,1jb9v78,1e88gxm,1bxczd4,19rgl93,1kbx0xu,21zmm2,1992y6g,1yzga1r,jsr02a,83u9ll,kvptdk,3jx4np,jjx3ki,x9wezc,tdhaoy,o0529g,1yjy38i,1pouv3x,k8od7c,14c7mey,1sf0weg,u3vbz,13tctxz,18yalsp,1ic1izl,1twspdk,o8659v,1g5gi7e,by630e","u2ol70,1va3rzv,1virgim,1w3rq3g,112icyn,12wkj1t,roc073,19xzgzp,iocoqv,19vt0t9,1oho3gx,1qqxlhk,734zd5,1mzc9wc,vqap3r,171j0b7,6hjzqe,fpa1tn,19rcnp3,3gfrj2,5mcma4,e1ppxa,1v3y1vu,ngcvkr,tnbdpj,14qwsbn,9h827g,12r2512,py0qx2,1d5yi46,1mfxd9f,10odxza,1egni6l,2lcsiq,8vp06y,ow6h42,1tx8nmf,w7mzu,n09vqg,wysbw1,166g1km,1f1mc3g,14jgmo8,1k9th9a,8vzty1,12vmdeb,1oqb5z2,969er6,1n07rr8,1pv0x4g,b7c8yc,lodasy,v16eyb,vtooer,1m6lsmd,t5fi4j,1y8vemp,3ozjir,9dhh2r,wu0qfs,1tiykip,wuuwmu,133lcsp,87cxei,ddl4y3,8jl8a0,q6469h,1ld0qit,fivr2d,ppxjjc,18lz42q,1nhcqzz,me284g,rogjb7,zhqf9y,eiv0x0,10gvgcg,1olzlll,1divwsy,1gisblh,1qc5fxy,1ly21n7,1ptxxth,1w1vafb,1mfh7,5mv1g7,b83soh,nusaw9,tbzltm,rceew2,xf8xss,17kgxh3,tzntxy,1orbx2s,hfpa8w,14x5ghh","161azvu,17yn7xs,1ckpydb,1h61ac1,1qwirbl,1ghmi9x,1p8c6f2,1w9xs3j,1dp5h0x,305ter,tnavvx,16rimk0,5apenv,1664zez,1fg7nnb,1gakfq3,1v7kinl,p8bcni,120i8fo,1adg01d,1f14uq5,1g4krnv,1jskf90,1x0odeh,1bd7lb,fmtqgt,gkfsn4,1urzmwq,1nn1dmq,rbtt3a,yedofd,10ckmcj,19c9z05,1xuar2n,15jzu7l,1uzsz1x,1xk8omq,fy2zne,15t41wn,1iuz9zr,1uhu983,8twmuj,uf6x6k,1011dd8,1rz4wp2,1wqnm9b,g2q7ao,132icn9,1cj9o5l,1qoy32q,amc199,zll2y4,12xiqew,1dy450y,1xpoot5,dxdkr,kkvnz3,mplvug,15zpfwi,1l1lgv,1951r0m,1lenq7w,13w0tes,1hpjy2i,4qo1az,9yl7kf,67xzxy,11dig7s,1i7m9yo,rq4zis,18tkgm9,1ri3lt5,1sr868e,8cxhyr,1h23ofb,1aic5x,i19loj,1adlp5o,1or4t78,1h3ft6f,d2xhtp,1wswlcc,rbide4,105tret,1fmz7q,13ais2d,1j01kr1,1wu903p,h898bi,ag09mw,6uld1o,1u8jqx5,icjrb7,14996ll,1fqtcd7,qvzdz4"],"4":["1g8uh9b,9lzyey,11gzdz8,1xir6cb,yef02j,rkoofk,lr0af4,1gx8f80,1and5xq,77ben6,1pyym14,13nfosn,1gxp82g,1q2w2j8,13f5ubu,tubdjb","1keyd8l,9e07t8,1dkiyj4,youbn2,d58ipk,1oufkhu,1hq66dz,xndzm8,1gviwvd,q8wzuv,usl1dv,1cw3alj,5e9d5b,1d2kj5t,105rb19,1e8tryp,5m6ar5","1pjf56d,1nytzls,1vt3eic,k40tkn,pawh2j,1uape1o,1wgf43r,1vforz,1ce6c3u,qpam6e,57732m,149axrq,10nmx6j,1aszzzw,er3gna,1qsx62f"]};
-  // KHO-END
-  // ===== KHO MÀN CHƠI (ván gốc đã được bộ giải kiểm chứng THẮNG ĐƯỢC) =====
-  // XBN_KHO[số chất] = [Dễ, Trung bình, Khó]: mỗi mục là chuỗi mã ván gốc (cơ số 36, cách nhau dấu phẩy), xếp từ dễ đến khó.
-  // Mỗi ván gốc nhân thành nhiều biến thể vẫn thắng được: đổi chỗ 4 cột 6 lá với nhau, 6 cột 5 lá với nhau (xấp bài đổi theo)
-  // và đổi tên chất (2 chất: 2 cách, 4 chất: 24 cách) → 1 ván gốc = 17.280 x (1 | 2 | 24) màn khác nhau.
-  // Màn thứ K của 1 mức = ván gốc (K mod L) + biến thể ((K div L) x 7919 + muối) mod P — 1-đổi-1 nên không bao giờ trùng.
-  function khoList(m, d){ var l = XBN_KHO[m] && XBN_KHO[m][d]; if (!l) return []; if (typeof l === 'string') l = XBN_KHO[m][d] = l.split(',').map(function(x){ return parseInt(x, 36); }); return l; }
-  function permNth(arr, n){ var a = arr.slice(), out = []; for (var i = a.length; i > 0; i--){ var f = 1; for (var j = 2; j < i; j++) f *= j; var q = Math.floor(n / f) % i; out.push(a.splice(q, 1)[0]); n %= f; } return out; }
-  function variantDeck(m, sd, p){
-    var dk = makeDeck(m, sd), sN = m === 4 ? 24 : m === 2 ? 2 : 1;
-    var pa = p % 24, pb = Math.floor(p / 24) % 720, ps = Math.floor(p / 17280) % sN;
-    var pi = permNth([0, 1, 2, 3], pa).concat(permNth([4, 5, 6, 7, 8, 9], pb));   // cột c → cột pi[c]
-    var sg = m === 4 ? permNth([0, 1, 2, 3], ps) : m === 2 ? (ps ? [1, 0] : [0, 1]) : [0];
-    var out = new Array(104), k;
-    for (k = 0; k < 54; k++){ var r = Math.floor(k / 10), c = k % 10; out[r * 10 + pi[c]] = dk[k]; }
-    for (k = 0; k < 50; k++){ var r2 = Math.floor(k / 10), c2 = k % 10; out[103 - (r2 * 10 + pi[c2])] = dk[103 - k]; }
-    for (k = 0; k < 104; k++){ var x = out[k]; out[k] = { id: x.id, s: sg[x.s], r: x.r, up: false }; }
-    return out;
-  }
-  function khoDeal(m, d, K){
-    var L = khoList(m, d), sN = m === 4 ? 24 : m === 2 ? 2 : 1, P = 17280 * sN;
-    if (!L.length) return null;
-    var idx = K % L.length, p = (Math.floor(K / L.length) * 7919 + (m * 131 + d * 17)) % P;
-    return { seed: (L[idx] ^ Math.imul(p + 1, 0x9E3779B1)) >>> 0, deck: variantDeck(m, L[idx], p) };
-  }
-  function pickDeal(m, d, n, at){
-    var r = khoDeal(m, d, ((n - 1) * 136 + (at % 136)) >>> 0);
-    return r ? r.deck : makeDeck(m, (n * 2654435761 + at) >>> 0); // dự phòng (kho trống — không xảy ra)
-  }
-  function roundsGet(){ try { return JSON.parse(lsGet('sol_round', '{}')) || {}; } catch(e){ return {}; } }
-  // 'sol_roundw' = vòng cao nhất đã THẮNG theo số chất + độ khó → thua / chơi lại thì vẫn đúng vòng đó, đúng ván đó.
-  // Lần đầu: lấy từ 'sol_round' (vòng đã chia gần nhất); ván đang lưu dở thuộc đúng mục đó thì vòng đó chưa thắng → trừ 1.
-  function roundsWon(){
-    var w; try { w = JSON.parse(lsGet('sol_roundw', 'null')); } catch(e){ w = null; }
-    if (!w){ w = {}; var r = roundsGet(), sv = null; try { sv = JSON.parse(lsGet('sol_save', 'null')); } catch(e){}
-      Object.keys(r).forEach(function(k){ var cur = sv && !sv.won && (sv.mode + '_' + (sv.diff == null ? 1 : sv.diff)) === k && sv.round === r[k]; w[k] = Math.max(0, r[k] - (cur ? 1 : 0)); });
-      lsSet('sol_roundw', JSON.stringify(w)); }
-    return w;
-  }
-  function markRoundWon(m, d, n){ var w = roundsWon(), k = m + '_' + d; if (n > (w[k] || 0)){ w[k] = n; lsSet('sol_roundw', JSON.stringify(w)); } }
-  function nextRound(m, d){ return (roundsWon()[m + '_' + d] || 0) + 1; }
-  function statKey(m, d){ return 's' + m + (d === 1 ? '' : 'd' + d); } // khoá cũ 's1','s2','s4' = Trung bình (giữ số liệu cũ)
-
-  // ── Trạng thái ván ──
-  function newGame(suits, keepDiff){
-    mode = suits || cfg.suits || 1; _autoRun = false; _zoomGrow = true;
-    gdiff = keepDiff != null ? keepDiff : cfg.diff == null ? 1 : cfg.diff; round = nextRound(mode, gdiff);
-    var rr = roundsGet(); rr[mode + '_' + gdiff] = round; lsSet('sol_round', JSON.stringify(rr));
-    // Chơi lại: 2 lần đầu vẫn ra đúng ván cũ (cảm giác vượt vòng); chia lại tới lần thứ 3 mới đổi ván khác (cùng vòng, cùng độ khó)
-    var deck = pickDeal(mode, gdiff, round, Math.floor(nextTry(mode, gdiff, round) / 3));
-    var st0 = stats(), k0 = statKey(mode, gdiff); st0[k0] = st0[k0] || { w: 0, b: 0 }; st0[k0].p = (st0[k0].p || 0) + 1; lsSet('sol_stat', JSON.stringify(st0));
-    cols = []; for (var c = 0; c < 10; c++) cols.push([]);
-    for (var k = 0; k < 54; k++) cols[k % 10].push(deck[k]);
-    cols.forEach(function(col){ col[col.length - 1].up = true; });
-    stock = deck.slice(54); done = []; score = 500; moves = 0; elapsed = 0; startAt = 0; hist = []; won = false; hintI = 0;
-    buildEls(); render(true); save(); updStats(); updRetry();
-    setTimeout(function(){ toastS('🎯 Vòng ' + round + ' · ' + mode + ' chất · ' + DIFF_N[gdiff]); }, 300);
-  }
-  function snap(){ return JSON.stringify({ cols: cols, stock: stock, done: done, score: score }); }
-  function pushHist(){ hist.push(snap()); if (hist.length > 300) hist.shift(); }
-  function save(){
-    try { lsSet('sol_save', JSON.stringify({ mode: mode, diff: gdiff, round: round, cols: cols, stock: stock, done: done, score: score, moves: moves, elapsed: curElapsed(), won: won })); } catch(e){}
-  }
-  function load(){
-    try {
-      var g = JSON.parse(lsGet('sol_save', 'null'));
-      if (!g || !g.cols || g.cols.length !== 10 || g.won) return false;
-      mode = g.mode || 1; cols = g.cols; stock = g.stock || []; done = g.done || []; score = g.score; moves = g.moves || 0;
-      elapsed = g.elapsed || 0; startAt = 0; hist = []; won = false; hintI = 0;
-      gdiff = g.diff == null ? 1 : g.diff; round = g.round || 0; _zoomGrow = true;
-      return true;
-    } catch(e){ return false; }
-  }
-  function curElapsed(){ return elapsed + (startAt ? (Date.now() - startAt) : 0); }
-  function startClock(){ if (!startAt && !won) startAt = Date.now(); }
-  function stopClock(){ if (startAt){ elapsed += Date.now() - startAt; startAt = 0; } }
-  function fmtT(ms){ var s = Math.floor(ms / 1000); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
-  function updStats(){
-    var a = $('sol-score'), b = $('sol-time'), c = $('sol-moves');
-    if (a) a.textContent = score; if (b) b.textContent = fmtT(curElapsed()); if (c) c.textContent = moves;
-  }
-
-  // ── Luật ──
-  function canPick(col, idx){
-    if (idx < 0 || idx >= col.length || !col[idx].up) return false;
-    for (var i = idx; i < col.length - 1; i++){
-      if (col[i + 1].s !== col[i].s || col[i + 1].r !== col[i].r - 1) return false;
-    }
-    return true;
-  }
-  function canDrop(card, dest){ var top = dest[dest.length - 1]; return !top || top.r === card.r + 1; }
-  function flipTop(col){ var t = col[col.length - 1]; if (t && !t.up){ t.up = true; } }
-  function checkDone(ci){
-    var col = cols[ci], n = col.length;
-    if (n < 13) return false;
-    var s = col[n - 1].s;
-    for (var i = 0; i < 13; i++){ var c = col[n - 1 - i]; if (!c.up || c.s !== s || c.r !== i + 1) return false; }
-    var run = col.splice(n - 13, 13);
-    done.push(s); score += 100; flipTop(col);
-    _zoomHold = false; _zoomGrow = true; // cột đã gọn → lá to lại (nếu đủ chỗ) âm thầm, cùng lúc với hiệu ứng thu dãy
-    flyRun(run, done.length - 1, ci);
-    return true;
-  }
-  function runComplete(col){
-    var n = col.length; if (n < 13) return false;
-    var s = col[n - 1].s;
-    for (var i = 0; i < 13; i++){ var c = col[n - 1 - i]; if (!c.up || c.s !== s || c.r !== i + 1) return false; }
-    return true;
-  }
-  var SETTLE_MS = 380; // chờ dãy vừa kéo trượt hẳn sang cột đích + dừng 1 nhịp rồi mới thu (thời gian trượt 180 ms)
-  function doMove(from, idx, to){
-    pushHist();
-    var seq = cols[from].splice(idx);
-    cols[to] = cols[to].concat(seq);
-    flipTop(cols[from]);
-    score--; moves++; startClock();
-    sndPlace();
-    if (runComplete(cols[to])){
-      _zoomHold = true; // sắp thu dãy → giữ nguyên cỡ lá, không thu/phóng
-      // Đủ dãy A→K: cho dãy vừa kéo trượt sang cột đích TRƯỚC, sau đó mới thu cả dãy lên góc
-      hintI = 0; render(); updStats(); save();
-      _busyUntil = Date.now() + SETTLE_MS + 100;
-      setTimeout(function(){ checkDone(to); _zoomHold = false; after(); }, SETTLE_MS);
-      return;
-    }
-    after();
-  }
-  function deal(){
-    if (won || busy()) return;
-    if (!stock.length){ toastS('Đã chia hết bài'); sndBad(); return; }
-    if (gdiff !== 0) for (var i = 0; i < 10; i++) if (!cols[i].length){ toastS('Phải lấp hết cột trống trước khi chia bài'); sndBad(); flashSlot(i); return; }
-    pushHist();
-    for (var c = 0; c < 10; c++){ var card = stock.pop(); card.up = true; cols[c].push(card); }
-    score--; moves++; startClock();
-    sndDealSeq(10, DEAL_GAP); render(); updStats(); // lá bay ra từng lá một, xong mới xét dãy hoàn thành
-    var dealT = 10 * DEAL_GAP + DEAL_DUR + 120; _busyUntil = Date.now() + dealT;
-    setTimeout(function(){ for (var k = 0; k < 10; k++) checkDone(k); after(); }, dealT);
-  }
-  function undo(){
-    if (won || !hist.length || busy()){ sndBad(); return; }
-    var g = JSON.parse(hist.pop());
-    cols = g.cols; stock = g.stock; done = g.done; score = g.score - (gdiff === 2 ? 5 : 0); moves++; _autoRun = false; // Dễ / Trung bình: hoàn nguyên không trừ điểm; Khó: trừ 5
-    Object.keys(els).forEach(function(id){ els[id].classList.remove('sol-gone'); });
-    sndPlace(); after();
-  }
-  // ── Tự hoàn thành: chỉ hiện khi đã chia hết xấp, mọi lá ngửa và MỖI cột là 1 dãy cùng chất liền mạch (không lá mờ)
-  //    → phần còn lại chắc chắn ghép đủ A→K, máy gom giúp từng nước ──
-  var _autoRun = false, _autoSeen = {};
-  function canAuto(){ return cols && !won && !stock.length && done.length < 8 && cols.every(function(c){ return !c.length || (c.every(function(x){ return x.up; }) && runLenTop(c).len === c.length); }); }
-  function updAuto(){ var b = $('sol-auto'); if (b) b.style.display = canAuto() && !_autoRun ? 'block' : 'none'; }
-  function autoStep(){
-    if (!_autoRun || won || !isOpen()) { _autoRun = false; return; }
-    if (done.length >= 8){ _autoRun = false; return; }
-    if (busy()){ setTimeout(autoStep, 120); return; }
-    var key = JSON.stringify(cols.map(function(c){ return c.map(function(x){ return x.id; }); })), list = allHints(), m = null;
-    for (var i = 0; i < list.length && !m; i++){ var c = list[i], k2 = key + '|' + c.f + ',' + c.i + ',' + c.t; if (!_autoSeen[k2]){ _autoSeen[k2] = 1; m = c; } }
-    if (!m){ _autoRun = false; updAuto(); toastS('Phần còn lại bạn tự xếp tiếp nhé!'); return; }
-    doMove(m.f, m.i, m.t);
-    setTimeout(autoStep, 320);
-  }
-  function autoStart(){ if (!canAuto() || busy()) return; _autoRun = true; _autoSeen = {}; updAuto(); sndHint(); setTimeout(autoStep, 400); }
-  // Hết nước đi: đã chia hết xấp, chưa thắng, không còn nước nào → thông báo nhanh (tự tắt) + nút Trang chủ, Chơi lại trên Gợi ý
-  function isStuck(){ return !!cols && !won && !stock.length && done.length < 8 && !canAuto() && !allHints().length; }
-  var _stuckT = 0;
-  function updRetry(){ var on = isStuck(); $('sol-bretry').style.display = $('sol-bhome').style.display = on ? '' : 'none'; var bt = ov && ov.querySelector('.sol-bot'); if (bt) bt.classList.toggle('five', on); }
-  function showStuck(){ updRetry(); toastS('😕 Hết nước đi — bấm Chơi lại hoặc Trang chủ'); sndBad(); }
-  function stuckCheck(){ if (!isOpen() || !isStuck()) return; if (busy()){ _stuckT = setTimeout(stuckCheck, 400); return; } showStuck(); }
-  function retry(){ clearTimeout(_stuckT); newGame(mode, gdiff); sndDeal(); } // chưa thắng → cùng vòng, cùng ván, cùng độ khó
-  function after(){
-    hintI = 0; render(); updStats(); updAuto();
-    updRetry(); clearTimeout(_stuckT); if (isStuck()) _stuckT = setTimeout(stuckCheck, busy() ? _busyUntil - Date.now() + 300 : 600);
-    if (done.length === 8 && !won && !_winPending){ _winPending = true; setTimeout(function(){ _winPending = false; if (!won && done.length === 8) win(); }, busy() ? _busyUntil - Date.now() + 500 : 0); }
-    save();
-  }
-  var _winPending = false;
-  function win(){
-    won = true; stopClock(); updRetry();
-    if (round) markRoundWon(mode, gdiff, round); // thắng → lần sau sang vòng tiếp theo
-    var st = stats(), k = statKey(mode, gdiff);
-    st[k] = st[k] || { w: 0, b: 0 }; st[k].w++; var rec = score > st[k].b; if (rec) st[k].b = score;
-    lsSet('sol_stat', JSON.stringify(st));
-    setTimeout(function(){
-      $('sol-win-next').textContent = '▶ Vòng tiếp theo (Vòng ' + nextRound(mode, cfg.diff == null ? 1 : cfg.diff) + ')';
-      $('sol-win-info').innerHTML = (round ? '🎯 Vòng ' + round + ' · ' : '') + mode + ' chất · ' + DIFF_N[gdiff] + '<br>Điểm: <b>' + score + '</b>' + (rec ? ' 🏆 Điểm cao mới!' : '') + '<br>Thời gian: <b>' + fmtT(curElapsed()) + '</b> · Nước đi: <b>' + moves + '</b>';
-      $('sol-win').style.display = 'flex';
-      sndWin();
-    }, 400);
-  }
-  function stats(){ try { return JSON.parse(lsGet('sol_stat', '{}')) || {}; } catch(e){ return {}; } }
-
-  // ── Chạm: tự đi tới chỗ hợp lý nhất ──
-  // ── Chạm 1 lá / 1 dãy → chọn chỗ đặt THÔNG MINH nhất (chấm điểm từng cột đặt được):
-  //   1) hoàn thành dãy A→K ngay  2) nối cùng chất tạo dãy dài nhất (gần đủ A→K nhất, dãy bắt đầu từ K được cộng)
-  //   3) lật được lá úp ở cột nguồn  4) không phá dãy cùng chất đang có  5) khác chất: ưu tiên cột có dãy dài hơn
-  //   6) cột trống chỉ dùng khi không còn chỗ khác, không dời cả cột sang cột trống vô ích
-  function runLenTop(col){ // độ dài dãy cùng chất, giảm dần, ngửa ở cuối cột (và lá đầu dãy)
-    var n = col.length; if (!n || !col[n - 1].up) return { len: 0, head: null };
-    var k = n - 1; while (k > 0 && col[k - 1].up && col[k - 1].s === col[k].s && col[k - 1].r === col[k].r + 1) k--;
-    return { len: n - k, head: col[k] };
-  }
-  function bestTarget(from, i){
-    var src = cols[from], card = src[i], len = src.length - i, below = src[i - 1];
-    var reveal = !!(below && !below.up), breaksRun = !!(below && below.up && below.s === card.s && below.r === card.r + 1);
-    var best = -1, bs = -1e9;
-    for (var k = 1; k < 10; k++){
-      var t = (from + k) % 10, dest = cols[t], top = dest[dest.length - 1], sc;
-      if (!top){
-        if (i === 0) continue;                       // dời cả cột sang cột trống: vô ích
-        sc = 50 + (reveal ? 150 : 0) - (breaksRun ? 900 : 0);
-      } else {
-        if (top.r !== card.r + 1) continue;
-        var rt = runLenTop(dest);
-        if (top.s === card.s){
-          var nl = rt.len + len;                     // độ dài dãy cùng chất sau khi nối
-          sc = 1000 + nl * 40 + (rt.head && rt.head.r === 13 ? 150 : 0) + (nl >= 13 ? 5000 : 0);
-          if (breaksRun) sc -= 700 - (nl > len + runLenTop(src.slice(0, i)).len ? 400 : 0); // chỉ đáng phá nếu dãy mới dài hơn
-        } else {
-          sc = 300 + rt.len * 10 - (breaksRun ? 900 : 0);
-        }
-        sc += (reveal ? 150 : 0) + (i === 0 ? 60 : 0); // lật lá úp / làm trống cột nguồn
-      }
-      sc -= k * 0.01;                                // hoà điểm: ưu tiên cột gần bên phải
-      if (sc > bs){ bs = sc; best = t; }
-    }
-    return best;
-  }
-  function autoMove(from, idx){
-    var best = bestTarget(from, idx);
-    if (best < 0){ shake(from, idx); sndBad(); return; }
-    doMove(from, idx, best);
-  }
-  // ── Gợi ý ──
-  function allHints(){
-    var list = [];
-    for (var f = 0; f < 10; f++){
-      var col = cols[f];
-      for (var i = col.length - 1; i >= 0 && canPick(col, i); i--){
-        var card = col[i], below = col[i - 1];
-        var linked = below && below.up && below.s === card.s && below.r === card.r + 1; // đang nằm đúng dãy cùng chất
-        for (var t = 0; t < 10; t++){
-          if (t === f) continue;
-          var dest = cols[t], top = dest[dest.length - 1], p = 0;
-          if (!top){ if (i > 0 && !linked) p = 1; }
-          else if (top.r === card.r + 1){
-            if (top.s === card.s) p = linked ? 0 : 5;
-            else if (!linked) p = (below && !below.up) || !below ? 3 : (below && below.up && below.r !== card.r + 1 ? 2 : 0);
-          }
-          if (p) list.push({ f: f, i: i, t: t, p: p });
-        }
-      }
-    }
-    list.sort(function(a, b){ return b.p - a.p; });
-    return list;
-  }
-  function hint(){
-    if (won || busy()) return;
-    var list = allHints();
-    if (!list.length){
-      if (stock.length){ toastS('Hết nước đi — chạm xấp bài góc phải để chia thêm'); var st = $('sol-stock'); if (st){ st.classList.remove('sol-hl'); void st.offsetWidth; st.classList.add('sol-hl'); } }
-      else { showStuck(); return; }
-      sndBad(); return;
-    }
-    var h = list[hintI % list.length]; hintI++;
-    if (gdiff === 2){ score -= 5; updStats(); save(); } // Khó: gợi ý trừ 5 điểm
-    var hl = cols[h.f].slice(h.i).map(function(c){ return els[c.id]; });
-    var dt = cols[h.t][cols[h.t].length - 1];
-    if (dt) hl.push(els[dt.id]); else { var sl = $('sol-slot-' + h.t); if (sl) hl.push(sl); }
-    hl.forEach(function(e){ if (!e) return; e.classList.remove('sol-hl'); void e.offsetWidth; e.classList.add('sol-hl'); });
-    sndHint();
-  }
-  function shake(ci, idx){
-    cols[ci].slice(idx).forEach(function(c){ var e = els[c.id]; if (!e) return; e.classList.remove('sol-shake'); void e.offsetWidth; e.classList.add('sol-shake'); });
-  }
-  function flashSlot(i){ var e = $('sol-slot-' + i); if (e){ e.classList.remove('sol-hl'); void e.offsetWidth; e.classList.add('sol-hl'); } }
-  function toastS(m){ var t = $('sol-toast'); if (!t) return; t.textContent = m; t.classList.add('show'); clearTimeout(t._tm); t._tm = setTimeout(function(){ t.classList.remove('show'); }, 2200); }
-
-  // ── Hình J, Q, K kiểu bài thật, vẽ bằng SVG (không dùng ảnh): nửa trên vẽ người, nửa dưới lật 180° đối xứng.
-  //    Áo theo màu chất (♠♣ xanh đen, ♥♦ đỏ), điểm vàng. Tạo 1 lần cho mỗi cặp (lá, chất) rồi dùng lại.
-  var _faceCache = {};
-  function faceSvg(r, s){
-    var key = r + '_' + s; if (_faceCache[key]) return _faceCache[key];
-    var red = s === 1 || s === 2, col = red ? '#c62828' : '#1f3a68', acc = red ? '#1f3a68' : '#c62828';
-    var gold = '#e8a800', skin = '#f5cfa6', hair = r === 13 ? '#8d5a2b' : r === 12 ? '#5d3a1a' : '#3e2a14', h = '';
-    if (r === 12) h += '<path d="M20.2 12Q20 5.8 25 6.3Q30 5.8 29.8 12L31 21Q28 19 29 13.5Q25 9 21 13.5Q22 19 19 21Z" fill="' + hair + '"/>';
-    h += '<path d="M9 28L13 19Q25 15 37 19L41 28Z" fill="' + col + '"/>' +
-         '<path d="M25 18.5V28M18 20.5L16.5 28M32 20.5L33.5 28" stroke="' + acc + '" stroke-width="1.3"/>' +
-         '<path d="M13 19Q25 15 37 19" stroke="' + gold + '" stroke-width="1.6" fill="none"/>' +
-         '<ellipse cx="25" cy="18.4" rx="5" ry="1.6" fill="#fff" stroke="' + gold + '" stroke-width=".6"/>' +
-         '<circle cx="25" cy="12.5" r="4.6" fill="' + skin + '" stroke="#a0704a" stroke-width=".4"/>' +
-         '<circle cx="23.3" cy="12" r=".55" fill="#333"/><circle cx="26.7" cy="12" r=".55" fill="#333"/>' +
-         '<path d="M23.8 14.6Q25 15.4 26.2 14.6" stroke="#a33" stroke-width=".5" fill="none"/>';
-    if (r === 13){ // Vua: râu, vương miện, quyền trượng
-      h += '<path d="M20.6 13Q21 18.5 25 18.6Q29 18.5 29.4 13Q27.5 15.8 25 15.8Q22.5 15.8 20.6 13Z" fill="#b07a3c"/>' +
-           '<path d="M20 8.6V3.8L22.5 6.2L25 3L27.5 6.2L30 3.8V8.6Z" fill="' + gold + '" stroke="#9a6a00" stroke-width=".4"/>' +
-           '<circle cx="25" cy="7" r=".8" fill="' + acc + '"/>' +
-           '<path d="M37 10.5L34.5 27" stroke="' + gold + '" stroke-width="1.2"/><circle cx="37.2" cy="9.6" r="1.4" fill="' + gold + '"/>';
-    } else if (r === 12){ // Hoàng hậu: tóc dài, vương miện nhỏ, cầm hoa
-      h += '<path d="M20.4 11.6Q21 7.4 25 7.6Q29 7.4 29.6 11.6Q27 9.6 25 9.8Q23 9.6 20.4 11.6Z" fill="' + hair + '"/>' +
-           '<path d="M21.5 7.8L22.5 4.8L24 6.5L25 4L26 6.5L27.5 4.8L28.5 7.8Z" fill="' + gold + '" stroke="#9a6a00" stroke-width=".4"/>' +
-           '<path d="M12.5 26L14.8 14" stroke="#2e7d32" stroke-width="1"/>' +
-           '<circle cx="15" cy="12.6" r="2.2" fill="' + acc + '"/><circle cx="15" cy="12.6" r=".8" fill="' + gold + '"/>';
-    } else { // Bồi (J): tóc ngắn, mũ có lông vũ, cây giáo
-      h += '<path d="M20.4 12Q20 8.2 25 8.4Q30 8.2 29.6 12Q27 10 25 10.2Q23 10 20.4 12Z" fill="' + hair + '"/>' +
-           '<path d="M28.6 6Q34 .8 37.5 4Q33.5 3.6 29.8 7.4Z" fill="' + gold + '"/>' +
-           '<path d="M20.6 8.6Q21 4.2 25 4.2Q29 4.2 29.4 8.6Z" fill="' + acc + '"/>' +
-           '<ellipse cx="25" cy="8.6" rx="6.4" ry="1.3" fill="' + acc + '"/>' +
-           '<path d="M13.4 7L15.4 27" stroke="#8a8a8a" stroke-width="1"/><path d="M12.6 7.6L13.2 3.6L14.6 7.2Z" fill="#9e9e9e"/>';
-    }
-    h += '<text x="5" y="9.5" font-size="7" fill="' + col + '">' + SUITS[s] + '</text>';
-    return (_faceCache[key] = '<svg viewBox="0 0 50 56"><rect x="2" y="2" width="46" height="52" rx="2" fill="#fff7dc" stroke="' + col + '" stroke-width=".8"/>' +
-      '<g>' + h + '</g><g transform="rotate(180 25 28)">' + h + '</g>' +
-      '<path d="M2 28H48" stroke="' + col + '" stroke-width=".6"/></svg>');
-  }
-  // Hình J Q K bài tây thật kiểu Anh (Adrian Kennard, CC0 — tài sản chung), file riêng game-la-bai.json chỉ tải khi mở
-  // game (không làm nặng app chính; Service Worker lưu lại để chơi offline). Chỉ lấy NỬA TRÊN, đứng 1 chiều, phóng to.
-  // Chưa tải xong / không tải được → dùng hình vẽ đơn giản faceSvg ở trên.
-  var _realFaces = null, _realUrl = {}, _facesLoading = false;
-  function loadRealFaces(){
-    if (_realFaces || _facesLoading) return;
-    _facesLoading = true;
-    fetch('game-la-bai.json').then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
-      _facesLoading = false;
-      if (!j || !j.SK) return;
-      _realFaces = j;
-      if (isOpen() && cols){ buildEls(); render(true); }
-    }).catch(function(){ _facesLoading = false; });
-  }
-  function realFaceUrl(r, s){
-    var k = 'SHDC'.charAt(s) + RANKS[r];
-    if (!_realFaces || !_realFaces[k]) return '';
-    if (!_realUrl[k]) _realUrl[k] = "url('data:image/svg+xml;charset=utf-8," + encodeURIComponent(
-      '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-57 -132 114 132" preserveAspectRatio="xMidYMin slice">' + _realFaces[k] + '</svg>'
-    ).replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29') + "')";
-    return _realUrl[k];
-  }
-  function cardInner(r, s){
-    var face = '';
-    if (r > 10){ var u = realFaceUrl(r, s); face = u ? '<span class="sol-f sol-fr" style="background-image:' + u + '"></span>' : '<span class="sol-f">' + faceSvg(r, s) + '</span>'; }
-    return '<span class="sol-r">' + RANKS[r] + '</span><span class="sol-s">' + SUITS[s] + '</span>' +
-      (r > 10 ? face : '<span class="sol-b">' + SUITS[s] + '</span><span class="sol-bn">' + RANKS[r] + '<i>' + SUITS[s] + '</i></span>');
-  }
-  // ── Vẽ ──
-  // Màn ngang: dời thanh trên + thanh dưới ra 2 bên (bàn bài cao trọn màn hình); màn dọc trả về chỗ cũ
-  var _landDom = null;
-  function placeSides(l){
-    if (l === _landDom) return; _landDom = l;
-    ov.classList.toggle('sol-land', l);
-    var top = ov.querySelector('.sol-top'), bot = ov.querySelector('.sol-bot'), st3 = ['sol-score', 'sol-time', 'sol-moves'].map(function(id){ return $(id).parentNode; });
-    if (l){
-      $('sol-sideT').appendChild($('sol-x')); $('sol-sideT').appendChild($('sol-gear'));
-      st3.forEach(function(e){ $('sol-sideL').appendChild(e); });
-      ['sol-bhome', 'sol-bretry', 'sol-bhint', 'sol-bundo', 'sol-bnew'].forEach(function(id){ $('sol-sideR').appendChild($(id)); }); // khi hết nước: Trang chủ, Chơi lại trên Gợi ý
-    } else {
-      top.appendChild($('sol-x')); st3.forEach(function(e){ top.appendChild(e); }); top.appendChild($('sol-gear'));
-      ['sol-bnew', 'sol-bhome', 'sol-bretry', 'sol-bhint', 'sol-bundo'].forEach(function(id){ bot.appendChild($(id)); });
-    }
-  }
-  function zoomCw(base, lv){ return Math.max(34, Math.floor(base * Math.pow(0.88, lv))); }
-  function layout(){
-    placeSides(ov.clientWidth > ov.clientHeight * 1.15);
-    var W = board.clientWidth;
-    cw = Math.floor((W - pad * 2 - gap * 9) / 10); ch = Math.round(cw * 1.42);
-    ov.style.setProperty('--cw', cw + 'px');
-    topY = Math.max(14, Math.round(ch * 0.22)); colY = topY + ch + Math.max(22, Math.round(ch * 0.42)); // cách xa nút ⚙️ và hàng cột cho khỏi bấm nhầm xấp bài
-    var H = board.clientHeight; land = W > H * 1.15; x0 = pad;
-    if (land){
-      // màn ngang: dãy đã thu dọc bên trái, xấp bài dọc bên phải, 10 cột ở giữa → lá to hơn
-      cw = Math.floor(Math.min((W - 16 - gap * 11) / 12.6, H / 3.1, 140));
-      side = Math.max(Math.round(cw * 1.3) + gap, 70); // cột bên rộng cố định theo cỡ lá gốc (đủ chỗ cho chữ số + 2 nút trên)
-      cw = Math.min(cw, Math.floor((W - 2 * side - gap * 9 - 4) / 10)); var ch0 = Math.round(cw * 1.42);
-      // Cột dài → lá nhỏ lại để mọi lá ngửa vẫn lộ rõ số. Chống giật (thu/phóng liên tục sau mỗi nước):
-      //  · cỡ lá theo các BẬC cố định (mỗi bậc nhỏ hơn 12%) · trong ván chỉ THU NHỎ khi cột không còn vừa
-      //  · chỉ PHÓNG TO lại khi thu xong 1 dãy, ván mới, mở lại ván, xoay màn hình · đổi cỡ mượt (CSS width/height)
-      if (cols){
-        var av = H - 6 - 6, m = fitM(), lvFor = function(mm){ var nd = av / mm / 1.42, l = 0; while (l < 12 && zoomCw(cw, l) > nd && zoomCw(cw, l) > 34) l++; return l; };
-        var lv = lvFor(m), lvRoom = lvFor(m + 0.54);   // lvRoom: cỡ vẫn vừa kể cả khi cột dài nhất có thêm 2 lá → đủ chỗ dư để to lại
-        if (_zoomHold && zBase === cw && zLv != null){ /* đang chờ thu dãy: giữ nguyên */ }
-        else if (zBase !== cw || zLv == null || _zoomGrow || lv > zLv){ zBase = cw; zLv = lv; }
-        else if (lvRoom < zLv){ zLv = lvRoom; }           // cột đã ngắn lại (thu dãy, đi bài, hoàn nguyên) và đủ chỗ dư → tự to lại
-        _zoomGrow = false; cw = zoomCw(cw, zLv);
-      }
-      ch = Math.round(cw * 1.42);
-      ov.style.setProperty('--cw', cw + 'px');
-      x0 = Math.round(side + (W - 2 * side - (cw * 10 + gap * 9)) / 2); topY = 6; colY = 6;
-      $('sol-sideL').style.width = $('sol-sideR').style.width = $('sol-sideT').style.width = side + 'px';
-      // cột trái: ✕ + ⚙️ (32) trên cùng, rồi chồng 8 dãy đã thu, dưới cùng 3 ô chỉ số (3 x 52 + khoảng cách)
-      fTop = 6 + 32 + 6; fStep = Math.max(4, Math.min(Math.round(ch0 * 0.2), Math.floor((H - 3 * 52 - 12 - 12 - fTop - ch0) / 7)));
-    }
-  }
-  var x0 = 3;
-  function foundPos(k){ return land ? { x: Math.round((side - cw) / 2), y: fTop + k * fStep } : { x: pad + k * cw * 0.32, y: topY }; }
-  // Ép cột dài: thu hẹp phần lá ÚP trước (tối thiểu 4% chiều cao lá), chỉ khi vẫn thiếu chỗ mới ép phần lá NGỬA,
-  // và không bao giờ dưới 25% (vẫn thấy rõ số). Trả về [bước lá úp, bước lá ngửa].
-  function fitSteps(nd, nu, chh, maxH){
-    var dS = chh * 0.12, uS = chh * 0.3, U = Math.max(0, nu - 1);
-    if (nd * dS + U * uS <= maxH || maxH <= 0) return [dS, uS];
-    dS = Math.max(chh * 0.04, nd ? (maxH - U * uS) / nd : 0);
-    if (nd * dS + U * uS <= maxH) return [dS, uS];
-    uS = U ? Math.max(chh * 0.25, (maxH - nd * dS) / U) : uS;
-    return [dS, uS];
-  }
-  // Cỡ lá lớn nhất để cột dài nhất vẫn lộ đủ số trên mọi lá ngửa (lá úp 4%, lá ngửa 27% chiều cao lá)
-  function fitM(){ // chiều dài cột dài nhất, tính theo số lần chiều cao lá (lá úp 4%, lá ngửa 27%)
-    var m = 1;
-    cols.forEach(function(c){ var nd = 0, nu = 0; c.forEach(function(x){ if (x.up) nu++; else nd++; }); m = Math.max(m, 1 + 0.04 * nd + 0.27 * Math.max(0, nu - 1)); });
-    return m;
-  }
-  function fitCh(avail){ return avail / fitM(); }
-  function colX(i){ return x0 + i * (cw + gap); }
-  function buildEls(){
-    board.querySelectorAll('.sol-c').forEach(function(e){ e.remove(); });
-    els = {};
-    var all = [];
-    cols.forEach(function(c){ all = all.concat(c); }); all = all.concat(stock);
-    all.forEach(function(c){
-      var e = document.createElement('div');
-      e.className = 'sol-c' + ((c.s === 1 || c.s === 2) ? ' red' : '') + (c.r > 10 ? ' face' : '');
-      e.innerHTML = cardInner(c.r, c.s);
-      e.dataset.id = c.id; e._shown = false;
-      board.appendChild(e); els[c.id] = e;
-    });
-  }
-  function stockPos(){ return { x: land ? board.clientWidth - side + Math.round((side - cw) / 2) : board.clientWidth - pad - cw, y: topY }; }
-  function render(first){
-    layout();
-    var H = board.clientHeight, avail = H - colY - 6, sp = stockPos(), inCol = {}, nNew = 0, maxD = 0;
-    for (var i = 0; i < 10; i++){
-      var sl = $('sol-slot-' + i);
-      if (sl){ sl.style.left = colX(i) + 'px'; sl.style.top = colY + 'px'; sl.style.width = cw + 'px'; sl.style.height = ch + 'px'; }
-      var col = cols[i], nd = 0, nu = 0;
-      col.forEach(function(c){ if (c.up) nu++; else nd++; });
-      var fs = fitSteps(nd, nu, ch, avail - ch), dStep = fs[0], uStep = fs[1];
-      var y = colY;
-      // dãy liền mạch (cùng chất, giảm dần) ở dưới cùng cột = kéo đi được → sáng; lá ngửa phía trên đứt mạch → mờ
-      var runStart = col.length - 1;
-      while (runStart > 0 && col[runStart - 1].up && col[runStart - 1].s === col[runStart].s && col[runStart - 1].r === col[runStart].r + 1) runStart--;
-      for (var j = 0; j < col.length; j++){
-        var c = col[j], e = els[c.id]; inCol[c.id] = 1;
-        if (!e) continue;
-        e.classList.toggle('down', !c.up);
-        e.classList.toggle('sol-dim', c.up && j < runStart);
-        e.classList.toggle('bigc', !!(cfg.bigNum && c.up && j === col.length - 1 && c.r <= 10)); // "Số lớn hơn": lá ngoài cùng hiện số to giữa lá (trừ J Q K)
-        e.style.width = cw + 'px'; e.style.height = ch + 'px'; e.style.zIndex = 10 + j;
-        e._toStock = false; clearTimeout(e._hideT);
-        if (!e._shown && e._inFound != null && !first){
-          // hoàn nguyên dãy đã thu: lá bay từ góc trái về cột (không chớp, không chia lại)
-          e._shown = true; e.classList.add('sol-notr'); var fpu = foundPos(e._inFound); e.style.left = fpu.x + 'px'; e.style.top = fpu.y + 'px'; e.style.display = '';
-          void e.offsetWidth; e.classList.remove('sol-notr');
-        } else if (!e._shown){
-          e._shown = true; e.classList.remove('sol-gone');
-          e.classList.add('sol-notr'); e.style.left = sp.x + 'px'; e.style.top = sp.y + 'px'; e.style.display = '';
-          void e.offsetWidth; e.classList.remove('sol-notr');
-          // chia bài: từng lá bay ra lần lượt (đầu ván theo hàng ngang, chia thêm thì lần lượt từng cột)
-          var dl = first ? (j * 10 + i) * DEAL_GAP_INIT : (nNew++) * DEAL_GAP; maxD = Math.max(maxD, dl);
-          e.style.transitionDelay = dl + 'ms'; e.style.transitionDuration = DEAL_DUR + 'ms';
-          (function(el, t){ setTimeout(function(){ el.style.transitionDelay = ''; el.style.transitionDuration = ''; }, t + DEAL_DUR + 60); })(e, dl);
-        } else if (!e._flying) e.style.transitionDelay = '';
-        e._inFound = null;
-        e.style.display = '';
-        e.style.left = colX(i) + 'px'; e.style.top = y + 'px';
-        y += c.up ? uStep : dStep;
-      }
-    }
-    // lá chưa chia (trong xấp) và lá đã thu: ẩn đi (xấp bài + dãy đã thu vẽ riêng)
-    var inStock = {}; stock.forEach(function(c){ inStock[c.id] = 1; });
-    Object.keys(els).forEach(function(id){
-      if (inCol[id]) return;
-      var e = els[id];
-      if (e._flying) return;
-      if (e.classList.contains('sol-gone') && e.style.display !== 'none'){
-        e.style.zIndex = 500; e.style.left = pad + 'px'; e.style.top = topY + 'px';
-        setTimeout(function(){ if (e.classList.contains('sol-gone')) { e.style.display = 'none'; e._shown = false; } }, 260);
-      } else if (!e.classList.contains('sol-gone')){
-        if (!first && inStock[id] && e.style.display !== 'none' && e._shown){
-          // hoàn nguyên lần chia bài: lá bay ngược về xấp rồi mới ẩn
-          if (!e._toStock){ e._toStock = true; e.classList.add('down'); e.classList.remove('sol-dim'); e.style.zIndex = 600; e.style.left = sp.x + 'px'; e.style.top = sp.y + 'px';
-            e._hideT = setTimeout(function(){ if (e._toStock){ e.style.display = 'none'; e._shown = false; e._toStock = false; } }, 300); }
-        } else if (!e._toStock){ e.style.display = 'none'; e._shown = false; }
-      }
-    });
-    // xấp bài còn chia được (góc phải)
-    var stk = $('sol-stock'), nDeal = Math.ceil(stock.length / 10), sh = '';
-    for (var d = 0; d < nDeal; d++) sh += '<div class="sol-c down" style="position:absolute;left:' + (land ? 0 : -d * cw * 0.28) + 'px;top:' + (land ? d * Math.round(ch * 0.16) : 0) + 'px;width:' + cw + 'px;height:' + ch + 'px"></div>';
-    stk.innerHTML = sh; stk.style.left = sp.x + 'px'; stk.style.top = topY + 'px'; stk.style.width = cw + 'px'; stk.style.height = ch + 'px';
-    stk.style.visibility = nDeal ? 'visible' : 'hidden';
-    // các dãy đã thu (góc trái): hiện lá K
-    var fd = $('sol-done'), fh = '';
-    if (maxD) _busyUntil = Math.max(_busyUntil, Date.now() + maxD + DEAL_DUR);
-    done.slice(0, done.length - _pendingDone).forEach(function(s, k){
-      fh += '<div class="sol-c' + ((s === 1 || s === 2) ? ' red' : '') + ' face" style="position:absolute;left:' + (land ? 0 : k * cw * 0.32) + 'px;top:' + (land ? k * fStep : 0) + 'px;width:' + cw + 'px;height:' + ch + 'px">' + cardInner(13, s) + '</div>';
-    });
-    fd.innerHTML = fh; fd.style.left = (land ? Math.round((side - cw) / 2) : pad) + 'px'; fd.style.top = (land ? fTop : topY) + 'px';
-  }
-
-  // ── Kéo thả + chạm ──
-  function findCard(id){
-    for (var i = 0; i < 10; i++) for (var j = 0; j < cols[i].length; j++) if (cols[i][j].id === id) return { c: i, i: j };
-    return null;
-  }
-  function onDown(e){
-    if (won || busy()) return;
-    var t = e.target.closest && e.target.closest('.sol-c[data-id]');
-    if (!t) return;
-    var loc = findCard(+t.dataset.id); if (!loc) return;
-    e.preventDefault();
-    var ok = canPick(cols[loc.c], loc.i);
-    var list = ok ? cols[loc.c].slice(loc.i).map(function(c){ return els[c.id]; }) : [];
-    drag = { c: loc.c, i: loc.i, ok: ok, x0: e.clientX, y0: e.clientY, moved: false, list: list, pid: e.pointerId };
-    try { board.setPointerCapture(e.pointerId); } catch(err){}
-  }
-  function onMove(e){
-    if (!drag || !drag.ok) return;
-    var dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
-    if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 8) return;
-    if (!drag.moved){
-      drag.moved = true;
-      drag.list.forEach(function(el, k){ el.classList.add('sol-notr', 'sol-drag'); el.style.zIndex = 1000 + k; el._x = parseFloat(el.style.left); el._y = parseFloat(el.style.top); });
-    }
-    drag.list.forEach(function(el){ el.style.left = (el._x + dx) + 'px'; el.style.top = (el._y + dy) + 'px'; });
-  }
-  function onUp(e){
-    if (!drag) return;
-    var d = drag; drag = null;
-    if (!d.moved){
-      if (!d.ok){ shake(d.c, d.i); sndBad(); return; }
-      autoMove(d.c, d.i); return;
-    }
-    d.list.forEach(function(el){ void el.offsetWidth; el.classList.remove('sol-notr', 'sol-drag'); });
-    // thả vào cột có tâm gần điểm giữa lá đầu dãy nhất
-    var first = d.list[0], cx = parseFloat(first.style.left) + cw / 2, to = -1, bd = 1e9;
-    for (var i = 0; i < 10; i++){ var dd = Math.abs(colX(i) + cw / 2 - cx); if (dd < bd){ bd = dd; to = i; } }
-    if (to >= 0 && to !== d.c && bd < cw * 1.2 && canDrop(cols[d.c][d.i], cols[to])) doMove(d.c, d.i, to);
-    else { if (to !== d.c) sndBad(); render(); }
-  }
-
-  // ── Mở / đóng / cài đặt ──
-  function open(){
-    ov = $('sol-overlay'); board = $('sol-board'); if (!ov || !board) return;
-    loadRealFaces(); // tải hình J Q K bài thật (lần đầu; sau đó lấy từ bộ nhớ đệm)
-    setTimeout(function(){ if (cfg.land) lockLand(); }, 0); // bật "Màn hình ngang" → xoay ngang khi mở game
-    try { var c = JSON.parse(lsGet('sol_cfg', 'null')); if (c) { cfg.sound = c.sound !== false; cfg.suits = [1, 2, 4].indexOf(c.suits) >= 0 ? c.suits : 1; cfg.land = !!c.land; cfg.bigNum = !!c.bigNum; cfg.diff = [0, 1, 2].indexOf(c.diff) >= 0 ? c.diff : 1; } } catch(e){}
-    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
-    ov.style.display = 'flex'; document.body.classList.add('gmp-open');
-    if (!ov._bound){
-      ov._bound = 1;
-      board.addEventListener('pointerdown', onDown);
-      board.addEventListener('pointermove', onMove);
-      board.addEventListener('pointerup', onUp);
-      board.addEventListener('pointercancel', function(){ if (drag){ drag.list.forEach(function(el){ el.classList.remove('sol-notr', 'sol-drag'); }); drag = null; render(); } });
-      $('sol-stock').addEventListener('click', deal);
-      window.addEventListener('resize', function(){ if (isOpen()){ _zoomGrow = true; render(true); } });
-      document.addEventListener('visibilitychange', function(){ if (isOpen()){ if (document.hidden) { stopClock(); save(); } else if (moves && !won && !resumeOpen()) startClock(); } });
-      window.addEventListener('pagehide', function(){ if (isOpen()){ stopClock(); save(); } });
-    }
-    $('sol-win').style.display = 'none'; closeSet();
-    var slots = '';
-    for (var i = 0; i < 10; i++) slots += '<div class="sol-slot" id="sol-slot-' + i + '"></div>';
-    board.querySelectorAll('.sol-slot').forEach(function(e){ e.remove(); });
-    board.insertAdjacentHTML('afterbegin', slots);
-    if (load()){
-      buildEls(); render(true); updAuto(); updRetry();
-      // Có ván đang chơi dở (đã đi ít nhất 1 nước) → hỏi chơi tiếp hay chơi ván mới; đồng hồ dừng tới khi chọn
-      if (moves) showResume();
-    }
-    else newGame(cfg.suits);
-    updStats();
-    clearInterval(timerT); timerT = setInterval(updStats, 1000);
-  }
-  function showResume(){
-    var p = $('sol-resume'); if (!p) return;
-    $('sol-resume-info').innerHTML = (round ? '🎯 Vòng ' + round + ' · ' : '') + mode + ' chất · ' + DIFF_N[gdiff] + '<br>Đã thu <b>' + done.length + '/8</b> dãy<br>Điểm: <b>' + score + '</b> · Thời gian: <b>' + fmtT(curElapsed()) + '</b> · Nước: <b>' + moves + '</b>';
-    p.style.display = 'flex';
-  }
-  function resumeChoice(tiepTuc){
-    var p = $('sol-resume'); if (p) p.style.display = 'none';
-    if (tiepTuc){ if (moves && !won) startClock(); }
-    else { newGame(cfg.suits); sndDeal(); }
-  }
-  function close(){
-    if (!ov) return;
-    var rp = $('sol-resume'); if (rp) rp.style.display = 'none';
-    _autoRun = false; var ab = $('sol-auto'); if (ab) ab.style.display = 'none';
-    if (cfg.land) unlockLand();
-    stopClock(); save(); clearInterval(timerT);
-    ov.style.display = 'none'; document.body.classList.remove('gmp-open');
-  }
-  function isOpen(){ return !!(ov && ov.style.display !== 'none' && ov.style.display !== ''); }
-  function saveCfg(){ lsSet('sol_cfg', JSON.stringify(cfg)); }
-  function renderSet(){
-    var p = $('sol-set'); if (!p) return;
-    p.querySelector('[data-k="sound"]').classList.toggle('on', !!cfg.sound);
-    p.querySelector('[data-k="land"]').classList.toggle('on', !!cfg.land);
-    var vm = (document.title.match(/v\d+(\.\d+)+/) || [''])[0]; p.querySelector('.sol-ver').textContent = '🕷️ Xếp Bài · TaiDauTieng@gmail.com · trong app Mủ Cao Su ' + vm; // số phiên bản lấy theo app
-    p.querySelector('[data-k="bigNum"]').classList.toggle('on', !!cfg.bigNum);
-    p.querySelectorAll('[data-suits]').forEach(function(b){ b.classList.toggle('on', +b.getAttribute('data-suits') === cfg.suits); });
-    var dv = cfg.diff == null ? 1 : cfg.diff;
-    p.querySelectorAll('[data-diff]').forEach(function(b){ b.classList.toggle('on', +b.getAttribute('data-diff') === dv); });
-    // thống kê riêng theo độ khó đang chọn
-    var st = stats(), txt = '<b>Mức ' + DIFF_N[dv] + '</b><br>' + [1, 2, 4].map(function(n){ var s = st[statKey(n, dv)] || { w: 0, b: 0 }; return n + ' chất: ' + (s.p ? 'chơi ' + s.p + ', ' : '') + 'thắng ' + s.w + ' ván' + (s.b ? ', điểm cao ' + s.b : ''); }).join('<br>');
-    $('sol-set-stat').innerHTML = txt;
-  }
-  function openSet(){ stopClock(); renderSet(); $('sol-set').style.display = 'flex'; }
-  function resumeOpen(){ var p = $('sol-resume'); return !!(p && p.style.display === 'flex'); }
-  function closeSet(){ var p = $('sol-set'); if (p) p.style.display = 'none'; if (isOpen() && moves && !won && !resumeOpen()) startClock(); }
-  function toggleSound(){ cfg.sound = !cfg.sound; saveCfg(); renderSet(); sndPlace(); }
-  function toggleBig(){ cfg.bigNum = !cfg.bigNum; saveCfg(); renderSet(); render(true); }
-  // Màn hình ngang: thử khoá xoay ngang (cần toàn màn hình); máy không cho khoá thì nhắc xoay tay — bố cục tự đổi theo
-  function lockLand(){
-    if (!cfg.land) return;
-    try {
-      var de = document.documentElement, p = (!document.fullscreenElement && de.requestFullscreen) ? de.requestFullscreen() : Promise.resolve();
-      p.then(function(){ return screen.orientation && screen.orientation.lock ? screen.orientation.lock('landscape') : Promise.reject(); })
-       .catch(function(){ toastS('🔄 Hãy xoay ngang điện thoại để chơi màn hình ngang'); });
-    } catch(e){ toastS('🔄 Hãy xoay ngang điện thoại để chơi màn hình ngang'); }
-  }
-  function unlockLand(){
-    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e){}
-    try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen(); } catch(e){}
-  }
-  function toggleLand(){ cfg.land = !cfg.land; saveCfg(); renderSet(); if (cfg.land) lockLand(); else unlockLand(); }
-  function setSuits(n){
-    if (n === cfg.suits) return;
-    var lam = function(){ cfg.suits = n; saveCfg(); newGame(n); renderSet(); closeSet(); };
-    if (moves && !won) GAME_CFM.ask('♠️ Đổi sang ' + n + ' chất?', 'Đổi số chất sẽ chia ván mới, ván đang chơi sẽ bị bỏ.', 'Chia ván mới', lam);
-    else lam();
-  }
-  function setDiff(d){
-    if (d === cfg.diff) return;
-    cfg.diff = d; saveCfg(); renderSet();
-    if (moves && !won) toastS('🎯 Độ khó ' + DIFF_N[d] + ' — áp dụng từ ván mới');
-    else { closeSet(); newGame(cfg.suits); sndDeal(); }
-  }
-  // thắng xong → sang thẳng vòng tiếp theo cùng số chất + độ khó đang chọn, không hỏi
-  function nextRoundGo(){ $('sol-win').style.display = 'none'; closeSet(); newGame(cfg.suits); sndDeal(); }
-  function newGameAsk(){
-    var lam = function(){ $('sol-win').style.display = 'none'; closeSet(); newGame(cfg.suits); sndDeal(); };
-    if (moves && !won) GAME_CFM.ask('🔄 Chia ván mới?', 'Ván đang chơi sẽ bị bỏ. Bạn chắc chắn muốn chơi ván mới?', 'Chơi ván mới', lam);
-    else lam();
-  }
-  document.addEventListener('keydown', function(e){
-    if (!isOpen()) return;
-    if (e.key === 'Escape'){ if (GAME_CFM.isOpen()) GAME_CFM.done(false); else if ($('sol-set').style.display === 'flex') closeSet(); else close(); }
-    else if ((e.ctrlKey || e.metaKey) && e.key === 'z'){ e.preventDefault(); undo(); }
-  });
-  return { toggleLand: toggleLand, toggleBig: toggleBig, open: open, close: close, isOpen: isOpen, deal: deal, resumeChoice: resumeChoice, undo: undo, hint: hint, newGame: newGameAsk,
-           openSet: openSet, closeSet: closeSet, toggleSound: toggleSound, setSuits: setSuits, setDiff: setDiff, nextRound: nextRoundGo, retry: retry,
-           _st: function(){ return { cols: cols, stock: stock, done: done, score: score, moves: moves }; }, _move: doMove, _hints: allHints, _best: bestTarget, auto: autoStart, _canAuto: canAuto, _after: after, _round: function(){ return { round: round, diff: gdiff }; }, _pick: pickDeal };
-})();
-
 // ─── POPUP XÁC NHẬN TRONG GAME (thay hộp thoại confirm() của trình duyệt — vốn hiện dòng
 // "nguyentai219.github.io cho biết" trông như thông báo lạ) ───
 var GAME_CFM = {
@@ -16138,6 +15285,63 @@ var GAME_CFM = {
   isOpen: function(){ var m = document.getElementById('game-cfm'); return !!(m && m.style.display === 'flex'); }
 };
 
+// ─── MÀN CHƠI GAME RIÊNG (games/*.html, chạy trong khung riêng phủ kín màn hình) ───
+// Mỗi game là bản web của game APK riêng của người dùng. Trong game có sẵn window.Android giả lập (xem đầu mỗi file):
+// dữ liệu lưu khoá 'mcsg_...' (riêng của game, không đồng bộ), "Thoát" → GAME_FRAME.close(). Nút Quay lại của điện thoại
+// được chuyển cho game (onAndroidBack) giống như trong APK; game trả về false (đang ở menu chính) thì đóng game.
+var GAME_FRAME = (function(){
+  var GAMES = { vq: 'games/vuon-qua.html', xg: 'games/xep-gach.html', xb: 'games/xep-bai.html' };
+  var NGANG = { vq: 1 }; // game chỉ chơi màn ngang (bản APK khoá ngang) → mở toàn màn hình + xoay ngang nếu máy cho phép
+  var ov, fr, ign = 0, inBack = false;
+  function el(){ if (!ov){ ov = document.getElementById('gf-overlay'); fr = document.getElementById('gf-frame'); } }
+  function win(){ try { return fr && fr.contentWindow; } catch(e){ return null; } }
+  function call(names){ var w = win(); if (!w) return; names.forEach(function(n){ try { if (typeof w[n] === 'function') w[n](); } catch(e){} }); }
+  function isOpen(){ el(); return !!(ov && ov.style.display === 'block'); }
+  function has(g){ return !!GAMES[g]; }
+  // Đổi trang trong khung bằng location.replace → không thêm mục lịch sử (nút Quay lại không bị lệch)
+  function nav(u){ try { fr.contentWindow.location.replace(u); } catch(e){ fr.src = u; } }
+  function open(g){
+    el(); if (!GAMES[g]) return;
+    nav(GAMES[g]);
+    if (NGANG[g]){
+      try {
+        var fs = ov.requestFullscreen ? ov.requestFullscreen() : null;
+        var xoay = function(){ try { screen.orientation.lock('landscape').catch(function(){}); } catch(e){} };
+        if (fs && fs.then) fs.then(xoay, xoay); else xoay();
+      } catch(e){}
+    }
+    ov.style.display = 'block'; document.body.classList.add('gmp-open');
+    try { history.pushState({ mcsGame: 1 }, '', location.href); } catch(e){}
+    fr.onload = function(){ try { fr.contentWindow.focus(); } catch(e){} };
+  }
+  function close(){
+    if (!isOpen()) return;
+    call(['onAppPause', 'onAndroidPause']); // để game lưu ván đang chơi trước khi đóng
+    ov.style.display = 'none'; nav('about:blank'); document.body.classList.remove('gmp-open');
+    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e){}
+    try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function(){}); } catch(e){}
+    if (!inBack){ ign++; try { history.back(); } catch(e){ ign--; } }
+    if (typeof resetIdleTimer === 'function') resetIdleTimer();
+  }
+  // Đăng ký ở pha capture để chạy TRƯỚC bộ xử lý popstate của các popup trong app (không đóng nhầm popup nào)
+  window.addEventListener('popstate', function(e){
+    if (ign > 0){ ign--; e.stopImmediatePropagation(); return; }
+    if (!isOpen()) return;
+    e.stopImmediatePropagation();
+    var w = win(), r = false;
+    inBack = true;
+    try { r = w && typeof w.onAndroidBack === 'function' ? w.onAndroidBack() : false; } catch(err){ r = false; }
+    if (isOpen() && r === false) close();
+    inBack = false;
+    if (isOpen()){ try { history.pushState({ mcsGame: 1 }, '', location.href); } catch(err){} }
+  }, true);
+  document.addEventListener('visibilitychange', function(){
+    if (!isOpen()) return;
+    if (document.hidden) call(['onAppPause', 'onAndroidPause', 'pauseGame']); else call(['onAppResume']);
+  });
+  return { open: open, close: close, isOpen: isOpen, has: has };
+})();
+
 // ─── DANH SÁCH GAME (nhấn nhanh 2 lần vào icon xoay) ───
 var GAME_MENU = {
   open: function(){ var m = document.getElementById('game-menu'); if (m) m.style.display = 'flex'; },
@@ -16151,7 +15355,7 @@ var GAME_MENU = {
       try { openGiaHan(); } catch(e){}
       return;
     }
-    if (g === 'sol') SOL.open(); else GMP.open();
+    if (GAME_FRAME.has(g)) GAME_FRAME.open(g); else GMP.open();
   },
   isOpen: function(){ var m = document.getElementById('game-menu'); return !!(m && m.style.display === 'flex'); }
 };
@@ -16218,7 +15422,7 @@ function _dangRanh(){
   if (ae && (/^(INPUT|SELECT|TEXTAREA)$/.test(ae.tagName) || ae.isContentEditable)) return false;
   if (document.querySelector('.modal.show')) return false;
   if (typeof GMP !== 'undefined' && GMP.isOpen()) return false; // đang chơi game ẩn
-  if (typeof SOL !== 'undefined' && SOL.isOpen()) return false;
+  if (typeof GAME_FRAME !== 'undefined' && GAME_FRAME.isOpen()) return false;
   if (typeof GAME_MENU !== 'undefined' && GAME_MENU.isOpen()) return false;
   return Date.now() - _lanThaoTacCuoi > 8000;
 }
@@ -16353,76 +15557,17 @@ if ('serviceWorker' in navigator) {
     </div>
   </div>
 </div>
+<!-- MÀN CHƠI GAME RIÊNG (Vườn Quả Phòng Thủ, Xếp Gạch, Xếp Bài — file games/*.html) -->
+<div id="gf-overlay"><iframe id="gf-frame" title="Trò chơi" allow="autoplay; fullscreen"></iframe></div>
 <!-- DANH SÁCH GAME ẨN (nhấn nhanh 2 lần vào icon xoay) -->
 <div id="game-menu" onclick="if(event.target===this)GAME_MENU.close()">
   <div class="gm-box">
     <div class="gm-ttl">🎮 Khu vực trò chơi</div>
     <button class="gm-item" onclick="GAME_MENU.play('gmp')"><span class="gm-ico">👼</span><span><div class="gm-name">Giọt Mủ Phiêu Lưu</div><div class="gm-desc">Chạm để bay qua khe giữa các thân cây cao su</div></span></button>
-    <button class="gm-item" onclick="GAME_MENU.play('sol')"><span class="gm-ico">🕷️</span><span><div class="gm-name">Xếp Bài</div><div class="gm-desc">Xếp bài cổ điển: xếp đủ dãy K → A cùng chất</div></span></button>
+    <button class="gm-item" onclick="GAME_MENU.play('vq')"><span class="gm-ico">🍊</span><span><div class="gm-name">Vườn Quả Phòng Thủ</div><div class="gm-desc">Trồng cây trái giữ vườn, đánh lui sâu bọ</div></span></button>
+    <button class="gm-item" onclick="GAME_MENU.play('xg')"><span class="gm-ico">🧱</span><span><div class="gm-name">Xếp Gạch</div><div class="gm-desc">Xếp khối gạch gỗ kín hàng để ghi điểm</div></span></button>
+    <button class="gm-item" onclick="GAME_MENU.play('xb')"><span class="gm-ico">🕷️</span><span><div class="gm-name">Xếp Bài</div><div class="gm-desc">Xếp bài cổ điển: xếp đủ dãy K → A cùng chất</div></span></button>
     <button class="gm-close" onclick="GAME_MENU.close()">Đóng</button>
-  </div>
-</div>
-<!-- GAME ẨN: Xếp Bài -->
-<div id="sol-overlay">
-  <div class="sol-top">
-    <button class="sol-ib" id="sol-x" onclick="SOL.close()" title="Thoát game">✕</button>
-    <div class="sol-stat"><small>ĐIỂM SỐ</small><b id="sol-score">500</b></div>
-    <div class="sol-stat"><small>THỜI GIAN</small><b id="sol-time">00:00</b></div>
-    <div class="sol-stat"><small>NƯỚC</small><b id="sol-moves">0</b></div>
-    <button class="sol-ib" id="sol-gear" onclick="SOL.openSet()" title="Cài đặt trò chơi">⚙️</button>
-  </div>
-  <div id="sol-board"><div id="sol-done"></div><div id="sol-stock" title="Chia thêm bài"></div></div>
-  <div class="sol-bot">
-    <button class="sol-bb" id="sol-bnew" onclick="SOL.newGame()"><span>🔄</span>Ván mới</button>
-    <button class="sol-bb" id="sol-bhome" style="display:none" onclick="SOL.close()"><span>🏠</span>Trang chủ</button>
-    <button class="sol-bb" id="sol-bretry" style="display:none" onclick="SOL.retry()"><span>🔁</span>Chơi lại</button>
-    <button class="sol-bb" id="sol-bhint" onclick="SOL.hint()"><span>💡</span>Gợi ý</button>
-    <button class="sol-bb" id="sol-bundo" onclick="SOL.undo()"><span><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#ff8a7a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span>Hoàn nguyên</button>
-  </div>
-  <div class="sol-side" id="sol-sideL"></div><div class="sol-side" id="sol-sideR"></div><div class="sol-side" id="sol-sideT"></div>
-  <div id="sol-toast"></div>
-  <button id="sol-auto" onclick="SOL.auto()">⚡ Tự hoàn thành</button>
-  <div id="sol-set" onclick="if(event.target===this)SOL.closeSet()">
-    <div class="gmp-set-box">
-      <button class="gmp-x" onclick="SOL.closeSet()" aria-label="Đóng">✕</button>
-      <div class="gmp-set-ttl">⚙️ Cài đặt Xếp Bài</div>
-      <div class="gmp-set-lbl">♠️ Số chất</div>
-      <div class="gmp-seg">
-        <button data-suits="1" onclick="SOL.setSuits(1)">1 chất ♠</button>
-        <button data-suits="2" onclick="SOL.setSuits(2)">2 chất</button>
-        <button data-suits="4" onclick="SOL.setSuits(4)">4 chất</button>
-      </div>
-      <div class="gmp-set-lbl">🎯 Độ khó</div>
-      <div class="gmp-seg">
-        <button data-diff="0" onclick="SOL.setDiff(0)">Dễ</button>
-        <button data-diff="1" onclick="SOL.setDiff(1)">Trung bình</button>
-        <button data-diff="2" onclick="SOL.setDiff(2)">Khó</button>
-      </div>
-      <div class="gmp-set-row" onclick="SOL.toggleSound()"><span>🔊 Âm thanh</span><span class="gmp-sw" data-k="sound"></span></div>
-      <div class="gmp-set-row" onclick="SOL.toggleLand()"><span>🔄 Màn hình ngang (lá to hơn)</span><span class="gmp-sw" data-k="land"></span></div>
-      <div class="gmp-set-row" onclick="SOL.toggleBig()"><span>🔢 Số lớn hơn (dễ nhìn)</span><span class="gmp-sw" data-k="bigNum"></span></div>
-      <div class="gmp-set-lbl">🏆 Thống kê</div>
-      <div class="gmp-set-best" id="sol-set-stat"></div>
-      <button class="gmp-set-del" style="color:#2d6a4f;border-color:#b7d3c2;background:#fff" onclick="SOL.newGame()">🔄 Chia ván mới</button>
-      <button class="gmp-set-ok" onclick="SOL.closeSet()">Xong</button>
-      <div class="sol-ver" style="text-align:center;font-size:12px;opacity:.6;margin-top:10px"></div>
-    </div>
-  </div>
-  <div id="sol-resume">
-    <div class="gmp-set-box">
-      <div class="gmp-set-ttl">🕷️ Bạn có ván đang chơi dở</div>
-      <div class="sol-win-info" id="sol-resume-info"></div>
-      <button class="gmp-set-ok" onclick="SOL.resumeChoice(true)">▶️ Chơi tiếp ván cũ</button>
-      <button class="gmp-set-del" style="color:#2d6a4f;border-color:#b7d3c2;background:#fff" onclick="SOL.resumeChoice(false)">🔄 Chơi ván mới</button>
-    </div>
-  </div>
-  <div id="sol-win">
-    <div class="gmp-set-box">
-      <div class="gmp-set-ttl">🎉 Thắng rồi!</div>
-      <div class="sol-win-info" id="sol-win-info"></div>
-      <button class="gmp-set-ok" id="sol-win-next" onclick="SOL.nextRound()">▶ Vòng tiếp theo</button>
-      <button class="gmp-set-del" style="color:#2d6a4f;border-color:#b7d3c2;background:#fff" onclick="SOL.close()">Về app</button>
-    </div>
   </div>
 </div>
 </body>

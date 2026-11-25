@@ -18,6 +18,7 @@ Số phiên bản theo dạng **`Z.X.Y`**:
 
 | Phiên bản | Ngày | Thay đổi |
 |-----------|------|----------|
+| **v3.3.5** | 2026-11-25 | 🎮 **Khu vực trò chơi** thêm 3 game riêng của bạn (bản web của game APK, file `games/*.html`): **Vườn Quả Phòng Thủ 1.6.4** (tự mở toàn màn hình + xoay ngang), **Xếp Gạch 1.1.4**, **Xếp Bài 1.4.1** (thay bản Xếp Bài cũ trong app; bỏ bản quyền riêng — game trong app đi theo hạn dùng của app, không gọi máy chủ). Nút Quay lại của điện thoại hoạt động như trong APK. Dữ liệu game lưu khoá riêng `mcsg_` trên máy (không đồng bộ). Bỏ `game-la-bai.json` (chỉ bản Xếp Bài cũ dùng). |
 | **v3.3.4** | 2026-11-25 | 🎮 Icon xoay trên đầu trang đổi xen kẽ logo app ↔ biểu tượng **GAME** (`logo-game.png`) cứ 2 vòng quay 1 lần, kể cả lúc bay ra cùng bong bóng bảo vệ màn hình; mở khu vực trò chơi bằng **nhấn 2 lần vào icon xoay** (thay cho nhấp tên app); tiêu đề danh sách game đổi thành **"Khu vực trò chơi"**. |
 | **v3.3.3** | 2026-11-20 | 🧹 Màn 👥: bỏ dòng hướng dẫn dưới **Mã cơ sở thu mua** và bỏ dòng hướng dẫn "Chế độ quản trị (email + mật khẩu quản trị)" — Sổ Khách Hàng v1.36 thay chế độ quản trị bằng mã cơ sở. |
 | **v3.3.2** | 2026-11-20 | 🏪 **Mã cơ sở thu mua** ngay dưới tiêu đề "Danh Sách và Mã Khách Hàng" (màn 👥): mã 7 số + mật khẩu 6 số, nút 📋 Sao chép và 🔄 Đổi mật khẩu (xác nhận mật khẩu giao dịch). Nhập vào app Sổ Khách Hàng (v1.35+) để xem toàn bộ sổ của cơ sở: Thu Mua, Bán Ra, Gửi sổ, Ứng tiền, Chấm Công, Tính Toán, danh sách khách. Đồng bộ lên Supabase (khoá `co_so_xem`, trộn an toàn khi đăng nhập). |
