@@ -70,6 +70,10 @@ cần file `.nojekyll`).
 
 Game APK riêng của người dùng **không đưa lên GitHub** (không thêm vào repo này): mã nguồn giữ ngoài repo, chỉ gửi file
 `.apk`/`.zip` trực tiếp cho người dùng — mỗi lần cập nhật gửi cả file `.zip` đầy đủ lẫn file `.apk` riêng để cài thử ngay.
+Ngoại lệ (theo yêu cầu người dùng từ v3.3.5): **bản web** của game Vườn Quả Phòng Thủ, Xếp Gạch, Xếp Bài nằm trong
+`games/*.html` để chơi trong "Khu vực trò chơi" của app. Chỉ đưa file HTML game (đã bỏ bản quyền riêng/khoá bí mật/máy chủ
+của bản APK); APK, vỏ APK, khoá ký, công cụ tạo kho ván vẫn giữ ngoài repo. Đầu mỗi file game có đoạn `window.Android`
+giả lập + `MCSG_LS` (khoá lưu `mcsg_`) — khi cập nhật game từ bản APK mới, giữ lại đoạn này.
 
 ## App quản trị (công cụ tính mã gia hạn)
 
