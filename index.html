@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v3.3.6</title>
+<title>Mua Bán Mủ Cao Su v3.3.7</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -70,6 +70,7 @@ body.gmp-open{overflow:hidden}
 /* Màn chơi các game riêng (games/*.html) + danh sách game */
 #gf-overlay{display:none;position:fixed;inset:0;z-index:6000;background:#1d2a20}
 #gf-frame{display:block;width:100%;height:100%;border:0;background:#1d2a20}
+#gf-overlay.cat{visibility:hidden;pointer-events:none} /* game đang cất: ẩn nhưng giữ kích thước khung (game không bị đo màn hình = 0) */
 #game-tm{display:none;position:fixed;z-index:6900;left:0;top:calc(50% - 22px);width:34px;height:44px;padding:0 0 0 2px;align-items:center;justify-content:center;
   border:2px solid rgba(255,255,255,.75);border-left:none;border-radius:0 22px 22px 0;background:rgba(27,67,50,.6);color:#fff;font-size:17px;line-height:1;
   opacity:.75;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.3)}
@@ -662,7 +663,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.3.6 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.3.7 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2138,7 +2139,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.3.6</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.3.7</div>
       </div>
     </div>
 
@@ -2310,7 +2311,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.3.6</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.3.7</div>
       </div>
     </div>
 
@@ -15291,8 +15292,10 @@ var GAME_CFM = {
     document.getElementById('game-cfm-ok').textContent = okLabel || 'Đồng ý';
     document.getElementById('game-cfm-no').textContent = noLabel || 'Huỷ';
     GAME_CFM._ok = onOk || null; GAME_CFM._no = onNo || null; GAME_CFM._bd = noOnBackdrop !== false; m.style.display = 'flex';
+    GAME_CFM._luc = Date.now();
   },
   done: function(yes, backdrop){
+    if (backdrop && Date.now() - (GAME_CFM._luc || 0) < 400) return; // cú chạm vừa mở hộp — không tính là bấm ra ngoài
     var m = document.getElementById('game-cfm'); if (m) m.style.display = 'none';
     var f = GAME_CFM._ok, g = GAME_CFM._no, bd = GAME_CFM._bd; GAME_CFM._ok = GAME_CFM._no = null;
     if (yes && f) f(); else if (!yes && g && (!backdrop || bd)) g();
@@ -15313,7 +15316,7 @@ var GAME_FRAME = (function(){
   function el(){ if (!ov){ ov = document.getElementById('gf-overlay'); fr = document.getElementById('gf-frame'); } }
   function win(){ try { return fr && fr.contentWindow; } catch(e){ return null; } }
   function call(names){ var w = win(); if (!w) return; names.forEach(function(n){ try { if (typeof w[n] === 'function') w[n](); } catch(e){} }); }
-  function isOpen(){ el(); return !!(ov && ov.style.display === 'block'); }
+  function isOpen(){ el(); return !!(ov && ov.style.display === 'block' && !ov.classList.contains('cat')); }
   function has(g){ return !!GAMES[g]; }
   // Đổi trang trong khung bằng location.replace → không thêm mục lịch sử (nút Quay lại không bị lệch)
   function nav(u){ try { fr.contentWindow.location.replace(u); } catch(e){ fr.src = u; } }
@@ -15333,7 +15336,7 @@ var GAME_FRAME = (function(){
     try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function(){}); } catch(e){}
   }
   function hien(){
-    ov.style.display = 'block'; document.body.classList.add('gmp-open');
+    ov.classList.remove('cat'); ov.style.display = 'block'; document.body.classList.add('gmp-open');
     try { history.pushState({ mcsGame: 1 }, '', location.href); } catch(e){}
     if (typeof GAME_TM !== 'undefined') GAME_TM.sync();
   }
@@ -15353,7 +15356,7 @@ var GAME_FRAME = (function(){
   function park(){
     if (!isOpen()) return;
     pause(); parked = cur;
-    ov.style.display = 'none'; document.body.classList.remove('gmp-open'); boNgang();
+    ov.classList.add('cat'); document.body.classList.remove('gmp-open'); boNgang();
     ign++; try { history.back(); } catch(e){ ign--; }
     if (typeof GAME_TM !== 'undefined') GAME_TM.sync();
   }
@@ -15364,7 +15367,7 @@ var GAME_FRAME = (function(){
     try { fr.contentWindow.focus(); } catch(e){}
   }
   // Bỏ game đang cất (chọn game khác / Chơi mới)
-  function discard(){ el(); if (!parked) return; parked = null; nav('about:blank'); }
+  function discard(){ el(); if (!parked) return; parked = null; ov.classList.remove('cat'); ov.style.display = 'none'; nav('about:blank'); }
   function close(){
     if (!isOpen()) return;
     call(['onAppPause', 'onAndroidPause']); // để game lưu ván đang chơi trước khi đóng
@@ -15401,7 +15404,7 @@ var GAME_FRAME = (function(){
 // "Chơi tiếp" (hiện lại đúng ván đang tạm dừng) hay "Chơi mới". Lưu ý: tải lại app thì ván đang cất bị bỏ (Xếp Bài, Xếp Gạch
 // vẫn tự lưu ván dở và hỏi chơi tiếp ở trang chủ game).
 var GAME_TM = (function(){
-  var POS_KEY = 'game_tm_pos', btn = null, gmpParked = false, drag = null;
+  var POS_KEY = 'game_tm_pos', btn = null, gmpParked = false, drag = null, keoLuc = 0;
   function el(){
     if (btn) return btn;
     btn = document.getElementById('game-tm'); if (!btn) return null;
@@ -15416,12 +15419,15 @@ var GAME_TM = (function(){
     });
     btn.addEventListener('pointerup', function(e){
       if (!drag) return; var d = drag; drag = null;
-      if (!d.moved){ cham(); return; }
+      if (!d.moved) return; // chạm (không kéo) → xử lý ở sự kiện click bên dưới
+      keoLuc = Date.now();
       var r = e.clientX > innerWidth / 2 ? 1 : 0, y = Math.max(0.05, Math.min(0.95, (e.clientY) / innerHeight));
       dat(r, y); try { MCS_LS.setItem(POS_KEY, JSON.stringify({ r: r, y: y })); } catch(err){}
     });
     btn.addEventListener('pointercancel', function(){ drag = null; });
-    btn.addEventListener('click', function(e){ e.stopPropagation(); });
+    // Mở hộp hỏi ở sự kiện click (sau khi ngón tay đã nhấc lên hẳn): nếu mở ngay lúc nhấc tay, trên màn hình cảm ứng
+    // cú chạm đó bị tính tiếp thành "bấm ra ngoài hộp" → hộp vừa hiện đã đóng ngay. Vừa kéo xong thì không mở.
+    btn.addEventListener('click', function(e){ e.stopPropagation(); e.preventDefault(); if (Date.now() - keoLuc < 400) return; cham(); });
     return btn;
   }
   // r = 1: dính mép phải, 0: mép trái; y = vị trí dọc (0–1 chiều cao màn hình)
