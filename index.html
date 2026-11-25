@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v3.3.3</title>
+<title>Mua Bán Mủ Cao Su v3.3.4</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -59,8 +59,10 @@ body{font-family:'Be Vietnam Pro',sans-serif;background:var(--g50);color:var(--g
 @keyframes coinSpin{ 0%{transform:rotateY(0deg)} 100%{transform:rotateY(360deg)} }
 @keyframes bubbleTextPulse{ 0%,100%{opacity:.35} 50%{opacity:.85} }
 .logo-ico img{ animation:coinSpin 3.2s linear infinite; backface-visibility:visible }
-.logo-txt{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer}
-/* Game ẩn Giọt Mủ Phiêu Lưu (nhấp 2 lần vào tên app) */
+.logo-txt{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr .logo-ico{-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer}
+.hdr .logo-ico img{-webkit-user-drag:none;pointer-events:none}
+/* Game ẩn Giọt Mủ Phiêu Lưu (nhấn 2 lần vào icon xoay) */
 #gmp-overlay{display:none;position:fixed;inset:0;z-index:6000;background:#bfe9ff;touch-action:none;-webkit-user-select:none;user-select:none;max-width:480px;margin:0 auto}
 #gmp-canvas{display:block;width:100%;height:100%}
 .gmp-btn{position:absolute;top:calc(10px + env(safe-area-inset-top));width:42px;height:42px;border-radius:50%;border:2px solid rgba(255,255,255,.9);background:rgba(27,67,50,.55);color:#fff;font-size:19px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1}
@@ -714,7 +716,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.3.3 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.3.4 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2190,7 +2192,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.3.3</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.3.4</div>
       </div>
     </div>
 
@@ -2362,7 +2364,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.3.3</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.3.4</div>
       </div>
     </div>
 
@@ -2674,6 +2676,32 @@ var MCS_OTHER_APP_KEY_RE = /^(quanlyheo|tk2_|kt_|ktai_|ltb_|tokhai-|lai_|ls_hist
 // đồng xu (coinSpin) giữa logo trên header và bản sao bay ra khi bong bóng bảo vệ màn hình hoạt động,
 // tránh bị "nhảy" góc xoay đột ngột (nhìn như khựng lại) mỗi khi hoán đổi qua lại giữa 2 phần tử.
 var _coinSpinRefTime = performance.now();
+// Góc xoay hiện tại (ms trong chu kỳ 3.2s) của icon trên header — lấy thẳng từ animation đang chạy cho chính xác
+function _coinPhase(){
+  try {
+    var img = document.getElementById('header-logo-img');
+    var a = img && img.getAnimations && img.getAnimations()[0];
+    if (a && a.currentTime != null) return ((a.currentTime % 3200) + 3200) % 3200;
+  } catch(e){}
+  return (performance.now() - _coinSpinRefTime) % 3200;
+}
+// Icon xoay đổi xen kẽ: logo app ↔ biểu tượng GAME, cứ 2 vòng quay đổi 1 lần. Đổi đúng lúc icon nghiêng
+// 90° (mỏng như sợi chỉ, ở 800ms của chu kỳ) nên mắt không thấy giật; đổi cùng lúc cho icon header và icon
+// đang bay cùng bong bóng bảo vệ màn hình (2 icon cùng pha xoay).
+var _logoSrcs = ['logo.png', 'logo-game.png'], _logoIdx = 0, _logoVong = 0;
+(function(){ var im = new Image(); im.src = 'logo-game.png'; })(); // tải sẵn để lúc đổi hiện ngay
+function _logoDoiVong(){
+  var cho = (800 - _coinPhase() + 3200) % 3200;
+  if (cho < 200) cho += 3200;
+  setTimeout(function(){
+    if (++_logoVong >= 2){
+      _logoVong = 0; _logoIdx = 1 - _logoIdx;
+      ['header-logo-img', 'bubble-logo-img'].forEach(function(id){ var el = document.getElementById(id); if (el) el.src = _logoSrcs[_logoIdx]; });
+    }
+    _logoDoiVong();
+  }, cho);
+}
+setTimeout(_logoDoiVong, 0);
 // ============================================================
 // MỦ CAO SU PRO v1.3
 // Công thức:
@@ -10317,8 +10345,9 @@ function _bubbleLaunchLogo(){
   // gian đã trôi qua kể từ mốc tham chiếu) — để khi header "biến mất"/hiện lại, góc xoay luôn liền mạch,
   // không bị nhảy đột ngột tạo cảm giác khựng lại.
   if (logoImg) {
-    var phase = (performance.now() - _coinSpinRefTime) % 3200;
+    var phase = _coinPhase();
     logoImg.style.animationDelay = '-' + phase + 'ms';
+    if (headerImg) logoImg.src = headerImg.getAttribute('src'); // đang hiện icon nào (logo app / GAME) thì bay ra icon đó
   }
   // Ép trình duyệt áp dụng vị trí ban đầu trước khi bắt đầu transition, tránh bị gộp animation
   void wrap.offsetWidth;
@@ -12046,7 +12075,7 @@ function _notifyBuildSlides(){
   } catch(e) {}
   slides.push({ id:'lucky', icon:'🍀', text: LUCKY_WISHES[new Date().getDate() % LUCKY_WISHES.length], cls:'synced' });
   slides.push({ id:'proverb', icon:'📜', text: _pickRandom(MUA_BAN_PROVERBS), cls:'synced' });
-  slides.push({ id:'game', icon:'🎮', text: 'Nhấp nhanh 2 lần vào tên App để mở game giải trí đôi chút nhé!', cls:'synced' }); // game ẩn (GMP)
+  slides.push({ id:'game', icon:'🎮', text: 'Nhấn nhanh 2 lần vào biểu tượng xoay ở góc trên để mở khu vực trò chơi!', cls:'synced' }); // game ẩn (GMP)
   // Thời tiết tại vị trí định vị của thiết bị. Nếu ĐÃ CÓ dữ liệu kịp lúc xây danh sách này (dưới 15 phút
   // — với lịch làm mới mỗi 5 phút/thử lại mỗi 10 giây khi lỗi thì dữ liệu hầu như không bao giờ cũ hơn
   // vậy, quá cũ thì thà không hiện còn hơn hiện sai lệch) → đưa lên vị trí ĐẦU TIÊN (ưu tiên cao nhất,
@@ -14897,7 +14926,7 @@ document.addEventListener('focusin', function(e){
 });
 
 // ─── GAME ẨN "GIỌT MỦ PHIÊU LƯU" ───
-// Mở: nhấp nhanh 2 lần vào tên app ở đầu trang. Chạm màn hình → giọt mủ thiên thần vỗ cánh bay lên; bay qua khe
+// Mở: nhấn nhanh 2 lần vào icon xoay ở đầu trang. Chạm màn hình → giọt mủ thiên thần vỗ cánh bay lên; bay qua khe
 // giữa 2 thân cây cao su được 1 điểm; chạm thân cây hoặc mặt đất là thua. Nút ⚙️: âm thanh, rung, độ khó,
 // tăng tốc dần, xoá kỷ lục. Kỷ lục (riêng từng độ khó) + cài đặt chỉ lưu trên máy này (khoá 'gmp_best',
 // 'gmp_best_de', 'gmp_best_kho', 'gmp_cfg', 'gmp_sound' — nằm trong SB_NO_SYNC_KEYS, không đồng bộ lên Supabase).
@@ -15279,11 +15308,11 @@ var GMP = (function(){
   document.addEventListener('keydown', onKey);
   window.addEventListener('resize', function(){ if (isOpen()){ resize(); if (st === 'ready') reset(); } });
   document.addEventListener('visibilitychange', function(){ if (document.hidden && isOpen() && st === 'play'){ paused = true; last = 0; } });
-  // Nhấp nhanh 2 lần vào tên app (cách nhau dưới 0,5 giây) → mở danh sách game (GAME_MENU)
+  // Nhấn nhanh 2 lần vào icon xoay trên header (cách nhau dưới 0,5 giây) → mở khu vực trò chơi (GAME_MENU)
   (function(){
     var n = 0, tm = 0;
     document.addEventListener('click', function(e){
-      var el = e.target && e.target.closest && e.target.closest('.logo-txt');
+      var el = e.target && e.target.closest && e.target.closest('.hdr .logo-ico');
       if (!el) return;
       n++; clearTimeout(tm);
       if (n >= 2){ n = 0; if (typeof GAME_MENU !== 'undefined') GAME_MENU.open(); else open(); return; }
@@ -16109,7 +16138,7 @@ var GAME_CFM = {
   isOpen: function(){ var m = document.getElementById('game-cfm'); return !!(m && m.style.display === 'flex'); }
 };
 
-// ─── DANH SÁCH GAME (nhấp nhanh 2 lần vào tên app) ───
+// ─── DANH SÁCH GAME (nhấn nhanh 2 lần vào icon xoay) ───
 var GAME_MENU = {
   open: function(){ var m = document.getElementById('game-menu'); if (m) m.style.display = 'flex'; },
   close: function(){ var m = document.getElementById('game-menu'); if (m) m.style.display = 'none'; },
@@ -16288,7 +16317,7 @@ if ('serviceWorker' in navigator) {
   </div>
   <div style="position:absolute;bottom:36px;left:0;right:0;text-align:center;color:rgba(255,255,255,.55);font-size:12.5px;font-family:'Be Vietnam Pro',sans-serif;pointer-events:none;animation:bubbleTextPulse 2.4s ease-in-out infinite">Chạm màn hình để tiếp tục</div>
 </div>
-<!-- GAME ẨN: Giọt Mủ Phiêu Lưu (nhấp nhanh 2 lần vào tên app) -->
+<!-- GAME ẨN: Giọt Mủ Phiêu Lưu (nhấn nhanh 2 lần vào icon xoay) -->
 <div id="gmp-overlay">
   <canvas id="gmp-canvas"></canvas>
   <button class="gmp-btn" style="left:12px" onclick="GMP.openSet()" title="Cài đặt trò chơi">⚙️</button>
@@ -16324,10 +16353,10 @@ if ('serviceWorker' in navigator) {
     </div>
   </div>
 </div>
-<!-- DANH SÁCH GAME ẨN (nhấp nhanh 2 lần vào tên app) -->
+<!-- DANH SÁCH GAME ẨN (nhấn nhanh 2 lần vào icon xoay) -->
 <div id="game-menu" onclick="if(event.target===this)GAME_MENU.close()">
   <div class="gm-box">
-    <div class="gm-ttl">🎮 Giải trí đôi chút nhé!</div>
+    <div class="gm-ttl">🎮 Khu vực trò chơi</div>
     <button class="gm-item" onclick="GAME_MENU.play('gmp')"><span class="gm-ico">👼</span><span><div class="gm-name">Giọt Mủ Phiêu Lưu</div><div class="gm-desc">Chạm để bay qua khe giữa các thân cây cao su</div></span></button>
     <button class="gm-item" onclick="GAME_MENU.play('sol')"><span class="gm-ico">🕷️</span><span><div class="gm-name">Xếp Bài</div><div class="gm-desc">Xếp bài cổ điển: xếp đủ dãy K → A cùng chất</div></span></button>
     <button class="gm-close" onclick="GAME_MENU.close()">Đóng</button>
