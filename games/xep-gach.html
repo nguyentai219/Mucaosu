@@ -16,6 +16,20 @@
     exit: function(){ var h = host(); if (h) h.close(); },
     setLandscape: function(on){ try { if (on) screen.orientation.lock('landscape').catch(function(){}); else screen.orientation.unlock(); } catch(e){} }
   };
+  // Tắt/bật toàn bộ âm thanh của game khi app tạm cất game (bấm "về Thu Mua"): ghi nhận mọi AudioContext game tạo ra;
+  // lúc đang tắt tiếng thì chặn game tự bật lại âm thanh.
+  var ACs = [], muted = false, AC0 = window.AudioContext || window.webkitAudioContext;
+  if (AC0){
+    var W = function(o){
+      var c = o === undefined ? new AC0() : new AC0(o), res = c.resume.bind(c);
+      c.resume = function(){ return muted ? Promise.resolve() : res(); };
+      ACs.push(c); if (muted) try { c.suspend(); } catch(e){}
+      return c;
+    };
+    W.prototype = AC0.prototype;
+    window.AudioContext = W; if (window.webkitAudioContext) window.webkitAudioContext = W;
+  }
+  window.__mcsgMute = function(on){ muted = !!on; ACs.forEach(function(c){ try { if (on) c.suspend(); else c.resume(); } catch(e){} }); };
 })();
 </script>
 

@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-startup-image" href="splash.png">
-<title>Mua Bán Mủ Cao Su v3.3.5</title>
+<title>Mua Bán Mủ Cao Su v3.3.6</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 :root{
@@ -70,6 +70,11 @@ body.gmp-open{overflow:hidden}
 /* Màn chơi các game riêng (games/*.html) + danh sách game */
 #gf-overlay{display:none;position:fixed;inset:0;z-index:6000;background:#1d2a20}
 #gf-frame{display:block;width:100%;height:100%;border:0;background:#1d2a20}
+#game-tm{display:none;position:fixed;z-index:6900;left:0;top:calc(50% - 22px);width:34px;height:44px;padding:0 0 0 2px;align-items:center;justify-content:center;
+  border:2px solid rgba(255,255,255,.75);border-left:none;border-radius:0 22px 22px 0;background:rgba(27,67,50,.6);color:#fff;font-size:17px;line-height:1;
+  opacity:.75;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+#game-tm.phai{border-left:2px solid rgba(255,255,255,.75);border-right:none;border-radius:22px 0 0 22px;padding:0 2px 0 0}
+#game-tm:active{opacity:1}
 #game-menu .gm-box{max-height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 #game-cfm{display:none;position:fixed;inset:0;z-index:7000;background:rgba(10,30,20,.5);align-items:center;justify-content:center;padding:20px}
 #game-menu{display:none;position:fixed;inset:0;z-index:6500;background:rgba(10,30,20,.55);align-items:center;justify-content:center;padding:20px}
@@ -657,7 +662,7 @@ input[type=date]:focus{border-color:var(--gl)}
       </div>
       <div>
         <div class="logo-txt">Mua Bán Mủ Cao Su</div>
-        <div class="logo-ver">taidautieng@gmail.com · v3.3.5 <span id="license-countdown"></span></div>
+        <div class="logo-ver">taidautieng@gmail.com · v3.3.6 <span id="license-countdown"></span></div>
       </div>
     </div>
     <div class="hdr-acts sg-drop-wrap">
@@ -2133,7 +2138,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Hướng dẫn sử dụng</div>
-        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.3.5</div>
+        <div style="font-size:11px;color:var(--g600)">Mua Bán Mủ Cao Su v3.3.6</div>
       </div>
     </div>
 
@@ -2305,7 +2310,7 @@ input[type=date]:focus{border-color:var(--gl)}
       <span style="font-size:28px">🌿</span>
       <div>
         <div style="font-size:16px;font-weight:800;color:var(--gd)">Giới thiệu phần mềm</div>
-        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.3.5</div>
+        <div style="font-size:11px;color:var(--g600)" id="gt-ver-line">Mua Bán Mủ Cao Su v3.3.6</div>
       </div>
     </div>
 
@@ -7134,6 +7139,7 @@ var SB_NO_SYNC_KEYS = ['device_code','gd_token','gd_token_expiry','gd_folder_id'
   'admin_override_applied_at','pw_reset_applied_at','registry_sync_debug','last_ext_info',
   'gmp_best','gmp_best_de','gmp_best_kho','gmp_sound','gmp_cfg', // kỷ lục + cài đặt game ẩn Giọt Mủ Phiêu Lưu: riêng từng máy
   'sol_cfg','sol_save','sol_stat','sol_round','sol_roundw','sol_rtry', // Xếp Bài bản cũ trong app (đã thay bằng games/xep-bai.html) — riêng từng máy
+  'game_tm_pos', // vị trí nút tắt 🛒 về Thu Mua trong game — riêng từng máy
   'nlt_mode','nlt_draft']; // Nhập liên tiếp: chế độ đang chọn + bảng nhập dở chưa lưu — riêng từng máy
 // Danh sách khoá THỰC SỰ sẽ đồng bộ mỗi lần: hợp của SB_DATA_KEYS (đảm bảo có giá trị mặc định hợp lý
 // nếu máy chưa từng có khoá đó) VÀ toàn bộ khoá đang thực sự tồn tại trong localStorage của app (trừ
@@ -15242,13 +15248,19 @@ var GMP = (function(){
     ov.style.display = 'block'; document.body.classList.add('gmp-open');
     resize(); reset(); last = 0;
     cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
+    if (typeof GAME_TM !== 'undefined') GAME_TM.sync();
   }
   function close(){
     if (!ov) return;
     closeSet(); ov.style.display = 'none'; document.body.classList.remove('gmp-open');
     cancelAnimationFrame(raf);
+    if (typeof GAME_TM !== 'undefined') GAME_TM.sync();
   }
   function isOpen(){ return !!(ov && ov.style.display !== 'none'); }
+  // Tạm cất game (nút "về Thu Mua"): dừng lại, ẩn đi nhưng giữ nguyên ván; show() hiện lại đúng chỗ (chạm để bay tiếp)
+  function pause(){ if (st === 'play'){ paused = true; last = 0; } }
+  function hide(){ if (!ov) return; pause(); closeSet(); ov.style.display = 'none'; document.body.classList.remove('gmp-open'); cancelAnimationFrame(raf); }
+  function show(){ if (!ov) return; ov.style.display = 'block'; document.body.classList.add('gmp-open'); resize(); last = 0; cancelAnimationFrame(raf); raf = requestAnimationFrame(loop); }
   document.addEventListener('keydown', onKey);
   window.addEventListener('resize', function(){ if (isOpen()){ resize(); if (st === 'ready') reset(); } });
   document.addEventListener('visibilitychange', function(){ if (document.hidden && isOpen() && st === 'play'){ paused = true; last = 0; } });
@@ -15263,24 +15275,27 @@ var GMP = (function(){
       tm = setTimeout(function(){ n = 0; }, 500);
     });
   })();
-  return { open: open, close: close, isOpen: isOpen, openSet: openSet, closeSet: closeSet, toggleCfg: toggleCfg, setDiff: setDiff, resetBest: resetBest };
+  return { open: open, close: close, isOpen: isOpen, pause: pause, hide: hide, show: show, openSet: openSet, closeSet: closeSet, toggleCfg: toggleCfg, setDiff: setDiff, resetBest: resetBest };
 })();
 
 // ─── POPUP XÁC NHẬN TRONG GAME (thay hộp thoại confirm() của trình duyệt — vốn hiện dòng
 // "nguyentai219.github.io cho biết" trông như thông báo lạ) ───
 var GAME_CFM = {
-  _ok: null,
-  ask: function(title, msg, okLabel, onOk){
+  _ok: null, _no: null,
+  // onNo/noLabel (tuỳ chọn): hành động + nhãn của nút thứ 2 (mặc định "Huỷ"). Bấm ra ngoài hộp: cũng gọi onNo,
+  // trừ khi noOnBackdrop === false (nút thứ 2 là một lựa chọn thật, VD "Chơi mới") — khi đó bấm ra ngoài chỉ đóng hộp.
+  ask: function(title, msg, okLabel, onOk, onNo, noLabel, noOnBackdrop){
     var m = document.getElementById('game-cfm'); if (!m){ if (onOk) onOk(); return; }
     document.getElementById('game-cfm-ttl').textContent = title;
     document.getElementById('game-cfm-msg').textContent = msg || '';
     document.getElementById('game-cfm-ok').textContent = okLabel || 'Đồng ý';
-    GAME_CFM._ok = onOk || null; m.style.display = 'flex';
+    document.getElementById('game-cfm-no').textContent = noLabel || 'Huỷ';
+    GAME_CFM._ok = onOk || null; GAME_CFM._no = onNo || null; GAME_CFM._bd = noOnBackdrop !== false; m.style.display = 'flex';
   },
-  done: function(yes){
+  done: function(yes, backdrop){
     var m = document.getElementById('game-cfm'); if (m) m.style.display = 'none';
-    var f = GAME_CFM._ok; GAME_CFM._ok = null;
-    if (yes && f) f();
+    var f = GAME_CFM._ok, g = GAME_CFM._no, bd = GAME_CFM._bd; GAME_CFM._ok = GAME_CFM._no = null;
+    if (yes && f) f(); else if (!yes && g && (!backdrop || bd)) g();
   },
   isOpen: function(){ var m = document.getElementById('game-cfm'); return !!(m && m.style.display === 'flex'); }
 };
@@ -15292,7 +15307,9 @@ var GAME_CFM = {
 var GAME_FRAME = (function(){
   var GAMES = { vq: 'games/vuon-qua.html', xg: 'games/xep-gach.html', xb: 'games/xep-bai.html' };
   var NGANG = { vq: 1 }; // game chỉ chơi màn ngang (bản APK khoá ngang) → mở toàn màn hình + xoay ngang nếu máy cho phép
-  var ov, fr, ign = 0, inBack = false;
+  var ov, fr, ign = 0, inBack = false, cur = null, parked = null;
+  // Khoá "ván đang chơi dở" của từng game (xoá khi chọn Chơi mới sau lúc tạm cất game) — Vườn Quả không lưu giữa màn
+  var SAVE_KEY = { xg: 'gg_save', xb: 'xbn_save' }, GLS = _mcsStore(window.localStorage, 'mcsg_'); // kho khoá 'mcsg_' của game
   function el(){ if (!ov){ ov = document.getElementById('gf-overlay'); fr = document.getElementById('gf-frame'); } }
   function win(){ try { return fr && fr.contentWindow; } catch(e){ return null; } }
   function call(names){ var w = win(); if (!w) return; names.forEach(function(n){ try { if (typeof w[n] === 'function') w[n](); } catch(e){} }); }
@@ -15300,26 +15317,60 @@ var GAME_FRAME = (function(){
   function has(g){ return !!GAMES[g]; }
   // Đổi trang trong khung bằng location.replace → không thêm mục lịch sử (nút Quay lại không bị lệch)
   function nav(u){ try { fr.contentWindow.location.replace(u); } catch(e){ fr.src = u; } }
-  function open(g){
-    el(); if (!GAMES[g]) return;
-    nav(GAMES[g]);
+  function mute(on){ var w = win(); try { if (w && w.__mcsgMute) w.__mcsgMute(on); } catch(e){} }
+  function ngang(g){
     if (NGANG[g]){
       try {
-        var fs = ov.requestFullscreen ? ov.requestFullscreen() : null;
+        // toàn màn hình cả trang (không chỉ khung game) để nút 🛒 + hộp hỏi vẫn hiện bên trên game
+        var de = document.documentElement, fs = de.requestFullscreen ? de.requestFullscreen() : null;
         var xoay = function(){ try { screen.orientation.lock('landscape').catch(function(){}); } catch(e){} };
         if (fs && fs.then) fs.then(xoay, xoay); else xoay();
       } catch(e){}
     }
+  }
+  function boNgang(){
+    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e){}
+    try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function(){}); } catch(e){}
+  }
+  function hien(){
     ov.style.display = 'block'; document.body.classList.add('gmp-open');
     try { history.pushState({ mcsGame: 1 }, '', location.href); } catch(e){}
+    if (typeof GAME_TM !== 'undefined') GAME_TM.sync();
+  }
+  function open(g, moi){
+    el(); if (!GAMES[g]) return;
+    if (moi && SAVE_KEY[g]) try { GLS.removeItem(SAVE_KEY[g]); } catch(e){}
+    cur = g; parked = null;
+    nav(GAMES[g]);
+    ngang(g);
+    hien();
     fr.onload = function(){ try { fr.contentWindow.focus(); } catch(e){} };
   }
+  // Tạm dừng game đang mở (gọi các hàm tạm dừng/lưu giống lúc APK bị ẩn) + tắt tiếng; resume() bật tiếng lại
+  function pause(){ call(['onAppPause', 'onAndroidPause', 'pauseGame']); mute(true); }
+  function resume(){ mute(false); var w = win(); try { if (w) w._hiddenAt = 0; } catch(e){} call(['onAppResume']); }
+  // Cất game (nút "về Thu Mua"): ẩn khung nhưng giữ nguyên ván đang chơi (đang tạm dừng, tắt tiếng)
+  function park(){
+    if (!isOpen()) return;
+    pause(); parked = cur;
+    ov.style.display = 'none'; document.body.classList.remove('gmp-open'); boNgang();
+    ign++; try { history.back(); } catch(e){ ign--; }
+    if (typeof GAME_TM !== 'undefined') GAME_TM.sync();
+  }
+  function unpark(){
+    el(); if (!parked) return; cur = parked; parked = null; hien(); ngang(cur); resume();
+    // Lúc cất, khung bị ẩn (kích thước 0) → báo game đo lại màn hình và vẽ lại bàn chơi
+    [0, 120, 400].forEach(function(t){ setTimeout(function(){ var w = win(); try { if (w) w.dispatchEvent(new w.Event('resize')); } catch(e){} }, t); });
+    try { fr.contentWindow.focus(); } catch(e){}
+  }
+  // Bỏ game đang cất (chọn game khác / Chơi mới)
+  function discard(){ el(); if (!parked) return; parked = null; nav('about:blank'); }
   function close(){
     if (!isOpen()) return;
     call(['onAppPause', 'onAndroidPause']); // để game lưu ván đang chơi trước khi đóng
-    ov.style.display = 'none'; nav('about:blank'); document.body.classList.remove('gmp-open');
-    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e){}
-    try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function(){}); } catch(e){}
+    ov.style.display = 'none'; nav('about:blank'); document.body.classList.remove('gmp-open'); boNgang();
+    cur = null; parked = null;
+    if (typeof GAME_TM !== 'undefined') GAME_TM.sync();
     if (!inBack){ ign++; try { history.back(); } catch(e){ ign--; } }
     if (typeof resetIdleTimer === 'function') resetIdleTimer();
   }
@@ -15339,7 +15390,76 @@ var GAME_FRAME = (function(){
     if (!isOpen()) return;
     if (document.hidden) call(['onAppPause', 'onAndroidPause', 'pauseGame']); else call(['onAppResume']);
   });
-  return { open: open, close: close, isOpen: isOpen, has: has };
+  return { open: open, close: close, isOpen: isOpen, has: has, cur: function(){ return isOpen() ? cur : null; }, parked: function(){ return parked; },
+           pause: pause, resume: resume, park: park, unpark: unpark, discard: discard };
+})();
+
+// ─── NÚT TẮT "VỀ THU MUA" TRONG MỌI GAME ───
+// Nút 🛒 nhỏ dính mép màn hình (mặc định mép trái, giữa màn), hiện cả ở trang chủ game lẫn lúc đang chơi. Kéo được sang chỗ
+// khác (thả ra tự dính vào mép trái/phải gần nhất, nhớ vị trí trên máy) để không vướng chỗ bấm của game. Chạm → game tạm
+// dừng + hỏi lại; Đồng ý → cất game (giữ nguyên ván, tắt tiếng) và về ngay trang Thu Mua. Lần sau mở lại game đó → hỏi
+// "Chơi tiếp" (hiện lại đúng ván đang tạm dừng) hay "Chơi mới". Lưu ý: tải lại app thì ván đang cất bị bỏ (Xếp Bài, Xếp Gạch
+// vẫn tự lưu ván dở và hỏi chơi tiếp ở trang chủ game).
+var GAME_TM = (function(){
+  var POS_KEY = 'game_tm_pos', btn = null, gmpParked = false, drag = null;
+  function el(){
+    if (btn) return btn;
+    btn = document.getElementById('game-tm'); if (!btn) return null;
+    try { var p = JSON.parse(MCS_LS.getItem(POS_KEY) || 'null'); if (p) dat(p.r, p.y); } catch(e){}
+    btn.addEventListener('pointerdown', function(e){ e.preventDefault(); e.stopPropagation(); drag = { x: e.clientX, y: e.clientY, moved: false }; try { btn.setPointerCapture(e.pointerId); } catch(err){} });
+    btn.addEventListener('pointermove', function(e){
+      if (!drag) return;
+      if (!drag.moved && Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y) < 10) return;
+      drag.moved = true;
+      btn.style.left = Math.max(0, Math.min(innerWidth - btn.offsetWidth, e.clientX - btn.offsetWidth / 2)) + 'px'; btn.style.right = 'auto';
+      btn.style.top = Math.max(0, Math.min(innerHeight - btn.offsetHeight, e.clientY - btn.offsetHeight / 2)) + 'px';
+    });
+    btn.addEventListener('pointerup', function(e){
+      if (!drag) return; var d = drag; drag = null;
+      if (!d.moved){ cham(); return; }
+      var r = e.clientX > innerWidth / 2 ? 1 : 0, y = Math.max(0.05, Math.min(0.95, (e.clientY) / innerHeight));
+      dat(r, y); try { MCS_LS.setItem(POS_KEY, JSON.stringify({ r: r, y: y })); } catch(err){}
+    });
+    btn.addEventListener('pointercancel', function(){ drag = null; });
+    btn.addEventListener('click', function(e){ e.stopPropagation(); });
+    return btn;
+  }
+  // r = 1: dính mép phải, 0: mép trái; y = vị trí dọc (0–1 chiều cao màn hình)
+  function dat(r, y){
+    btn.classList.toggle('phai', !!r);
+    btn.style.left = r ? 'auto' : '0'; btn.style.right = r ? '0' : 'auto';
+    btn.style.top = 'calc(' + (y * 100) + '% - 22px)';
+  }
+  function dangChoi(){ return GAME_FRAME.isOpen() ? GAME_FRAME.cur() : (typeof GMP !== 'undefined' && GMP.isOpen() ? 'gmp' : null); }
+  function sync(){ var b = el(); if (b) b.style.display = dangChoi() ? 'flex' : 'none'; }
+  function cham(){
+    var g = dangChoi(); if (!g) return;
+    if (g === 'gmp') GMP.pause(); else GAME_FRAME.pause();
+    GAME_CFM.ask('🛒 Về trang Thu Mua?', 'Game sẽ tạm dừng. Lần sau mở lại game này, bạn chọn chơi tiếp ván đang dừng hoặc chơi ván mới.', '🛒 Về Thu Mua',
+      function(){ veThuMua(g); },
+      function(){ if (g !== 'gmp') GAME_FRAME.resume(); });
+  }
+  function veThuMua(g){
+    if (g === 'gmp'){ GAME_FRAME.discard(); GMP.hide(); gmpParked = true; } else { gmpParked = false; GAME_FRAME.park(); }
+    sync();
+    if (typeof GAME_MENU !== 'undefined') GAME_MENU.close();
+    try { switchTab('mua'); } catch(e){}
+    try { window.scrollTo({ top: 0, behavior: 'instant' }); } catch(e){}
+    if (typeof resetIdleTimer === 'function') resetIdleTimer();
+    toast('🛒 Đã về Thu Mua — game đang tạm dừng');
+  }
+  function parked(){ return gmpParked ? 'gmp' : GAME_FRAME.parked(); }
+  // Mở game g từ danh sách game: g đang được cất → hỏi chơi tiếp / chơi mới; game khác đang cất → bỏ game đó
+  function moGame(g, moThuong){
+    var p = parked();
+    if (p && p !== g){ if (p === 'gmp') { gmpParked = false; GMP.close(); } else GAME_FRAME.discard(); p = null; }
+    if (!p){ moThuong(); sync(); return; }
+    GAME_CFM.ask('🎮 Ván đang tạm dừng', 'Bạn muốn chơi tiếp ván đang tạm dừng hay chơi ván mới?', '▶️ Chơi tiếp',
+      function(){ if (g === 'gmp'){ gmpParked = false; GMP.show(); } else GAME_FRAME.unpark(); sync(); },
+      function(){ if (g === 'gmp'){ gmpParked = false; GMP.close(); GMP.open(); } else { GAME_FRAME.discard(); GAME_FRAME.open(g, true); } sync(); },
+      '🔄 Chơi mới', false);
+  }
+  return { sync: sync, moGame: moGame, parked: parked };
 })();
 
 // ─── DANH SÁCH GAME (nhấn nhanh 2 lần vào icon xoay) ───
@@ -15355,7 +15475,7 @@ var GAME_MENU = {
       try { openGiaHan(); } catch(e){}
       return;
     }
-    if (GAME_FRAME.has(g)) GAME_FRAME.open(g); else GMP.open();
+    GAME_TM.moGame(g, function(){ if (GAME_FRAME.has(g)) GAME_FRAME.open(g); else GMP.open(); });
   },
   isOpen: function(){ var m = document.getElementById('game-menu'); return !!(m && m.style.display === 'flex'); }
 };
@@ -15547,18 +15667,20 @@ if ('serviceWorker' in navigator) {
   <button class="gmp-btn" style="right:12px" onclick="GMP.close()" title="Thoát game">✕</button>
 </div>
 <!-- POPUP XÁC NHẬN TRONG GAME -->
-<div id="game-cfm" onclick="if(event.target===this)GAME_CFM.done(false)">
+<div id="game-cfm" onclick="if(event.target===this)GAME_CFM.done(false,true)">
   <div class="gmp-set-box" style="text-align:center">
     <div class="gmp-set-ttl" id="game-cfm-ttl"></div>
     <div class="sol-win-info" id="game-cfm-msg"></div>
     <div style="display:flex;gap:8px;margin-top:10px">
-      <button class="gmp-set-del" style="margin-top:0;flex:1;color:#2d6a4f;border-color:#b7d3c2;background:#fff;padding:11px" onclick="GAME_CFM.done(false)">Huỷ</button>
+      <button class="gmp-set-del" style="margin-top:0;flex:1;color:#2d6a4f;border-color:#b7d3c2;background:#fff;padding:11px" id="game-cfm-no" onclick="GAME_CFM.done(false)">Huỷ</button>
       <button class="gmp-set-ok" style="margin-top:0;flex:1.4" id="game-cfm-ok" onclick="GAME_CFM.done(true)">Đồng ý</button>
     </div>
   </div>
 </div>
 <!-- MÀN CHƠI GAME RIÊNG (Vườn Quả Phòng Thủ, Xếp Gạch, Xếp Bài — file games/*.html) -->
 <div id="gf-overlay"><iframe id="gf-frame" title="Trò chơi" allow="autoplay; fullscreen"></iframe></div>
+<!-- NÚT TẮT VỀ TRANG THU MUA (hiện trong mọi game; kéo được) -->
+<button id="game-tm" type="button" title="Về trang Thu Mua (kéo để đổi chỗ)" aria-label="Về trang Thu Mua">🛒</button>
 <!-- DANH SÁCH GAME ẨN (nhấn nhanh 2 lần vào icon xoay) -->
 <div id="game-menu" onclick="if(event.target===this)GAME_MENU.close()">
   <div class="gm-box">
