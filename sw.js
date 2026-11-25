@@ -1,5 +1,5 @@
-const CACHE = 'mu-cao-su-v3.3.3';
-const FILES = ['/Mucaosu/','/Mucaosu/index.html','/Mucaosu/manifest.json','/Mucaosu/icon-192.png','/Mucaosu/icon-512.png','/Mucaosu/apple-touch-icon.png','/Mucaosu/logo.png','/Mucaosu/splash.png'];
+const CACHE = 'mu-cao-su-v3.3.4';
+const FILES = ['/Mucaosu/','/Mucaosu/index.html','/Mucaosu/manifest.json','/Mucaosu/icon-192.png','/Mucaosu/icon-512.png','/Mucaosu/apple-touch-icon.png','/Mucaosu/logo.png','/Mucaosu/logo-game.png','/Mucaosu/splash.png'];
 
 self.addEventListener('install', e => {
   // Tải các file với cache:'reload' (bỏ qua HẲN bộ nhớ đệm HTTP của trình duyệt). GitHub Pages trả header
