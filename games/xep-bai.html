@@ -876,7 +876,9 @@ function reward(ev, to){
 function deal(){
   if (won || busy()) return;
   if (!stock.length){ toast('Đã chia hết bài trong xấp'); SND.bad(); return; }
-  if (gdiff !== 0) for (var i = 0; i < 10; i++) if (!cols[i].length){ toast('Phải lấp đầy các cột trống trước khi chia bài'); SND.bad(); flashSlot(i); vib(30); return; }
+  // chia bắt buộc: trên bàn còn ít hơn 10 lá (không thể lấp đủ mọi cột) mà xấp vẫn còn bài → cho chia dù có cột trống
+  var onTable = 0; cols.forEach(function(c){ onTable += c.length; });
+  if (gdiff !== 0 && onTable >= 10) for (var i = 0; i < 10; i++) if (!cols[i].length){ toast('Phải lấp đầy các cột trống trước khi chia bài'); SND.bad(); flashSlot(i); vib(30); return; }
   pushHist();
   var dealt = [];
   for (var c = 0; c < 10; c++){ var card = stock.pop(); card.up = true; cols[c].push(card); dealt.push(card); }
@@ -1510,7 +1512,7 @@ function applyOrient(say){
   if (say) toast(cfg.land ? '🔄 Đã chuyển màn hình ngang' : '🔄 Đã trở lại xoay tự do');
 }
 // số phiên bản đang cài: lấy từ Android (luôn khớp file APK), dự phòng hằng số
-var GAME_VER = '1.4.1';
+var GAME_VER = '1.4.2';
 function gameVer(){ try { if (window.Android && Android.version) return Android.version(); } catch(e){} return GAME_VER; }
 function renderSet(){
   var dv = cfg.diff == null ? 1 : cfg.diff;
